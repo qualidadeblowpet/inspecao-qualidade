@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teste de Conexão — Inspeção Qualidade</title>
+<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+<style>
+  body { font-family: system-ui, sans-serif; background: #17191c; color: #edeef0; padding: 24px; max-width: 640px; margin: 0 auto; }
+  h1 { font-size: 20px; }
+  button { background: #f2a93b; color: #1a1200; border: none; padding: 12px 18px; border-radius: 8px; font-weight: 600; font-size: 15px; cursor: pointer; margin-right: 8px; margin-bottom: 8px; }
+  button:disabled { opacity: 0.5; }
+  pre { background: #202327; padding: 14px; border-radius: 8px; overflow-x: auto; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+  .ok { color: #3fb68b; }
+  .err { color: #e5484d; }
+  .step { margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid #34383e; }
+</style>
+</head>
+<body>
+  <h1>🔧 Teste de Conexão — App Inspeção Qualidade</h1>
+  <p>Página só para validar login e acesso à planilha antes de montar o app final. Pode apagar depois.</p>
+
+  <div class="step">
+    <h3>1. Login</h3>
+    <button id="btnLogin">Entrar com Microsoft</button>
+    <button id="btnLogout" disabled>Sair</button>
+    <div id="statusLogin"></div>
+  </div>
+
+  <div class="step">
+    <h3>2. Localizar o arquivo Excel</h3>
+    <button id="btnFindFile" disabled>Localizar planilha</button>
+    <pre id="resultFile">—</pre>
+  </div>
+
+  <div class="step">
+    <h3>3. Ler dados da tabela</h3>
+    <button id="btnReadInjecao" disabled>Ler TabelaInjecao</button>
+    <button id="btnReadSopro" disabled>Ler TabelaSopro</button>
+    <pre id="resultRead">—</pre>
+  </div>
+
+  <div class="step">
+    <h3>4. Testar gravação (linha de teste)</h3>
+    <button id="btnWriteTest" disabled>Gravar linha de teste em TabelaInjecao</button>
+    <pre id="resultWrite">—</pre>
+  </div>
+
+<script>
+/* ====== CONFIG — já preenchido com os dados do seu app ====== */
+const msalConfig = {
+  auth: {
+    clientId: "f518fc60-a544-45d1-89a9-97e9f6b523ad",
+    authority: "https://login.microsoftonline.com/b38f2dcb-4251-4b93-977a-f469eb315033",
+    redirectUri: "https://qualidadeblowpet.github.io/inspecao-qualidade/"
+  }
+};
+
+// Link de compartilhamento da planilha (o que você me mandou)
+const LINK_PLANILHA = "https://blowpet2-my.sharepoint.com/:x:/g/personal/cleber_rodrigues_blowpet_com_br/IQAWjpUUN_SbToVo1pGmdJcyAQ45D1l_a7UryTknKp9Aq0c?e=pDv6fS";
+
+const scopes = ["Files.ReadWrite", "Sites.ReadWrite.All", "User.Read"];
+
+const msalInstance = new msal.PublicClientApplication(msalConfig);
+let contaAtual = null;
+let driveId = null;
+let itemId = null;
+
+function log(elId, texto, isErr) {
+  const el = document.getElementById(elId);
+  el.textContent = texto;
+  el.className = isErr ? "err" : "ok";
+}
+
+async function getToken() {
+  const req = { scopes, account: contaAtual };
+  try {
+    const res = await msalInstance.acquireTokenSilent(req);
+    return res.accessToken;
+  } catch (e) {
+    const res = await msalInstance.acquireTokenPopup(req);
+    return res.accessToken;
+  }
+}
+
+document.getElementById('btnLogin').onclick = async function() {
+  try {
+    const res = await msalInstance.loginPopup({ scopes });
+    contaAtual = res.account;
+    document.getElementById('statusLogin').innerHTML = '<span class="ok">Logado como: ' + contaAtual.username + '</span>';
+    document.getElementById('btnLogin').disabled = true;
+    document.getElementById('btnLogout').disabled = false;
+    document.getElementById('btnFindFile').disabled = false;
+  } catch (e) {
+    document.getElementById('statusLogin').innerHTML = '<span class="err">Erro no login: ' + e.message + '</span>';
+  }
+};
+
+document.getElementById('btnLogout').onclick = function() {
+  msalInstance.logoutPopup();
+};
+
+document.getElementById('btnFindFile').onclick = async function() {
+  log('resultFile', 'Buscando...');
+  try {
+    const token = await getToken();
+    // Codifica o link de compartilhamento no formato que o Graph API exige
+    const base64 = btoa(LINK_PLANILHA).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+    const sharingId = 'u!' + base64;
+
+    const resp = await fetch('https://graph.microsoft.com/v1.0/shares/' + sharingId + '/driveItem', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    const json = await resp.json();
+    if (json.id) {
+      itemId = json.id;
+      driveId = json.parentReference.driveId;
+      log('resultFile', 'Arquivo encontrado ✓\nNome: ' + json.name + '\ndriveId: ' + driveId + '\nitemId: ' + itemId);
+      document.getElementById('btnReadInjecao').disabled = false;
+      document.getElementById('btnReadSopro').disabled = false;
+      document.getElementById('btnWriteTest').disabled = false;
+    } else {
+      log('resultFile', 'Não encontrado:\n' + JSON.stringify(json, null, 2), true);
+    }
+  } catch (e) {
+    log('resultFile', 'Erro: ' + e.message, true);
+  }
+};
+
+async function lerTabela(nomeTabela) {
+  log('resultRead', 'Lendo ' + nomeTabela + '...');
+  try {
+    const token = await getToken();
+    const url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId +
+                '/workbook/tables/' + nomeTabela + '/rows';
+    const resp = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+    const json = await resp.json();
+    if (json.value) {
+      log('resultRead', nomeTabela + ': ' + json.value.length + ' linha(s) encontradas\n\n' + JSON.stringify(json.value.slice(0, 3), null, 2));
+    } else {
+      log('resultRead', 'Erro:\n' + JSON.stringify(json, null, 2), true);
+    }
+  } catch (e) {
+    log('resultRead', 'Erro: ' + e.message, true);
+  }
+}
+
+document.getElementById('btnReadInjecao').onclick = function() { lerTabela('TabelaInjecao'); };
+document.getElementById('btnReadSopro').onclick = function() { lerTabela('TabelaSopro'); };
+
+document.getElementById('btnWriteTest').onclick = async function() {
+  log('resultWrite', 'Gravando...');
+  try {
+    const token = await getToken();
+    const url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId +
+                '/workbook/tables/TabelaInjecao/rows/add';
+    const linhaTeste = [[
+      'TESTE-' + Date.now(), '2026-08-19', '08:00', '08:30', 'HUSK 1', 'Juliana',
+      'Pablo', 'Cristal', '42', 'Indorama Max', 'REBARBA NA ROSCA', '5;22',
+      'LEVE', 'SIM', 'CORRIGIDO', 'Linha de teste - pode apagar', '', new Date().toISOString()
+    ]];
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: linhaTeste })
+    });
+    const json = await resp.json();
+    if (resp.ok) {
+      log('resultWrite', 'Linha gravada com sucesso ✓ Confira na planilha (linha com id_sessao começando em TESTE-)');
+    } else {
+      log('resultWrite', 'Erro:\n' + JSON.stringify(json, null, 2), true);
+    }
+  } catch (e) {
+    log('resultWrite', 'Erro: ' + e.message, true);
+  }
+};
+
+// Trata retorno do redirect (necessário mesmo usando popup, por segurança do MSAL)
+msalInstance.handleRedirectPromise().catch(function(e){ console.error(e); });
+</script>
+</body>
+</html>
