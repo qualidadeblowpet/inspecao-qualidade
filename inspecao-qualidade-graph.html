@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Inspeção de Qualidade</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
+<style>
+  /* ============================================================
+     CONFIGURAÇÃO — cole aqui a URL do seu Apps Script Web App
+     (veja instruções no arquivo Code.gs / INSTRUCOES.md)
+     ============================================================ */
+  :root {
+    --bg: #17191c;
+    --surface: #202327;
+    --surface-2: #282c31;
+    --border: #34383e;
+    --text: #edeef0;
+    --text-dim: #9aa0a6;
+    --accent: #f2a93b;
+    --accent-dim: #7a5a24;
+    --danger: #e5484d;
+    --warn: #f2a93b;
+    --ok: #3fb68b;
+    --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  #app { min-height: 100vh; padding-bottom: 40px; }
+
+  /* ---------- Header ---------- */
+  .topbar {
+    background: linear-gradient(180deg, #1d2024 0%, #17191c 100%);
+    border-bottom: 2px solid var(--accent);
+    padding: 14px 18px 10px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+  .topbar-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+  .brand .mark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: 0.5px;
+    color: var(--accent);
+  }
+  .brand .sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  .status-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--text-dim);
+    display: inline-block;
+    margin-right: 6px;
+  }
+  .status-dot.online { background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+  .status-dot.offline { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+  .conn-label { font-size: 11px; color: var(--text-dim); display: flex; align-items: center; }
+
+  .process-toggle {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px;
+    margin-top: 12px;
+    gap: 3px;
+  }
+  .process-toggle button {
+    flex: 1;
+    padding: 9px 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-dim);
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .process-toggle button.active {
+    background: var(--accent);
+    color: #1a1200;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+  .tabs button {
+    flex: 1;
+    padding: 10px 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 13px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  .tabs button.active {
+    background: var(--surface-2);
+    color: var(--text);
+    border-color: var(--accent-dim);
+  }
+
+  /* ---------- Layout ---------- */
+  .content { padding: 16px; max-width: 720px; margin: 0 auto; }
+  .hidden { display: none !important; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .card h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin: 0 0 12px;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+
+  .field { margin-bottom: 12px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .field input, .field select, .field textarea {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 11px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: var(--font-body);
+  }
+  .field textarea { resize: vertical; min-height: 50px; }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+  }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 11px 16px;
+    border-radius: 8px;
+    border: none;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+  .btn-accent { background: var(--accent); color: #1a1200; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-danger-outline { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+  .btn-block { width: 100%; }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Deviation entry card */
+  .desvio-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .desvio-card .desvio-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .remove-desvio {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px;
+  }
+  .remove-desvio:hover { color: var(--danger); }
+
+  .empty-state {
+    text-align: center;
+    padding: 30px 10px;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  /* Chips for criticidade */
+  .chip {
+    display: inline-block;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .chip.leve { background: rgba(63,182,139,0.15); color: var(--ok); }
+  .chip.medio { background: rgba(242,169,59,0.15); color: var(--warn); }
+  .chip.grave { background: rgba(229,72,77,0.15); color: var(--danger); }
+
+  /* Dashboard */
+  .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+  .kpi {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 10px;
+    text-align: center;
+  }
+  .kpi .num {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .kpi .label {
+    font-size: 10px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+  }
+  .chart-wrap { position: relative; height: 260px; }
+  .filters-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .filters-row select {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--surface-2);
+    border: 1px solid var(--accent);
+    color: var(--text);
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.error { border-color: var(--danger); }
+
+  .config-note {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .config-note code {
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  ::placeholder { color: #5f646b; }
+
+  /* Tela de login */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+  }
+  #loginScreen .mark {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 32px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  #loginScreen .sub {
+    font-size: 13px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 30px;
+  }
+  #loginMsg { margin-top: 16px; font-size: 13px; color: var(--text-dim); max-width: 320px; }
+  #loginMsg.err { color: var(--danger); }
+  .user-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .user-pill button {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== TELA DE LOGIN ===================== -->
+<div id="loginScreen">
+  <div class="mark">INSPEÇÃO</div>
+  <div class="sub">Controle de Qualidade</div>
+  <button class="btn btn-accent" id="btnLoginMicrosoft" style="padding:13px 24px;font-size:15px;">Entrar com Microsoft</button>
+  <div id="loginMsg"></div>
+</div>
+
+<div id="app" class="hidden">
+
+  <div class="topbar">
+    <div class="topbar-row">
+      <div class="brand">
+        <span class="mark">INSPEÇÃO</span>
+        <span class="sub">Controle de Qualidade</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="conn-label"><span id="statusDot" class="status-dot"></span><span id="statusText">verificando…</span></div>
+        <div class="user-pill"><span id="userEmail"></span><button onclick="logout()">Sair</button></div>
+      </div>
+    </div>
+
+    <div class="process-toggle">
+      <button id="btnProcInjecao" class="active" onclick="setProcesso('injecao')">INJEÇÃO</button>
+      <button id="btnProcSopro" onclick="setProcesso('sopro')">SOPRO</button>
+    </div>
+
+    <div class="tabs">
+      <button id="tabNova" class="active" onclick="setTab('nova')">Nova Inspeção</button>
+      <button id="tabDash" onclick="setTab('dashboard')">Dashboard</button>
+      <button id="tabConfig" onclick="setTab('config')">⚙</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ===================== TELA: NOVA INSPEÇÃO ===================== -->
+    <div id="viewNova">
+
+      <div class="card">
+        <h3>Dados da sessão</h3>
+        <div class="grid-2">
+          <div class="field">
+            <label>Data</label>
+            <input type="date" id="sessaoData">
+          </div>
+          <div class="field">
+            <label>Equipamento</label>
+            <select id="sessaoEquipamento"></select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Hora início</label>
+            <input type="time" id="sessaoHoraInicio">
+          </div>
+          <div class="field">
+            <label>Hora conclusão</label>
+            <input type="time" id="sessaoHoraFim">
+          </div>
+        </div>
+        <div class="field">
+          <label>Responsável pela inspeção</label>
+          <select id="sessaoResponsavel"></select>
+        </div>
+
+        <!-- Campos específicos de Injeção -->
+        <div id="camposInjecao">
+          <div class="field">
+            <label>Operador principal</label>
+            <input type="text" id="sessaoOperador" placeholder="Nome do operador">
+          </div>
+          <div class="grid-3">
+            <div class="field">
+              <label>Cor da preforma</label>
+              <input type="text" id="sessaoCor" placeholder="Ex: Cristal">
+            </div>
+            <div class="field">
+              <label>Gramatura</label>
+              <input type="text" id="sessaoGramatura" placeholder="Ex: 42">
+            </div>
+            <div class="field">
+              <label>Resina</label>
+              <input type="text" id="sessaoResina" placeholder="Ex: Indorama Max">
+            </div>
+          </div>
+        </div>
+
+        <!-- Campos específicos de Sopro -->
+        <div id="camposSopro" class="hidden">
+          <div class="grid-3">
+            <div class="field">
+              <label>Cor</label>
+              <input type="text" id="soproCor" placeholder="Ex: Cristal">
+            </div>
+            <div class="field">
+              <label>Volume (mL)</label>
+              <input type="text" id="soproMl" placeholder="Ex: 510 mL">
+            </div>
+            <div class="field">
+              <label>Tipo de frasco</label>
+              <input type="text" id="soproFrasco" placeholder="Ex: Água Himalaia">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Desvios encontrados</h3>
+        <div id="listaDesvios"></div>
+        <div id="semDesvios" class="empty-state">Nenhum desvio adicionado ainda.</div>
+        <button class="btn btn-outline btn-block" onclick="adicionarDesvio()">+ Adicionar desvio</button>
+      </div>
+
+      <button class="btn btn-accent btn-block" id="btnSalvarSessao" onclick="salvarSessao()">
+        Salvar sessão na planilha
+      </button>
+    </div>
+
+    <!-- ===================== TELA: DASHBOARD ===================== -->
+    <div id="viewDashboard" class="hidden">
+      <div class="filters-row">
+        <select id="filtroPeriodo" onchange="atualizarDashboard()">
+          <option value="7">Últimos 7 dias</option>
+          <option value="30" selected>Últimos 30 dias</option>
+          <option value="90">Últimos 90 dias</option>
+          <option value="0">Todo o período</option>
+        </select>
+        <button class="btn btn-outline" onclick="carregarDados(true)">↻ Atualizar</button>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi"><div class="num" id="kpiTotal">–</div><div class="label">Desvios</div></div>
+        <div class="kpi"><div class="num" id="kpiPendentes">–</div><div class="label">Pendentes</div></div>
+        <div class="kpi"><div class="num" id="kpiGraves">–</div><div class="label">Graves</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Defeitos mais frequentes</h3>
+        <div class="chart-wrap"><canvas id="chartDefeitos"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h3>Criticidade</h3>
+        <div class="chart-wrap"><canvas id="chartCriticidade"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h3>Corrigido vs. Pendente</h3>
+        <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h3>Desvios por responsável</h3>
+        <div class="chart-wrap"><canvas id="chartResponsavel"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h3>Desvios por equipamento</h3>
+        <div class="chart-wrap"><canvas id="chartEquipamento"></canvas></div>
+      </div>
+
+      <div class="card">
+        <h3>Evolução diária</h3>
+        <div class="chart-wrap"><canvas id="chartEvolucao"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ===================== TELA: CONFIGURAÇÃO ===================== -->
+    <div id="viewConfig" class="hidden">
+      <div class="card">
+        <h3>Conexão com a planilha</h3>
+        <div class="field">
+          <label>Link de compartilhamento da planilha (SharePoint/OneDrive)</label>
+          <input type="text" id="configLink" placeholder="https://empresa-my.sharepoint.com/:x:/g/personal/...">
+        </div>
+        <button class="btn btn-accent btn-block" onclick="salvarConfigLink()">Salvar e testar conexão</button>
+        <p class="config-note" style="margin-top:12px;">
+          A conexão usa seu próprio login Microsoft — não precisa de senha
+          nem chave de API separada. Cada pessoa que abrir este app precisa
+          ter permissão de edição nessa planilha (compartilhada normalmente
+          pelo SharePoint/OneDrive).<br><br>
+          Obs: como este app não usa armazenamento do navegador, esse link
+          precisa ser colado novamente se você abrir o arquivo num
+          dispositivo novo. Se preferir que já venha fixo, abra este arquivo
+          .html num editor de texto e cole o link na constante
+          <code>LINK_PLANILHA_PADRAO</code> no topo do bloco de script.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Listas de apoio (menus suspensos)</h3>
+        <div class="field">
+          <label>Responsáveis (um por linha)</label>
+          <textarea id="listaResponsaveis" rows="4"></textarea>
+        </div>
+        <div class="field">
+          <label>Equipamentos — Injeção (um por linha)</label>
+          <textarea id="listaEquipInjecao" rows="4"></textarea>
+        </div>
+        <div class="field">
+          <label>Equipamentos — Sopro (um por linha)</label>
+          <textarea id="listaEquipSopro" rows="4"></textarea>
+        </div>
+        <div class="field">
+          <label>Defeitos — Injeção (um por linha)</label>
+          <textarea id="listaDefeitosInjecao" rows="6"></textarea>
+        </div>
+        <div class="field">
+          <label>Defeitos — Sopro (um por linha)</label>
+          <textarea id="listaDefeitosSopro" rows="6"></textarea>
+        </div>
+        <button class="btn btn-accent btn-block" onclick="salvarListas()">Salvar listas</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG — dados do app registrado no Azure e da planilha.
+   Se quiser que o link da planilha já venha fixo (sem precisar
+   colar toda vez na aba ⚙), cole-o em LINK_PLANILHA_PADRAO.
+   ============================================================ */
+const msalConfig = {
+  auth: {
+    clientId: "f518fc60-a544-45d1-89a9-97e9f6b523ad",
+    authority: "https://login.microsoftonline.com/b38f2dcb-4251-4b93-977a-f469eb315033",
+    redirectUri: "https://qualidadeblowpet.github.io/inspecao-qualidade/"
+  }
+};
+const graphScopes = ["Files.ReadWrite", "User.Read"];
+const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/cleber_rodrigues_blowpet_com_br/IQAWjpUUN_SbToVo1pGmdJcyAQ45D1l_a7UryTknKp9Aq0c?e=pDv6fS";
+
+/* Cabeçalhos das tabelas — precisam bater EXATAMENTE com a ordem das
+   colunas no Excel, pois o Graph API grava/lê por posição, não por nome. */
+const CABECALHO_INJECAO = [
+  'id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel',
+  'operador_principal','cor','gramatura','resina','defeito','cavidade',
+  'criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em'
+];
+const CABECALHO_SOPRO = [
+  'id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel',
+  'cor','ml','tipo_frasco','defeito','criticidade','status_correcao',
+  'observacao','foto_url','criado_em'
+];
+
+/* ---------------- Estado em memória ---------------- */
+let LINK_PLANILHA = LINK_PLANILHA_PADRAO;
+let msalInstance = null;
+let msalPronto = null;
+let contaAtual = null;
+let driveId = null;
+let itemId = null;
+let processoAtual = 'injecao';
+let tabAtual = 'nova';
+let desvios = [];
+let contadorDesvio = 0;
+let dadosCache = { injecao: [], sopro: [] };
+let charts = {};
+
+let listas = {
+  responsaveis: ['Juliana', 'Kenedy', 'Pablo', 'Tiago', 'Lucas', 'Kenneth', 'Arthur'],
+  equipInjecao: ['HUSK 1', 'HUSK 2', 'KM2', 'KM3'],
+  equipSopro: ['UNIPET 1', 'MULTIPET 1', 'SBO1', 'SBO2A', 'SBO2B'],
+  defeitosInjecao: ['REBARBA NA ROSCA', 'RISCO NO CORPO', 'PONTO DE INJEÇÃO ESCORRIDO', 'PELE DE LARANJA', 'MARCAS NO CORPO', 'GATE ALTO', 'FUNDO BRANCO', 'BOLHA'],
+  defeitosSopro: ['ANEL TORTO', 'ALTURA DO FRASCO FORA DO ESPECIFICADO', 'COSTURA LATERAL QUADRADA', 'DEGRAU NA COSTURA DO FUNDO']
+};
+
+const criticidades = ['LEVE', 'MÉDIO', 'GRAVE'];
+const statusCorrecao = ['CORRIGIDO', 'FICOU PENDENTE'];
+
+/* ---------------- Navegação ---------------- */
+function setProcesso(p) {
+  processoAtual = p;
+  document.getElementById('btnProcInjecao').classList.toggle('active', p === 'injecao');
+  document.getElementById('btnProcSopro').classList.toggle('active', p === 'sopro');
+  document.getElementById('camposInjecao').classList.toggle('hidden', p !== 'injecao');
+  document.getElementById('camposSopro').classList.toggle('hidden', p !== 'sopro');
+  desvios = [];
+  contadorDesvio = 0;
+  renderDesvios();
+  if (tabAtual === 'dashboard') atualizarDashboard();
+}
+
+function setTab(t) {
+  tabAtual = t;
+  document.getElementById('tabNova').classList.toggle('active', t === 'nova');
+  document.getElementById('tabDash').classList.toggle('active', t === 'dashboard');
+  document.getElementById('tabConfig').classList.toggle('active', t === 'config');
+  document.getElementById('viewNova').classList.toggle('hidden', t !== 'nova');
+  document.getElementById('viewDashboard').classList.toggle('hidden', t !== 'dashboard');
+  document.getElementById('viewConfig').classList.toggle('hidden', t !== 'config');
+  if (t === 'dashboard') carregarDados();
+}
+
+/* ---------------- Listas suspensas ---------------- */
+function preencherSelect(id, opcoes) {
+  const el = document.getElementById(id);
+  el.innerHTML = opcoes.map(function(o){ return '<option value="'+o+'">'+o+'</option>'; }).join('');
+}
+
+function renderListasNaTela() {
+  document.getElementById('listaResponsaveis').value = listas.responsaveis.join('\n');
+  document.getElementById('listaEquipInjecao').value = listas.equipInjecao.join('\n');
+  document.getElementById('listaEquipSopro').value = listas.equipSopro.join('\n');
+  document.getElementById('listaDefeitosInjecao').value = listas.defeitosInjecao.join('\n');
+  document.getElementById('listaDefeitosSopro').value = listas.defeitosSopro.join('\n');
+  preencherSelect('sessaoResponsavel', listas.responsaveis);
+  preencherSelect('sessaoEquipamento', processoAtual === 'sopro' ? listas.equipSopro : listas.equipInjecao);
+}
+
+function salvarListas() {
+  listas.responsaveis = document.getElementById('listaResponsaveis').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+  listas.equipInjecao = document.getElementById('listaEquipInjecao').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+  listas.equipSopro = document.getElementById('listaEquipSopro').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+  listas.defeitosInjecao = document.getElementById('listaDefeitosInjecao').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+  listas.defeitosSopro = document.getElementById('listaDefeitosSopro').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+  renderListasNaTela();
+  mostrarToast('Listas atualizadas.');
+}
+
+/* ---------------- Desvios (form dinâmico) ---------------- */
+function adicionarDesvio() {
+  contadorDesvio++;
+  desvios.push({
+    id: contadorDesvio,
+    defeito: '',
+    cavidade: '',
+    criticidade: 'LEVE',
+    operadorCiente: 'SIM',
+    status: 'FICOU PENDENTE',
+    observacao: ''
+  });
+  renderDesvios();
+}
+
+function removerDesvio(id) {
+  desvios = desvios.filter(function(d){ return d.id !== id; });
+  renderDesvios();
+}
+
+function atualizarDesvio(id, campo, valor) {
+  const d = desvios.find(function(d){ return d.id === id; });
+  if (d) d[campo] = valor;
+}
+
+function renderDesvios() {
+  const container = document.getElementById('listaDesvios');
+  const vazio = document.getElementById('semDesvios');
+  vazio.classList.toggle('hidden', desvios.length > 0);
+
+  const defeitosLista = processoAtual === 'sopro' ? listas.defeitosSopro : listas.defeitosInjecao;
+  const campoCavidadeLabel = processoAtual === 'sopro' ? 'Frasco(s) afetado(s)' : 'Cavidade(s)';
+
+  container.innerHTML = desvios.map(function(d, idx) {
+    const opcoesDefeito = defeitosLista.map(function(f){
+      return '<option value="'+f+'"'+(d.defeito===f?' selected':'')+'>'+f+'</option>';
+    }).join('');
+    const opcoesCrit = criticidades.map(function(c){
+      return '<option value="'+c+'"'+(d.criticidade===c?' selected':'')+'>'+c+'</option>';
+    }).join('');
+    const opcoesStatus = statusCorrecao.map(function(s){
+      return '<option value="'+s+'"'+(d.status===s?' selected':'')+'>'+s+'</option>';
+    }).join('');
+
+    const cienteBlock = processoAtual === 'injecao'
+      ? '<div class="field"><label>Operador estava ciente?</label><select onchange="atualizarDesvio('+d.id+',\'operadorCiente\',this.value)"><option value="SIM"'+(d.operadorCiente==='SIM'?' selected':'')+'>SIM</option><option value="NÃO"'+(d.operadorCiente==='NÃO'?' selected':'')+'>NÃO</option></select></div>'
+      : '';
+
+    return '' +
+      '<div class="desvio-card">' +
+        '<button class="remove-desvio" onclick="removerDesvio('+d.id+')">✕</button>' +
+        '<div class="desvio-num">DESVIO #'+(idx+1)+'</div>' +
+        '<div class="field"><label>Defeito</label>' +
+          '<select onchange="atualizarDesvio('+d.id+',\'defeito\',this.value)"><option value="">Selecione…</option>'+opcoesDefeito+'</select>' +
+        '</div>' +
+        '<div class="grid-2">' +
+          '<div class="field"><label>'+campoCavidadeLabel+'</label>' +
+            '<input type="text" placeholder="Ex: 5;22;27" value="'+d.cavidade+'" oninput="atualizarDesvio('+d.id+',\'cavidade\',this.value)">' +
+          '</div>' +
+          '<div class="field"><label>Criticidade</label>' +
+            '<select onchange="atualizarDesvio('+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select>' +
+          '</div>' +
+        '</div>' +
+        '<div class="grid-2">' +
+          cienteBlock +
+          '<div class="field"><label>Status</label>' +
+            '<select onchange="atualizarDesvio('+d.id+',\'status\',this.value)">'+opcoesStatus+'</select>' +
+          '</div>' +
+        '</div>' +
+        '<div class="field"><label>Observação</label>' +
+          '<textarea oninput="atualizarDesvio('+d.id+',\'observacao\',this.value)">'+d.observacao+'</textarea>' +
+        '</div>' +
+      '</div>';
+  }).join('');
+}
+
+/* ---------------- Salvar sessão ---------------- */
+function gerarIdSessao() {
+  return 'S' + Date.now();
+}
+
+async function salvarSessao() {
+  if (!itemId) {
+    mostrarToast('Conecte-se à planilha (aba ⚙) antes de salvar.', true);
+    setTab('config');
+    return;
+  }
+  if (desvios.length === 0) {
+    mostrarToast('Adicione ao menos um desvio (ou registre a sessão como "sem desvio" na planilha manualmente).', true);
+    return;
+  }
+
+  const idSessao = gerarIdSessao();
+  const data = document.getElementById('sessaoData').value;
+  const horaInicio = document.getElementById('sessaoHoraInicio').value;
+  const horaFim = document.getElementById('sessaoHoraFim').value;
+  const equipamento = document.getElementById('sessaoEquipamento').value;
+  const responsavel = document.getElementById('sessaoResponsavel').value;
+
+  let linhasObj = [];
+  const nomeTabela = processoAtual === 'sopro' ? 'TabelaSopro' : 'TabelaInjecao';
+  const cabecalho = processoAtual === 'sopro' ? CABECALHO_SOPRO : CABECALHO_INJECAO;
+
+  if (processoAtual === 'injecao') {
+    const operador = document.getElementById('sessaoOperador').value;
+    const cor = document.getElementById('sessaoCor').value;
+    const gramatura = document.getElementById('sessaoGramatura').value;
+    const resina = document.getElementById('sessaoResina').value;
+
+    linhasObj = desvios.map(function(d) {
+      return {
+        id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim,
+        equipamento: equipamento, responsavel: responsavel, operador_principal: operador,
+        cor: cor, gramatura: gramatura, resina: resina,
+        defeito: d.defeito, cavidade: d.cavidade, criticidade: d.criticidade,
+        operador_ciente: d.operadorCiente, status_correcao: d.status, observacao: d.observacao,
+        foto_url: '', criado_em: new Date().toISOString()
+      };
+    });
+  } else {
+    const cor = document.getElementById('soproCor').value;
+    const ml = document.getElementById('soproMl').value;
+    const frasco = document.getElementById('soproFrasco').value;
+
+    linhasObj = desvios.map(function(d) {
+      return {
+        id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim,
+        equipamento: equipamento, responsavel: responsavel,
+        cor: cor, ml: ml, tipo_frasco: frasco,
+        defeito: d.defeito, criticidade: d.criticidade, status_correcao: d.status,
+        observacao: d.observacao, foto_url: '', criado_em: new Date().toISOString()
+      };
+    });
+  }
+
+  // Converte de objeto nomeado para array na ordem exata das colunas da tabela
+  const valores = linhasObj.map(function(obj) {
+    return cabecalho.map(function(campo) { return obj[campo] !== undefined ? String(obj[campo]) : ''; });
+  });
+
+  const btn = document.getElementById('btnSalvarSessao');
+  btn.disabled = true;
+  btn.textContent = 'Salvando…';
+
+  try {
+    const token = await getToken();
+    const url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId +
+                '/workbook/tables/' + nomeTabela + '/rows/add';
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: valores })
+    });
+    if (resp.ok) {
+      mostrarToast(valores.length + ' desvio(s) salvos na planilha ✓');
+      desvios = [];
+      contadorDesvio = 0;
+      renderDesvios();
+    } else {
+      const json = await resp.json();
+      mostrarToast('Erro ao salvar: ' + (json.error ? json.error.message : resp.status), true);
+    }
+  } catch (err) {
+    mostrarToast('Falha de conexão: ' + err.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Salvar sessão na planilha';
+  }
+}
+
+/* ---------------- Login (Microsoft / MSAL) ---------------- */
+async function getToken() {
+  await msalPronto;
+  const req = { scopes: graphScopes, account: contaAtual };
+  try {
+    const res = await msalInstance.acquireTokenSilent(req);
+    return res.accessToken;
+  } catch (e) {
+    const res = await msalInstance.acquireTokenPopup(req);
+    return res.accessToken;
+  }
+}
+
+function logout() {
+  msalInstance.logoutRedirect();
+}
+
+async function iniciarLogin() {
+  if (typeof msal === 'undefined') {
+    document.getElementById('loginMsg').className = 'err';
+    document.getElementById('loginMsg').textContent = 'A biblioteca de login não carregou (possível bloqueio de rede). Tente por outra rede ou avise o TI para liberar cdn.jsdelivr.net.';
+    return;
+  }
+  msalInstance = new msal.PublicClientApplication(msalConfig);
+  msalPronto = msalInstance.initialize();
+  await msalPronto;
+  await msalInstance.handleRedirectPromise().catch(function(e){ console.error(e); });
+
+  const contas = msalInstance.getAllAccounts();
+  if (contas.length > 0) {
+    contaAtual = contas[0];
+    aposLogin();
+  }
+
+  document.getElementById('btnLoginMicrosoft').onclick = async function() {
+    try {
+      const res = await msalInstance.loginPopup({ scopes: graphScopes });
+      contaAtual = res.account;
+      aposLogin();
+    } catch (e) {
+      document.getElementById('loginMsg').className = 'err';
+      document.getElementById('loginMsg').textContent = 'Erro no login: ' + e.message;
+    }
+  };
+}
+
+function aposLogin() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('userEmail').textContent = contaAtual.username;
+  conectarPlanilha();
+}
+
+/* ---------------- Conexão com a planilha ---------------- */
+async function conectarPlanilha() {
+  const dot = document.getElementById('statusDot');
+  const label = document.getElementById('statusText');
+  if (!LINK_PLANILHA) {
+    dot.className = 'status-dot offline';
+    label.textContent = 'não configurado';
+    setTab('config');
+    return false;
+  }
+  label.textContent = 'conectando…';
+  try {
+    const token = await getToken();
+    const base64 = btoa(LINK_PLANILHA).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+    const sharingId = 'u!' + base64;
+    const resp = await fetch('https://graph.microsoft.com/v1.0/shares/' + sharingId + '/driveItem', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    const json = await resp.json();
+    if (json.id) {
+      itemId = json.id;
+      driveId = json.parentReference.driveId;
+      dot.className = 'status-dot online';
+      label.textContent = 'conectado';
+      return true;
+    } else {
+      dot.className = 'status-dot offline';
+      label.textContent = 'erro na planilha';
+      return false;
+    }
+  } catch (err) {
+    dot.className = 'status-dot offline';
+    label.textContent = 'offline';
+    return false;
+  }
+}
+
+async function salvarConfigLink() {
+  const link = document.getElementById('configLink').value.trim();
+  if (!link) { mostrarToast('Cole o link da planilha.', true); return; }
+  LINK_PLANILHA = link;
+  const ok = await conectarPlanilha();
+  if (ok) mostrarToast('Conectado à planilha ✓');
+}
+
+/* ---------------- Dashboard ---------------- */
+function linhasArrayParaObjeto(linhasArray, cabecalho) {
+  return linhasArray.map(function(row) {
+    const valores = row.values[0];
+    const obj = {};
+    cabecalho.forEach(function(campo, i) { obj[campo] = valores[i]; });
+    return obj;
+  });
+}
+
+async function carregarDados(forcar) {
+  if (!itemId) {
+    mostrarToast('Conecte-se à planilha na aba ⚙ para ver o dashboard.', true);
+    setTab('config');
+    return;
+  }
+  try {
+    const token = await getToken();
+    const [respInj, respSop] = await Promise.all([
+      fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaInjecao/rows', { headers: { Authorization: 'Bearer ' + token } }),
+      fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaSopro/rows', { headers: { Authorization: 'Bearer ' + token } })
+    ]);
+    const jsonInj = await respInj.json();
+    const jsonSop = await respSop.json();
+    dadosCache = {
+      injecao: jsonInj.value ? linhasArrayParaObjeto(jsonInj.value, CABECALHO_INJECAO) : [],
+      sopro: jsonSop.value ? linhasArrayParaObjeto(jsonSop.value, CABECALHO_SOPRO) : []
+    };
+    atualizarDashboard();
+  } catch (err) {
+    mostrarToast('Falha de conexão ao carregar dashboard.', true);
+  }
+}
+
+function filtrarPorPeriodo(linhas) {
+  const dias = parseInt(document.getElementById('filtroPeriodo').value, 10);
+  if (!dias) return linhas;
+  const limite = new Date();
+  limite.setDate(limite.getDate() - dias);
+  return linhas.filter(function(l) {
+    if (!l.data) return true;
+    const d = new Date(l.data);
+    return d >= limite;
+  });
+}
+
+function contarPor(linhas, campo) {
+  const contagem = {};
+  linhas.forEach(function(l) {
+    const chave = (l[campo] || 'N/A').toString().trim() || 'N/A';
+    contagem[chave] = (contagem[chave] || 0) + 1;
+  });
+  return contagem;
+}
+
+function topN(contagem, n) {
+  return Object.entries(contagem).sort(function(a,b){ return b[1]-a[1]; }).slice(0, n);
+}
+
+function destruirChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+function corBase() { return getComputedStyle(document.documentElement); }
+
+function criarBarChart(canvasId, labels, valores, cor) {
+  destruirChart(canvasId);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  charts[canvasId] = new Chart(ctx, {
+    type: 'bar',
+    data: { labels: labels, datasets: [{ data: valores, backgroundColor: cor || '#f2a93b', borderRadius: 5 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#9aa0a6', font: { size: 10 } }, grid: { color: '#2a2e33' } },
+        y: { ticks: { color: '#9aa0a6' }, grid: { color: '#2a2e33' }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+function criarDonutChart(canvasId, labels, valores, cores) {
+  destruirChart(canvasId);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  charts[canvasId] = new Chart(ctx, {
+    type: 'doughnut',
+    data: { labels: labels, datasets: [{ data: valores, backgroundColor: cores }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { color: '#edeef0', boxWidth: 12, font: { size: 11 } } } }
+    }
+  });
+}
+
+function criarLineChart(canvasId, labels, valores) {
+  destruirChart(canvasId);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  charts[canvasId] = new Chart(ctx, {
+    type: 'line',
+    data: { labels: labels, datasets: [{ data: valores, borderColor: '#f2a93b', backgroundColor: 'rgba(242,169,59,0.15)', fill: true, tension: 0.3 }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#9aa0a6', font: { size: 10 } }, grid: { display: false } },
+        y: { ticks: { color: '#9aa0a6' }, grid: { color: '#2a2e33' }, beginAtZero: true }
+      }
+    }
+  });
+}
+
+function atualizarDashboard() {
+  const todasLinhas = dadosCache[processoAtual] || [];
+  const linhas = filtrarPorPeriodo(todasLinhas).filter(function(l){ return l.defeito; });
+
+  document.getElementById('kpiTotal').textContent = linhas.length;
+  document.getElementById('kpiPendentes').textContent = linhas.filter(function(l){ return (l.status_correcao||'').toUpperCase().indexOf('PENDENTE') > -1; }).length;
+  document.getElementById('kpiGraves').textContent = linhas.filter(function(l){ return (l.criticidade||'').toUpperCase() === 'GRAVE'; }).length;
+
+  const porDefeito = topN(contarPor(linhas, 'defeito'), 8);
+  criarBarChart('chartDefeitos', porDefeito.map(function(x){return x[0];}), porDefeito.map(function(x){return x[1];}));
+
+  const porCrit = contarPor(linhas, 'criticidade');
+  const ordemCrit = ['LEVE','MÉDIO','GRAVE'];
+  const critLabels = ordemCrit.filter(function(c){ return porCrit[c]; });
+  criarDonutChart('chartCriticidade', critLabels, critLabels.map(function(c){return porCrit[c];}), ['#3fb68b','#f2a93b','#e5484d']);
+
+  const porStatus = contarPor(linhas, 'status_correcao');
+  const statusLabels = Object.keys(porStatus);
+  criarDonutChart('chartStatus', statusLabels, statusLabels.map(function(s){return porStatus[s];}),
+    statusLabels.map(function(s){ return s.toUpperCase().indexOf('PENDENTE')>-1 ? '#e5484d' : '#3fb68b'; }));
+
+  const porResp = topN(contarPor(linhas, 'responsavel'), 8);
+  criarBarChart('chartResponsavel', porResp.map(function(x){return x[0];}), porResp.map(function(x){return x[1];}), '#6ea8fe');
+
+  const porEquip = topN(contarPor(linhas, 'equipamento'), 8);
+  criarBarChart('chartEquipamento', porEquip.map(function(x){return x[0];}), porEquip.map(function(x){return x[1];}), '#9c7bd9');
+
+  const porData = contarPor(linhas, 'data');
+  const datasOrdenadas = Object.keys(porData).sort();
+  criarLineChart('chartEvolucao', datasOrdenadas, datasOrdenadas.map(function(d){return porData[d];}));
+}
+
+/* ---------------- Utilidades ---------------- */
+function mostrarToast(msg, isError) {
+  const existente = document.querySelector('.toast');
+  if (existente) existente.remove();
+  const t = document.createElement('div');
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 4000);
+}
+
+function hojeISO() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+/* ---------------- Inicialização ---------------- */
+function init() {
+  document.getElementById('sessaoData').value = hojeISO();
+  document.getElementById('configLink').value = LINK_PLANILHA;
+  renderListasNaTela();
+  renderDesvios();
+  iniciarLogin();
+}
+
+init();
+</script>
+</body>
+</html>
