@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Teste de Conexão — Inspeção Qualidade</title>
-<script src="https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
 <style>
   body { font-family: system-ui, sans-serif; background: #17191c; color: #edeef0; padding: 24px; max-width: 640px; margin: 0 auto; }
   h1 { font-size: 20px; }
@@ -60,6 +60,11 @@ const msalConfig = {
 const LINK_PLANILHA = "https://blowpet2-my.sharepoint.com/:x:/g/personal/cleber_rodrigues_blowpet_com_br/IQAWjpUUN_SbToVo1pGmdJcyAQ45D1l_a7UryTknKp9Aq0c?e=pDv6fS";
 
 const scopes = ["Files.ReadWrite", "Sites.ReadWrite.All", "User.Read"];
+
+if (typeof msal === 'undefined') {
+  document.getElementById('statusLogin').innerHTML = '<span class="err">Erro: a biblioteca de login (MSAL) não carregou. Provavelmente bloqueada pela rede/firewall da empresa. Tente por outra rede (ex: dados móveis) ou avise o TI para liberar o domínio cdn.jsdelivr.net.</span>';
+  throw new Error('MSAL não carregou');
+}
 
 const msalInstance = new msal.PublicClientApplication(msalConfig);
 let contaAtual = null;
