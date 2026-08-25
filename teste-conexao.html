@@ -67,6 +67,7 @@ if (typeof msal === 'undefined') {
 }
 
 const msalInstance = new msal.PublicClientApplication(msalConfig);
+let msalPronto = msalInstance.initialize();
 let contaAtual = null;
 let driveId = null;
 let itemId = null;
@@ -78,6 +79,7 @@ function log(elId, texto, isErr) {
 }
 
 async function getToken() {
+  await msalPronto;
   const req = { scopes, account: contaAtual };
   try {
     const res = await msalInstance.acquireTokenSilent(req);
@@ -90,6 +92,7 @@ async function getToken() {
 
 document.getElementById('btnLogin').onclick = async function() {
   try {
+    await msalPronto;
     const res = await msalInstance.loginPopup({ scopes });
     contaAtual = res.account;
     document.getElementById('statusLogin').innerHTML = '<span class="ok">Logado como: ' + contaAtual.username + '</span>';
@@ -181,7 +184,7 @@ document.getElementById('btnWriteTest').onclick = async function() {
 };
 
 // Trata retorno do redirect (necessário mesmo usando popup, por segurança do MSAL)
-msalInstance.handleRedirectPromise().catch(function(e){ console.error(e); });
+msalPronto.then(function(){ return msalInstance.handleRedirectPromise(); }).catch(function(e){ console.error(e); });
 </script>
 </body>
 </html>
