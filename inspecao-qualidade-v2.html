@@ -571,11 +571,12 @@ function renderFormInjecao() {
         '<div class="field"><label>Gramatura</label><select id="inj_gramatura"></select></div>' +
         '<div class="field"><label>Resina</label><select id="inj_resina"></select></div>' +
       '</div>' +
+      '<div class="field"><label>Foi identificado algum defeito?</label><select id="inj_temDefeito" onchange="alternarSecaoDesvios(\'injecao\',this.value)"><option value="SIM">SIM</option><option value="NAO">NÃO</option></select></div>' +
     '</div>' +
-    '<div class="card"><h3>Desvios encontrados</h3>' +
+    '<div class="card" id="cardDesviosInjecao"><h3>Desvios encontrados</h3>' +
       '<div id="listaDesviosInjecao"></div>' +
       '<div id="semDesviosInjecao" class="empty-state">Nenhum desvio adicionado ainda.</div>' +
-      '<button class="btn btn-outline btn-block" onclick="adicionarDesvio(\'injecao\')">+ Adicionar desvio</button>' +
+      '<button class="btn btn-outline btn-block" id="btnAddDesvioInjecao" onclick="adicionarDesvio(\'injecao\')">+ Adicionar desvio</button>' +
     '</div>' +
     '<button class="btn btn-accent btn-block" id="btnSalvarInjecao" onclick="salvarSessao(\'injecao\')">Salvar sessão na planilha</button>';
   preencherSelect('inj_equipamento', listas.equipInjecao);
@@ -587,6 +588,7 @@ function renderFormInjecao() {
   document.getElementById('inj_data').value = hojeISO();
   document.getElementById('inj_hora_inicio').value = agoraHHMM();
   renderDesvios('injecao');
+  alternarSecaoDesvios('injecao', 'SIM');
 }
 
 function renderFormSopro() {
@@ -607,11 +609,12 @@ function renderFormSopro() {
         '<div class="field"><label>Volume (mL)</label><select id="sop_ml"></select></div>' +
         '<div class="field"><label>Tipo de frasco</label><select id="sop_frasco"></select></div>' +
       '</div>' +
+      '<div class="field"><label>Foi identificado algum defeito?</label><select id="sop_temDefeito" onchange="alternarSecaoDesvios(\'sopro\',this.value)"><option value="SIM">SIM</option><option value="NAO">NÃO</option></select></div>' +
     '</div>' +
-    '<div class="card"><h3>Desvios encontrados</h3>' +
+    '<div class="card" id="cardDesviosSopro"><h3>Desvios encontrados</h3>' +
       '<div id="listaDesviosSopro"></div>' +
       '<div id="semDesviosSopro" class="empty-state">Nenhum desvio adicionado ainda.</div>' +
-      '<button class="btn btn-outline btn-block" onclick="adicionarDesvio(\'sopro\')">+ Adicionar desvio</button>' +
+      '<button class="btn btn-outline btn-block" id="btnAddDesvioSopro" onclick="adicionarDesvio(\'sopro\')">+ Adicionar desvio</button>' +
     '</div>' +
     '<button class="btn btn-accent btn-block" id="btnSalvarSopro" onclick="salvarSessao(\'sopro\')">Salvar sessão na planilha</button>';
   preencherSelect('sop_equipamento', listas.equipSopro);
@@ -622,12 +625,13 @@ function renderFormSopro() {
   document.getElementById('sop_data').value = hojeISO();
   document.getElementById('sop_hora_inicio').value = agoraHHMM();
   renderDesvios('sopro');
+  alternarSecaoDesvios('sopro', 'SIM');
 }
 
 function listaDesvios(processo) { return processo === 'sopro' ? desviosSopro : desviosInjecao; }
 
 function adicionarDesvio(processo) {
-  const item = { id: (processo === 'sopro' ? ++contadorSopro : ++contadorInjecao), defeitoEncontrado: 'SIM', defeito: '', cavidade: [], criticidade: 'LEVE', operadorCiente: 'SIM', status: 'FICOU PENDENTE', observacao: '' };
+  const item = { id: (processo === 'sopro' ? ++contadorSopro : ++contadorInjecao), defeito: '', cavidade: [], criticidade: 'LEVE', operadorCiente: 'SIM', status: 'FICOU PENDENTE', observacao: '' };
   if (processo === 'sopro') desviosSopro.push(item); else desviosInjecao.push(item);
   renderDesvios(processo);
 }
@@ -650,15 +654,18 @@ function alternarCavidade(processo, id, num, checked) {
   if (resumo) resumo.textContent = d.cavidade.length ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…';
 }
 
-function alternarDefeitoEncontrado(processo, id, valor) {
-  const d = listaDesvios(processo).find(function(d){ return d.id === id; });
-  if (!d) return;
-  d.defeitoEncontrado = valor;
-  if (valor === 'NAO') d.defeito = '';
-  const campoDefeito = document.getElementById('defeitoInput_'+processo+'_'+id);
-  if (campoDefeito) {
-    campoDefeito.disabled = (valor === 'NAO');
-    if (valor === 'NAO') campoDefeito.value = '';
+function alternarSecaoDesvios(processo, valor) {
+  const card = document.getElementById(processo === 'sopro' ? 'cardDesviosSopro' : 'cardDesviosInjecao');
+  const btnAdd = document.getElementById(processo === 'sopro' ? 'btnAddDesvioSopro' : 'btnAddDesvioInjecao');
+  const travado = (valor === 'NAO');
+  card.style.opacity = travado ? '0.45' : '1';
+  card.querySelectorAll('input, select, textarea, button').forEach(function(el) { el.disabled = travado; });
+  btnAdd.disabled = travado;
+  if (travado) {
+    if (processo === 'sopro') { desviosSopro = []; contadorSopro = 0; } else { desviosInjecao = []; contadorInjecao = 0; }
+    renderDesvios(processo);
+  } else if (listaDesvios(processo).length === 0) {
+    adicionarDesvio(processo);
   }
 }
 
@@ -698,8 +705,7 @@ function renderDesvios(processo) {
 
     return '<div class="desvio-card"><button class="remove-desvio" onclick="removerDesvio(\''+processo+'\','+d.id+')">✕</button>' +
       '<div class="desvio-num">DESVIO #'+(idx+1)+'</div>' +
-      '<div class="field"><label>Foi identificado algum defeito?</label><select onchange="alternarDefeitoEncontrado(\''+processo+'\','+d.id+',this.value)"><option value="SIM"'+(d.defeitoEncontrado!=='NAO'?' selected':'')+'>SIM</option><option value="NAO"'+(d.defeitoEncontrado==='NAO'?' selected':'')+'>NÃO</option></select></div>' +
-      '<div class="field"><label>Defeito encontrado</label><input type="text" id="defeitoInput_'+processo+'_'+d.id+'" list="'+datalistId+'" value="'+d.defeito+'" placeholder="Digite para buscar…" oninput="atualizarDesvio(\''+processo+'\','+d.id+',\'defeito\',this.value)"'+(d.defeitoEncontrado==='NAO'?' disabled':'')+'></div>' +
+      '<div class="field"><label>Defeito encontrado</label><input type="text" id="defeitoInput_'+processo+'_'+d.id+'" list="'+datalistId+'" value="'+d.defeito+'" placeholder="Digite para buscar…" oninput="atualizarDesvio(\''+processo+'\','+d.id+',\'defeito\',this.value)"></div>' +
       (processo === 'injecao' ? '<div class="grid-2">' + cavidadeBlock + '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div></div>'
                               : '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div>') +
       '<div class="grid-2">' + cienteBlock + '<div class="field"><label>Status</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'status\',this.value)">'+opcoesStatus+'</select></div></div>' +
@@ -710,10 +716,11 @@ function renderDesvios(processo) {
 
 async function salvarSessao(processo) {
   if (!itemId) { mostrarToast('Conecte-se à planilha (Configurações) antes de salvar.', true); setPage('config'); return; }
-  const desvios = listaDesvios(processo);
-  if (desvios.length === 0) { mostrarToast('Adicione ao menos um desvio.', true); return; }
-
   const pfx = processo === 'sopro' ? 'sop_' : 'inj_';
+  const temDefeito = document.getElementById(pfx+'temDefeito').value;
+  const desvios = temDefeito === 'NAO' ? [{ defeito: '', cavidade: [], criticidade: '', operadorCiente: '', status: 'SEM DESVIO', observacao: '' }] : listaDesvios(processo);
+  if (temDefeito === 'SIM' && desvios.length === 0) { mostrarToast('Adicione ao menos um desvio.', true); return; }
+
   const idSessao = gerarIdSessao();
   const data = document.getElementById(pfx+'data').value;
   const horaInicio = document.getElementById(pfx+'hora_inicio').value;
@@ -755,9 +762,10 @@ async function salvarSessao(processo) {
     const url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + nomeTabela + '/rows/add';
     const resp = await fetch(url, { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ values: valores }) });
     if (resp.ok) {
-      mostrarToast(valores.length + ' desvio(s) salvos ✓');
+      mostrarToast(valores.length + ' registro(s) salvos ✓');
       if (processo === 'sopro') { desviosSopro = []; contadorSopro = 0; } else { desviosInjecao = []; contadorInjecao = 0; }
-      renderDesvios(processo);
+      document.getElementById(pfx+'temDefeito').value = 'SIM';
+      alternarSecaoDesvios(processo, 'SIM');
       document.getElementById(pfx+'hora_inicio').value = agoraHHMM();
       document.getElementById(pfx+'hora_fim').value = '';
     } else {
