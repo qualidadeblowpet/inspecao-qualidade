@@ -172,6 +172,21 @@
   .remove-desvio:hover { color: var(--danger); }
   .empty-state { text-align: center; padding: 24px 10px; color: var(--text-dim); font-size: 13px; }
 
+  /* Seletor de cavidades (multi-select) */
+  .cav-details { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; }
+  .cav-details summary {
+    padding: 10px 11px; font-size: 14px; color: var(--text); cursor: pointer; list-style: none;
+  }
+  .cav-details summary::-webkit-details-marker { display: none; }
+  .cav-details summary::after { content: '▾'; float: right; color: var(--text-dim); }
+  .cav-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
+    padding: 10px; border-top: 1px solid var(--border); max-height: 200px; overflow-y: auto;
+  }
+  .cav-opt { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-dim); padding: 3px 4px; border-radius: 5px; cursor: pointer; }
+  .cav-opt:hover { background: var(--surface); }
+  .cav-opt input { margin: 0; }
+
   .config-note { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
   .config-note code { background: var(--surface-2); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; }
 
@@ -611,7 +626,7 @@ function renderFormSopro() {
 function listaDesvios(processo) { return processo === 'sopro' ? desviosSopro : desviosInjecao; }
 
 function adicionarDesvio(processo) {
-  const item = { id: (processo === 'sopro' ? ++contadorSopro : ++contadorInjecao), defeito: '', cavidade: '', criticidade: 'LEVE', operadorCiente: 'SIM', status: 'FICOU PENDENTE', observacao: '' };
+  const item = { id: (processo === 'sopro' ? ++contadorSopro : ++contadorInjecao), defeito: '', cavidade: [], criticidade: 'LEVE', operadorCiente: 'SIM', status: 'FICOU PENDENTE', observacao: '' };
   if (processo === 'sopro') desviosSopro.push(item); else desviosInjecao.push(item);
   renderDesvios(processo);
 }
@@ -624,6 +639,15 @@ function atualizarDesvio(processo, id, campo, valor) {
   const d = listaDesvios(processo).find(function(d){ return d.id === id; });
   if (d) d[campo] = valor;
 }
+function alternarCavidade(processo, id, num, checked) {
+  const d = listaDesvios(processo).find(function(d){ return d.id === id; });
+  if (!d) return;
+  if (!Array.isArray(d.cavidade)) d.cavidade = [];
+  if (checked) { if (d.cavidade.indexOf(num) === -1) d.cavidade.push(num); }
+  else { d.cavidade = d.cavidade.filter(function(c){ return c !== num; }); }
+  const resumo = document.getElementById('cavResumo_'+processo+'_'+id);
+  if (resumo) resumo.textContent = d.cavidade.length ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…';
+}
 
 function renderDesvios(processo) {
   const desvios = listaDesvios(processo);
@@ -631,22 +655,39 @@ function renderDesvios(processo) {
   const vazio = document.getElementById(processo === 'sopro' ? 'semDesviosSopro' : 'semDesviosInjecao');
   vazio.classList.toggle('hidden', desvios.length > 0);
   const defeitosLista = processo === 'sopro' ? listas.defeitosSopro : listas.defeitosInjecao;
-  const campoCavidadeLabel = processo === 'sopro' ? 'Frasco(s) afetado(s)' : 'Cavidade(s)';
+  const datalistId = 'dlDefeitos_' + processo;
 
-  container.innerHTML = desvios.map(function(d, idx) {
-    const opcoesDefeito = defeitosLista.map(function(f){ return '<option value="'+f+'"'+(d.defeito===f?' selected':'')+'>'+f+'</option>'; }).join('');
+  const datalistHtml = '<datalist id="'+datalistId+'">' + defeitosLista.map(function(f){ return '<option value="'+f+'">'; }).join('') + '</datalist>';
+
+  container.innerHTML = datalistHtml + desvios.map(function(d, idx) {
     const opcoesCrit = criticidades.map(function(c){ return '<option value="'+c+'"'+(d.criticidade===c?' selected':'')+'>'+c+'</option>'; }).join('');
     const opcoesStatus = statusCorrecao.map(function(s){ return '<option value="'+s+'"'+(d.status===s?' selected':'')+'>'+s+'</option>'; }).join('');
     const cienteBlock = processo === 'injecao'
       ? '<div class="field"><label>Operador ciente?</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'operadorCiente\',this.value)"><option value="SIM"'+(d.operadorCiente==='SIM'?' selected':'')+'>SIM</option><option value="NÃO"'+(d.operadorCiente==='NÃO'?' selected':'')+'>NÃO</option></select></div>'
       : '';
+
+    let cavidadeBlock = '';
+    if (processo === 'injecao') {
+      const selecionadas = Array.isArray(d.cavidade) ? d.cavidade : [];
+      let opcoesCav = '';
+      for (let n = 1; n <= 72; n++) {
+        const marcado = selecionadas.indexOf(n) > -1 ? ' checked' : '';
+        opcoesCav += '<label class="cav-opt"><input type="checkbox" value="'+n+'"'+marcado+' onchange="alternarCavidade(\''+processo+'\','+d.id+','+n+',this.checked)"> '+n+'</label>';
+      }
+      cavidadeBlock =
+        '<div class="field"><label>Cavidade(s)</label>' +
+          '<details class="cav-details">' +
+            '<summary id="cavResumo_'+processo+'_'+d.id+'">'+(selecionadas.length ? selecionadas.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…')+'</summary>' +
+            '<div class="cav-grid">'+opcoesCav+'</div>' +
+          '</details>' +
+        '</div>';
+    }
+
     return '<div class="desvio-card"><button class="remove-desvio" onclick="removerDesvio(\''+processo+'\','+d.id+')">✕</button>' +
       '<div class="desvio-num">DESVIO #'+(idx+1)+'</div>' +
-      '<div class="field"><label>Defeito</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'defeito\',this.value)"><option value="">Selecione…</option>'+opcoesDefeito+'</select></div>' +
-      '<div class="grid-2">' +
-        '<div class="field"><label>'+campoCavidadeLabel+'</label><input type="text" placeholder="Ex: 5;22;27" value="'+d.cavidade+'" oninput="atualizarDesvio(\''+processo+'\','+d.id+',\'cavidade\',this.value)"></div>' +
-        '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div>' +
-      '</div>' +
+      '<div class="field"><label>Defeito</label><input type="text" list="'+datalistId+'" value="'+d.defeito+'" placeholder="Digite para buscar…" oninput="atualizarDesvio(\''+processo+'\','+d.id+',\'defeito\',this.value)"></div>' +
+      (processo === 'injecao' ? '<div class="grid-2">' + cavidadeBlock + '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div></div>'
+                              : '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div>') +
       '<div class="grid-2">' + cienteBlock + '<div class="field"><label>Status</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'status\',this.value)">'+opcoesStatus+'</select></div></div>' +
       '<div class="field"><label>Observação</label><textarea oninput="atualizarDesvio(\''+processo+'\','+d.id+',\'observacao\',this.value)">'+d.observacao+'</textarea></div>' +
     '</div>';
@@ -677,7 +718,7 @@ async function salvarSessao(processo) {
     const resina = document.getElementById('inj_resina').value;
     linhasObj = desvios.map(function(d) {
       return { id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim, equipamento: equipamento, responsavel: responsavel,
-        operador_principal: operador, cor: cor, gramatura: gramatura, resina: resina, defeito: d.defeito, cavidade: d.cavidade,
+        operador_principal: operador, cor: cor, gramatura: gramatura, resina: resina, defeito: d.defeito, cavidade: Array.isArray(d.cavidade) ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(';') : (d.cavidade || ''),
         criticidade: d.criticidade, operador_ciente: d.operadorCiente, status_correcao: d.status, observacao: d.observacao, foto_url: '', criado_em: new Date().toISOString() };
     });
   } else {
