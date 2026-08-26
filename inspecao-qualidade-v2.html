@@ -157,6 +157,11 @@
   .field textarea { resize: vertical; min-height: 50px; }
   .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
   .field input:disabled { opacity: 0.4; cursor: not-allowed; }
+  .field input[type=file] { padding: 8px; font-size: 12px; color: var(--text-dim); }
+  .field input[type=file]::file-selector-button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    padding: 6px 10px; border-radius: 6px; font-size: 12px; margin-right: 10px; cursor: pointer;
+  }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
@@ -571,7 +576,7 @@ function renderFormInjecao() {
         '<div class="field"><label>Gramatura</label><select id="inj_gramatura"></select></div>' +
         '<div class="field"><label>Resina</label><select id="inj_resina"></select></div>' +
       '</div>' +
-      '<div class="field"><label>Foi identificado algum defeito?</label><select id="inj_temDefeito" onchange="alternarSecaoDesvios(\'injecao\',this.value)"><option value="SIM">SIM</option><option value="NAO">NÃO</option></select></div>' +
+      '<div class="field"><label>Foi identificado algum defeito?</label><select id="inj_temDefeito" onchange="alternarSecaoDesvios(\'injecao\',this.value)"><option value="NAO" selected>NÃO</option><option value="SIM">SIM</option></select></div>' +
     '</div>' +
     '<div class="card" id="cardDesviosInjecao"><h3>Desvios encontrados</h3>' +
       '<div id="listaDesviosInjecao"></div>' +
@@ -588,7 +593,7 @@ function renderFormInjecao() {
   document.getElementById('inj_data').value = hojeISO();
   document.getElementById('inj_hora_inicio').value = agoraHHMM();
   renderDesvios('injecao');
-  alternarSecaoDesvios('injecao', 'SIM');
+  alternarSecaoDesvios('injecao', 'NAO');
 }
 
 function renderFormSopro() {
@@ -609,7 +614,7 @@ function renderFormSopro() {
         '<div class="field"><label>Volume (mL)</label><select id="sop_ml"></select></div>' +
         '<div class="field"><label>Tipo de frasco</label><select id="sop_frasco"></select></div>' +
       '</div>' +
-      '<div class="field"><label>Foi identificado algum defeito?</label><select id="sop_temDefeito" onchange="alternarSecaoDesvios(\'sopro\',this.value)"><option value="SIM">SIM</option><option value="NAO">NÃO</option></select></div>' +
+      '<div class="field"><label>Foi identificado algum defeito?</label><select id="sop_temDefeito" onchange="alternarSecaoDesvios(\'sopro\',this.value)"><option value="NAO" selected>NÃO</option><option value="SIM">SIM</option></select></div>' +
     '</div>' +
     '<div class="card" id="cardDesviosSopro"><h3>Desvios encontrados</h3>' +
       '<div id="listaDesviosSopro"></div>' +
@@ -625,13 +630,13 @@ function renderFormSopro() {
   document.getElementById('sop_data').value = hojeISO();
   document.getElementById('sop_hora_inicio').value = agoraHHMM();
   renderDesvios('sopro');
-  alternarSecaoDesvios('sopro', 'SIM');
+  alternarSecaoDesvios('sopro', 'NAO');
 }
 
 function listaDesvios(processo) { return processo === 'sopro' ? desviosSopro : desviosInjecao; }
 
 function adicionarDesvio(processo) {
-  const item = { id: (processo === 'sopro' ? ++contadorSopro : ++contadorInjecao), defeito: '', cavidade: [], criticidade: 'LEVE', operadorCiente: 'SIM', status: 'FICOU PENDENTE', observacao: '' };
+  const item = { id: (processo === 'sopro' ? ++contadorSopro : ++contadorInjecao), defeito: '', cavidade: [], criticidade: 'LEVE', operadorCiente: 'SIM', status: 'FICOU PENDENTE', observacao: '', fotoFile: null };
   if (processo === 'sopro') desviosSopro.push(item); else desviosInjecao.push(item);
   renderDesvios(processo);
 }
@@ -652,6 +657,14 @@ function alternarCavidade(processo, id, num, checked) {
   else { d.cavidade = d.cavidade.filter(function(c){ return c !== num; }); }
   const resumo = document.getElementById('cavResumo_'+processo+'_'+id);
   if (resumo) resumo.textContent = d.cavidade.length ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…';
+}
+
+function armazenarFoto(processo, id, files) {
+  const d = listaDesvios(processo).find(function(d){ return d.id === id; });
+  if (!d) return;
+  d.fotoFile = files && files[0] ? files[0] : null;
+  const label = document.getElementById('fotoLabel_'+processo+'_'+id);
+  if (label) label.textContent = d.fotoFile ? d.fotoFile.name : 'Nenhuma foto selecionada';
 }
 
 function alternarSecaoDesvios(processo, valor) {
@@ -709,16 +722,43 @@ function renderDesvios(processo) {
       (processo === 'injecao' ? '<div class="grid-2">' + cavidadeBlock + '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div></div>'
                               : '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div>') +
       '<div class="grid-2">' + cienteBlock + '<div class="field"><label>Status</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'status\',this.value)">'+opcoesStatus+'</select></div></div>' +
+      '<div class="field"><label>Foto do desvio</label>' +
+        '<input type="file" accept="image/*" capture="environment" onchange="armazenarFoto(\''+processo+'\','+d.id+',this.files)">' +
+        '<div id="fotoLabel_'+processo+'_'+d.id+'" style="font-size:11px; color:var(--text-dim); margin-top:5px;">'+(d.fotoFile ? d.fotoFile.name : 'Nenhuma foto selecionada')+'</div>' +
+      '</div>' +
       '<div class="field"><label>Observação</label><textarea oninput="atualizarDesvio(\''+processo+'\','+d.id+',\'observacao\',this.value)">'+d.observacao+'</textarea></div>' +
     '</div>';
   }).join('');
+}
+
+const PASTA_FOTOS = "Documents/Apps/Microsoft Forms/Inspeção da Qualidade - Linhas de Injeção/Pergunta";
+
+async function uploadFoto(token, file, idSessao, indice) {
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const nomeArquivo = 'Inspecao_' + idSessao + '_' + indice + '.' + ext;
+  const caminho = PASTA_FOTOS.split('/').map(encodeURIComponent).join('/') + '/' + encodeURIComponent(nomeArquivo);
+  const sessionResp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/root:/' + caminho + ':/createUploadSession', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ item: { '@microsoft.graph.conflictBehavior': 'rename' } })
+  });
+  const session = await sessionResp.json();
+  if (!session.uploadUrl) throw new Error(session.error ? session.error.message : 'não foi possível iniciar o upload');
+  const uploadResp = await fetch(session.uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Range': 'bytes 0-' + (file.size - 1) + '/' + file.size },
+    body: file
+  });
+  const uploadJson = await uploadResp.json();
+  if (!uploadResp.ok) throw new Error(uploadJson.error ? uploadJson.error.message : 'falha no upload');
+  return uploadJson.webUrl || '';
 }
 
 async function salvarSessao(processo) {
   if (!itemId) { mostrarToast('Conecte-se à planilha (Configurações) antes de salvar.', true); setPage('config'); return; }
   const pfx = processo === 'sopro' ? 'sop_' : 'inj_';
   const temDefeito = document.getElementById(pfx+'temDefeito').value;
-  const desvios = temDefeito === 'NAO' ? [{ defeito: '', cavidade: [], criticidade: '', operadorCiente: '', status: 'SEM DESVIO', observacao: '' }] : listaDesvios(processo);
+  const desvios = temDefeito === 'NAO' ? [{ defeito: '', cavidade: [], criticidade: '', operadorCiente: '', status: 'SEM DESVIO', observacao: '', fotoFile: null }] : listaDesvios(processo);
   if (temDefeito === 'SIM' && desvios.length === 0) { mostrarToast('Adicione ao menos um desvio.', true); return; }
 
   const idSessao = gerarIdSessao();
@@ -731,41 +771,56 @@ async function salvarSessao(processo) {
   const nomeTabela = processo === 'sopro' ? 'TabelaSopro' : 'TabelaInjecao';
   const cabecalho = processo === 'sopro' ? CABECALHO_SOPRO : CABECALHO_INJECAO;
 
-  let linhasObj;
-  if (processo === 'injecao') {
-    const operador = document.getElementById('inj_operador').value;
-    const cor = document.getElementById('inj_cor').value;
-    const gramatura = document.getElementById('inj_gramatura').value;
-    const resina = document.getElementById('inj_resina').value;
-    linhasObj = desvios.map(function(d) {
-      return { id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim, equipamento: equipamento, responsavel: responsavel,
-        operador_principal: operador, cor: cor, gramatura: gramatura, resina: resina, defeito: d.defeito, cavidade: Array.isArray(d.cavidade) ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(';') : (d.cavidade || ''),
-        criticidade: d.criticidade, operador_ciente: d.operadorCiente, status_correcao: d.status, observacao: d.observacao, foto_url: '', criado_em: new Date().toISOString() };
-    });
-  } else {
-    const cor = document.getElementById('sop_cor').value;
-    const ml = document.getElementById('sop_ml').value;
-    const frasco = document.getElementById('sop_frasco').value;
-    linhasObj = desvios.map(function(d) {
-      return { id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim, equipamento: equipamento, responsavel: responsavel,
-        cor: cor, ml: ml, tipo_frasco: frasco, defeito: d.defeito, criticidade: d.criticidade, status_correcao: d.status,
-        observacao: d.observacao, foto_url: '', criado_em: new Date().toISOString() };
-    });
-  }
-
-  const valores = linhasObj.map(function(obj) { return cabecalho.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; }); });
   const btn = document.getElementById(processo === 'sopro' ? 'btnSalvarSopro' : 'btnSalvarInjecao');
   btn.disabled = true; btn.textContent = 'Salvando…';
 
   try {
     const token = await getToken();
+
+    // Envia as fotos primeiro (quando houver) e guarda a URL de cada uma
+    for (let i = 0; i < desvios.length; i++) {
+      if (desvios[i].fotoFile) {
+        btn.textContent = 'Enviando foto ' + (i+1) + '/' + desvios.length + '…';
+        try {
+          desvios[i].fotoUrlFinal = await uploadFoto(token, desvios[i].fotoFile, idSessao, i + 1);
+        } catch (e) {
+          mostrarToast('Falha ao enviar uma foto: ' + e.message, true);
+          desvios[i].fotoUrlFinal = '';
+        }
+      }
+    }
+    btn.textContent = 'Salvando…';
+
+    let linhasObj;
+    if (processo === 'injecao') {
+      const operador = document.getElementById('inj_operador').value;
+      const cor = document.getElementById('inj_cor').value;
+      const gramatura = document.getElementById('inj_gramatura').value;
+      const resina = document.getElementById('inj_resina').value;
+      linhasObj = desvios.map(function(d) {
+        return { id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim, equipamento: equipamento, responsavel: responsavel,
+          operador_principal: operador, cor: cor, gramatura: gramatura, resina: resina, defeito: d.defeito, cavidade: Array.isArray(d.cavidade) ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(';') : (d.cavidade || ''),
+          criticidade: d.criticidade, operador_ciente: d.operadorCiente, status_correcao: d.status, observacao: d.observacao, foto_url: d.fotoUrlFinal || '', criado_em: new Date().toISOString() };
+      });
+    } else {
+      const cor = document.getElementById('sop_cor').value;
+      const ml = document.getElementById('sop_ml').value;
+      const frasco = document.getElementById('sop_frasco').value;
+      linhasObj = desvios.map(function(d) {
+        return { id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim, equipamento: equipamento, responsavel: responsavel,
+          cor: cor, ml: ml, tipo_frasco: frasco, defeito: d.defeito, criticidade: d.criticidade, status_correcao: d.status,
+          observacao: d.observacao, foto_url: d.fotoUrlFinal || '', criado_em: new Date().toISOString() };
+      });
+    }
+
+    const valores = linhasObj.map(function(obj) { return cabecalho.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; }); });
     const url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + nomeTabela + '/rows/add';
     const resp = await fetch(url, { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ values: valores }) });
     if (resp.ok) {
       mostrarToast(valores.length + ' registro(s) salvos ✓');
       if (processo === 'sopro') { desviosSopro = []; contadorSopro = 0; } else { desviosInjecao = []; contadorInjecao = 0; }
-      document.getElementById(pfx+'temDefeito').value = 'SIM';
-      alternarSecaoDesvios(processo, 'SIM');
+      document.getElementById(pfx+'temDefeito').value = 'NAO';
+      alternarSecaoDesvios(processo, 'NAO');
       document.getElementById(pfx+'hora_inicio').value = agoraHHMM();
       document.getElementById(pfx+'hora_fim').value = '';
     } else {
