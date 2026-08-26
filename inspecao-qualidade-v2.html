@@ -343,6 +343,13 @@
         <div class="field"><label>Equipamentos — Sopro (um por linha)</label><textarea id="listaEquipSopro" rows="4"></textarea></div>
         <div class="field"><label>Defeitos — Injeção (um por linha)</label><textarea id="listaDefeitosInjecao" rows="6"></textarea></div>
         <div class="field"><label>Defeitos — Sopro (um por linha)</label><textarea id="listaDefeitosSopro" rows="6"></textarea></div>
+        <div class="field"><label>Operadores — Injeção (um por linha)</label><textarea id="listaOperadores" rows="4"></textarea></div>
+        <div class="field"><label>Cores — Injeção (um por linha)</label><textarea id="listaCoresInjecao" rows="3"></textarea></div>
+        <div class="field"><label>Gramaturas — Injeção (um por linha)</label><textarea id="listaGramaturas" rows="3"></textarea></div>
+        <div class="field"><label>Resinas — Injeção (um por linha)</label><textarea id="listaResinas" rows="3"></textarea></div>
+        <div class="field"><label>Cores — Sopro (um por linha)</label><textarea id="listaCoresSopro" rows="3"></textarea></div>
+        <div class="field"><label>Volumes (mL) — Sopro (um por linha)</label><textarea id="listaMlSopro" rows="3"></textarea></div>
+        <div class="field"><label>Tipos de frasco — Sopro (um por linha)</label><textarea id="listaTipoFrasco" rows="4"></textarea></div>
         <button class="btn btn-accent" onclick="salvarListas()">Salvar listas</button>
       </div>
     </div>
@@ -380,7 +387,14 @@ let listas = {
   equipInjecao: ['HUSK 1', 'HUSK 2', 'KM2', 'KM3'],
   equipSopro: ['UNIPET 1', 'MULTIPET 1', 'SBO1', 'SBO2A', 'SBO2B'],
   defeitosInjecao: ['REBARBA NA ROSCA', 'RISCO NO CORPO', 'PONTO DE INJEÇÃO ESCORRIDO', 'PELE DE LARANJA', 'MARCAS NO CORPO', 'GATE ALTO', 'FUNDO BRANCO', 'BOLHA'],
-  defeitosSopro: ['ANEL TORTO', 'ALTURA DO FRASCO FORA DO ESPECIFICADO', 'COSTURA LATERAL QUADRADA', 'DEGRAU NA COSTURA DO FUNDO']
+  defeitosSopro: ['ANEL TORTO', 'ALTURA DO FRASCO FORA DO ESPECIFICADO', 'COSTURA LATERAL QUADRADA', 'DEGRAU NA COSTURA DO FUNDO'],
+  operadores: ['Pablo', 'Marcos', 'André', 'Wesley'],
+  coresInjecao: ['Cristal', 'Azul', 'Verde', 'Âmbar'],
+  gramaturas: ['28', '32', '42', '48'],
+  resinas: ['Indorama Max', 'Alpek', 'M&G'],
+  coresSopro: ['Cristal', 'Azul', 'Verde'],
+  mlSopro: ['300 mL', '500 mL', '510 mL', '1500 mL', '2000 mL'],
+  tipoFrasco: ['Água Himalaia', 'Água Indaiá', 'Refrigerante Linha X']
 };
 const criticidades = ['LEVE', 'MÉDIO', 'GRAVE'];
 const statusCorrecao = ['CORRIGIDO', 'FICOU PENDENTE'];
@@ -491,14 +505,29 @@ function renderListasNaTela() {
   document.getElementById('listaEquipSopro').value = listas.equipSopro.join('\n');
   document.getElementById('listaDefeitosInjecao').value = listas.defeitosInjecao.join('\n');
   document.getElementById('listaDefeitosSopro').value = listas.defeitosSopro.join('\n');
+  document.getElementById('listaOperadores').value = listas.operadores.join('\n');
+  document.getElementById('listaCoresInjecao').value = listas.coresInjecao.join('\n');
+  document.getElementById('listaGramaturas').value = listas.gramaturas.join('\n');
+  document.getElementById('listaResinas').value = listas.resinas.join('\n');
+  document.getElementById('listaCoresSopro').value = listas.coresSopro.join('\n');
+  document.getElementById('listaMlSopro').value = listas.mlSopro.join('\n');
+  document.getElementById('listaTipoFrasco').value = listas.tipoFrasco.join('\n');
 }
 
 function salvarListas() {
-  listas.responsaveis = document.getElementById('listaResponsaveis').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
-  listas.equipInjecao = document.getElementById('listaEquipInjecao').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
-  listas.equipSopro = document.getElementById('listaEquipSopro').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
-  listas.defeitosInjecao = document.getElementById('listaDefeitosInjecao').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
-  listas.defeitosSopro = document.getElementById('listaDefeitosSopro').value.split('\n').map(function(s){return s.trim();}).filter(Boolean);
+  function parse(id) { return document.getElementById(id).value.split('\n').map(function(s){return s.trim();}).filter(Boolean); }
+  listas.responsaveis = parse('listaResponsaveis');
+  listas.equipInjecao = parse('listaEquipInjecao');
+  listas.equipSopro = parse('listaEquipSopro');
+  listas.defeitosInjecao = parse('listaDefeitosInjecao');
+  listas.defeitosSopro = parse('listaDefeitosSopro');
+  listas.operadores = parse('listaOperadores');
+  listas.coresInjecao = parse('listaCoresInjecao');
+  listas.gramaturas = parse('listaGramaturas');
+  listas.resinas = parse('listaResinas');
+  listas.coresSopro = parse('listaCoresSopro');
+  listas.mlSopro = parse('listaMlSopro');
+  listas.tipoFrasco = parse('listaTipoFrasco');
   renderFormInjecao();
   renderFormSopro();
   mostrarToast('Listas atualizadas.');
@@ -520,11 +549,11 @@ function renderFormInjecao() {
         '<div class="field"><label>Hora conclusão</label><input type="time" id="inj_hora_fim"></div>' +
       '</div>' +
       '<div class="field"><label>Responsável pela inspeção</label><select id="inj_responsavel"></select></div>' +
-      '<div class="field"><label>Operador principal</label><input type="text" id="inj_operador" placeholder="Nome do operador"></div>' +
+      '<div class="field"><label>Operador principal</label><select id="inj_operador"></select></div>' +
       '<div class="grid-3">' +
-        '<div class="field"><label>Cor da preforma</label><input type="text" id="inj_cor" placeholder="Ex: Cristal"></div>' +
-        '<div class="field"><label>Gramatura</label><input type="text" id="inj_gramatura" placeholder="Ex: 42"></div>' +
-        '<div class="field"><label>Resina</label><input type="text" id="inj_resina" placeholder="Ex: Indorama Max"></div>' +
+        '<div class="field"><label>Cor da preforma</label><select id="inj_cor"></select></div>' +
+        '<div class="field"><label>Gramatura</label><select id="inj_gramatura"></select></div>' +
+        '<div class="field"><label>Resina</label><select id="inj_resina"></select></div>' +
       '</div>' +
     '</div>' +
     '<div class="card"><h3>Desvios encontrados</h3>' +
@@ -535,7 +564,12 @@ function renderFormInjecao() {
     '<button class="btn btn-accent btn-block" id="btnSalvarInjecao" onclick="salvarSessao(\'injecao\')">Salvar sessão na planilha</button>';
   preencherSelect('inj_equipamento', listas.equipInjecao);
   preencherSelect('inj_responsavel', listas.responsaveis);
+  preencherSelect('inj_operador', listas.operadores);
+  preencherSelect('inj_cor', listas.coresInjecao);
+  preencherSelect('inj_gramatura', listas.gramaturas);
+  preencherSelect('inj_resina', listas.resinas);
   document.getElementById('inj_data').value = hojeISO();
+  document.getElementById('inj_hora_inicio').value = agoraHHMM();
   renderDesvios('injecao');
 }
 
@@ -553,9 +587,9 @@ function renderFormSopro() {
       '</div>' +
       '<div class="field"><label>Responsável pela inspeção</label><select id="sop_responsavel"></select></div>' +
       '<div class="grid-3">' +
-        '<div class="field"><label>Cor</label><input type="text" id="sop_cor" placeholder="Ex: Cristal"></div>' +
-        '<div class="field"><label>Volume (mL)</label><input type="text" id="sop_ml" placeholder="Ex: 510 mL"></div>' +
-        '<div class="field"><label>Tipo de frasco</label><input type="text" id="sop_frasco" placeholder="Ex: Água Himalaia"></div>' +
+        '<div class="field"><label>Cor</label><select id="sop_cor"></select></div>' +
+        '<div class="field"><label>Volume (mL)</label><select id="sop_ml"></select></div>' +
+        '<div class="field"><label>Tipo de frasco</label><select id="sop_frasco"></select></div>' +
       '</div>' +
     '</div>' +
     '<div class="card"><h3>Desvios encontrados</h3>' +
@@ -566,7 +600,11 @@ function renderFormSopro() {
     '<button class="btn btn-accent btn-block" id="btnSalvarSopro" onclick="salvarSessao(\'sopro\')">Salvar sessão na planilha</button>';
   preencherSelect('sop_equipamento', listas.equipSopro);
   preencherSelect('sop_responsavel', listas.responsaveis);
+  preencherSelect('sop_cor', listas.coresSopro);
+  preencherSelect('sop_ml', listas.mlSopro);
+  preencherSelect('sop_frasco', listas.tipoFrasco);
   document.getElementById('sop_data').value = hojeISO();
+  document.getElementById('sop_hora_inicio').value = agoraHHMM();
   renderDesvios('sopro');
 }
 
@@ -624,7 +662,8 @@ async function salvarSessao(processo) {
   const idSessao = gerarIdSessao();
   const data = document.getElementById(pfx+'data').value;
   const horaInicio = document.getElementById(pfx+'hora_inicio').value;
-  const horaFim = document.getElementById(pfx+'hora_fim').value;
+  const horaFim = agoraHHMM();
+  document.getElementById(pfx+'hora_fim').value = horaFim;
   const equipamento = document.getElementById(pfx+'equipamento').value;
   const responsavel = document.getElementById(pfx+'responsavel').value;
   const nomeTabela = processo === 'sopro' ? 'TabelaSopro' : 'TabelaInjecao';
@@ -664,6 +703,8 @@ async function salvarSessao(processo) {
       mostrarToast(valores.length + ' desvio(s) salvos ✓');
       if (processo === 'sopro') { desviosSopro = []; contadorSopro = 0; } else { desviosInjecao = []; contadorInjecao = 0; }
       renderDesvios(processo);
+      document.getElementById(pfx+'hora_inicio').value = agoraHHMM();
+      document.getElementById(pfx+'hora_fim').value = '';
     } else {
       const json = await resp.json();
       mostrarToast('Erro ao salvar: ' + (json.error ? json.error.message : resp.status), true);
@@ -870,6 +911,10 @@ function mostrarToast(msg, isError) {
 function hojeISO() {
   const d = new Date();
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function agoraHHMM() {
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
 }
 
 /* ---------------- Inicialização ---------------- */
