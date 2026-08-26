@@ -156,6 +156,7 @@
   }
   .field textarea { resize: vertical; min-height: 50px; }
   .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .field input:disabled { opacity: 0.4; cursor: not-allowed; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
 
@@ -626,7 +627,7 @@ function renderFormSopro() {
 function listaDesvios(processo) { return processo === 'sopro' ? desviosSopro : desviosInjecao; }
 
 function adicionarDesvio(processo) {
-  const item = { id: (processo === 'sopro' ? ++contadorSopro : ++contadorInjecao), defeito: '', cavidade: [], criticidade: 'LEVE', operadorCiente: 'SIM', status: 'FICOU PENDENTE', observacao: '' };
+  const item = { id: (processo === 'sopro' ? ++contadorSopro : ++contadorInjecao), defeitoEncontrado: 'SIM', defeito: '', cavidade: [], criticidade: 'LEVE', operadorCiente: 'SIM', status: 'FICOU PENDENTE', observacao: '' };
   if (processo === 'sopro') desviosSopro.push(item); else desviosInjecao.push(item);
   renderDesvios(processo);
 }
@@ -647,6 +648,18 @@ function alternarCavidade(processo, id, num, checked) {
   else { d.cavidade = d.cavidade.filter(function(c){ return c !== num; }); }
   const resumo = document.getElementById('cavResumo_'+processo+'_'+id);
   if (resumo) resumo.textContent = d.cavidade.length ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…';
+}
+
+function alternarDefeitoEncontrado(processo, id, valor) {
+  const d = listaDesvios(processo).find(function(d){ return d.id === id; });
+  if (!d) return;
+  d.defeitoEncontrado = valor;
+  if (valor === 'NAO') d.defeito = '';
+  const campoDefeito = document.getElementById('defeitoInput_'+processo+'_'+id);
+  if (campoDefeito) {
+    campoDefeito.disabled = (valor === 'NAO');
+    if (valor === 'NAO') campoDefeito.value = '';
+  }
 }
 
 function renderDesvios(processo) {
@@ -685,7 +698,8 @@ function renderDesvios(processo) {
 
     return '<div class="desvio-card"><button class="remove-desvio" onclick="removerDesvio(\''+processo+'\','+d.id+')">✕</button>' +
       '<div class="desvio-num">DESVIO #'+(idx+1)+'</div>' +
-      '<div class="field"><label>Defeito</label><input type="text" list="'+datalistId+'" value="'+d.defeito+'" placeholder="Digite para buscar…" oninput="atualizarDesvio(\''+processo+'\','+d.id+',\'defeito\',this.value)"></div>' +
+      '<div class="field"><label>Foi identificado algum defeito?</label><select onchange="alternarDefeitoEncontrado(\''+processo+'\','+d.id+',this.value)"><option value="SIM"'+(d.defeitoEncontrado!=='NAO'?' selected':'')+'>SIM</option><option value="NAO"'+(d.defeitoEncontrado==='NAO'?' selected':'')+'>NÃO</option></select></div>' +
+      '<div class="field"><label>Defeito encontrado</label><input type="text" id="defeitoInput_'+processo+'_'+d.id+'" list="'+datalistId+'" value="'+d.defeito+'" placeholder="Digite para buscar…" oninput="atualizarDesvio(\''+processo+'\','+d.id+',\'defeito\',this.value)"'+(d.defeitoEncontrado==='NAO'?' disabled':'')+'></div>' +
       (processo === 'injecao' ? '<div class="grid-2">' + cavidadeBlock + '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div></div>'
                               : '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div>') +
       '<div class="grid-2">' + cienteBlock + '<div class="field"><label>Status</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'status\',this.value)">'+opcoesStatus+'</select></div></div>' +
