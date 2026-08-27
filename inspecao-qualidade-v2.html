@@ -400,7 +400,7 @@ const graphScopes = ["Files.ReadWrite", "User.Read"];
 const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/cleber_rodrigues_blowpet_com_br/IQAWjpUUN_SbToVo1pGmdJcyAQ45D1l_a7UryTknKp9Aq0c?e=pDv6fS";
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em'];
-const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','criado_em'];
+const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','criado_em'];
 
 let LINK_PLANILHA = LINK_PLANILHA_PADRAO;
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
@@ -620,6 +620,11 @@ function renderFormSopro() {
         '<div class="field"><label>Cor</label><select id="sop_cor"></select></div>' +
         '<div class="field"><label>Volume (mL)</label><select id="sop_ml"></select></div>' +
         '<div class="field"><label>Tipo de frasco</label><select id="sop_frasco"></select></div>' +
+      '</div>' +
+      '<div class="grid-3">' +
+        toggleGroupHtml('sop_fechamentoSaco', 'Condição fechamento saco', ['APROVADO','REPROVADO'], 'APROVADO') +
+        toggleGroupHtml('sop_alinhamentoPaletes', 'Alinhamento dos paletes', ['APROVADO','REPROVADO'], 'APROVADO') +
+        toggleGroupHtml('sop_organizacaoLinha', 'Organização linha produtiva', ['APROVADO','REPROVADO'], 'APROVADO') +
       '</div>' +
       '<div class="grid-3">' +
         toggleGroupHtml('sop_produtoRotulado', 'Produto rotulado?', ['SIM','NÃO'], 'SIM') +
@@ -862,6 +867,9 @@ async function salvarSessao(processo) {
       const produtoRotulado = getToggleValue('sop_produtoRotulado');
       const condicaoRotulo = getToggleValue('sop_condicaoRotulo');
       const testeProducao = getToggleValue('sop_testeProducao');
+      const fechamentoSaco = getToggleValue('sop_fechamentoSaco');
+      const alinhamentoPaletes = getToggleValue('sop_alinhamentoPaletes');
+      const organizacaoLinha = getToggleValue('sop_organizacaoLinha');
       const numPostos = document.getElementById('sop_numPostos').value;
       const pesos = {}, alturas = {};
       for (let i = 1; i <= 4; i++) {
@@ -874,6 +882,7 @@ async function salvarSessao(processo) {
         return { id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim, equipamento: equipamento, responsavel: responsavel,
           cor: cor, ml: ml, tipo_frasco: frasco, defeito: d.defeito, criticidade: d.criticidade, status_correcao: d.status,
           observacao: d.observacao, foto_url: d.fotoUrlFinal || '',
+          condicao_fechamento_saco: fechamentoSaco, alinhamento_paletes: alinhamentoPaletes, organizacao_linha_produtiva: organizacaoLinha,
           produto_rotulado: produtoRotulado, condicao_rotulo: condicaoRotulo, teste_producao: testeProducao, num_postos_molde: numPostos,
           peso_1: pesos[1], peso_2: pesos[2], peso_3: pesos[3], peso_4: pesos[4],
           altura_1: alturas[1], altura_2: alturas[2], altura_3: alturas[3], altura_4: alturas[4],
