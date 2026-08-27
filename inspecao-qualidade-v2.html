@@ -347,7 +347,9 @@
             <thead>
               <tr>
                 <th>Data</th><th>Hora</th><th>Equip.</th><th>Resp.</th><th>Operador</th><th>Cor</th>
-                <th>Gram.</th><th>Resina</th><th>Defeito</th><th>Cavidade(s)</th><th>Criticidade</th>
+                <th>Gram.</th><th>Resina</th><th>Temp. Gate</th><th>Temp. Corpo</th>
+                <th>Org. Linha</th><th>Tonalid.</th><th>Alinh. Etiq.</th>
+                <th>Defeito</th><th>Cavidade(s)</th><th>Criticidade</th>
                 <th>Oper. Ciente</th><th>Status</th><th>Observação</th>
               </tr>
             </thead>
@@ -428,7 +430,7 @@ const msalConfig = {
 const graphScopes = ["Files.ReadWrite", "User.Read"];
 const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/cleber_rodrigues_blowpet_com_br/IQAWjpUUN_SbToVo1pGmdJcyAQ45D1l_a7UryTknKp9Aq0c?e=pDv6fS";
 
-const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em'];
+const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate','temperatura_corpo'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4'];
 
 let LINK_PLANILHA = LINK_PLANILHA_PADRAO;
@@ -611,6 +613,15 @@ function renderFormInjecao() {
         '<div class="field"><label>Cor da preforma</label><select id="inj_cor"></select></div>' +
         '<div class="field"><label>Gramatura</label><select id="inj_gramatura"></select></div>' +
         '<div class="field"><label>Resina</label><select id="inj_resina"></select></div>' +
+      '</div>' +
+      '<div class="grid-3">' +
+        toggleGroupHtml('inj_organizacaoLinha', 'Organização linha produtiva', ['APROVADO','REPROVADO'], 'APROVADO') +
+        toggleGroupHtml('inj_tonalidadePreforma', 'Tonalidade da preforma', ['APROVADO','REPROVADO'], 'APROVADO') +
+        toggleGroupHtml('inj_alinhamentoEtiqueta', 'Alinhamento etiqueta caixa', ['APROVADO','REPROVADO'], 'APROVADO') +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Temperatura Gate (°C)</label><input type="number" step="0.1" id="inj_tempGate" placeholder="Ex: 245.5"></div>' +
+        '<div class="field"><label>Temperatura Corpo (°C)</label><input type="number" step="0.1" id="inj_tempCorpo" placeholder="Ex: 250.0"></div>' +
       '</div>' +
       '<div class="field"><label>Foi identificado algum defeito?</label><select id="inj_temDefeito" onchange="alternarSecaoDesvios(\'injecao\',this.value)"><option value="NAO" selected>NÃO</option><option value="SIM">SIM</option></select></div>' +
     '</div>' +
@@ -884,10 +895,17 @@ async function salvarSessao(processo) {
       const cor = document.getElementById('inj_cor').value;
       const gramatura = document.getElementById('inj_gramatura').value;
       const resina = document.getElementById('inj_resina').value;
+      const organizacaoLinha = getToggleValue('inj_organizacaoLinha');
+      const tonalidadePreforma = getToggleValue('inj_tonalidadePreforma');
+      const alinhamentoEtiqueta = getToggleValue('inj_alinhamentoEtiqueta');
+      const tempGate = document.getElementById('inj_tempGate').value;
+      const tempCorpo = document.getElementById('inj_tempCorpo').value;
       linhasObj = desvios.map(function(d) {
         return { id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim, equipamento: equipamento, responsavel: responsavel,
           operador_principal: operador, cor: cor, gramatura: gramatura, resina: resina, defeito: d.defeito, cavidade: Array.isArray(d.cavidade) ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(';') : (d.cavidade || ''),
-          criticidade: d.criticidade, operador_ciente: d.operadorCiente, status_correcao: d.status, observacao: d.observacao, foto_url: d.fotoUrlFinal || '', criado_em: new Date().toISOString() };
+          criticidade: d.criticidade, operador_ciente: d.operadorCiente, status_correcao: d.status, observacao: d.observacao, foto_url: d.fotoUrlFinal || '', criado_em: new Date().toISOString(),
+          organizacao_linha_produtiva: organizacaoLinha, tonalidade_preforma: tonalidadePreforma, alinhamento_etiqueta_caixa: alinhamentoEtiqueta,
+          temperatura_gate: tempGate, temperatura_corpo: tempCorpo };
       });
     } else {
       const cor = document.getElementById('sop_cor').value;
@@ -1169,6 +1187,8 @@ function renderTabelaInjecao() {
       '<td>'+(l.data||'—')+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
       '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
       '<td>'+(l.gramatura||'—')+'</td>' + '<td>'+(l.resina||'—')+'</td>' +
+      '<td>'+(l.temperatura_gate||'—')+'</td>' + '<td>'+(l.temperatura_corpo||'—')+'</td>' +
+      '<td>'+abrev(l.organizacao_linha_produtiva)+'</td>' + '<td>'+abrev(l.tonalidade_preforma)+'</td>' + '<td>'+abrev(l.alinhamento_etiqueta_caixa)+'</td>' +
       '<td>'+(l.defeito||'—')+'</td>' + '<td>'+(l.cavidade||'—')+'</td>' +
       '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' + '<td>'+abrev(l.operador_ciente)+'</td>' +
       '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
@@ -1200,10 +1220,12 @@ function gerarPDF(processo) {
     });
   } else {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal']);
-    colunas = ['Data','Hora','Equip.','Resp.','Operador','Cor','Gram.','Resina','Defeito','Cavidade(s)','Critic.','Op.Ciente','Status','Obs.'];
+    colunas = ['Data','Hora','Equip.','Resp.','Operador','Cor','Gram.','Resina','T.Gate','T.Corpo','Org.Linha','Tonalid.','Alinh.Etiq.','Defeito','Cavidade(s)','Critic.','Op.Ciente','Status','Obs.'];
     corpo = linhas.map(function(l) {
       return [l.data||'—', l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
-        l.gramatura||'—', l.resina||'—', l.defeito||'—', l.cavidade||'—', l.criticidade||'—', abrev(l.operador_ciente),
+        l.gramatura||'—', l.resina||'—', l.temperatura_gate||'—', l.temperatura_corpo||'—',
+        abrev(l.organizacao_linha_produtiva), abrev(l.tonalidade_preforma), abrev(l.alinhamento_etiqueta_caixa),
+        l.defeito||'—', l.cavidade||'—', l.criticidade||'—', abrev(l.operador_ciente),
         l.status_correcao||'—', l.observacao||''];
     });
   }
