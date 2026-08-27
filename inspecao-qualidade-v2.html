@@ -647,22 +647,19 @@ async function salvarConfigLink() {
 }
 
 /* ---------------- Listas suspensas ---------------- */
+function ordenarLista(opcoes) {
+  return opcoes.slice().sort(function(a, b) {
+    return a.localeCompare(b, 'pt-BR', { numeric: true, sensitivity: 'base' });
+  });
+}
+
 function preencherSelect(id, opcoes, comTodos) {
   const el = document.getElementById(id);
   if (!el) return;
-  let html = comTodos ? '<option value="">Todos</option>' : '';
-  html += opcoes.map(function(o){ return '<option value="'+o+'">'+o+'</option>'; }).join('');
+  const ordenadas = ordenarLista(opcoes);
+  let html = comTodos ? '<option value="">Todos</option>' : '<option value="">Selecione…</option>';
+  html += ordenadas.map(function(o){ return '<option value="'+o+'">'+o+'</option>'; }).join('');
   el.innerHTML = html;
-}
-
-function preencherDatalist(id, opcoes) {
-  const el = document.getElementById('dl_' + id);
-  if (!el) return;
-  el.innerHTML = opcoes.map(function(o){ return '<option value="'+o+'">'; }).join('');
-}
-
-function campoBusca(id, placeholder) {
-  return '<input type="text" id="'+id+'" list="dl_'+id+'" placeholder="'+(placeholder || 'Digite ou selecione…')+'" autocomplete="off"><datalist id="dl_'+id+'"></datalist>';
 }
 
 function renderListasNaTela() {
@@ -712,18 +709,18 @@ function renderFormInjecao() {
     '<div class="card"><h3>Dados da sessão</h3>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Data</label><input type="date" id="inj_data"></div>' +
-        '<div class="field"><label>Equipamento</label>'+campoBusca('inj_equipamento')+'</div>' +
+        '<div class="field"><label>Equipamento</label>'+'<select id="inj_equipamento"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Hora início</label><input type="time" id="inj_hora_inicio"></div>' +
         '<div class="field"><label>Hora conclusão</label><input type="time" id="inj_hora_fim"></div>' +
       '</div>' +
-      '<div class="field"><label>Responsável pela inspeção</label>'+campoBusca('inj_responsavel')+'</div>' +
-      '<div class="field"><label>Operador principal</label>'+campoBusca('inj_operador')+'</div>' +
+      '<div class="field"><label>Responsável pela inspeção</label>'+'<select id="inj_responsavel"></select>'+'</div>' +
+      '<div class="field"><label>Operador principal</label>'+'<select id="inj_operador"></select>'+'</div>' +
       '<div class="grid-3">' +
-        '<div class="field"><label>Cor da preforma</label>'+campoBusca('inj_cor')+'</div>' +
-        '<div class="field"><label>Gramatura</label>'+campoBusca('inj_gramatura')+'</div>' +
-        '<div class="field"><label>Resina</label>'+campoBusca('inj_resina')+'</div>' +
+        '<div class="field"><label>Cor da preforma</label>'+'<select id="inj_cor"></select>'+'</div>' +
+        '<div class="field"><label>Gramatura</label>'+'<select id="inj_gramatura"></select>'+'</div>' +
+        '<div class="field"><label>Resina</label>'+'<select id="inj_resina"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-3">' +
         toggleGroupHtml('inj_organizacaoLinha', 'Organização linha produtiva', ['APROVADO','REPROVADO'], 'APROVADO') +
@@ -746,12 +743,12 @@ function renderFormInjecao() {
       '<button class="btn btn-outline btn-block" id="btnAddDesvioInjecao" onclick="adicionarDesvio(\'injecao\')">+ Adicionar desvio</button>' +
     '</div>' +
     '<button class="btn btn-accent btn-block" id="btnSalvarInjecao" onclick="salvarSessao(\'injecao\')">Salvar sessão na planilha</button>';
-  preencherDatalist('inj_equipamento', listas.equipInjecao);
-  preencherDatalist('inj_responsavel', listas.responsaveis);
-  preencherDatalist('inj_operador', listas.operadores);
-  preencherDatalist('inj_cor', listas.coresInjecao);
-  preencherDatalist('inj_gramatura', listas.gramaturas);
-  preencherDatalist('inj_resina', listas.resinas);
+  preencherSelect('inj_equipamento', listas.equipInjecao);
+  preencherSelect('inj_responsavel', listas.responsaveis);
+  preencherSelect('inj_operador', listas.operadores);
+  preencherSelect('inj_cor', listas.coresInjecao);
+  preencherSelect('inj_gramatura', listas.gramaturas);
+  preencherSelect('inj_resina', listas.resinas);
   document.getElementById('inj_data').value = hojeISO();
   document.getElementById('inj_hora_inicio').value = agoraHHMM();
   renderDesvios('injecao');
@@ -764,21 +761,21 @@ function renderFormSopro() {
     '<div class="card"><h3>Dados da sessão</h3>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Data</label><input type="date" id="sop_data"></div>' +
-        '<div class="field"><label>Equipamento</label>'+campoBusca('sop_equipamento')+'</div>' +
+        '<div class="field"><label>Equipamento</label>'+'<select id="sop_equipamento"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Hora início</label><input type="time" id="sop_hora_inicio"></div>' +
         '<div class="field"><label>Hora conclusão</label><input type="time" id="sop_hora_fim"></div>' +
       '</div>' +
-      '<div class="field"><label>Responsável pela inspeção</label>'+campoBusca('sop_responsavel')+'</div>' +
+      '<div class="field"><label>Responsável pela inspeção</label>'+'<select id="sop_responsavel"></select>'+'</div>' +
       '<div class="grid-3">' +
-        '<div class="field"><label>Cor</label>'+campoBusca('sop_cor')+'</div>' +
-        '<div class="field"><label>Volume (mL)</label>'+campoBusca('sop_ml')+'</div>' +
-        '<div class="field"><label>Tipo de frasco</label>'+campoBusca('sop_frasco')+'</div>' +
+        '<div class="field"><label>Cor</label>'+'<select id="sop_cor"></select>'+'</div>' +
+        '<div class="field"><label>Volume (mL)</label>'+'<select id="sop_ml"></select>'+'</div>' +
+        '<div class="field"><label>Tipo de frasco</label>'+'<select id="sop_frasco"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-3">' +
-        '<div class="field"><label>Gramatura preforma</label>'+campoBusca('sop_gramaturaPreforma')+'</div>' +
-        '<div class="field"><label>Fornecedor preforma</label>'+campoBusca('sop_fornecedorPreforma')+'</div>' +
+        '<div class="field"><label>Gramatura preforma</label>'+'<select id="sop_gramaturaPreforma"></select>'+'</div>' +
+        '<div class="field"><label>Fornecedor preforma</label>'+'<select id="sop_fornecedorPreforma"></select>'+'</div>' +
         '<div class="field"><label>Lote caixa</label><input type="text" id="sop_loteCaixa" placeholder="Ex: L2026-081"></div>' +
       '</div>' +
       '<div class="grid-2">' +
@@ -808,13 +805,13 @@ function renderFormSopro() {
       '<button class="btn btn-outline btn-block" id="btnAddDesvioSopro" onclick="adicionarDesvio(\'sopro\')">+ Adicionar desvio</button>' +
     '</div>' +
     '<button class="btn btn-accent btn-block" id="btnSalvarSopro" onclick="salvarSessao(\'sopro\')">Salvar sessão na planilha</button>';
-  preencherDatalist('sop_equipamento', listas.equipSopro);
-  preencherDatalist('sop_responsavel', listas.responsaveis);
-  preencherDatalist('sop_cor', listas.coresSopro);
-  preencherDatalist('sop_ml', listas.mlSopro);
-  preencherDatalist('sop_frasco', listas.tipoFrasco);
-  preencherDatalist('sop_fornecedorPreforma', listas.fornecedoresPreforma);
-  preencherDatalist('sop_gramaturaPreforma', listas.gramaturasPreforma);
+  preencherSelect('sop_equipamento', listas.equipSopro);
+  preencherSelect('sop_responsavel', listas.responsaveis);
+  preencherSelect('sop_cor', listas.coresSopro);
+  preencherSelect('sop_ml', listas.mlSopro);
+  preencherSelect('sop_frasco', listas.tipoFrasco);
+  preencherSelect('sop_fornecedorPreforma', listas.fornecedoresPreforma);
+  preencherSelect('sop_gramaturaPreforma', listas.gramaturasPreforma);
   renderPostosMolde('4');
   document.getElementById('sop_data').value = hojeISO();
   document.getElementById('sop_hora_inicio').value = agoraHHMM();
