@@ -474,6 +474,11 @@
 
       <div class="card">
         <h3>Listas de apoio (menus suspensos)</h3>
+        <p class="config-note" style="margin-bottom:12px;">
+          Essas listas ficam guardadas numa aba própria da planilha (<code>Listas_App</code>),
+          criada automaticamente. Depois de salvar, elas aparecem em qualquer dispositivo que
+          abrir este app — não precisa configurar de novo em cada aparelho.
+        </p>
         <div class="field"><label>Responsáveis (um por linha)</label><textarea id="listaResponsaveis" rows="4"></textarea></div>
         <div class="field"><label>Equipamentos — Injeção (um por linha)</label><textarea id="listaEquipInjecao" rows="4"></textarea></div>
         <div class="field"><label>Equipamentos — Sopro (um por linha)</label><textarea id="listaEquipSopro" rows="4"></textarea></div>
@@ -488,7 +493,7 @@
         <div class="field"><label>Tipos de frasco — Sopro (um por linha)</label><textarea id="listaTipoFrasco" rows="4"></textarea></div>
         <div class="field"><label>Fornecedores de preforma — Sopro (um por linha)</label><textarea id="listaFornecedoresPreforma" rows="3"></textarea></div>
         <div class="field"><label>Gramaturas de preforma — Sopro (um por linha)</label><textarea id="listaGramaturasPreforma" rows="3"></textarea></div>
-        <button class="btn btn-accent" onclick="salvarListas()">Salvar listas</button>
+        <button class="btn btn-accent" id="btnSalvarListas" onclick="salvarListas()">Salvar listas</button>
       </div>
     </div>
 
@@ -633,6 +638,7 @@ async function conectarPlanilha() {
     if (json.id) {
       itemId = json.id; driveId = json.parentReference.driveId;
       dot.className = 'status-dot online'; dotSide.style.background = 'var(--ok)'; label.textContent = 'conectado';
+      await carregarListasDaPlanilha();
       carregarDados();
       return true;
     } else {
@@ -651,7 +657,113 @@ async function salvarConfigLink() {
   if (ok) mostrarToast('Conectado à planilha ✓');
 }
 
-/* ---------------- Listas suspensas ---------------- */
+/* ---------------- Listas suspensas (guardadas na planilha, aba Listas_App) ---------------- */
+const CHAVES_LISTAS = ['responsaveis','equipInjecao','equipSopro','defeitosInjecao','defeitosSopro','operadores','coresInjecao','gramaturas','resinas','coresSopro','mlSopro','tipoFrasco','fornecedoresPreforma','gramaturasPreforma'];
+
+async function garantirTabelaListas(token) {
+  // Verifica se a planilha (worksheet) "Listas_App" existe
+  const respWs = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets', { headers: { Authorization: 'Bearer ' + token } });
+  const jsonWs = await respWs.json();
+  let existeWs = (jsonWs.value || []).some(function(w){ return w.name === 'Listas_App'; });
+
+  if (!existeWs) {
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Listas_App' })
+    });
+  }
+
+  // Verifica se a tabela já existe dentro dela
+  const respTb = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/tables', { headers: { Authorization: 'Bearer ' + token } });
+  const jsonTb = await respTb.json();
+  let existeTb = (jsonTb.value || []).some(function(t){ return t.name === 'TabelaListas'; });
+
+  if (!existeTb) {
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/range(address=\'A1:B1\')', {
+      method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [['tipo', 'valor']] })
+    });
+    const respAdd = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/tables/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: 'Listas_App!A1:B1', hasHeaders: true })
+    });
+    const jsonAdd = await respAdd.json();
+    if (jsonAdd.id) {
+      await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + jsonAdd.id, {
+        method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'TabelaListas' })
+      });
+    }
+    return false; // tabela recém-criada, ainda vazia
+  }
+  return true;
+}
+
+async function carregarListasDaPlanilha() {
+  try {
+    const token = await getToken();
+    const jaExistia = await garantirTabelaListas(token);
+
+    if (!jaExistia) {
+      // Tabela acabou de ser criada: grava os valores padrão que já estavam no app
+      await salvarListasNaPlanilha();
+      return;
+    }
+
+    const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/tables/TabelaListas/rows', { headers: { Authorization: 'Bearer ' + token } });
+    const json = await resp.json();
+    if (!json.value || json.value.length === 0) { await salvarListasNaPlanilha(); return; }
+
+    const novasListas = {};
+    CHAVES_LISTAS.forEach(function(chave) { novasListas[chave] = []; });
+    json.value.forEach(function(row) {
+      const valores = row.values[0];
+      const tipo = valores[0], valor = valores[1];
+      if (novasListas[tipo] !== undefined && valor) novasListas[tipo].push(valor);
+    });
+    CHAVES_LISTAS.forEach(function(chave) {
+      if (novasListas[chave].length > 0) listas[chave] = novasListas[chave];
+    });
+    renderListasNaTela();
+    renderFormInjecao();
+    renderFormSopro();
+  } catch (err) {
+    console.error('Erro ao carregar listas da planilha:', err);
+  }
+}
+
+async function salvarListasNaPlanilha() {
+  try {
+    const token = await getToken();
+    await garantirTabelaListas(token);
+    const urlBase = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/tables/TabelaListas';
+
+    // Apaga todas as linhas atuais
+    const respAtual = await fetch(urlBase + '/rows', { headers: { Authorization: 'Bearer ' + token } });
+    const jsonAtual = await respAtual.json();
+    const total = jsonAtual.value ? jsonAtual.value.length : 0;
+    for (let i = total - 1; i >= 0; i--) {
+      await fetch(urlBase + '/rows/itemAt(index=' + i + ')', { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
+    }
+
+    // Grava tudo de novo
+    const valores = [];
+    CHAVES_LISTAS.forEach(function(chave) {
+      (listas[chave] || []).forEach(function(valor) { valores.push([chave, valor]); });
+    });
+    if (valores.length > 0) {
+      await fetch(urlBase + '/rows/add', {
+        method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ values: valores })
+      });
+    }
+    return true;
+  } catch (err) {
+    console.error('Erro ao salvar listas na planilha:', err);
+    return false;
+  }
+}
+
 function ordenarLista(opcoes) {
   return opcoes.slice().sort(function(a, b) {
     return a.localeCompare(b, 'pt-BR', { numeric: true, sensitivity: 'base' });
@@ -684,7 +796,7 @@ function renderListasNaTela() {
   document.getElementById('listaGramaturasPreforma').value = listas.gramaturasPreforma.join('\n');
 }
 
-function salvarListas() {
+async function salvarListas() {
   function parse(id) { return document.getElementById(id).value.split('\n').map(function(s){return s.trim();}).filter(Boolean); }
   listas.responsaveis = parse('listaResponsaveis');
   listas.equipInjecao = parse('listaEquipInjecao');
@@ -702,7 +814,12 @@ function salvarListas() {
   listas.gramaturasPreforma = parse('listaGramaturasPreforma');
   renderFormInjecao();
   renderFormSopro();
-  mostrarToast('Listas atualizadas.');
+
+  const btn = document.getElementById('btnSalvarListas');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando na planilha…'; }
+  const ok = await salvarListasNaPlanilha();
+  if (btn) { btn.disabled = false; btn.textContent = 'Salvar listas'; }
+  mostrarToast(ok ? 'Listas salvas na planilha ✓ (visíveis em qualquer dispositivo)' : 'Listas atualizadas aqui, mas houve falha ao salvar na planilha.', !ok);
 }
 
 /* ---------------- Formulário genérico (Injeção / Sopro) ---------------- */
@@ -914,12 +1031,10 @@ function renderDesvios(processo) {
   const container = document.getElementById(processo === 'sopro' ? 'listaDesviosSopro' : 'listaDesviosInjecao');
   const vazio = document.getElementById(processo === 'sopro' ? 'semDesviosSopro' : 'semDesviosInjecao');
   vazio.classList.toggle('hidden', desvios.length > 0);
-  const defeitosLista = processo === 'sopro' ? listas.defeitosSopro : listas.defeitosInjecao;
-  const datalistId = 'dlDefeitos_' + processo;
+  const defeitosLista = ordenarLista(processo === 'sopro' ? listas.defeitosSopro : listas.defeitosInjecao);
 
-  const datalistHtml = '<datalist id="'+datalistId+'">' + defeitosLista.map(function(f){ return '<option value="'+f+'">'; }).join('') + '</datalist>';
-
-  container.innerHTML = datalistHtml + desvios.map(function(d, idx) {
+  container.innerHTML = desvios.map(function(d, idx) {
+    const opcoesDefeito = defeitosLista.map(function(f){ return '<option value="'+f+'"'+(d.defeito===f?' selected':'')+'>'+f+'</option>'; }).join('');
     const opcoesCrit = criticidades.map(function(c){ return '<option value="'+c+'"'+(d.criticidade===c?' selected':'')+'>'+c+'</option>'; }).join('');
     const opcoesStatus = statusCorrecao.map(function(s){ return '<option value="'+s+'"'+(d.status===s?' selected':'')+'>'+s+'</option>'; }).join('');
     const cienteBlock = processo === 'injecao'
@@ -945,7 +1060,7 @@ function renderDesvios(processo) {
 
     return '<div class="desvio-card"><button class="remove-desvio" onclick="removerDesvio(\''+processo+'\','+d.id+')">✕</button>' +
       '<div class="desvio-num">DESVIO #'+(idx+1)+'</div>' +
-      '<div class="field"><label>Defeito encontrado</label><input type="text" id="defeitoInput_'+processo+'_'+d.id+'" list="'+datalistId+'" value="'+d.defeito+'" placeholder="Digite para buscar…" oninput="atualizarDesvio(\''+processo+'\','+d.id+',\'defeito\',this.value)"></div>' +
+      '<div class="field"><label>Defeito encontrado</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'defeito\',this.value)"><option value="">Selecione…</option>'+opcoesDefeito+'</select></div>' +
       (processo === 'injecao' ? '<div class="grid-2">' + cavidadeBlock + '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div></div>'
                               : '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div>') +
       '<div class="grid-2">' + cienteBlock + '<div class="field"><label>Status</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'status\',this.value)">'+opcoesStatus+'</select></div></div>' +
