@@ -149,7 +149,11 @@
     background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
     padding: 7px 10px; border-radius: 7px; font-size: 12px;
   }
-  .table-scroll { overflow-x: auto; }
+  .table-scroll { overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  .table-scroll::-webkit-scrollbar { height: 7px; }
+  .table-scroll::-webkit-scrollbar-track { background: transparent; }
+  .table-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .table-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
   table.occ-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
   table.occ-table th {
     text-align: left; padding: 9px 10px; color: var(--text-dim); font-size: 10.5px; text-transform: uppercase;
@@ -220,7 +224,11 @@
   .cav-grid {
     display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
     padding: 10px; border-top: 1px solid var(--border); max-height: 200px; overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
   }
+  .cav-grid::-webkit-scrollbar { width: 7px; }
+  .cav-grid::-webkit-scrollbar-track { background: transparent; }
+  .cav-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
   .cav-opt { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-dim); padding: 3px 4px; border-radius: 5px; cursor: pointer; }
   .cav-opt:hover { background: var(--surface); }
   .cav-opt input { margin: 0; }
@@ -324,7 +332,18 @@
           <input type="date" id="tDataDeSopro" onchange="renderTabelaSopro()">
           <span style="color:var(--text-dim); font-size:12px;">até</span>
           <input type="date" id="tDataAteSopro" onchange="renderTabelaSopro()">
-          <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarPDF('sopro')">📄 PDF</button>
+          <select id="tLimiteSopro" onchange="renderTabelaSopro()">
+            <option value="5">5 linhas</option>
+            <option value="10">10 linhas</option>
+            <option value="15">15 linhas</option>
+            <option value="20" selected>20 linhas</option>
+            <option value="25">25 linhas</option>
+            <option value="30">30 linhas</option>
+            <option value="35">35 linhas</option>
+            <option value="50">50 linhas</option>
+          </select>
+          <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('sopro')">🟢 WhatsApp</button>
+          <button class="btn btn-outline" onclick="gerarPDF('sopro')">📄 PDF</button>
         </div>
         <div class="table-scroll">
           <table class="occ-table">
@@ -350,7 +369,18 @@
           <input type="date" id="tDataDeInjecao" onchange="renderTabelaInjecao()">
           <span style="color:var(--text-dim); font-size:12px;">até</span>
           <input type="date" id="tDataAteInjecao" onchange="renderTabelaInjecao()">
-          <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarPDF('injecao')">📄 PDF</button>
+          <select id="tLimiteInjecao" onchange="renderTabelaInjecao()">
+            <option value="5">5 linhas</option>
+            <option value="10">10 linhas</option>
+            <option value="15">15 linhas</option>
+            <option value="20" selected>20 linhas</option>
+            <option value="25">25 linhas</option>
+            <option value="30">30 linhas</option>
+            <option value="35">35 linhas</option>
+            <option value="50">50 linhas</option>
+          </select>
+          <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('injecao')">🟢 WhatsApp</button>
+          <button class="btn btn-outline" onclick="gerarPDF('injecao')">📄 PDF</button>
         </div>
         <div class="table-scroll">
           <table class="occ-table">
@@ -1470,7 +1500,7 @@ function formatarPesoAltura(l) {
   return partes.length ? partes.join(' · ') : '—';
 }
 
-function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca) {
+function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, limite) {
   const busca = (document.getElementById(buscaId).value || '').toLowerCase().trim();
   if (busca) {
     linhas = linhas.filter(function(l) {
@@ -1482,13 +1512,14 @@ function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca) {
   if (dataDe) linhas = linhas.filter(function(l){ return !l.data || l.data >= dataDe; });
   if (dataAte) linhas = linhas.filter(function(l){ return !l.data || l.data <= dataAte; });
   linhas.sort(function(a,b){ return (b.data||'').localeCompare(a.data||'') || (b.hora_inicio||'').localeCompare(a.hora_inicio||''); });
-  return linhas.slice(0, 200);
+  return linhas.slice(0, limite || 200);
 }
 
 function renderTabelaSopro() {
   if (!itemId) return;
   let linhas = linhasFiltradasPorProcesso('sopro');
-  linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco']);
+  const limite = parseInt(document.getElementById('tLimiteSopro').value, 10);
+  linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], limite);
 
   const corpo = document.getElementById('tabelaSoproBody');
   const vazio = document.getElementById('tabelaSoproVazia');
@@ -1514,7 +1545,8 @@ function renderTabelaSopro() {
 function renderTabelaInjecao() {
   if (!itemId) return;
   let linhas = linhasFiltradasPorProcesso('injecao');
-  linhas = filtrarBuscaEData(linhas, 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal']);
+  const limite = parseInt(document.getElementById('tLimiteInjecao').value, 10);
+  linhas = filtrarBuscaEData(linhas, 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], limite);
 
   const corpo = document.getElementById('tabelaInjecaoBody');
   const vazio = document.getElementById('tabelaInjecaoVazia');
@@ -1538,6 +1570,74 @@ function renderTabelaInjecao() {
 }
 
 /* ---------------- Geração de PDF ---------------- */
+/* ---------------- Geração de texto para WhatsApp ---------------- */
+function formatarGramaturaWpp(valor) {
+  if (!valor) return '—';
+  const v = valor.toString().trim();
+  return (v.indexOf(',') > -1 || v.indexOf('.') > -1) ? v + 'G' : v + ',0G';
+}
+
+function agruparPorSessao(linhas) {
+  const grupos = [];
+  const indicePorSessao = {};
+  linhas.forEach(function(l) {
+    const chave = l.id_sessao || (l.equipamento + '|' + l.data + '|' + l.hora_inicio);
+    if (indicePorSessao[chave] === undefined) {
+      indicePorSessao[chave] = grupos.length;
+      grupos.push({ sessao: l, itens: [] });
+    }
+    grupos[indicePorSessao[chave]].itens.push(l);
+  });
+  return grupos;
+}
+
+function gerarWhatsApp(processo) {
+  let linhas;
+  if (processo === 'sopro') {
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500);
+  } else {
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500);
+  }
+
+  if (linhas.length === 0) { mostrarToast('Nenhuma ocorrência para gerar o texto.', true); return; }
+
+  const grupos = agruparPorSessao(linhas);
+  const agora = new Date();
+  const dataHora = String(agora.getDate()).padStart(2,'0') + '/' + String(agora.getMonth()+1).padStart(2,'0') + '/' + agora.getFullYear() + ' - ' + String(agora.getHours()).padStart(2,'0') + ':' + String(agora.getMinutes()).padStart(2,'0');
+
+  let texto = '*Inspeção da Qualidade*\n_' + dataHora + '_\n\n';
+  texto += (processo === 'sopro' ? '*Sopro*' : '*Injetora*') + '\n========\n';
+
+  grupos.forEach(function(g, idx) {
+    const s = g.sessao;
+    texto += '*_' + (s.equipamento || '—') + '_*\n';
+    if (processo === 'injecao') {
+      texto += formatarGramaturaWpp(s.gramatura) + ' - ' + (s.cor || '—') + '\n';
+      g.itens.forEach(function(item) {
+        if (!item.defeito) return;
+        const cavidades = (item.cavidade || '').split(';').filter(Boolean).join(', ');
+        texto += item.defeito + ' - ' + (cavidades || '—') + '\n';
+      });
+    } else {
+      texto += (s.tipo_frasco || '—') + ' - ' + (s.ml || '—') + '\n';
+      g.itens.forEach(function(item) {
+        if (!item.defeito) return;
+        texto += item.defeito + ' - ' + (item.criticidade || '—') + '\n';
+      });
+      const n = parseInt(s.num_postos_molde, 10) || 0;
+      for (let i = 1; i <= n; i++) {
+        if (s['peso_'+i]) texto += 'Peso - Posto ' + i + ': ' + s['peso_'+i] + ' gramas\n';
+        if (s['altura_'+i]) texto += 'Altura - Posto ' + i + ': ' + s['altura_'+i] + ' mm\n';
+      }
+    }
+    if (idx < grupos.length - 1) texto += '\n';
+  });
+
+  navigator.clipboard.writeText(texto).catch(function(){});
+  window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
+  mostrarToast('Texto copiado — abrindo o WhatsApp…');
+}
+
 function gerarPDF(processo) {
   if (typeof window.jspdf === 'undefined') { mostrarToast('Biblioteca de PDF não carregou (verifique a conexão de rede).', true); return; }
   const { jsPDF } = window.jspdf;
@@ -1550,7 +1650,7 @@ function gerarPDF(processo) {
 
   let linhas, colunas, corpo;
   if (processo === 'sopro') {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco']);
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500);
     colunas = ['Data','Hora','Equip.','Resp.','Operador','Frasco','Gram.Pref','Fornec.Pref','LoteCx','NºCx','CxVerm','MotivoCx','Rotul.','Cond.Rót.','Defeito','Critic.','Teste','Peso/Altura','Fech.Saco','Alinh.','Org.Linha','Status','Obs.'];
     corpo = linhas.map(function(l) {
       return [l.data||'—', l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador||'—', l.tipo_frasco||'—',
@@ -1560,7 +1660,7 @@ function gerarPDF(processo) {
         l.status_correcao||'—', l.observacao||''];
     });
   } else {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal']);
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500);
     colunas = ['Data','Hora','Equip.','Resp.','Operador','Cor','Gram.','Resina','T.GateMin','T.GateMax','T.CorpoMin','T.CorpoMax','Org.Linha','Tonalid.','Alinh.Etiq.','Defeito','Cavidade(s)','Critic.','Op.Ciente','Status','Obs.'];
     corpo = linhas.map(function(l) {
       return [l.data||'—', l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
