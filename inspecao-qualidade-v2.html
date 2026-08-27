@@ -489,9 +489,10 @@
       <div class="card">
         <h3>Conexão com a planilha</h3>
         <p class="config-note">
-          A conexão é automática — usa seu próprio login Microsoft e o identificador fixo do
-          arquivo, sem precisar de link nem senha separada. Cada pessoa que abrir este app
-          precisa ter permissão de edição nessa planilha (veja "Liberar acesso" abaixo).
+          A conexão é automática — usa seu próprio login Microsoft, através de um link de
+          compartilhamento fixo já configurado no app. Cada pessoa que abrir este app precisa
+          ter permissão de edição nessa planilha (veja "Liberar acesso" abaixo). Se o link de
+          compartilhamento da planilha mudar no SharePoint, é preciso atualizar o código do app.
         </p>
       </div>
 
@@ -552,8 +553,9 @@ const graphScopes = ["Files.ReadWrite", "User.Read"];
 /* Identificadores fixos do arquivo na nuvem (mais confiável que link de
    compartilhamento — funciona para qualquer conta com permissão no arquivo,
    sem depender do tipo/escopo do link). */
-const DRIVE_ID_PADRAO = "b!oj_MAbSbrkeilOu91zhL7P2hYXmF3ilPqfmm7poiQ01YHg8vpwKqS5yAbYI1ZR1C";
-const ITEM_ID_PADRAO = "015D7CGSAWR2KRIN7UTNHIK2GWSGTHJFZS";
+/* Link de compartilhamento da planilha. Se você trocar o tipo de link no
+   SharePoint (ex: para "Pessoas da organização com o link"), atualize aqui. */
+const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/cleber_rodrigues_blowpet_com_br/IQAWjpUUN_SbToVo1pGmdJcyAQ45D1l_a7UryTknKp9Aq0c?e=pDv6fS";
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -669,22 +671,21 @@ async function conectarPlanilha() {
   const dotSide = document.getElementById('statusDotSide');
   const label = document.getElementById('statusText');
   label.textContent = 'conectando…';
-  driveId = DRIVE_ID_PADRAO;
-  itemId = ITEM_ID_PADRAO;
   try {
     const token = await getToken();
-    const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId, { headers: { Authorization: 'Bearer ' + token } });
+    const base64 = btoa(LINK_PLANILHA_PADRAO).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+    const sharingId = 'u!' + base64;
+    const resp = await fetch('https://graph.microsoft.com/v1.0/shares/' + sharingId + '/driveItem', { headers: { Authorization: 'Bearer ' + token } });
     const json = await resp.json();
     if (json.id) {
+      itemId = json.id; driveId = json.parentReference.driveId;
       dot.className = 'status-dot online'; dotSide.style.background = 'var(--ok)'; label.textContent = 'conectado';
       await carregarListasDaPlanilha();
       await prepararColunasComoTexto(token);
       carregarDados();
       return true;
     } else {
-      dot.className = 'status-dot offline';
-      label.textContent = (json.error && json.error.code === 'itemNotFound') ? 'sem permissão nesta planilha' : 'erro na planilha';
-      return false;
+      dot.className = 'status-dot offline'; label.textContent = 'erro na planilha'; return false;
     }
   } catch (err) {
     dot.className = 'status-dot offline'; label.textContent = 'offline'; return false;
@@ -716,11 +717,17 @@ async function liberarAcesso() {
             roles: ['write']
           })
         });
-        if (resp.ok) sucesso++; else falhas.push(email);
-      } catch (e) { falhas.push(email); }
+        if (resp.ok) {
+          sucesso++;
+        } else {
+          const json = await resp.json().catch(function(){ return {}; });
+          const motivo = json.error ? (json.error.message || json.error.code) : ('status ' + resp.status);
+          falhas.push(email + ' (' + motivo + ')');
+        }
+      } catch (e) { falhas.push(email + ' (' + e.message + ')'); }
     }
     if (sucesso > 0) campo.value = '';
-    mostrarToast(sucesso + ' e-mail(s) liberado(s) com sucesso' + (falhas.length ? ('; falha em: ' + falhas.join(', ')) : '') + '.', falhas.length > 0);
+    mostrarToast(sucesso + ' e-mail(s) liberado(s) com sucesso' + (falhas.length ? ('; falha em: ' + falhas.join('; ')) : '') + '.', falhas.length > 0);
   } finally {
     btn.disabled = false; btn.textContent = 'Liberar acesso';
   }
