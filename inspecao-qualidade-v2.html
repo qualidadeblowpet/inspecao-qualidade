@@ -322,6 +322,7 @@
             <thead>
               <tr>
                 <th>Data</th><th>Hora</th><th>Equip.</th><th>Resp.</th><th>Frasco</th>
+                <th>Gram. Pref.</th><th>Fornec. Pref.</th><th>Lote Caixa</th><th>Nº Caixa</th><th>Caixa Verm.</th>
                 <th>Rotulado</th><th>Cond. Rótulo</th><th>Defeito</th><th>Criticidade</th>
                 <th>Teste Prod.</th><th>Peso/Altura</th><th>Fech. Saco</th><th>Alinh. Paletes</th><th>Org. Linha</th>
                 <th>Status</th><th>Observação</th>
@@ -347,7 +348,7 @@
             <thead>
               <tr>
                 <th>Data</th><th>Hora</th><th>Equip.</th><th>Resp.</th><th>Operador</th><th>Cor</th>
-                <th>Gram.</th><th>Resina</th><th>Temp. Gate</th><th>Temp. Corpo</th>
+                <th>Gram.</th><th>Resina</th><th>T.Gate Min</th><th>T.Gate Max</th><th>T.Corpo Min</th><th>T.Corpo Max</th>
                 <th>Org. Linha</th><th>Tonalid.</th><th>Alinh. Etiq.</th>
                 <th>Defeito</th><th>Cavidade(s)</th><th>Criticidade</th>
                 <th>Oper. Ciente</th><th>Status</th><th>Observação</th>
@@ -430,8 +431,8 @@ const msalConfig = {
 const graphScopes = ["Files.ReadWrite", "User.Read"];
 const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/cleber_rodrigues_blowpet_com_br/IQAWjpUUN_SbToVo1pGmdJcyAQ45D1l_a7UryTknKp9Aq0c?e=pDv6fS";
 
-const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate','temperatura_corpo'];
-const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4'];
+const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max'];
+const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha'];
 
 let LINK_PLANILHA = LINK_PLANILHA_PADRAO;
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
@@ -620,8 +621,12 @@ function renderFormInjecao() {
         toggleGroupHtml('inj_alinhamentoEtiqueta', 'Alinhamento etiqueta caixa', ['APROVADO','REPROVADO'], 'APROVADO') +
       '</div>' +
       '<div class="grid-2">' +
-        '<div class="field"><label>Temperatura Gate (°C)</label><input type="number" step="0.1" id="inj_tempGate" placeholder="Ex: 245.5"></div>' +
-        '<div class="field"><label>Temperatura Corpo (°C)</label><input type="number" step="0.1" id="inj_tempCorpo" placeholder="Ex: 250.0"></div>' +
+        '<div class="field"><label>Temperatura Gate — °C Mínima</label><input type="number" step="0.1" id="inj_tempGateMin" placeholder="Ex: 240.0"></div>' +
+        '<div class="field"><label>Temperatura Gate — °C Máxima</label><input type="number" step="0.1" id="inj_tempGateMax" placeholder="Ex: 250.0"></div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Temperatura Corpo — °C Mínima</label><input type="number" step="0.1" id="inj_tempCorpoMin" placeholder="Ex: 245.0"></div>' +
+        '<div class="field"><label>Temperatura Corpo — °C Máxima</label><input type="number" step="0.1" id="inj_tempCorpoMax" placeholder="Ex: 255.0"></div>' +
       '</div>' +
       '<div class="field"><label>Foi identificado algum defeito?</label><select id="inj_temDefeito" onchange="alternarSecaoDesvios(\'injecao\',this.value)"><option value="NAO" selected>NÃO</option><option value="SIM">SIM</option></select></div>' +
     '</div>' +
@@ -660,6 +665,15 @@ function renderFormSopro() {
         '<div class="field"><label>Cor</label><select id="sop_cor"></select></div>' +
         '<div class="field"><label>Volume (mL)</label><select id="sop_ml"></select></div>' +
         '<div class="field"><label>Tipo de frasco</label><select id="sop_frasco"></select></div>' +
+      '</div>' +
+      '<div class="grid-3">' +
+        '<div class="field"><label>Gramatura preforma</label><input type="text" id="sop_gramaturaPreforma" placeholder="Ex: 24"></div>' +
+        '<div class="field"><label>Fornecedor preforma</label><input type="text" id="sop_fornecedorPreforma" placeholder="Ex: Indorama"></div>' +
+        '<div class="field"><label>Lote caixa</label><input type="text" id="sop_loteCaixa" placeholder="Ex: L2026-081"></div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Número caixa</label><input type="text" id="sop_numeroCaixa" placeholder="Ex: 0142"></div>' +
+        toggleGroupHtml('sop_caixaVermelha', 'Caixa vermelha?', ['SIM','NÃO'], 'NÃO') +
       '</div>' +
       '<div class="grid-3">' +
         toggleGroupHtml('sop_fechamentoSaco', 'Condição fechamento saco', ['APROVADO','REPROVADO'], 'APROVADO') +
@@ -898,14 +912,16 @@ async function salvarSessao(processo) {
       const organizacaoLinha = getToggleValue('inj_organizacaoLinha');
       const tonalidadePreforma = getToggleValue('inj_tonalidadePreforma');
       const alinhamentoEtiqueta = getToggleValue('inj_alinhamentoEtiqueta');
-      const tempGate = document.getElementById('inj_tempGate').value;
-      const tempCorpo = document.getElementById('inj_tempCorpo').value;
+      const tempGateMin = document.getElementById('inj_tempGateMin').value;
+      const tempGateMax = document.getElementById('inj_tempGateMax').value;
+      const tempCorpoMin = document.getElementById('inj_tempCorpoMin').value;
+      const tempCorpoMax = document.getElementById('inj_tempCorpoMax').value;
       linhasObj = desvios.map(function(d) {
         return { id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim, equipamento: equipamento, responsavel: responsavel,
           operador_principal: operador, cor: cor, gramatura: gramatura, resina: resina, defeito: d.defeito, cavidade: Array.isArray(d.cavidade) ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(';') : (d.cavidade || ''),
           criticidade: d.criticidade, operador_ciente: d.operadorCiente, status_correcao: d.status, observacao: d.observacao, foto_url: d.fotoUrlFinal || '', criado_em: new Date().toISOString(),
           organizacao_linha_produtiva: organizacaoLinha, tonalidade_preforma: tonalidadePreforma, alinhamento_etiqueta_caixa: alinhamentoEtiqueta,
-          temperatura_gate: tempGate, temperatura_corpo: tempCorpo };
+          temperatura_gate_min: tempGateMin, temperatura_gate_max: tempGateMax, temperatura_corpo_min: tempCorpoMin, temperatura_corpo_max: tempCorpoMax };
       });
     } else {
       const cor = document.getElementById('sop_cor').value;
@@ -918,6 +934,11 @@ async function salvarSessao(processo) {
       const alinhamentoPaletes = getToggleValue('sop_alinhamentoPaletes');
       const organizacaoLinha = getToggleValue('sop_organizacaoLinha');
       const numPostos = document.getElementById('sop_numPostos').value;
+      const gramaturaPreforma = document.getElementById('sop_gramaturaPreforma').value;
+      const fornecedorPreforma = document.getElementById('sop_fornecedorPreforma').value;
+      const loteCaixa = document.getElementById('sop_loteCaixa').value;
+      const numeroCaixa = document.getElementById('sop_numeroCaixa').value;
+      const caixaVermelha = getToggleValue('sop_caixaVermelha');
       const pesos = {}, alturas = {};
       for (let i = 1; i <= 4; i++) {
         const campoPeso = document.getElementById('sop_peso_'+i);
@@ -933,6 +954,7 @@ async function salvarSessao(processo) {
           produto_rotulado: produtoRotulado, condicao_rotulo: condicaoRotulo, teste_producao: testeProducao, num_postos_molde: numPostos,
           peso_1: pesos[1], peso_2: pesos[2], peso_3: pesos[3], peso_4: pesos[4],
           altura_1: alturas[1], altura_2: alturas[2], altura_3: alturas[3], altura_4: alturas[4],
+          gramatura_preforma: gramaturaPreforma, fornecedor_preforma: fornecedorPreforma, lote_caixa: loteCaixa, numero_caixa: numeroCaixa, caixa_vermelha: caixaVermelha,
           criado_em: new Date().toISOString() };
       });
     }
@@ -1161,6 +1183,7 @@ function renderTabelaSopro() {
     return '<tr>' +
       '<td>'+(l.data||'—')+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
       '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.tipo_frasco||'—')+'</td>' +
+      '<td>'+(l.gramatura_preforma||'—')+'</td>' + '<td>'+(l.fornecedor_preforma||'—')+'</td>' + '<td>'+(l.lote_caixa||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+abrev(l.caixa_vermelha)+'</td>' +
       '<td>'+abrev(l.produto_rotulado)+'</td>' + '<td>'+abrev(l.condicao_rotulo)+'</td>' +
       '<td>'+(l.defeito||'—')+'</td>' + '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' +
       '<td>'+abrev(l.teste_producao)+'</td>' + '<td style="white-space:normal;">'+formatarPesoAltura(l)+'</td>' +
@@ -1187,7 +1210,7 @@ function renderTabelaInjecao() {
       '<td>'+(l.data||'—')+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
       '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
       '<td>'+(l.gramatura||'—')+'</td>' + '<td>'+(l.resina||'—')+'</td>' +
-      '<td>'+(l.temperatura_gate||'—')+'</td>' + '<td>'+(l.temperatura_corpo||'—')+'</td>' +
+      '<td>'+(l.temperatura_gate_min||'—')+'</td>' + '<td>'+(l.temperatura_gate_max||'—')+'</td>' + '<td>'+(l.temperatura_corpo_min||'—')+'</td>' + '<td>'+(l.temperatura_corpo_max||'—')+'</td>' +
       '<td>'+abrev(l.organizacao_linha_produtiva)+'</td>' + '<td>'+abrev(l.tonalidade_preforma)+'</td>' + '<td>'+abrev(l.alinhamento_etiqueta_caixa)+'</td>' +
       '<td>'+(l.defeito||'—')+'</td>' + '<td>'+(l.cavidade||'—')+'</td>' +
       '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' + '<td>'+abrev(l.operador_ciente)+'</td>' +
@@ -1211,19 +1234,20 @@ function gerarPDF(processo) {
   let linhas, colunas, corpo;
   if (processo === 'sopro') {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco']);
-    colunas = ['Data','Hora','Equip.','Resp.','Frasco','Rotul.','Cond.Rót.','Defeito','Critic.','Teste','Peso/Altura','Fech.Saco','Alinh.','Org.Linha','Status','Obs.'];
+    colunas = ['Data','Hora','Equip.','Resp.','Frasco','Gram.Pref','Fornec.Pref','LoteCx','NºCx','CxVerm','Rotul.','Cond.Rót.','Defeito','Critic.','Teste','Peso/Altura','Fech.Saco','Alinh.','Org.Linha','Status','Obs.'];
     corpo = linhas.map(function(l) {
       return [l.data||'—', l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.tipo_frasco||'—',
+        l.gramatura_preforma||'—', l.fornecedor_preforma||'—', l.lote_caixa||'—', l.numero_caixa||'—', abrev(l.caixa_vermelha),
         abrev(l.produto_rotulado), abrev(l.condicao_rotulo), l.defeito||'—', l.criticidade||'—', abrev(l.teste_producao),
         formatarPesoAltura(l), abrev(l.condicao_fechamento_saco), abrev(l.alinhamento_paletes), abrev(l.organizacao_linha_produtiva),
         l.status_correcao||'—', l.observacao||''];
     });
   } else {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal']);
-    colunas = ['Data','Hora','Equip.','Resp.','Operador','Cor','Gram.','Resina','T.Gate','T.Corpo','Org.Linha','Tonalid.','Alinh.Etiq.','Defeito','Cavidade(s)','Critic.','Op.Ciente','Status','Obs.'];
+    colunas = ['Data','Hora','Equip.','Resp.','Operador','Cor','Gram.','Resina','T.GateMin','T.GateMax','T.CorpoMin','T.CorpoMax','Org.Linha','Tonalid.','Alinh.Etiq.','Defeito','Cavidade(s)','Critic.','Op.Ciente','Status','Obs.'];
     corpo = linhas.map(function(l) {
       return [l.data||'—', l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
-        l.gramatura||'—', l.resina||'—', l.temperatura_gate||'—', l.temperatura_corpo||'—',
+        l.gramatura||'—', l.resina||'—', l.temperatura_gate_min||'—', l.temperatura_gate_max||'—', l.temperatura_corpo_min||'—', l.temperatura_corpo_max||'—',
         abrev(l.organizacao_linha_produtiva), abrev(l.tonalidade_preforma), abrev(l.alinhamento_etiqueta_caixa),
         l.defeito||'—', l.cavidade||'—', l.criticidade||'—', abrev(l.operador_ciente),
         l.status_correcao||'—', l.observacao||''];
