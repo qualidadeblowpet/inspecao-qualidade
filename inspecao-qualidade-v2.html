@@ -411,7 +411,7 @@
         <div class="field"><label>Volumes (mL) — Sopro (um por linha)</label><textarea id="listaMlSopro" rows="3"></textarea></div>
         <div class="field"><label>Tipos de frasco — Sopro (um por linha)</label><textarea id="listaTipoFrasco" rows="4"></textarea></div>
         <div class="field"><label>Fornecedores de preforma — Sopro (um por linha)</label><textarea id="listaFornecedoresPreforma" rows="3"></textarea></div>
-        <div class="field"><label>Números de caixa — Sopro (um por linha)</label><textarea id="listaNumerosCaixa" rows="3"></textarea></div>
+        <div class="field"><label>Gramaturas de preforma — Sopro (um por linha)</label><textarea id="listaGramaturasPreforma" rows="3"></textarea></div>
         <button class="btn btn-accent" onclick="salvarListas()">Salvar listas</button>
       </div>
     </div>
@@ -458,7 +458,7 @@ let listas = {
   mlSopro: ['300 mL', '500 mL', '510 mL', '1500 mL', '2000 mL'],
   tipoFrasco: ['Água Himalaia', 'Água Indaiá', 'Refrigerante Linha X'],
   fornecedoresPreforma: ['Indorama', 'Alpek', 'M&G'],
-  numerosCaixa: ['0001', '0002', '0003']
+  gramaturasPreforma: ['20', '22', '24', '26']
 };
 const criticidades = ['LEVE', 'MÉDIO', 'GRAVE'];
 const statusCorrecao = ['CORRIGIDO', 'FICOU PENDENTE'];
@@ -577,7 +577,7 @@ function renderListasNaTela() {
   document.getElementById('listaMlSopro').value = listas.mlSopro.join('\n');
   document.getElementById('listaTipoFrasco').value = listas.tipoFrasco.join('\n');
   document.getElementById('listaFornecedoresPreforma').value = listas.fornecedoresPreforma.join('\n');
-  document.getElementById('listaNumerosCaixa').value = listas.numerosCaixa.join('\n');
+  document.getElementById('listaGramaturasPreforma').value = listas.gramaturasPreforma.join('\n');
 }
 
 function salvarListas() {
@@ -595,7 +595,7 @@ function salvarListas() {
   listas.mlSopro = parse('listaMlSopro');
   listas.tipoFrasco = parse('listaTipoFrasco');
   listas.fornecedoresPreforma = parse('listaFornecedoresPreforma');
-  listas.numerosCaixa = parse('listaNumerosCaixa');
+  listas.gramaturasPreforma = parse('listaGramaturasPreforma');
   renderFormInjecao();
   renderFormSopro();
   mostrarToast('Listas atualizadas.');
@@ -675,12 +675,12 @@ function renderFormSopro() {
         '<div class="field"><label>Tipo de frasco</label><select id="sop_frasco"></select></div>' +
       '</div>' +
       '<div class="grid-3">' +
-        '<div class="field"><label>Gramatura preforma</label><input type="text" id="sop_gramaturaPreforma" placeholder="Ex: 24"></div>' +
+        '<div class="field"><label>Gramatura preforma</label><select id="sop_gramaturaPreforma"></select></div>' +
         '<div class="field"><label>Fornecedor preforma</label><select id="sop_fornecedorPreforma"></select></div>' +
         '<div class="field"><label>Lote caixa</label><input type="text" id="sop_loteCaixa" placeholder="Ex: L2026-081"></div>' +
       '</div>' +
       '<div class="grid-2">' +
-        '<div class="field"><label>Número caixa</label><select id="sop_numeroCaixa"></select></div>' +
+        '<div class="field"><label>Número caixa</label><input type="text" id="sop_numeroCaixa" placeholder="Ex: 0142"></div>' +
         toggleGroupHtml('sop_caixaVermelha', 'Caixa vermelha?', ['SIM','NÃO'], 'NÃO') +
       '</div>' +
       '<div class="field"><label>Motivo caixa vermelha</label><input type="text" id="sop_motivoCaixaVermelha" placeholder="Descreva o motivo, se houver"></div>' +
@@ -712,7 +712,7 @@ function renderFormSopro() {
   preencherSelect('sop_ml', listas.mlSopro);
   preencherSelect('sop_frasco', listas.tipoFrasco);
   preencherSelect('sop_fornecedorPreforma', listas.fornecedoresPreforma);
-  preencherSelect('sop_numeroCaixa', listas.numerosCaixa);
+  preencherSelect('sop_gramaturaPreforma', listas.gramaturasPreforma);
   renderPostosMolde('4');
   document.getElementById('sop_data').value = hojeISO();
   document.getElementById('sop_hora_inicio').value = agoraHHMM();
