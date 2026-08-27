@@ -145,9 +145,9 @@
 
   /* ---------- Table ---------- */
   .table-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
-  .table-toolbar input[type=date], .table-toolbar input[type=text] {
+  .table-toolbar input[type=date], .table-toolbar input[type=text], .table-toolbar input[type=time], .table-toolbar select {
     background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
-    padding: 7px 10px; border-radius: 7px; font-size: 12px;
+    padding: 7px 10px; border-radius: 7px; font-size: 12px; height: 32px; box-sizing: border-box;
   }
   .table-scroll { overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
   .table-scroll::-webkit-scrollbar { height: 7px; }
