@@ -322,7 +322,7 @@
             <thead>
               <tr>
                 <th>Data</th><th>Hora</th><th>Equip.</th><th>Resp.</th><th>Frasco</th>
-                <th>Gram. Pref.</th><th>Fornec. Pref.</th><th>Lote Caixa</th><th>Nº Caixa</th><th>Caixa Verm.</th>
+                <th>Gram. Pref.</th><th>Fornec. Pref.</th><th>Lote Caixa</th><th>Nº Caixa</th><th>Caixa Verm.</th><th>Motivo</th>
                 <th>Rotulado</th><th>Cond. Rótulo</th><th>Defeito</th><th>Criticidade</th>
                 <th>Teste Prod.</th><th>Peso/Altura</th><th>Fech. Saco</th><th>Alinh. Paletes</th><th>Org. Linha</th>
                 <th>Status</th><th>Observação</th>
@@ -410,6 +410,8 @@
         <div class="field"><label>Cores — Sopro (um por linha)</label><textarea id="listaCoresSopro" rows="3"></textarea></div>
         <div class="field"><label>Volumes (mL) — Sopro (um por linha)</label><textarea id="listaMlSopro" rows="3"></textarea></div>
         <div class="field"><label>Tipos de frasco — Sopro (um por linha)</label><textarea id="listaTipoFrasco" rows="4"></textarea></div>
+        <div class="field"><label>Fornecedores de preforma — Sopro (um por linha)</label><textarea id="listaFornecedoresPreforma" rows="3"></textarea></div>
+        <div class="field"><label>Números de caixa — Sopro (um por linha)</label><textarea id="listaNumerosCaixa" rows="3"></textarea></div>
         <button class="btn btn-accent" onclick="salvarListas()">Salvar listas</button>
       </div>
     </div>
@@ -432,7 +434,7 @@ const graphScopes = ["Files.ReadWrite", "User.Read"];
 const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/cleber_rodrigues_blowpet_com_br/IQAWjpUUN_SbToVo1pGmdJcyAQ45D1l_a7UryTknKp9Aq0c?e=pDv6fS";
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max'];
-const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha'];
+const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha'];
 
 let LINK_PLANILHA = LINK_PLANILHA_PADRAO;
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
@@ -454,7 +456,9 @@ let listas = {
   resinas: ['Indorama Max', 'Alpek', 'M&G'],
   coresSopro: ['Cristal', 'Azul', 'Verde'],
   mlSopro: ['300 mL', '500 mL', '510 mL', '1500 mL', '2000 mL'],
-  tipoFrasco: ['Água Himalaia', 'Água Indaiá', 'Refrigerante Linha X']
+  tipoFrasco: ['Água Himalaia', 'Água Indaiá', 'Refrigerante Linha X'],
+  fornecedoresPreforma: ['Indorama', 'Alpek', 'M&G'],
+  numerosCaixa: ['0001', '0002', '0003']
 };
 const criticidades = ['LEVE', 'MÉDIO', 'GRAVE'];
 const statusCorrecao = ['CORRIGIDO', 'FICOU PENDENTE'];
@@ -572,6 +576,8 @@ function renderListasNaTela() {
   document.getElementById('listaCoresSopro').value = listas.coresSopro.join('\n');
   document.getElementById('listaMlSopro').value = listas.mlSopro.join('\n');
   document.getElementById('listaTipoFrasco').value = listas.tipoFrasco.join('\n');
+  document.getElementById('listaFornecedoresPreforma').value = listas.fornecedoresPreforma.join('\n');
+  document.getElementById('listaNumerosCaixa').value = listas.numerosCaixa.join('\n');
 }
 
 function salvarListas() {
@@ -588,6 +594,8 @@ function salvarListas() {
   listas.coresSopro = parse('listaCoresSopro');
   listas.mlSopro = parse('listaMlSopro');
   listas.tipoFrasco = parse('listaTipoFrasco');
+  listas.fornecedoresPreforma = parse('listaFornecedoresPreforma');
+  listas.numerosCaixa = parse('listaNumerosCaixa');
   renderFormInjecao();
   renderFormSopro();
   mostrarToast('Listas atualizadas.');
@@ -668,13 +676,14 @@ function renderFormSopro() {
       '</div>' +
       '<div class="grid-3">' +
         '<div class="field"><label>Gramatura preforma</label><input type="text" id="sop_gramaturaPreforma" placeholder="Ex: 24"></div>' +
-        '<div class="field"><label>Fornecedor preforma</label><input type="text" id="sop_fornecedorPreforma" placeholder="Ex: Indorama"></div>' +
+        '<div class="field"><label>Fornecedor preforma</label><select id="sop_fornecedorPreforma"></select></div>' +
         '<div class="field"><label>Lote caixa</label><input type="text" id="sop_loteCaixa" placeholder="Ex: L2026-081"></div>' +
       '</div>' +
       '<div class="grid-2">' +
-        '<div class="field"><label>Número caixa</label><input type="text" id="sop_numeroCaixa" placeholder="Ex: 0142"></div>' +
+        '<div class="field"><label>Número caixa</label><select id="sop_numeroCaixa"></select></div>' +
         toggleGroupHtml('sop_caixaVermelha', 'Caixa vermelha?', ['SIM','NÃO'], 'NÃO') +
       '</div>' +
+      '<div class="field"><label>Motivo caixa vermelha</label><input type="text" id="sop_motivoCaixaVermelha" placeholder="Descreva o motivo, se houver"></div>' +
       '<div class="grid-3">' +
         toggleGroupHtml('sop_fechamentoSaco', 'Condição fechamento saco', ['APROVADO','REPROVADO'], 'APROVADO') +
         toggleGroupHtml('sop_alinhamentoPaletes', 'Alinhamento dos paletes', ['APROVADO','REPROVADO'], 'APROVADO') +
@@ -702,6 +711,8 @@ function renderFormSopro() {
   preencherSelect('sop_cor', listas.coresSopro);
   preencherSelect('sop_ml', listas.mlSopro);
   preencherSelect('sop_frasco', listas.tipoFrasco);
+  preencherSelect('sop_fornecedorPreforma', listas.fornecedoresPreforma);
+  preencherSelect('sop_numeroCaixa', listas.numerosCaixa);
   renderPostosMolde('4');
   document.getElementById('sop_data').value = hojeISO();
   document.getElementById('sop_hora_inicio').value = agoraHHMM();
@@ -939,6 +950,7 @@ async function salvarSessao(processo) {
       const loteCaixa = document.getElementById('sop_loteCaixa').value;
       const numeroCaixa = document.getElementById('sop_numeroCaixa').value;
       const caixaVermelha = getToggleValue('sop_caixaVermelha');
+      const motivoCaixaVermelha = document.getElementById('sop_motivoCaixaVermelha').value;
       const pesos = {}, alturas = {};
       for (let i = 1; i <= 4; i++) {
         const campoPeso = document.getElementById('sop_peso_'+i);
@@ -954,7 +966,7 @@ async function salvarSessao(processo) {
           produto_rotulado: produtoRotulado, condicao_rotulo: condicaoRotulo, teste_producao: testeProducao, num_postos_molde: numPostos,
           peso_1: pesos[1], peso_2: pesos[2], peso_3: pesos[3], peso_4: pesos[4],
           altura_1: alturas[1], altura_2: alturas[2], altura_3: alturas[3], altura_4: alturas[4],
-          gramatura_preforma: gramaturaPreforma, fornecedor_preforma: fornecedorPreforma, lote_caixa: loteCaixa, numero_caixa: numeroCaixa, caixa_vermelha: caixaVermelha,
+          gramatura_preforma: gramaturaPreforma, fornecedor_preforma: fornecedorPreforma, lote_caixa: loteCaixa, numero_caixa: numeroCaixa, caixa_vermelha: caixaVermelha, motivo_caixa_vermelha: motivoCaixaVermelha,
           criado_em: new Date().toISOString() };
       });
     }
@@ -1183,7 +1195,7 @@ function renderTabelaSopro() {
     return '<tr>' +
       '<td>'+(l.data||'—')+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
       '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.tipo_frasco||'—')+'</td>' +
-      '<td>'+(l.gramatura_preforma||'—')+'</td>' + '<td>'+(l.fornecedor_preforma||'—')+'</td>' + '<td>'+(l.lote_caixa||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+abrev(l.caixa_vermelha)+'</td>' +
+      '<td>'+(l.gramatura_preforma||'—')+'</td>' + '<td>'+(l.fornecedor_preforma||'—')+'</td>' + '<td>'+(l.lote_caixa||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+abrev(l.caixa_vermelha)+'</td>' + '<td>'+(l.motivo_caixa_vermelha||'—')+'</td>' +
       '<td>'+abrev(l.produto_rotulado)+'</td>' + '<td>'+abrev(l.condicao_rotulo)+'</td>' +
       '<td>'+(l.defeito||'—')+'</td>' + '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' +
       '<td>'+abrev(l.teste_producao)+'</td>' + '<td style="white-space:normal;">'+formatarPesoAltura(l)+'</td>' +
@@ -1234,10 +1246,10 @@ function gerarPDF(processo) {
   let linhas, colunas, corpo;
   if (processo === 'sopro') {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco']);
-    colunas = ['Data','Hora','Equip.','Resp.','Frasco','Gram.Pref','Fornec.Pref','LoteCx','NºCx','CxVerm','Rotul.','Cond.Rót.','Defeito','Critic.','Teste','Peso/Altura','Fech.Saco','Alinh.','Org.Linha','Status','Obs.'];
+    colunas = ['Data','Hora','Equip.','Resp.','Frasco','Gram.Pref','Fornec.Pref','LoteCx','NºCx','CxVerm','MotivoCx','Rotul.','Cond.Rót.','Defeito','Critic.','Teste','Peso/Altura','Fech.Saco','Alinh.','Org.Linha','Status','Obs.'];
     corpo = linhas.map(function(l) {
       return [l.data||'—', l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.tipo_frasco||'—',
-        l.gramatura_preforma||'—', l.fornecedor_preforma||'—', l.lote_caixa||'—', l.numero_caixa||'—', abrev(l.caixa_vermelha),
+        l.gramatura_preforma||'—', l.fornecedor_preforma||'—', l.lote_caixa||'—', l.numero_caixa||'—', abrev(l.caixa_vermelha), l.motivo_caixa_vermelha||'—',
         abrev(l.produto_rotulado), abrev(l.condicao_rotulo), l.defeito||'—', l.criticidade||'—', abrev(l.teste_producao),
         formatarPesoAltura(l), abrev(l.condicao_fechamento_saco), abrev(l.alinhamento_paletes), abrev(l.organizacao_linha_produtiva),
         l.status_correcao||'—', l.observacao||''];
