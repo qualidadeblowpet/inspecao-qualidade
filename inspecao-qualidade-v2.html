@@ -632,8 +632,9 @@ async function getToken() {
     const res = await msalInstance.acquireTokenSilent(req);
     return res.accessToken;
   } catch (e) {
-    const res = await msalInstance.acquireTokenPopup(req);
-    return res.accessToken;
+    await msalInstance.acquireTokenRedirect(req);
+    // acquireTokenRedirect navega a página inteira — o código não continua daqui.
+    return new Promise(function(){});
   }
 }
 function logout() { msalInstance.logoutRedirect(); }
@@ -647,16 +648,26 @@ async function iniciarLogin() {
   msalInstance = new msal.PublicClientApplication(msalConfig);
   msalPronto = msalInstance.initialize();
   await msalPronto;
-  await msalInstance.handleRedirectPromise().catch(function(e){ console.error(e); });
+
+  try {
+    const resposta = await msalInstance.handleRedirectPromise();
+    if (resposta && resposta.account) {
+      contaAtual = resposta.account;
+      aposLogin();
+      return;
+    }
+  } catch (e) {
+    document.getElementById('loginMsg').className = 'err';
+    document.getElementById('loginMsg').textContent = 'Erro no login: ' + e.message;
+  }
 
   const contas = msalInstance.getAllAccounts();
   if (contas.length > 0) { contaAtual = contas[0]; aposLogin(); }
 
   document.getElementById('btnLoginMicrosoft').onclick = async function() {
     try {
-      const res = await msalInstance.loginPopup({ scopes: graphScopes });
-      contaAtual = res.account;
-      aposLogin();
+      await msalInstance.loginRedirect({ scopes: graphScopes });
+      // loginRedirect navega a página inteira — o login continua ao recarregar.
     } catch (e) {
       document.getElementById('loginMsg').className = 'err';
       document.getElementById('loginMsg').textContent = 'Erro no login: ' + e.message;
