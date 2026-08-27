@@ -332,6 +332,9 @@
           <input type="date" id="tDataDeSopro" onchange="renderTabelaSopro()">
           <span style="color:var(--text-dim); font-size:12px;">até</span>
           <input type="date" id="tDataAteSopro" onchange="renderTabelaSopro()">
+          <input type="time" id="tHoraDeSopro" onchange="renderTabelaSopro()">
+          <span style="color:var(--text-dim); font-size:12px;">até</span>
+          <input type="time" id="tHoraAteSopro" onchange="renderTabelaSopro()">
           <select id="tLimiteSopro" onchange="renderTabelaSopro()">
             <option value="5">5 linhas</option>
             <option value="10">10 linhas</option>
@@ -353,7 +356,7 @@
                 <th>Gram. Pref.</th><th>Fornec. Pref.</th><th>Lote Caixa</th><th>Nº Caixa</th><th>Caixa Verm.</th><th>Motivo</th>
                 <th>Rotulado</th><th>Cond. Rótulo</th><th>Defeito</th><th>Criticidade</th>
                 <th>Teste Prod.</th><th>Peso/Altura</th><th>Fech. Saco</th><th>Alinh. Paletes</th><th>Org. Linha</th>
-                <th>Status</th><th>Observação</th>
+                <th>Status</th><th>Observação</th><th>Foto</th>
               </tr>
             </thead>
             <tbody id="tabelaSoproBody"></tbody>
@@ -369,6 +372,9 @@
           <input type="date" id="tDataDeInjecao" onchange="renderTabelaInjecao()">
           <span style="color:var(--text-dim); font-size:12px;">até</span>
           <input type="date" id="tDataAteInjecao" onchange="renderTabelaInjecao()">
+          <input type="time" id="tHoraDeInjecao" onchange="renderTabelaInjecao()">
+          <span style="color:var(--text-dim); font-size:12px;">até</span>
+          <input type="time" id="tHoraAteInjecao" onchange="renderTabelaInjecao()">
           <select id="tLimiteInjecao" onchange="renderTabelaInjecao()">
             <option value="5">5 linhas</option>
             <option value="10">10 linhas</option>
@@ -390,7 +396,7 @@
                 <th>Gram.</th><th>Resina</th><th>T.Gate Min</th><th>T.Gate Max</th><th>T.Corpo Min</th><th>T.Corpo Max</th>
                 <th>Org. Linha</th><th>Tonalid.</th><th>Alinh. Etiq.</th>
                 <th>Defeito</th><th>Cavidade(s)</th><th>Criticidade</th>
-                <th>Oper. Ciente</th><th>Status</th><th>Observação</th>
+                <th>Oper. Ciente</th><th>Status</th><th>Observação</th><th>Foto</th>
               </tr>
             </thead>
             <tbody id="tabelaInjecaoBody"></tbody>
@@ -1403,9 +1409,13 @@ function limparFiltros() {
   document.getElementById('tBuscaSopro').value = '';
   document.getElementById('tDataDeSopro').value = '';
   document.getElementById('tDataAteSopro').value = '';
+  document.getElementById('tHoraDeSopro').value = '';
+  document.getElementById('tHoraAteSopro').value = '';
   document.getElementById('tBuscaInjecao').value = '';
   document.getElementById('tDataDeInjecao').value = '';
   document.getElementById('tDataAteInjecao').value = '';
+  document.getElementById('tHoraDeInjecao').value = '';
+  document.getElementById('tHoraAteInjecao').value = '';
   atualizarDashboard();
 }
 
@@ -1540,7 +1550,7 @@ function formatarPesoAltura(l) {
   return partes.length ? partes.join(' · ') : '—';
 }
 
-function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, limite) {
+function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, limite, horaDeId, horaAteId) {
   const busca = (document.getElementById(buscaId).value || '').toLowerCase().trim();
   if (busca) {
     linhas = linhas.filter(function(l) {
@@ -1551,6 +1561,12 @@ function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, li
   const dataAte = document.getElementById(dataAteId).value;
   if (dataDe) linhas = linhas.filter(function(l){ return !l.data || l.data >= dataDe; });
   if (dataAte) linhas = linhas.filter(function(l){ return !l.data || l.data <= dataAte; });
+  if (horaDeId && horaAteId) {
+    const horaDe = document.getElementById(horaDeId).value;
+    const horaAte = document.getElementById(horaAteId).value;
+    if (horaDe) linhas = linhas.filter(function(l){ return !l.hora_inicio || l.hora_inicio >= horaDe; });
+    if (horaAte) linhas = linhas.filter(function(l){ return !l.hora_inicio || l.hora_inicio <= horaAte; });
+  }
   linhas.sort(function(a,b){ return (b.data||'').localeCompare(a.data||'') || (b.hora_inicio||'').localeCompare(a.hora_inicio||''); });
   return linhas.slice(0, limite || 200);
 }
@@ -1559,7 +1575,7 @@ function renderTabelaSopro() {
   if (!itemId) return;
   let linhas = linhasFiltradasPorProcesso('sopro');
   const limite = parseInt(document.getElementById('tLimiteSopro').value, 10);
-  linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], limite);
+  linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], limite, 'tHoraDeSopro', 'tHoraAteSopro');
 
   const corpo = document.getElementById('tabelaSoproBody');
   const vazio = document.getElementById('tabelaSoproVazia');
@@ -1578,6 +1594,7 @@ function renderTabelaSopro() {
       '<td>'+abrev(l.condicao_fechamento_saco)+'</td>' + '<td>'+abrev(l.alinhamento_paletes)+'</td>' + '<td>'+abrev(l.organizacao_linha_produtiva)+'</td>' +
       '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
       '<td style="max-width:200px; overflow:hidden; text-overflow:ellipsis;">'+(l.observacao||'')+'</td>' +
+      '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
     '</tr>';
   }).join('');
 }
@@ -1586,7 +1603,7 @@ function renderTabelaInjecao() {
   if (!itemId) return;
   let linhas = linhasFiltradasPorProcesso('injecao');
   const limite = parseInt(document.getElementById('tLimiteInjecao').value, 10);
-  linhas = filtrarBuscaEData(linhas, 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], limite);
+  linhas = filtrarBuscaEData(linhas, 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], limite, 'tHoraDeInjecao', 'tHoraAteInjecao');
 
   const corpo = document.getElementById('tabelaInjecaoBody');
   const vazio = document.getElementById('tabelaInjecaoVazia');
@@ -1605,6 +1622,7 @@ function renderTabelaInjecao() {
       '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' + '<td>'+abrev(l.operador_ciente)+'</td>' +
       '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
       '<td style="max-width:200px; overflow:hidden; text-overflow:ellipsis;">'+(l.observacao||'')+'</td>' +
+      '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
     '</tr>';
   }).join('');
 }
