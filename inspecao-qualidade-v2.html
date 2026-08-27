@@ -641,6 +641,7 @@ async function conectarPlanilha() {
       itemId = json.id; driveId = json.parentReference.driveId;
       dot.className = 'status-dot online'; dotSide.style.background = 'var(--ok)'; label.textContent = 'conectado';
       await carregarListasDaPlanilha();
+      await prepararColunasComoTexto(token);
       carregarDados();
       return true;
     } else {
@@ -661,6 +662,42 @@ async function salvarConfigLink() {
 
 /* ---------------- Listas suspensas (guardadas na planilha, aba Listas_App) ---------------- */
 const CHAVES_LISTAS = ['responsaveis','equipInjecao','equipSopro','defeitosInjecao','defeitosSopro','operadores','coresInjecao','gramaturas','resinas','coresSopro','mlSopro','tipoFrasco','fornecedoresPreforma','gramaturasPreforma','operadoresSopro'];
+
+/* ---------------- Evita que o Excel converta data/hora automaticamente ---------------- */
+function letraColuna(indiceZeroBased) {
+  let n = indiceZeroBased + 1, letra = '';
+  while (n > 0) {
+    const resto = (n - 1) % 26;
+    letra = String.fromCharCode(65 + resto) + letra;
+    n = Math.floor((n - 1) / 26);
+  }
+  return letra;
+}
+
+let colunasTextoPreparadas = false;
+
+async function prepararColunasComoTexto(token) {
+  if (colunasTextoPreparadas) return;
+  const camposData = ['data', 'hora_inicio', 'hora_fim', 'criado_em'];
+  const tabelas = [
+    { aba: 'Injecao_App', cabecalho: CABECALHO_INJECAO },
+    { aba: 'Sopro_App', cabecalho: CABECALHO_SOPRO }
+  ];
+  for (const t of tabelas) {
+    for (const campo of camposData) {
+      const idx = t.cabecalho.indexOf(campo);
+      if (idx === -1) continue;
+      const col = letraColuna(idx);
+      try {
+        await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + t.aba + '/range(address=\'' + col + ':' + col + '\')', {
+          method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ numberFormat: [['@']] })
+        });
+      } catch (e) { /* segue mesmo se falhar numa coluna */ }
+    }
+  }
+  colunasTextoPreparadas = true;
+}
 
 async function garantirTabelaListas(token) {
   // Verifica se a planilha (worksheet) "Listas_App" existe
@@ -1224,11 +1261,36 @@ async function salvarSessao(processo) {
 }
 
 /* ---------------- Dashboard: dados ---------------- */
+/* Corrige valores que o Excel converteu automaticamente em data/hora
+   (caso a coluna ainda não estivesse formatada como Texto no momento do cadastro) */
+function normalizarValorDataHora(campo, valor) {
+  if (valor === null || valor === undefined || valor === '') return valor;
+  const ehNumero = typeof valor === 'number' || (typeof valor === 'string' && valor.trim() !== '' && !isNaN(valor) && /^[0-9.]+$/.test(valor.trim()));
+  if (!ehNumero) return valor;
+
+  const serial = parseFloat(valor);
+  // Serial de data do Excel: dias desde 30/12/1899
+  const baseMs = Date.UTC(1899, 11, 30);
+  const dataConvertida = new Date(baseMs + serial * 86400000);
+
+  if (campo === 'data') {
+    return dataConvertida.getUTCFullYear() + '-' + String(dataConvertida.getUTCMonth()+1).padStart(2,'0') + '-' + String(dataConvertida.getUTCDate()).padStart(2,'0');
+  }
+  if (campo === 'hora_inicio' || campo === 'hora_fim' || campo === 'criado_em') {
+    const fracaoDia = serial % 1;
+    const totalMinutos = Math.round(fracaoDia * 24 * 60);
+    const hh = Math.floor(totalMinutos / 60) % 24;
+    const mm = totalMinutos % 60;
+    return String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+  }
+  return valor;
+}
+
 function linhasArrayParaObjeto(linhasArray, cabecalho, processo) {
   return linhasArray.map(function(row) {
     const valores = row.values[0];
     const obj = { processo: processo };
-    cabecalho.forEach(function(campo, i) { obj[campo] = valores[i]; });
+    cabecalho.forEach(function(campo, i) { obj[campo] = normalizarValorDataHora(campo, valores[i]); });
     return obj;
   });
 }
