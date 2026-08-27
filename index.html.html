@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<title>Inspeção de Qualidade</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+
+  :root {
+    --bg: #0c0d0f;
+    --sidebar: #111214;
+    --surface: #17181b;
+    --surface-2: #1e2023;
+    --border: #2a2d31;
+    --text: #edeef0;
+    --text-dim: #8b8f96;
+    --accent: #f2a93b;
+    --accent-dim: #4a3a1a;
+    --danger: #e5484d;
+    --warn: #f2a93b;
+    --ok: #3fb68b;
+    --blue: #5b9bf2;
+    --purple: #9c7bd9;
+    --font-display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+
+  body.tema-claro {
+    --bg: #f4f5f6;
+    --sidebar: #ffffff;
+    --surface: #ffffff;
+    --surface-2: #eceef0;
+    --border: #d8dade;
+    --text: #17181b;
+    --text-dim: #6b6f76;
+    --accent-dim: #f6e2bd;
+  }
+  body.tema-claro .toggle-btn { background: var(--surface-2); }
+  body.tema-claro ::placeholder { color: #9a9ea4; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
+  ::placeholder { color: #55585e; }
+  .hidden { display: none !important; }
+
+  /* ---------- Login ---------- */
+  #loginScreen {
+    min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 24px; text-align: center;
+  }
+  #loginScreen .mark { font-family: var(--font-display); font-weight: 700; font-size: 34px; color: var(--accent); letter-spacing: 0.5px; margin-bottom: 6px; }
+  #loginScreen .sub { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 30px; }
+  #loginMsg { margin-top: 16px; font-size: 13px; color: var(--text-dim); max-width: 340px; }
+  #loginMsg.err { color: var(--danger); }
+
+  /* ---------- App shell ---------- */
+  #app { display: flex; min-height: 100vh; }
+
+  .mobile-topbar { display: none; }
+
+  .sidebar {
+    width: 232px;
+    flex-shrink: 0;
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 14px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+  }
+  .sidebar-brand { display: flex; align-items: baseline; gap: 6px; padding: 4px 8px 20px; }
+  .sidebar-brand .mark { font-family: var(--font-display); font-weight: 700; font-size: 19px; color: var(--accent); letter-spacing: 0.4px; }
+  .sidebar-brand .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 5px var(--ok); }
+
+  .nav-section-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1.2px; padding: 14px 10px 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 10px; border-radius: 8px; cursor: pointer;
+    color: var(--text-dim); font-size: 14px; font-weight: 500; margin-bottom: 2px;
+    border: none; background: transparent; width: 100%; text-align: left; font-family: var(--font-body);
+  }
+  .nav-item .ic { width: 18px; text-align: center; font-size: 15px; }
+  .nav-item:hover { background: var(--surface); color: var(--text); }
+  .nav-item.active { background: var(--accent); color: #1a1200; font-weight: 700; }
+
+  .sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding-top: 12px; }
+  .sidebar-user { font-size: 11px; color: var(--text-dim); padding: 0 10px 8px; word-break: break-all; }
+  .sidebar-footer button {
+    width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
+    padding: 9px; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: var(--font-body);
+  }
+
+  .main { flex: 1; min-width: 0; padding: 24px 28px 60px; max-width: 1280px; }
+  .page-title { font-family: var(--font-display); font-size: 24px; font-weight: 700; letter-spacing: 0.3px; margin: 0 0 4px; text-transform: uppercase; }
+  .page-sub { font-size: 13px; color: var(--text-dim); margin: 0 0 22px; }
+
+  .conn-label { font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
+  .quick-actions { display: flex; gap: 10px; margin-bottom: 16px; }
+  .quick-actions .btn { flex: 1; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); display: inline-block; }
+  .status-dot.online { background: var(--ok); box-shadow: 0 0 5px var(--ok); }
+  .status-dot.offline { background: var(--danger); box-shadow: 0 0 5px var(--danger); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px;
+  }
+  .card h3 { font-family: var(--font-display); font-size: 16px; font-weight: 600; letter-spacing: 0.3px; margin: 0 0 12px; text-transform: uppercase; color: var(--text); }
+
+  /* ---------- Filter bar (Power BI style) ---------- */
+  .filter-bar {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; align-items: center;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px;
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-group label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .filter-group select {
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    padding: 7px 10px; border-radius: 7px; font-size: 12px; font-family: var(--font-body); min-width: 130px;
+  }
+  .filter-clear {
+    margin-left: auto; background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    padding: 8px 14px; border-radius: 7px; font-size: 12px; cursor: pointer; align-self: flex-end;
+  }
+
+  /* ---------- KPIs ---------- */
+  .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .kpi .label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .kpi .num { font-family: var(--font-display); font-size: 30px; font-weight: 700; color: var(--accent); line-height: 1; }
+  .kpi .num.small { font-size: 22px; }
+
+  .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .charts-grid .card.wide { grid-column: 1 / -1; }
+  .chart-wrap { position: relative; height: 260px; }
+  /* Responsividade mobile fica no final do CSS, perto do fechamento da tag de estilo */
+
+  /* ---------- Table ---------- */
+  .table-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
+  .table-toolbar input[type=date], .table-toolbar input[type=text], .table-toolbar input[type=time], .table-toolbar select {
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    padding: 7px 10px; border-radius: 7px; font-size: 12px; height: 32px; box-sizing: border-box;
+  }
+  .table-scroll { overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  .table-scroll::-webkit-scrollbar { height: 7px; }
+  .table-scroll::-webkit-scrollbar-track { background: transparent; }
+  .table-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .table-scroll::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+  table.occ-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  table.occ-table th {
+    text-align: left; padding: 9px 10px; color: var(--text-dim); font-size: 10.5px; text-transform: uppercase;
+    letter-spacing: 0.4px; border-bottom: 1px solid var(--border); white-space: nowrap;
+  }
+  table.occ-table td { padding: 9px 10px; border-bottom: 1px solid #1e2023; white-space: nowrap; }
+  table.occ-table tr:hover td { background: var(--surface-2); }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; }
+  .badge.leve { background: rgba(63,182,139,0.15); color: var(--ok); }
+  .badge.medio { background: rgba(242,169,59,0.15); color: var(--warn); }
+  .badge.grave { background: rgba(229,72,77,0.15); color: var(--danger); }
+  .badge.corrigido { background: rgba(63,182,139,0.15); color: var(--ok); }
+  .badge.pendente { background: rgba(229,72,77,0.15); color: var(--danger); }
+  .badge.proc-injecao { background: rgba(91,155,242,0.15); color: var(--blue); }
+  .badge.proc-sopro { background: rgba(156,123,217,0.15); color: var(--purple); }
+  .table-empty { text-align: center; padding: 30px; color: var(--text-dim); font-size: 13px; }
+
+  /* ---------- Forms (cadastro) ---------- */
+  .field { margin-bottom: 12px; min-width: 0; }
+  .field label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .field input, .field select, .field textarea {
+    width: 100%; max-width: 100%; box-sizing: border-box; background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    padding: 10px 11px; border-radius: 8px; font-size: 14px; font-family: var(--font-body);
+  }
+  .field input[type=date], .field input[type=time] {
+    width: 100%; max-width: 100%; box-sizing: border-box; -webkit-appearance: none; appearance: none;
+    min-width: 0; display: block;
+  }
+  .field input[type=date]::-webkit-date-and-time-value, .field input[type=time]::-webkit-date-and-time-value { text-align: left; }
+  .field textarea { resize: vertical; min-height: 50px; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .field input:disabled { opacity: 0.4; cursor: not-allowed; }
+  .field input[type=file] { padding: 8px; font-size: 12px; color: var(--text-dim); }
+  .field input[type=file]::file-selector-button {
+    background: var(--surface); border: 1px solid var(--border); color: var(--text);
+    padding: 6px 10px; border-radius: 6px; font-size: 12px; margin-right: 10px; cursor: pointer;
+  }
+  .toggle-group { display: flex; gap: 6px; }
+  .toggle-btn {
+    flex: 1; padding: 10px 8px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface-2); color: var(--text-dim); font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: var(--font-body);
+  }
+  .toggle-btn.active { background: var(--accent); color: #1a1200; border-color: var(--accent); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 16px; border-radius: 8px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; font-family: var(--font-body); }
+  .btn-accent { background: var(--accent); color: #1a1200; }
+  .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-block { width: 100%; }
+  .btn:active { transform: scale(0.98); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .desvio-card { background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px; padding: 12px; margin-bottom: 10px; position: relative; }
+  .desvio-card .desvio-num { font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 8px; letter-spacing: 1px; }
+  .remove-desvio { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; line-height: 1; padding: 4px; }
+  .remove-desvio:hover { color: var(--danger); }
+  .empty-state { text-align: center; padding: 24px 10px; color: var(--text-dim); font-size: 13px; }
+
+  /* Seletor de cavidades (multi-select) */
+  .cav-details { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; }
+  .cav-details summary {
+    padding: 10px 11px; font-size: 14px; color: var(--text); cursor: pointer; list-style: none;
+  }
+  .cav-details summary::-webkit-details-marker { display: none; }
+  .cav-details summary::after { content: '▾'; float: right; color: var(--text-dim); }
+  .cav-grid {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
+    padding: 10px; border-top: 1px solid var(--border); max-height: 200px; overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  }
+  .cav-grid::-webkit-scrollbar { width: 7px; }
+  .cav-grid::-webkit-scrollbar-track { background: transparent; }
+  .cav-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .cav-opt { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-dim); padding: 3px 4px; border-radius: 5px; cursor: pointer; }
+  .cav-opt:hover { background: var(--surface); }
+  .cav-opt input { margin: 0; }
+
+  .config-note { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
+  .config-note code { background: var(--surface-2); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; }
+
+  .toast {
+    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+    background: var(--surface-2); border: 1px solid var(--accent); color: var(--text);
+    padding: 12px 20px; border-radius: 10px; font-size: 14px; z-index: 100;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4); max-width: 90%; text-align: center;
+  }
+  .toast.error { border-color: var(--danger); }
+
+  @media (max-width: 900px) {
+    .charts-grid { grid-template-columns: 1fr; }
+
+    .mobile-topbar {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--sidebar); border-bottom: 1px solid var(--border);
+      padding: 12px 16px; position: sticky; top: 0; z-index: 30;
+    }
+    .mobile-topbar .mark { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--accent); }
+    .btn-menu { background: var(--surface-2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 8px 12px; font-size: 16px; cursor: pointer; }
+
+    #app { display: block; }
+    .sidebar {
+      position: fixed; top: 0; left: 0; height: 100vh; z-index: 40;
+      transform: translateX(-100%); transition: transform 0.2s ease; box-shadow: 8px 0 24px rgba(0,0,0,0.4);
+    }
+    .sidebar.aberta { transform: translateX(0); }
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 35;
+    }
+    .sidebar-overlay.ativa { display: block; }
+    .main { padding: 16px; }
+
+    .grid-2, .grid-3 { grid-template-columns: 1fr !important; }
+    .filter-bar { flex-direction: column; align-items: stretch; }
+    .filter-group select { min-width: 0; width: 100%; }
+    .filter-clear { align-self: stretch; margin-left: 0; }
+    .quick-actions { flex-direction: column; }
+    .kpi-row { grid-template-columns: 1fr 1fr !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="loginScreen">
+  <div class="mark">INSPEÇÃO</div>
+  <div class="sub">Controle de Qualidade</div>
+  <button class="btn btn-accent" id="btnLoginMicrosoft" style="padding:13px 24px;font-size:15px;">Entrar com Microsoft</button>
+  <div id="loginMsg"></div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app" class="hidden">
+
+  <div class="mobile-topbar">
+    <button class="btn-menu" onclick="alternarMenuMobile()">☰</button>
+    <span class="mark">INSPEÇÃO</span>
+  </div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="fecharMenuMobile()"></div>
+
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-brand"><span class="mark">INSPEÇÃO</span><span class="dot" id="statusDotSide"></span></div>
+
+    <div class="nav-section-label">Principal</div>
+    <button class="nav-item active" data-page="dashboard" onclick="setPage('dashboard')"><span class="ic">▦</span> Dashboard</button>
+    <button class="nav-item" data-page="cadastroInjecao" onclick="setPage('cadastroInjecao')"><span class="ic">●</span> Cadastro Injeção</button>
+    <button class="nav-item" data-page="cadastroSopro" onclick="setPage('cadastroSopro')"><span class="ic">●</span> Cadastro Sopro</button>
+
+    <div class="nav-section-label">Sistema</div>
+    <button class="nav-item" data-page="config" onclick="setPage('config')"><span class="ic">⚙</span> Configurações</button>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user" id="userEmail"></div>
+      <div class="conn-label" style="padding:0 10px 10px;"><span id="statusDot" class="status-dot"></span><span id="statusText">verificando…</span></div>
+      <button onclick="logout()">Sair da conta</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <div id="pageDashboard">
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Cruzamento de dados das inspeções de Injeção e Sopro</div>
+
+      <div class="quick-actions">
+        <button class="btn btn-accent" onclick="setPage('cadastroInjecao')">+ Cadastro Injeção</button>
+        <button class="btn btn-accent" onclick="setPage('cadastroSopro')">+ Cadastro Sopro</button>
+      </div>
+
+      <div class="card">
+        <h3>Últimas ocorrências — Sopro</h3>
+        <div class="table-toolbar">
+          <input type="text" id="tBuscaSopro" placeholder="Buscar defeito, máquina, responsável…" oninput="renderTabelaSopro()" style="min-width:220px;">
+          <input type="date" id="tDataDeSopro" onchange="renderTabelaSopro()">
+          <span style="color:var(--text-dim); font-size:12px;">até</span>
+          <input type="date" id="tDataAteSopro" onchange="renderTabelaSopro()">
+          <input type="time" id="tHoraDeSopro" onchange="renderTabelaSopro()">
+          <span style="color:var(--text-dim); font-size:12px;">até</span>
+          <input type="time" id="tHoraAteSopro" onchange="renderTabelaSopro()">
+          <select id="tLimiteSopro" onchange="renderTabelaSopro()">
+            <option value="5">5 linhas</option>
+            <option value="10">10 linhas</option>
+            <option value="15">15 linhas</option>
+            <option value="20" selected>20 linhas</option>
+            <option value="25">25 linhas</option>
+            <option value="30">30 linhas</option>
+            <option value="35">35 linhas</option>
+            <option value="50">50 linhas</option>
+          </select>
+          <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('sopro')">🟢 WhatsApp</button>
+          <button class="btn btn-outline" onclick="gerarPDF('sopro')">📄 PDF</button>
+        </div>
+        <div class="table-scroll">
+          <table class="occ-table">
+            <thead>
+              <tr>
+                <th>Data</th><th>Hora</th><th>Equip.</th><th>Resp.</th><th>Operador</th><th>Frasco</th>
+                <th>Gram. Pref.</th><th>Fornec. Pref.</th><th>Lote Caixa</th><th>Nº Caixa</th><th>Caixa Verm.</th><th>Motivo</th>
+                <th>Rotulado</th><th>Cond. Rótulo</th><th>Defeito</th><th>Criticidade</th>
+                <th>Teste Prod.</th><th>Peso/Altura</th><th>Fech. Saco</th><th>Alinh. Paletes</th><th>Org. Linha</th>
+                <th>Status</th><th>Observação</th><th>Foto</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaSoproBody"></tbody>
+          </table>
+          <div id="tabelaSoproVazia" class="table-empty hidden">Nenhuma ocorrência encontrada com esses filtros.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Últimas ocorrências — Injeção</h3>
+        <div class="table-toolbar">
+          <input type="text" id="tBuscaInjecao" placeholder="Buscar defeito, máquina, responsável…" oninput="renderTabelaInjecao()" style="min-width:220px;">
+          <input type="date" id="tDataDeInjecao" onchange="renderTabelaInjecao()">
+          <span style="color:var(--text-dim); font-size:12px;">até</span>
+          <input type="date" id="tDataAteInjecao" onchange="renderTabelaInjecao()">
+          <input type="time" id="tHoraDeInjecao" onchange="renderTabelaInjecao()">
+          <span style="color:var(--text-dim); font-size:12px;">até</span>
+          <input type="time" id="tHoraAteInjecao" onchange="renderTabelaInjecao()">
+          <select id="tLimiteInjecao" onchange="renderTabelaInjecao()">
+            <option value="5">5 linhas</option>
+            <option value="10">10 linhas</option>
+            <option value="15">15 linhas</option>
+            <option value="20" selected>20 linhas</option>
+            <option value="25">25 linhas</option>
+            <option value="30">30 linhas</option>
+            <option value="35">35 linhas</option>
+            <option value="50">50 linhas</option>
+          </select>
+          <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('injecao')">🟢 WhatsApp</button>
+          <button class="btn btn-outline" onclick="gerarPDF('injecao')">📄 PDF</button>
+        </div>
+        <div class="table-scroll">
+          <table class="occ-table">
+            <thead>
+              <tr>
+                <th>Data</th><th>Hora</th><th>Equip.</th><th>Resp.</th><th>Operador</th><th>Cor</th>
+                <th>Gram.</th><th>Resina</th><th>T.Gate Min</th><th>T.Gate Max</th><th>T.Corpo Min</th><th>T.Corpo Max</th>
+                <th>Org. Linha</th><th>Tonalid.</th><th>Alinh. Etiq.</th>
+                <th>Defeito</th><th>Cavidade(s)</th><th>Criticidade</th>
+                <th>Oper. Ciente</th><th>Status</th><th>Observação</th><th>Foto</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaInjecaoBody"></tbody>
+          </table>
+          <div id="tabelaInjecaoVazia" class="table-empty hidden">Nenhuma ocorrência encontrada com esses filtros.</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>Processo</label>
+          <select id="fProcesso" onchange="atualizarDashboard()">
+            <option value="todos">Todos</option>
+            <option value="injecao">Injeção</option>
+            <option value="sopro">Sopro</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Período</label>
+          <select id="fPeriodo" onchange="atualizarDashboard()">
+            <option value="7">Últimos 7 dias</option>
+            <option value="30" selected>Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="0">Todo o período</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Equipamento</label>
+          <select id="fEquipamento" onchange="atualizarDashboard()"><option value="">Todos</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Responsável</label>
+          <select id="fResponsavel" onchange="atualizarDashboard()"><option value="">Todos</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Criticidade</label>
+          <select id="fCriticidade" onchange="atualizarDashboard()">
+            <option value="">Todas</option>
+            <option value="LEVE">Leve</option>
+            <option value="MÉDIO">Médio</option>
+            <option value="GRAVE">Grave</option>
+          </select>
+        </div>
+        <button class="filter-clear" onclick="limparFiltros()">Limpar filtros</button>
+        <button class="btn btn-outline" onclick="carregarDados(true)" style="align-self:flex-end;">↻ Atualizar</button>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi"><div class="label">Desvios no período</div><div class="num" id="kpiTotal">–</div></div>
+        <div class="kpi"><div class="label">Pendentes</div><div class="num" id="kpiPendentes">–</div></div>
+        <div class="kpi"><div class="label">Graves</div><div class="num" id="kpiGraves">–</div></div>
+        <div class="kpi"><div class="label">Taxa de correção</div><div class="num small" id="kpiTaxa">–</div></div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="card"><h3>Defeitos mais frequentes</h3><div class="chart-wrap"><canvas id="chartDefeitos"></canvas></div></div>
+        <div class="card"><h3>Criticidade</h3><div class="chart-wrap"><canvas id="chartCriticidade"></canvas></div></div>
+        <div class="card"><h3>Corrigido vs. Pendente</h3><div class="chart-wrap"><canvas id="chartStatus"></canvas></div></div>
+        <div class="card"><h3>Injeção vs. Sopro</h3><div class="chart-wrap"><canvas id="chartProcesso"></canvas></div></div>
+        <div class="card"><h3>Desvios por responsável</h3><div class="chart-wrap"><canvas id="chartResponsavel"></canvas></div></div>
+        <div class="card"><h3>Desvios por equipamento</h3><div class="chart-wrap"><canvas id="chartEquipamento"></canvas></div></div>
+        <div class="card wide"><h3>Evolução diária</h3><div class="chart-wrap"><canvas id="chartEvolucao"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- ===================== CADASTRO INJEÇÃO ===================== -->
+    <div id="pageCadastroInjecao" class="hidden">
+      <div class="page-title">Cadastro — Injeção</div>
+      <div class="page-sub">Registrar uma nova sessão de inspeção do processo de injeção</div>
+      <div id="formInjecao"></div>
+    </div>
+
+    <!-- ===================== CADASTRO SOPRO ===================== -->
+    <div id="pageCadastroSopro" class="hidden">
+      <div class="page-title">Cadastro — Sopro</div>
+      <div class="page-sub">Registrar uma nova sessão de inspeção do processo de sopro</div>
+      <div id="formSopro"></div>
+    </div>
+
+    <!-- ===================== CONFIGURAÇÕES ===================== -->
+    <div id="pageConfig" class="hidden">
+      <div class="page-title">Configurações</div>
+      <div class="page-sub">Conexão com a planilha e listas de apoio</div>
+
+      <div class="card">
+        <h3>Aparência</h3>
+        <div class="field">
+          <label>Tema</label>
+          <div class="toggle-group" id="temaSelector" data-value="escuro">
+            <button type="button" class="toggle-btn active" onclick="alternarTema('escuro')">Escuro</button>
+            <button type="button" class="toggle-btn" onclick="alternarTema('claro')">Claro</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Conexão com a planilha</h3>
+        <p class="config-note">
+          A conexão é automática — usa seu próprio login Microsoft, através de um link de
+          compartilhamento fixo já configurado no app. Cada pessoa que abrir este app precisa
+          ter permissão de edição nessa planilha (veja "Liberar acesso" abaixo). Se o link de
+          compartilhamento da planilha mudar no SharePoint, é preciso atualizar o código do app.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Liberar acesso a outras contas</h3>
+        <div class="field">
+          <label>E-mails para liberar acesso completo (um por linha)</label>
+          <textarea id="emailsLiberarAcesso" rows="4" placeholder="nome@blowpet.com.br"></textarea>
+        </div>
+        <button class="btn btn-accent" id="btnLiberarAcesso" onclick="liberarAcesso()">Liberar acesso</button>
+        <p class="config-note" style="margin-top:12px;">
+          Ao clicar, cada e-mail recebe uma notificação da Microsoft com acesso de edição à
+          planilha. A pessoa só precisa abrir o link do app e fazer login normalmente depois disso.
+        </p>
+      </div>
+
+      <div class="card">
+        <h3>Listas de apoio (menus suspensos)</h3>
+        <p class="config-note" style="margin-bottom:12px;">
+          Essas listas ficam guardadas numa aba própria da planilha (<code>Listas_App</code>),
+          criada automaticamente. Depois de salvar, elas aparecem em qualquer dispositivo que
+          abrir este app — não precisa configurar de novo em cada aparelho.
+        </p>
+        <div class="field"><label>Responsáveis (um por linha)</label><textarea id="listaResponsaveis" rows="4"></textarea></div>
+        <div class="field"><label>Equipamentos — Injeção (um por linha)</label><textarea id="listaEquipInjecao" rows="4"></textarea></div>
+        <div class="field"><label>Equipamentos — Sopro (um por linha)</label><textarea id="listaEquipSopro" rows="4"></textarea></div>
+        <div class="field"><label>Defeitos — Injeção (um por linha)</label><textarea id="listaDefeitosInjecao" rows="6"></textarea></div>
+        <div class="field"><label>Defeitos — Sopro (um por linha)</label><textarea id="listaDefeitosSopro" rows="6"></textarea></div>
+        <div class="field"><label>Operadores — Injeção (um por linha)</label><textarea id="listaOperadores" rows="4"></textarea></div>
+        <div class="field"><label>Cores — Injeção (um por linha)</label><textarea id="listaCoresInjecao" rows="3"></textarea></div>
+        <div class="field"><label>Gramaturas — Injeção (um por linha)</label><textarea id="listaGramaturas" rows="3"></textarea></div>
+        <div class="field"><label>Resinas — Injeção (um por linha)</label><textarea id="listaResinas" rows="3"></textarea></div>
+        <div class="field"><label>Cores — Sopro (um por linha)</label><textarea id="listaCoresSopro" rows="3"></textarea></div>
+        <div class="field"><label>Volumes (mL) — Sopro (um por linha)</label><textarea id="listaMlSopro" rows="3"></textarea></div>
+        <div class="field"><label>Tipos de frasco — Sopro (um por linha)</label><textarea id="listaTipoFrasco" rows="4"></textarea></div>
+        <div class="field"><label>Fornecedores de preforma — Sopro (um por linha)</label><textarea id="listaFornecedoresPreforma" rows="3"></textarea></div>
+        <div class="field"><label>Gramaturas de preforma — Sopro (um por linha)</label><textarea id="listaGramaturasPreforma" rows="3"></textarea></div>
+        <div class="field"><label>Operadores — Sopro (um por linha)</label><textarea id="listaOperadoresSopro" rows="3"></textarea></div>
+        <button class="btn btn-accent" id="btnSalvarListas" onclick="salvarListas()">Salvar listas</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   CONFIG
+   ============================================================ */
+const msalConfig = {
+  auth: {
+    clientId: "f518fc60-a544-45d1-89a9-97e9f6b523ad",
+    authority: "https://login.microsoftonline.com/b38f2dcb-4251-4b93-977a-f469eb315033",
+    redirectUri: "https://qualidadeblowpet.github.io/inspecao-qualidade/"
+  }
+};
+const graphScopes = ["Files.ReadWrite", "User.Read"];
+/* Identificadores fixos do arquivo na nuvem (mais confiável que link de
+   compartilhamento — funciona para qualquer conta com permissão no arquivo,
+   sem depender do tipo/escopo do link). */
+/* Link de compartilhamento da planilha. Se você trocar o tipo de link no
+   SharePoint (ex: para "Pessoas da organização com o link"), atualize aqui. */
+const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/cleber_rodrigues_blowpet_com_br/IQAWjpUUN_SbToVo1pGmdJcyAQ45D1l_a7UryTknKp9Aq0c?e=pDv6fS";
+
+const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max'];
+const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
+
+let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
+let paginaAtual = 'dashboard';
+let dadosCache = { injecao: [], sopro: [] };
+let charts = {};
+let desviosInjecao = [], contadorInjecao = 0;
+let desviosSopro = [], contadorSopro = 0;
+
+let listas = {
+  responsaveis: ['Juliana', 'Kenedy', 'Pablo', 'Tiago', 'Lucas', 'Kenneth', 'Arthur'],
+  equipInjecao: ['HUSK 1', 'HUSK 2', 'KM2', 'KM3'],
+  equipSopro: ['UNIPET 1', 'MULTIPET 1', 'SBO1', 'SBO2A', 'SBO2B'],
+  defeitosInjecao: ['REBARBA NA ROSCA', 'RISCO NO CORPO', 'PONTO DE INJEÇÃO ESCORRIDO', 'PELE DE LARANJA', 'MARCAS NO CORPO', 'GATE ALTO', 'FUNDO BRANCO', 'BOLHA'],
+  defeitosSopro: ['ANEL TORTO', 'ALTURA DO FRASCO FORA DO ESPECIFICADO', 'COSTURA LATERAL QUADRADA', 'DEGRAU NA COSTURA DO FUNDO'],
+  operadores: ['Pablo', 'Marcos', 'André', 'Wesley'],
+  coresInjecao: ['Cristal', 'Azul', 'Verde', 'Âmbar'],
+  gramaturas: ['28', '32', '42', '48'],
+  resinas: ['Indorama Max', 'Alpek', 'M&G'],
+  coresSopro: ['Cristal', 'Azul', 'Verde'],
+  mlSopro: ['300 mL', '500 mL', '510 mL', '1500 mL', '2000 mL'],
+  tipoFrasco: ['Água Himalaia', 'Água Indaiá', 'Refrigerante Linha X'],
+  fornecedoresPreforma: ['Indorama', 'Alpek', 'M&G'],
+  gramaturasPreforma: ['20', '22', '24', '26'],
+  operadoresSopro: ['Ana', 'Bruno', 'Carla']
+};
+const criticidades = ['LEVE', 'MÉDIO', 'GRAVE'];
+const statusCorrecao = ['CORRIGIDO', 'FICOU PENDENTE'];
+
+/* ---------------- Navegação ---------------- */
+function setPage(p) {
+  paginaAtual = p;
+  document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.toggle('active', el.dataset.page === p); });
+  ['dashboard','cadastroInjecao','cadastroSopro','config'].forEach(function(id) {
+    document.getElementById('page' + id.charAt(0).toUpperCase() + id.slice(1)).classList.toggle('hidden', id !== p);
+  });
+  if (p === 'dashboard') carregarDados();
+  fecharMenuMobile();
+  window.scrollTo(0, 0);
+}
+
+/* ---------------- Menu mobile / tema ---------------- */
+function alternarMenuMobile() {
+  document.getElementById('sidebar').classList.toggle('aberta');
+  document.getElementById('sidebarOverlay').classList.toggle('ativa');
+}
+function fecharMenuMobile() {
+  document.getElementById('sidebar').classList.remove('aberta');
+  document.getElementById('sidebarOverlay').classList.remove('ativa');
+}
+function alternarTema(valor) {
+  document.body.classList.toggle('tema-claro', valor === 'claro');
+  const group = document.getElementById('temaSelector');
+  group.dataset.value = valor;
+  Array.prototype.forEach.call(group.querySelectorAll('.toggle-btn'), function(btn) {
+    btn.classList.toggle('active', (valor === 'claro') === (btn.textContent === 'Claro'));
+  });
+  if (itemId && paginaAtual === 'dashboard') atualizarDashboard();
+}
+
+/* ---------------- Login (MSAL) ---------------- */
+async function getToken() {
+  await msalPronto;
+  const req = { scopes: graphScopes, account: contaAtual };
+  try {
+    const res = await msalInstance.acquireTokenSilent(req);
+    return res.accessToken;
+  } catch (e) {
+    await msalInstance.acquireTokenRedirect(req);
+    // acquireTokenRedirect navega a página inteira — o código não continua daqui.
+    return new Promise(function(){});
+  }
+}
+function logout() { msalInstance.logoutRedirect(); }
+
+async function iniciarLogin() {
+  if (typeof msal === 'undefined') {
+    document.getElementById('loginMsg').className = 'err';
+    document.getElementById('loginMsg').textContent = 'A biblioteca de login não carregou (possível bloqueio de rede). Tente por outra rede ou avise o TI para liberar cdn.jsdelivr.net.';
+    return;
+  }
+  msalInstance = new msal.PublicClientApplication(msalConfig);
+  msalPronto = msalInstance.initialize();
+  await msalPronto;
+
+  try {
+    const resposta = await msalInstance.handleRedirectPromise();
+    if (resposta && resposta.account) {
+      contaAtual = resposta.account;
+      aposLogin();
+      return;
+    }
+  } catch (e) {
+    document.getElementById('loginMsg').className = 'err';
+    document.getElementById('loginMsg').textContent = 'Erro no login: ' + e.message;
+  }
+
+  const contas = msalInstance.getAllAccounts();
+  if (contas.length > 0) { contaAtual = contas[0]; aposLogin(); }
+
+  document.getElementById('btnLoginMicrosoft').onclick = async function() {
+    try {
+      await msalInstance.loginRedirect({ scopes: graphScopes });
+      // loginRedirect navega a página inteira — o login continua ao recarregar.
+    } catch (e) {
+      document.getElementById('loginMsg').className = 'err';
+      document.getElementById('loginMsg').textContent = 'Erro no login: ' + e.message;
+    }
+  };
+}
+
+function aposLogin() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('userEmail').textContent = contaAtual.username;
+  conectarPlanilha();
+}
+
+/* ---------------- Conexão com a planilha ---------------- */
+async function conectarPlanilha() {
+  const dot = document.getElementById('statusDot');
+  const dotSide = document.getElementById('statusDotSide');
+  const label = document.getElementById('statusText');
+  label.textContent = 'conectando…';
+  try {
+    const token = await getToken();
+    const base64 = btoa(LINK_PLANILHA_PADRAO).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+    const sharingId = 'u!' + base64;
+    const resp = await fetch('https://graph.microsoft.com/v1.0/shares/' + sharingId + '/driveItem', { headers: { Authorization: 'Bearer ' + token } });
+    const json = await resp.json();
+    if (json.id) {
+      itemId = json.id; driveId = json.parentReference.driveId;
+      dot.className = 'status-dot online'; dotSide.style.background = 'var(--ok)'; label.textContent = 'conectado';
+      await carregarListasDaPlanilha();
+      await prepararColunasComoTexto(token);
+      carregarDados();
+      return true;
+    } else {
+      dot.className = 'status-dot offline'; label.textContent = 'erro na planilha'; return false;
+    }
+  } catch (err) {
+    dot.className = 'status-dot offline'; label.textContent = 'offline'; return false;
+  }
+}
+
+/* ---------------- Liberar acesso a outras contas ---------------- */
+async function liberarAcesso() {
+  const campo = document.getElementById('emailsLiberarAcesso');
+  const emails = campo.value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+  if (emails.length === 0) { mostrarToast('Cole ao menos um e-mail.', true); return; }
+  if (!itemId) { mostrarToast('Conecte-se à planilha antes de liberar acesso.', true); return; }
+
+  const btn = document.getElementById('btnLiberarAcesso');
+  btn.disabled = true; btn.textContent = 'Liberando acesso…';
+  try {
+    const token = await getToken();
+    let sucesso = 0;
+    const falhas = [];
+    for (const email of emails) {
+      try {
+        const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/invite', {
+          method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            recipients: [{ email: email }],
+            message: 'Você foi liberado para usar o app de Inspeção de Qualidade da Blowpet.',
+            requireSignIn: true,
+            sendInvitation: true,
+            roles: ['write']
+          })
+        });
+        if (resp.ok) {
+          sucesso++;
+        } else {
+          const json = await resp.json().catch(function(){ return {}; });
+          const motivo = json.error ? (json.error.message || json.error.code) : ('status ' + resp.status);
+          falhas.push(email + ' (' + motivo + ')');
+        }
+      } catch (e) { falhas.push(email + ' (' + e.message + ')'); }
+    }
+    if (sucesso > 0) campo.value = '';
+    mostrarToast(sucesso + ' e-mail(s) liberado(s) com sucesso' + (falhas.length ? ('; falha em: ' + falhas.join('; ')) : '') + '.', falhas.length > 0);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Liberar acesso';
+  }
+}
+
+/* ---------------- Listas suspensas (guardadas na planilha, aba Listas_App) ---------------- */
+const CHAVES_LISTAS = ['responsaveis','equipInjecao','equipSopro','defeitosInjecao','defeitosSopro','operadores','coresInjecao','gramaturas','resinas','coresSopro','mlSopro','tipoFrasco','fornecedoresPreforma','gramaturasPreforma','operadoresSopro'];
+
+/* ---------------- Evita que o Excel converta data/hora automaticamente ---------------- */
+function letraColuna(indiceZeroBased) {
+  let n = indiceZeroBased + 1, letra = '';
+  while (n > 0) {
+    const resto = (n - 1) % 26;
+    letra = String.fromCharCode(65 + resto) + letra;
+    n = Math.floor((n - 1) / 26);
+  }
+  return letra;
+}
+
+let colunasTextoPreparadas = false;
+
+async function prepararColunasComoTexto(token) {
+  if (colunasTextoPreparadas) return;
+  const camposData = ['data', 'hora_inicio', 'hora_fim', 'criado_em'];
+  const tabelas = [
+    { aba: 'Injecao_App', cabecalho: CABECALHO_INJECAO },
+    { aba: 'Sopro_App', cabecalho: CABECALHO_SOPRO }
+  ];
+  for (const t of tabelas) {
+    for (const campo of camposData) {
+      const idx = t.cabecalho.indexOf(campo);
+      if (idx === -1) continue;
+      const col = letraColuna(idx);
+      try {
+        await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + t.aba + '/range(address=\'' + col + ':' + col + '\')', {
+          method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ numberFormat: [['@']] })
+        });
+      } catch (e) { /* segue mesmo se falhar numa coluna */ }
+    }
+  }
+  colunasTextoPreparadas = true;
+}
+
+async function garantirTabelaListas(token) {
+  // Verifica se a planilha (worksheet) "Listas_App" existe
+  const respWs = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets', { headers: { Authorization: 'Bearer ' + token } });
+  const jsonWs = await respWs.json();
+  let existeWs = (jsonWs.value || []).some(function(w){ return w.name === 'Listas_App'; });
+
+  if (!existeWs) {
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Listas_App' })
+    });
+  }
+
+  // Verifica se a tabela já existe dentro dela
+  const respTb = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/tables', { headers: { Authorization: 'Bearer ' + token } });
+  const jsonTb = await respTb.json();
+  let existeTb = (jsonTb.value || []).some(function(t){ return t.name === 'TabelaListas'; });
+
+  if (!existeTb) {
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/range(address=\'A1:B1\')', {
+      method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [['tipo', 'valor']] })
+    });
+    const respAdd = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/tables/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: 'Listas_App!A1:B1', hasHeaders: true })
+    });
+    const jsonAdd = await respAdd.json();
+    if (jsonAdd.id) {
+      await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + jsonAdd.id, {
+        method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'TabelaListas' })
+      });
+    }
+    return false; // tabela recém-criada, ainda vazia
+  }
+  return true;
+}
+
+async function carregarListasDaPlanilha() {
+  try {
+    const token = await getToken();
+    const jaExistia = await garantirTabelaListas(token);
+
+    if (!jaExistia) {
+      // Tabela acabou de ser criada: grava os valores padrão que já estavam no app
+      await salvarListasNaPlanilha();
+      return;
+    }
+
+    const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/tables/TabelaListas/rows', { headers: { Authorization: 'Bearer ' + token } });
+    const json = await resp.json();
+    if (!json.value || json.value.length === 0) { await salvarListasNaPlanilha(); return; }
+
+    const novasListas = {};
+    CHAVES_LISTAS.forEach(function(chave) { novasListas[chave] = []; });
+    json.value.forEach(function(row) {
+      const valores = row.values[0];
+      const tipo = valores[0], valor = valores[1];
+      if (novasListas[tipo] !== undefined && valor) novasListas[tipo].push(valor);
+    });
+    CHAVES_LISTAS.forEach(function(chave) {
+      if (novasListas[chave].length > 0) listas[chave] = novasListas[chave];
+    });
+    renderListasNaTela();
+    renderFormInjecao();
+    renderFormSopro();
+  } catch (err) {
+    console.error('Erro ao carregar listas da planilha:', err);
+  }
+}
+
+async function salvarListasNaPlanilha() {
+  try {
+    const token = await getToken();
+    await garantirTabelaListas(token);
+    const urlBase = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/tables/TabelaListas';
+
+    // Apaga todas as linhas atuais de uma só vez (em vez de uma requisição por linha)
+    try {
+      const respRange = await fetch(urlBase + '/dataBodyRange', { headers: { Authorization: 'Bearer ' + token } });
+      const jsonRange = await respRange.json();
+      if (jsonRange.address) {
+        await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/range(address=\'' + encodeURIComponent(jsonRange.address) + '\')/delete', {
+          method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shift: 'Up' })
+        });
+      }
+    } catch (e) { /* tabela ainda sem linhas — segue normalmente */ }
+
+    // Grava tudo de novo (uma única chamada)
+    const valores = [];
+    CHAVES_LISTAS.forEach(function(chave) {
+      (listas[chave] || []).forEach(function(valor) { valores.push([chave, valor]); });
+    });
+    if (valores.length > 0) {
+      await fetch(urlBase + '/rows/add', {
+        method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ values: valores })
+      });
+    }
+    return true;
+  } catch (err) {
+    console.error('Erro ao salvar listas na planilha:', err);
+    return false;
+  }
+}
+
+function ordenarLista(opcoes) {
+  return opcoes.slice().sort(function(a, b) {
+    return a.localeCompare(b, 'pt-BR', { numeric: true, sensitivity: 'base' });
+  });
+}
+
+function preencherSelect(id, opcoes, comTodos) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const ordenadas = ordenarLista(opcoes);
+  let html = comTodos ? '<option value="">Todos</option>' : '<option value="">Selecione…</option>';
+  html += ordenadas.map(function(o){ return '<option value="'+o+'">'+o+'</option>'; }).join('');
+  el.innerHTML = html;
+}
+
+function renderListasNaTela() {
+  document.getElementById('listaResponsaveis').value = listas.responsaveis.join('\n');
+  document.getElementById('listaEquipInjecao').value = listas.equipInjecao.join('\n');
+  document.getElementById('listaEquipSopro').value = listas.equipSopro.join('\n');
+  document.getElementById('listaDefeitosInjecao').value = listas.defeitosInjecao.join('\n');
+  document.getElementById('listaDefeitosSopro').value = listas.defeitosSopro.join('\n');
+  document.getElementById('listaOperadores').value = listas.operadores.join('\n');
+  document.getElementById('listaCoresInjecao').value = listas.coresInjecao.join('\n');
+  document.getElementById('listaGramaturas').value = listas.gramaturas.join('\n');
+  document.getElementById('listaResinas').value = listas.resinas.join('\n');
+  document.getElementById('listaCoresSopro').value = listas.coresSopro.join('\n');
+  document.getElementById('listaMlSopro').value = listas.mlSopro.join('\n');
+  document.getElementById('listaTipoFrasco').value = listas.tipoFrasco.join('\n');
+  document.getElementById('listaFornecedoresPreforma').value = listas.fornecedoresPreforma.join('\n');
+  document.getElementById('listaGramaturasPreforma').value = listas.gramaturasPreforma.join('\n');
+  document.getElementById('listaOperadoresSopro').value = listas.operadoresSopro.join('\n');
+}
+
+async function salvarListas() {
+  function parse(id) { return document.getElementById(id).value.split('\n').map(function(s){return s.trim();}).filter(Boolean); }
+  listas.responsaveis = parse('listaResponsaveis');
+  listas.equipInjecao = parse('listaEquipInjecao');
+  listas.equipSopro = parse('listaEquipSopro');
+  listas.defeitosInjecao = parse('listaDefeitosInjecao');
+  listas.defeitosSopro = parse('listaDefeitosSopro');
+  listas.operadores = parse('listaOperadores');
+  listas.coresInjecao = parse('listaCoresInjecao');
+  listas.gramaturas = parse('listaGramaturas');
+  listas.resinas = parse('listaResinas');
+  listas.coresSopro = parse('listaCoresSopro');
+  listas.mlSopro = parse('listaMlSopro');
+  listas.tipoFrasco = parse('listaTipoFrasco');
+  listas.fornecedoresPreforma = parse('listaFornecedoresPreforma');
+  listas.gramaturasPreforma = parse('listaGramaturasPreforma');
+  listas.operadoresSopro = parse('listaOperadoresSopro');
+  renderFormInjecao();
+  renderFormSopro();
+
+  const btn = document.getElementById('btnSalvarListas');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando na planilha…'; }
+  const ok = await salvarListasNaPlanilha();
+  if (btn) { btn.disabled = false; btn.textContent = 'Salvar listas'; }
+  mostrarToast(ok ? 'Listas salvas na planilha ✓ (visíveis em qualquer dispositivo)' : 'Listas atualizadas aqui, mas houve falha ao salvar na planilha.', !ok);
+}
+
+/* ---------------- Formulário genérico (Injeção / Sopro) ---------------- */
+function gerarIdSessao() { return 'S' + Date.now(); }
+
+function renderFormInjecao() {
+  const el = document.getElementById('formInjecao');
+  el.innerHTML =
+    '<div class="card"><h3>Dados da sessão</h3>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Data</label><input type="date" id="inj_data"></div>' +
+        '<div class="field"><label>Equipamento</label>'+'<select id="inj_equipamento"></select>'+'</div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Hora início</label><input type="time" id="inj_hora_inicio"></div>' +
+        '<div class="field"><label>Hora conclusão</label><input type="time" id="inj_hora_fim"></div>' +
+      '</div>' +
+      '<div class="field"><label>Responsável pela inspeção</label>'+'<select id="inj_responsavel"></select>'+'</div>' +
+      '<div class="field"><label>Operador principal</label>'+'<select id="inj_operador"></select>'+'</div>' +
+      '<div class="grid-3">' +
+        '<div class="field"><label>Cor da preforma</label>'+'<select id="inj_cor"></select>'+'</div>' +
+        '<div class="field"><label>Gramatura</label>'+'<select id="inj_gramatura"></select>'+'</div>' +
+        '<div class="field"><label>Resina</label>'+'<select id="inj_resina"></select>'+'</div>' +
+      '</div>' +
+      '<div class="grid-3">' +
+        toggleGroupHtml('inj_organizacaoLinha', 'Organização linha produtiva', ['APROVADO','REPROVADO'], 'APROVADO') +
+        toggleGroupHtml('inj_tonalidadePreforma', 'Tonalidade da preforma', ['APROVADO','REPROVADO'], 'APROVADO') +
+        toggleGroupHtml('inj_alinhamentoEtiqueta', 'Alinhamento etiqueta caixa', ['APROVADO','REPROVADO'], 'APROVADO') +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Temperatura Gate — °C Mínima</label><input type="number" step="0.1" id="inj_tempGateMin" placeholder="Ex: 240.0"></div>' +
+        '<div class="field"><label>Temperatura Gate — °C Máxima</label><input type="number" step="0.1" id="inj_tempGateMax" placeholder="Ex: 250.0"></div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Temperatura Corpo — °C Mínima</label><input type="number" step="0.1" id="inj_tempCorpoMin" placeholder="Ex: 245.0"></div>' +
+        '<div class="field"><label>Temperatura Corpo — °C Máxima</label><input type="number" step="0.1" id="inj_tempCorpoMax" placeholder="Ex: 255.0"></div>' +
+      '</div>' +
+      '<div class="field"><label>Foi identificado algum defeito?</label><select id="inj_temDefeito" onchange="alternarSecaoDesvios(\'injecao\',this.value)"><option value="NAO" selected>NÃO</option><option value="SIM">SIM</option></select></div>' +
+    '</div>' +
+    '<div class="card" id="cardDesviosInjecao"><h3>Desvios encontrados</h3>' +
+      '<div id="listaDesviosInjecao"></div>' +
+      '<div id="semDesviosInjecao" class="empty-state">Nenhum desvio adicionado ainda.</div>' +
+      '<button class="btn btn-outline btn-block" id="btnAddDesvioInjecao" onclick="adicionarDesvio(\'injecao\')">+ Adicionar desvio</button>' +
+    '</div>' +
+    '<button class="btn btn-accent btn-block" id="btnSalvarInjecao" onclick="salvarSessao(\'injecao\')">Salvar sessão na planilha</button>';
+  preencherSelect('inj_equipamento', listas.equipInjecao);
+  preencherSelect('inj_responsavel', listas.responsaveis);
+  preencherSelect('inj_operador', listas.operadores);
+  preencherSelect('inj_cor', listas.coresInjecao);
+  preencherSelect('inj_gramatura', listas.gramaturas);
+  preencherSelect('inj_resina', listas.resinas);
+  document.getElementById('inj_data').value = hojeISO();
+  document.getElementById('inj_hora_inicio').value = agoraHHMM();
+  renderDesvios('injecao');
+  alternarSecaoDesvios('injecao', 'NAO');
+}
+
+function renderFormSopro() {
+  const el = document.getElementById('formSopro');
+  el.innerHTML =
+    '<div class="card"><h3>Dados da sessão</h3>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Data</label><input type="date" id="sop_data"></div>' +
+        '<div class="field"><label>Equipamento</label>'+'<select id="sop_equipamento"></select>'+'</div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Hora início</label><input type="time" id="sop_hora_inicio"></div>' +
+        '<div class="field"><label>Hora conclusão</label><input type="time" id="sop_hora_fim"></div>' +
+      '</div>' +
+      '<div class="field"><label>Responsável pela inspeção</label>'+'<select id="sop_responsavel"></select>'+'</div>' +
+      '<div class="field"><label>Operador</label><select id="sop_operador"></select></div>' +
+      '<div class="grid-3">' +
+        '<div class="field"><label>Cor</label>'+'<select id="sop_cor"></select>'+'</div>' +
+        '<div class="field"><label>Volume (mL)</label>'+'<select id="sop_ml"></select>'+'</div>' +
+        '<div class="field"><label>Tipo de frasco</label>'+'<select id="sop_frasco"></select>'+'</div>' +
+      '</div>' +
+      '<div class="grid-3">' +
+        '<div class="field"><label>Gramatura preforma</label>'+'<select id="sop_gramaturaPreforma"></select>'+'</div>' +
+        '<div class="field"><label>Fornecedor preforma</label>'+'<select id="sop_fornecedorPreforma"></select>'+'</div>' +
+        '<div class="field"><label>Lote caixa</label><input type="text" id="sop_loteCaixa" placeholder="Ex: L2026-081"></div>' +
+      '</div>' +
+      '<div class="grid-2">' +
+        '<div class="field"><label>Número caixa</label><input type="text" id="sop_numeroCaixa" placeholder="Ex: 0142"></div>' +
+        toggleGroupHtml('sop_caixaVermelha', 'Caixa vermelha?', ['SIM','NÃO'], 'NÃO') +
+      '</div>' +
+      '<div class="field"><label>Motivo caixa vermelha</label><input type="text" id="sop_motivoCaixaVermelha" placeholder="Descreva o motivo, se houver"></div>' +
+      '<div class="grid-3">' +
+        toggleGroupHtml('sop_fechamentoSaco', 'Condição fechamento saco', ['APROVADO','REPROVADO'], 'APROVADO') +
+        toggleGroupHtml('sop_alinhamentoPaletes', 'Alinhamento dos paletes', ['APROVADO','REPROVADO'], 'APROVADO') +
+        toggleGroupHtml('sop_organizacaoLinha', 'Organização linha produtiva', ['APROVADO','REPROVADO'], 'APROVADO') +
+      '</div>' +
+      '<div class="grid-3">' +
+        toggleGroupHtml('sop_produtoRotulado', 'Produto rotulado?', ['SIM','NÃO'], 'SIM') +
+        toggleGroupHtml('sop_condicaoRotulo', 'Condição do rótulo?', ['APROVADO','REPROVADO'], 'APROVADO') +
+        toggleGroupHtml('sop_testeProducao', 'Teste realizado pela produção?', ['SIM','NÃO'], 'SIM') +
+      '</div>' +
+      '<div class="field"><label>Número de postos de molde</label><select id="sop_numPostos" onchange="renderPostosMolde(this.value)">' +
+        '<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4" selected>4</option>' +
+      '</select></div>' +
+      '<div id="postosMoldeContainer"></div>' +
+      '<div class="field"><label>Foi identificado algum defeito?</label><select id="sop_temDefeito" onchange="alternarSecaoDesvios(\'sopro\',this.value)"><option value="NAO" selected>NÃO</option><option value="SIM">SIM</option></select></div>' +
+    '</div>' +
+    '<div class="card" id="cardDesviosSopro"><h3>Desvios encontrados</h3>' +
+      '<div id="listaDesviosSopro"></div>' +
+      '<div id="semDesviosSopro" class="empty-state">Nenhum desvio adicionado ainda.</div>' +
+      '<button class="btn btn-outline btn-block" id="btnAddDesvioSopro" onclick="adicionarDesvio(\'sopro\')">+ Adicionar desvio</button>' +
+    '</div>' +
+    '<button class="btn btn-accent btn-block" id="btnSalvarSopro" onclick="salvarSessao(\'sopro\')">Salvar sessão na planilha</button>';
+  preencherSelect('sop_equipamento', listas.equipSopro);
+  preencherSelect('sop_responsavel', listas.responsaveis);
+  preencherSelect('sop_operador', listas.operadoresSopro);
+  preencherSelect('sop_cor', listas.coresSopro);
+  preencherSelect('sop_ml', listas.mlSopro);
+  preencherSelect('sop_frasco', listas.tipoFrasco);
+  preencherSelect('sop_fornecedorPreforma', listas.fornecedoresPreforma);
+  preencherSelect('sop_gramaturaPreforma', listas.gramaturasPreforma);
+  renderPostosMolde('4');
+  document.getElementById('sop_data').value = hojeISO();
+  document.getElementById('sop_hora_inicio').value = agoraHHMM();
+  renderDesvios('sopro');
+  alternarSecaoDesvios('sopro', 'NAO');
+}
+
+function listaDesvios(processo) { return processo === 'sopro' ? desviosSopro : desviosInjecao; }
+
+/* ---------------- Grupos de opções (toggle) ---------------- */
+function toggleGroupHtml(id, label, opcoes, valorPadrao) {
+  return '<div class="field"><label>'+label+'</label><div class="toggle-group" id="'+id+'" data-value="'+valorPadrao+'">' +
+    opcoes.map(function(op){
+      return '<button type="button" class="toggle-btn'+(op===valorPadrao?' active':'')+'" onclick="selecionarToggle(\''+id+'\',\''+op+'\')">'+op+'</button>';
+    }).join('') +
+  '</div></div>';
+}
+function selecionarToggle(groupId, valor) {
+  const group = document.getElementById(groupId);
+  if (!group) return;
+  group.dataset.value = valor;
+  Array.prototype.forEach.call(group.querySelectorAll('.toggle-btn'), function(btn) {
+    btn.classList.toggle('active', btn.textContent === valor);
+  });
+}
+function getToggleValue(groupId) {
+  const group = document.getElementById(groupId);
+  return group ? (group.dataset.value || '') : '';
+}
+
+/* ---------------- Postos de molde (Peso/Altura) ---------------- */
+function renderPostosMolde(qtd) {
+  const n = parseInt(qtd, 10) || 4;
+  const container = document.getElementById('postosMoldeContainer');
+  let html = '<div class="card" style="background:var(--surface-2); margin-bottom:12px;"><h3 style="font-size:13px;">Peso e altura por posto</h3>';
+  for (let i = 1; i <= n; i++) {
+    html += '<div class="grid-2">' +
+      '<div class="field"><label>Peso — Posto '+i+' (g)</label><input type="number" step="0.01" id="sop_peso_'+i+'" placeholder="Ex: 24.5"></div>' +
+      '<div class="field"><label>Altura — Posto '+i+' (mm)</label><input type="number" step="0.01" id="sop_altura_'+i+'" placeholder="Ex: 118.2"></div>' +
+    '</div>';
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function adicionarDesvio(processo) {
+  const item = { id: (processo === 'sopro' ? ++contadorSopro : ++contadorInjecao), defeito: '', cavidade: [], criticidade: 'LEVE', operadorCiente: 'SIM', status: 'FICOU PENDENTE', observacao: '', fotoFile: null };
+  if (processo === 'sopro') desviosSopro.push(item); else desviosInjecao.push(item);
+  renderDesvios(processo);
+}
+function removerDesvio(processo, id) {
+  if (processo === 'sopro') desviosSopro = desviosSopro.filter(function(d){ return d.id !== id; });
+  else desviosInjecao = desviosInjecao.filter(function(d){ return d.id !== id; });
+  renderDesvios(processo);
+}
+function atualizarDesvio(processo, id, campo, valor) {
+  const d = listaDesvios(processo).find(function(d){ return d.id === id; });
+  if (d) d[campo] = valor;
+}
+function alternarCavidade(processo, id, num, checked) {
+  const d = listaDesvios(processo).find(function(d){ return d.id === id; });
+  if (!d) return;
+  if (!Array.isArray(d.cavidade)) d.cavidade = [];
+  if (checked) { if (d.cavidade.indexOf(num) === -1) d.cavidade.push(num); }
+  else { d.cavidade = d.cavidade.filter(function(c){ return c !== num; }); }
+  const resumo = document.getElementById('cavResumo_'+processo+'_'+id);
+  if (resumo) resumo.textContent = d.cavidade.length ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…';
+}
+
+function armazenarFoto(processo, id, files) {
+  const d = listaDesvios(processo).find(function(d){ return d.id === id; });
+  if (!d) return;
+  d.fotoFile = files && files[0] ? files[0] : null;
+  const label = document.getElementById('fotoLabel_'+processo+'_'+id);
+  if (label) label.textContent = d.fotoFile ? d.fotoFile.name : 'Nenhuma foto selecionada';
+}
+
+function alternarSecaoDesvios(processo, valor) {
+  const card = document.getElementById(processo === 'sopro' ? 'cardDesviosSopro' : 'cardDesviosInjecao');
+  const btnAdd = document.getElementById(processo === 'sopro' ? 'btnAddDesvioSopro' : 'btnAddDesvioInjecao');
+  const travado = (valor === 'NAO');
+  card.style.opacity = travado ? '0.45' : '1';
+  card.querySelectorAll('input, select, textarea, button').forEach(function(el) { el.disabled = travado; });
+  btnAdd.disabled = travado;
+  if (travado) {
+    if (processo === 'sopro') { desviosSopro = []; contadorSopro = 0; } else { desviosInjecao = []; contadorInjecao = 0; }
+    renderDesvios(processo);
+  } else if (listaDesvios(processo).length === 0) {
+    adicionarDesvio(processo);
+  }
+}
+
+function renderDesvios(processo) {
+  const desvios = listaDesvios(processo);
+  const container = document.getElementById(processo === 'sopro' ? 'listaDesviosSopro' : 'listaDesviosInjecao');
+  const vazio = document.getElementById(processo === 'sopro' ? 'semDesviosSopro' : 'semDesviosInjecao');
+  vazio.classList.toggle('hidden', desvios.length > 0);
+  const defeitosLista = ordenarLista(processo === 'sopro' ? listas.defeitosSopro : listas.defeitosInjecao);
+
+  container.innerHTML = desvios.map(function(d, idx) {
+    const opcoesDefeito = defeitosLista.map(function(f){ return '<option value="'+f+'"'+(d.defeito===f?' selected':'')+'>'+f+'</option>'; }).join('');
+    const opcoesCrit = criticidades.map(function(c){ return '<option value="'+c+'"'+(d.criticidade===c?' selected':'')+'>'+c+'</option>'; }).join('');
+    const opcoesStatus = statusCorrecao.map(function(s){ return '<option value="'+s+'"'+(d.status===s?' selected':'')+'>'+s+'</option>'; }).join('');
+    const cienteBlock = processo === 'injecao'
+      ? '<div class="field"><label>Operador ciente?</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'operadorCiente\',this.value)"><option value="SIM"'+(d.operadorCiente==='SIM'?' selected':'')+'>SIM</option><option value="NÃO"'+(d.operadorCiente==='NÃO'?' selected':'')+'>NÃO</option></select></div>'
+      : '';
+
+    let cavidadeBlock = '';
+    if (processo === 'injecao') {
+      const selecionadas = Array.isArray(d.cavidade) ? d.cavidade : [];
+      let opcoesCav = '';
+      for (let n = 1; n <= 72; n++) {
+        const marcado = selecionadas.indexOf(n) > -1 ? ' checked' : '';
+        opcoesCav += '<label class="cav-opt"><input type="checkbox" value="'+n+'"'+marcado+' onchange="alternarCavidade(\''+processo+'\','+d.id+','+n+',this.checked)"> '+n+'</label>';
+      }
+      cavidadeBlock =
+        '<div class="field"><label>Cavidade(s)</label>' +
+          '<details class="cav-details">' +
+            '<summary id="cavResumo_'+processo+'_'+d.id+'">'+(selecionadas.length ? selecionadas.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…')+'</summary>' +
+            '<div class="cav-grid">'+opcoesCav+'</div>' +
+          '</details>' +
+        '</div>';
+    }
+
+    return '<div class="desvio-card"><button class="remove-desvio" onclick="removerDesvio(\''+processo+'\','+d.id+')">✕</button>' +
+      '<div class="desvio-num">DESVIO #'+(idx+1)+'</div>' +
+      '<div class="field"><label>Defeito encontrado</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'defeito\',this.value)"><option value="">Selecione…</option>'+opcoesDefeito+'</select></div>' +
+      (processo === 'injecao' ? '<div class="grid-2">' + cavidadeBlock + '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div></div>'
+                              : '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div>') +
+      '<div class="grid-2">' + cienteBlock + '<div class="field"><label>Status</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'status\',this.value)">'+opcoesStatus+'</select></div></div>' +
+      '<div class="field"><label>Foto do desvio</label>' +
+        '<input type="file" accept="image/*" capture="environment" onchange="armazenarFoto(\''+processo+'\','+d.id+',this.files)">' +
+        '<div id="fotoLabel_'+processo+'_'+d.id+'" style="font-size:11px; color:var(--text-dim); margin-top:5px;">'+(d.fotoFile ? d.fotoFile.name : 'Nenhuma foto selecionada')+'</div>' +
+      '</div>' +
+      '<div class="field"><label>Observação</label><textarea oninput="atualizarDesvio(\''+processo+'\','+d.id+',\'observacao\',this.value)">'+d.observacao+'</textarea></div>' +
+    '</div>';
+  }).join('');
+}
+
+const PASTA_FOTOS = "Documents/Apps/Microsoft Forms/Inspeção da Qualidade - Linhas de Injeção/Pergunta";
+
+async function uploadFoto(token, file, idSessao, indice) {
+  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  const nomeArquivo = 'Inspecao_' + idSessao + '_' + indice + '.' + ext;
+  const caminho = PASTA_FOTOS.split('/').map(encodeURIComponent).join('/') + '/' + encodeURIComponent(nomeArquivo);
+  const sessionResp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/root:/' + caminho + ':/createUploadSession', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ item: { '@microsoft.graph.conflictBehavior': 'rename' } })
+  });
+  const session = await sessionResp.json();
+  if (!session.uploadUrl) throw new Error(session.error ? session.error.message : 'não foi possível iniciar o upload');
+  const uploadResp = await fetch(session.uploadUrl, {
+    method: 'PUT',
+    headers: { 'Content-Range': 'bytes 0-' + (file.size - 1) + '/' + file.size },
+    body: file
+  });
+  const uploadJson = await uploadResp.json();
+  if (!uploadResp.ok) throw new Error(uploadJson.error ? uploadJson.error.message : 'falha no upload');
+  return uploadJson.webUrl || '';
+}
+
+async function salvarSessao(processo) {
+  if (!itemId) { mostrarToast('Conecte-se à planilha (Configurações) antes de salvar.', true); setPage('config'); return; }
+  const pfx = processo === 'sopro' ? 'sop_' : 'inj_';
+  const temDefeito = document.getElementById(pfx+'temDefeito').value;
+  const desvios = temDefeito === 'NAO' ? [{ defeito: '', cavidade: [], criticidade: '', operadorCiente: '', status: 'SEM DESVIO', observacao: '', fotoFile: null }] : listaDesvios(processo);
+  if (temDefeito === 'SIM' && desvios.length === 0) { mostrarToast('Adicione ao menos um desvio.', true); return; }
+
+  const idSessao = gerarIdSessao();
+  const data = document.getElementById(pfx+'data').value;
+  const horaInicio = document.getElementById(pfx+'hora_inicio').value;
+  const horaFim = agoraHHMM();
+  document.getElementById(pfx+'hora_fim').value = horaFim;
+  const equipamento = document.getElementById(pfx+'equipamento').value;
+  const responsavel = document.getElementById(pfx+'responsavel').value;
+  const nomeTabela = processo === 'sopro' ? 'TabelaSopro' : 'TabelaInjecao';
+  const cabecalho = processo === 'sopro' ? CABECALHO_SOPRO : CABECALHO_INJECAO;
+
+  const btn = document.getElementById(processo === 'sopro' ? 'btnSalvarSopro' : 'btnSalvarInjecao');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+
+  try {
+    const token = await getToken();
+
+    // Envia as fotos primeiro (quando houver) e guarda a URL de cada uma
+    for (let i = 0; i < desvios.length; i++) {
+      if (desvios[i].fotoFile) {
+        btn.textContent = 'Enviando foto ' + (i+1) + '/' + desvios.length + '…';
+        try {
+          desvios[i].fotoUrlFinal = await uploadFoto(token, desvios[i].fotoFile, idSessao, i + 1);
+        } catch (e) {
+          mostrarToast('Falha ao enviar uma foto: ' + e.message, true);
+          desvios[i].fotoUrlFinal = '';
+        }
+      }
+    }
+    btn.textContent = 'Salvando…';
+
+    let linhasObj;
+    if (processo === 'injecao') {
+      const operador = document.getElementById('inj_operador').value;
+      const cor = document.getElementById('inj_cor').value;
+      const gramatura = document.getElementById('inj_gramatura').value;
+      const resina = document.getElementById('inj_resina').value;
+      const organizacaoLinha = getToggleValue('inj_organizacaoLinha');
+      const tonalidadePreforma = getToggleValue('inj_tonalidadePreforma');
+      const alinhamentoEtiqueta = getToggleValue('inj_alinhamentoEtiqueta');
+      const tempGateMin = document.getElementById('inj_tempGateMin').value;
+      const tempGateMax = document.getElementById('inj_tempGateMax').value;
+      const tempCorpoMin = document.getElementById('inj_tempCorpoMin').value;
+      const tempCorpoMax = document.getElementById('inj_tempCorpoMax').value;
+      linhasObj = desvios.map(function(d) {
+        return { id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim, equipamento: equipamento, responsavel: responsavel,
+          operador_principal: operador, cor: cor, gramatura: gramatura, resina: resina, defeito: d.defeito, cavidade: Array.isArray(d.cavidade) ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(';') : (d.cavidade || ''),
+          criticidade: d.criticidade, operador_ciente: d.operadorCiente, status_correcao: d.status, observacao: d.observacao, foto_url: d.fotoUrlFinal || '', criado_em: new Date().toISOString(),
+          organizacao_linha_produtiva: organizacaoLinha, tonalidade_preforma: tonalidadePreforma, alinhamento_etiqueta_caixa: alinhamentoEtiqueta,
+          temperatura_gate_min: tempGateMin, temperatura_gate_max: tempGateMax, temperatura_corpo_min: tempCorpoMin, temperatura_corpo_max: tempCorpoMax };
+      });
+    } else {
+      const cor = document.getElementById('sop_cor').value;
+      const ml = document.getElementById('sop_ml').value;
+      const frasco = document.getElementById('sop_frasco').value;
+      const operador = document.getElementById('sop_operador').value;
+      const produtoRotulado = getToggleValue('sop_produtoRotulado');
+      const condicaoRotulo = getToggleValue('sop_condicaoRotulo');
+      const testeProducao = getToggleValue('sop_testeProducao');
+      const fechamentoSaco = getToggleValue('sop_fechamentoSaco');
+      const alinhamentoPaletes = getToggleValue('sop_alinhamentoPaletes');
+      const organizacaoLinha = getToggleValue('sop_organizacaoLinha');
+      const numPostos = document.getElementById('sop_numPostos').value;
+      const gramaturaPreforma = document.getElementById('sop_gramaturaPreforma').value;
+      const fornecedorPreforma = document.getElementById('sop_fornecedorPreforma').value;
+      const loteCaixa = document.getElementById('sop_loteCaixa').value;
+      const numeroCaixa = document.getElementById('sop_numeroCaixa').value;
+      const caixaVermelha = getToggleValue('sop_caixaVermelha');
+      const motivoCaixaVermelha = document.getElementById('sop_motivoCaixaVermelha').value;
+      const pesos = {}, alturas = {};
+      for (let i = 1; i <= 4; i++) {
+        const campoPeso = document.getElementById('sop_peso_'+i);
+        const campoAltura = document.getElementById('sop_altura_'+i);
+        pesos[i] = (i <= numPostos && campoPeso) ? campoPeso.value : '';
+        alturas[i] = (i <= numPostos && campoAltura) ? campoAltura.value : '';
+      }
+      linhasObj = desvios.map(function(d) {
+        return { id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim, equipamento: equipamento, responsavel: responsavel,
+          cor: cor, ml: ml, tipo_frasco: frasco, defeito: d.defeito, criticidade: d.criticidade, status_correcao: d.status,
+          observacao: d.observacao, foto_url: d.fotoUrlFinal || '',
+          condicao_fechamento_saco: fechamentoSaco, alinhamento_paletes: alinhamentoPaletes, organizacao_linha_produtiva: organizacaoLinha,
+          produto_rotulado: produtoRotulado, condicao_rotulo: condicaoRotulo, teste_producao: testeProducao, num_postos_molde: numPostos,
+          peso_1: pesos[1], peso_2: pesos[2], peso_3: pesos[3], peso_4: pesos[4],
+          altura_1: alturas[1], altura_2: alturas[2], altura_3: alturas[3], altura_4: alturas[4],
+          gramatura_preforma: gramaturaPreforma, fornecedor_preforma: fornecedorPreforma, lote_caixa: loteCaixa, numero_caixa: numeroCaixa, caixa_vermelha: caixaVermelha, motivo_caixa_vermelha: motivoCaixaVermelha,
+          operador: operador,
+          criado_em: new Date().toISOString() };
+      });
+    }
+
+    const valores = linhasObj.map(function(obj) { return cabecalho.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; }); });
+    const url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + nomeTabela + '/rows/add';
+    const resp = await fetch(url, { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ values: valores }) });
+    if (resp.ok) {
+      mostrarToast(valores.length + ' registro(s) salvos ✓');
+      if (processo === 'sopro') { desviosSopro = []; contadorSopro = 0; renderFormSopro(); } else { desviosInjecao = []; contadorInjecao = 0; renderFormInjecao(); }
+      setPage('dashboard');
+    } else {
+      const json = await resp.json();
+      mostrarToast('Erro ao salvar: ' + (json.error ? json.error.message : resp.status), true);
+    }
+  } catch (err) {
+    mostrarToast('Falha de conexão: ' + err.message, true);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Salvar sessão na planilha';
+  }
+}
+
+/* ---------------- Dashboard: dados ---------------- */
+/* Corrige valores que o Excel converteu automaticamente em data/hora
+   (caso a coluna ainda não estivesse formatada como Texto no momento do cadastro) */
+function normalizarValorDataHora(campo, valor) {
+  if (valor === null || valor === undefined || valor === '') return valor;
+  const ehNumero = typeof valor === 'number' || (typeof valor === 'string' && valor.trim() !== '' && !isNaN(valor) && /^[0-9.]+$/.test(valor.trim()));
+  if (!ehNumero) return valor;
+
+  const serial = parseFloat(valor);
+  // Serial de data do Excel: dias desde 30/12/1899
+  const baseMs = Date.UTC(1899, 11, 30);
+  const dataConvertida = new Date(baseMs + serial * 86400000);
+
+  if (campo === 'data') {
+    return dataConvertida.getUTCFullYear() + '-' + String(dataConvertida.getUTCMonth()+1).padStart(2,'0') + '-' + String(dataConvertida.getUTCDate()).padStart(2,'0');
+  }
+  if (campo === 'hora_inicio' || campo === 'hora_fim' || campo === 'criado_em') {
+    const fracaoDia = serial % 1;
+    const totalMinutos = Math.round(fracaoDia * 24 * 60);
+    const hh = Math.floor(totalMinutos / 60) % 24;
+    const mm = totalMinutos % 60;
+    return String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+  }
+  return valor;
+}
+
+function linhasArrayParaObjeto(linhasArray, cabecalho, processo) {
+  return linhasArray.map(function(row) {
+    const valores = row.values[0];
+    const obj = { processo: processo };
+    cabecalho.forEach(function(campo, i) { obj[campo] = normalizarValorDataHora(campo, valores[i]); });
+    return obj;
+  });
+}
+
+async function carregarDados() {
+  if (!itemId) return;
+  try {
+    const token = await getToken();
+    const [respInj, respSop] = await Promise.all([
+      fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaInjecao/rows', { headers: { Authorization: 'Bearer ' + token } }),
+      fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaSopro/rows', { headers: { Authorization: 'Bearer ' + token } })
+    ]);
+    const jsonInj = await respInj.json();
+    const jsonSop = await respSop.json();
+    dadosCache = {
+      injecao: jsonInj.value ? linhasArrayParaObjeto(jsonInj.value, CABECALHO_INJECAO, 'injecao') : [],
+      sopro: jsonSop.value ? linhasArrayParaObjeto(jsonSop.value, CABECALHO_SOPRO, 'sopro') : []
+    };
+    popularFiltrosEquipResp();
+    atualizarDashboard();
+  } catch (err) {
+    mostrarToast('Falha de conexão ao carregar dashboard.', true);
+  }
+}
+
+function popularFiltrosEquipResp() {
+  const todos = dadosCache.injecao.concat(dadosCache.sopro);
+  const equipamentos = Array.from(new Set(todos.map(function(l){return l.equipamento;}).filter(Boolean))).sort();
+  const responsaveis = Array.from(new Set(todos.map(function(l){return l.responsavel;}).filter(Boolean))).sort();
+  preencherSelect('fEquipamento', equipamentos, true);
+  preencherSelect('fResponsavel', responsaveis, true);
+}
+
+function limparFiltros() {
+  document.getElementById('fProcesso').value = 'todos';
+  document.getElementById('fPeriodo').value = '30';
+  document.getElementById('fEquipamento').value = '';
+  document.getElementById('fResponsavel').value = '';
+  document.getElementById('fCriticidade').value = '';
+  document.getElementById('tBuscaSopro').value = '';
+  document.getElementById('tDataDeSopro').value = '';
+  document.getElementById('tDataAteSopro').value = '';
+  document.getElementById('tHoraDeSopro').value = '';
+  document.getElementById('tHoraAteSopro').value = '';
+  document.getElementById('tBuscaInjecao').value = '';
+  document.getElementById('tDataDeInjecao').value = '';
+  document.getElementById('tDataAteInjecao').value = '';
+  document.getElementById('tHoraDeInjecao').value = '';
+  document.getElementById('tHoraAteInjecao').value = '';
+  atualizarDashboard();
+}
+
+function linhasFiltradasBase() {
+  const proc = document.getElementById('fProcesso').value;
+  let todos = proc === 'injecao' ? dadosCache.injecao.slice() : proc === 'sopro' ? dadosCache.sopro.slice() : dadosCache.injecao.concat(dadosCache.sopro);
+  return aplicarFiltrosComuns(todos);
+}
+
+function linhasFiltradasPorProcesso(processoFixo) {
+  const todos = dadosCache[processoFixo] ? dadosCache[processoFixo].slice() : [];
+  return aplicarFiltrosComuns(todos);
+}
+
+function aplicarFiltrosComuns(todos) {
+  todos = todos.filter(function(l){ return l.defeito; });
+  const dias = parseInt(document.getElementById('fPeriodo').value, 10);
+  if (dias) {
+    const limite = new Date(); limite.setDate(limite.getDate() - dias);
+    todos = todos.filter(function(l){ return !l.data || new Date(l.data) >= limite; });
+  }
+  const equip = document.getElementById('fEquipamento').value;
+  if (equip) todos = todos.filter(function(l){ return l.equipamento === equip; });
+  const resp = document.getElementById('fResponsavel').value;
+  if (resp) todos = todos.filter(function(l){ return l.responsavel === resp; });
+  const crit = document.getElementById('fCriticidade').value;
+  if (crit) todos = todos.filter(function(l){ return (l.criticidade||'').toUpperCase() === crit; });
+  return todos;
+}
+
+function contarPor(linhas, campo) {
+  const contagem = {};
+  linhas.forEach(function(l) { const chave = (l[campo] || 'N/A').toString().trim() || 'N/A'; contagem[chave] = (contagem[chave] || 0) + 1; });
+  return contagem;
+}
+function topN(contagem, n) { return Object.entries(contagem).sort(function(a,b){ return b[1]-a[1]; }).slice(0, n); }
+function destruirChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
+
+function coresGrafico() {
+  const claro = document.body.classList.contains('tema-claro');
+  return {
+    tick: claro ? '#6b6f76' : '#8b8f96',
+    grid: claro ? '#e3e5e8' : '#2a2d31',
+    legenda: claro ? '#17181b' : '#edeef0'
+  };
+}
+
+function criarBarChart(canvasId, labels, valores, cor) {
+  destruirChart(canvasId);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const c = coresGrafico();
+  charts[canvasId] = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ data: valores, backgroundColor: cor || '#f2a93b', borderRadius: 5 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: { ticks: { color: c.tick, font: { size: 10 } }, grid: { color: c.grid } }, y: { ticks: { color: c.tick }, grid: { color: c.grid }, beginAtZero: true } } } });
+}
+function criarDonutChart(canvasId, labels, valores, cores) {
+  destruirChart(canvasId);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const c = coresGrafico();
+  charts[canvasId] = new Chart(ctx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: valores, backgroundColor: cores }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: c.legenda, boxWidth: 12, font: { size: 11 } } } } } });
+}
+function criarLineChart(canvasId, labels, valores) {
+  destruirChart(canvasId);
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  const c = coresGrafico();
+  charts[canvasId] = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: valores, borderColor: '#f2a93b', backgroundColor: 'rgba(242,169,59,0.15)', fill: true, tension: 0.3 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      scales: { x: { ticks: { color: c.tick, font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: c.tick }, grid: { color: c.grid }, beginAtZero: true } } } });
+}
+
+function atualizarDashboard() {
+  if (!itemId) return;
+  const linhas = linhasFiltradasBase();
+
+  const total = linhas.length;
+  const pendentes = linhas.filter(function(l){ return (l.status_correcao||'').toUpperCase().indexOf('PENDENTE') > -1; }).length;
+  const graves = linhas.filter(function(l){ return (l.criticidade||'').toUpperCase() === 'GRAVE'; }).length;
+  document.getElementById('kpiTotal').textContent = total;
+  document.getElementById('kpiPendentes').textContent = pendentes;
+  document.getElementById('kpiGraves').textContent = graves;
+  document.getElementById('kpiTaxa').textContent = total ? Math.round(((total - pendentes) / total) * 100) + '%' : '–';
+
+  const porDefeito = topN(contarPor(linhas, 'defeito'), 8);
+  criarBarChart('chartDefeitos', porDefeito.map(function(x){return x[0];}), porDefeito.map(function(x){return x[1];}));
+
+  const porCrit = contarPor(linhas, 'criticidade');
+  const ordemCrit = ['LEVE','MÉDIO','GRAVE'];
+  const critLabels = ordemCrit.filter(function(c){ return porCrit[c]; });
+  criarDonutChart('chartCriticidade', critLabels, critLabels.map(function(c){return porCrit[c];}), ['#3fb68b','#f2a93b','#e5484d']);
+
+  const porStatus = contarPor(linhas, 'status_correcao');
+  const statusLabels = Object.keys(porStatus);
+  criarDonutChart('chartStatus', statusLabels, statusLabels.map(function(s){return porStatus[s];}), statusLabels.map(function(s){ return s.toUpperCase().indexOf('PENDENTE')>-1 ? '#e5484d' : '#3fb68b'; }));
+
+  const porProcesso = contarPor(linhas, 'processo');
+  const procLabels = Object.keys(porProcesso);
+  criarDonutChart('chartProcesso', procLabels.map(function(p){return p==='sopro'?'Sopro':'Injeção';}), procLabels.map(function(p){return porProcesso[p];}), ['#5b9bf2','#9c7bd9']);
+
+  const porResp = topN(contarPor(linhas, 'responsavel'), 8);
+  criarBarChart('chartResponsavel', porResp.map(function(x){return x[0];}), porResp.map(function(x){return x[1];}), '#5b9bf2');
+
+  const porEquip = topN(contarPor(linhas, 'equipamento'), 8);
+  criarBarChart('chartEquipamento', porEquip.map(function(x){return x[0];}), porEquip.map(function(x){return x[1];}), '#9c7bd9');
+
+  const porData = contarPor(linhas, 'data');
+  const datasOrdenadas = Object.keys(porData).sort();
+  criarLineChart('chartEvolucao', datasOrdenadas, datasOrdenadas.map(function(d){return porData[d];}));
+
+  renderTabelaSopro();
+  renderTabelaInjecao();
+}
+
+/* ---------------- Tabela de últimas ocorrências ---------------- */
+function abrev(v) {
+  const u = (v||'').toString().toUpperCase();
+  if (u === 'SIM') return 'S';
+  if (u === 'NÃO' || u === 'NAO') return 'N';
+  if (u === 'APROVADO') return 'A';
+  if (u === 'REPROVADO') return 'R';
+  return v || '—';
+}
+
+function formatarPesoAltura(l) {
+  const n = parseInt(l.num_postos_molde, 10) || 0;
+  if (!n) return '—';
+  const partes = [];
+  for (let i = 1; i <= n; i++) {
+    const p = l['peso_'+i], a = l['altura_'+i];
+    if (p || a) partes.push('P'+i+': '+(p||'—')+'g / '+(a||'—')+'mm');
+  }
+  return partes.length ? partes.join(' · ') : '—';
+}
+
+function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, limite, horaDeId, horaAteId) {
+  const busca = (document.getElementById(buscaId).value || '').toLowerCase().trim();
+  if (busca) {
+    linhas = linhas.filter(function(l) {
+      return camposBusca.some(function(campo){ return (l[campo]||'').toString().toLowerCase().indexOf(busca) > -1; });
+    });
+  }
+  const dataDe = document.getElementById(dataDeId).value;
+  const dataAte = document.getElementById(dataAteId).value;
+  if (dataDe) linhas = linhas.filter(function(l){ return !l.data || l.data >= dataDe; });
+  if (dataAte) linhas = linhas.filter(function(l){ return !l.data || l.data <= dataAte; });
+  if (horaDeId && horaAteId) {
+    const horaDe = document.getElementById(horaDeId).value;
+    const horaAte = document.getElementById(horaAteId).value;
+    if (horaDe) linhas = linhas.filter(function(l){ return !l.hora_inicio || l.hora_inicio >= horaDe; });
+    if (horaAte) linhas = linhas.filter(function(l){ return !l.hora_inicio || l.hora_inicio <= horaAte; });
+  }
+  linhas.sort(function(a,b){ return (b.data||'').localeCompare(a.data||'') || (b.hora_inicio||'').localeCompare(a.hora_inicio||''); });
+  return linhas.slice(0, limite || 200);
+}
+
+function renderTabelaSopro() {
+  if (!itemId) return;
+  let linhas = linhasFiltradasPorProcesso('sopro');
+  const limite = parseInt(document.getElementById('tLimiteSopro').value, 10);
+  linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], limite, 'tHoraDeSopro', 'tHoraAteSopro');
+
+  const corpo = document.getElementById('tabelaSoproBody');
+  const vazio = document.getElementById('tabelaSoproVazia');
+  vazio.classList.toggle('hidden', linhas.length > 0);
+
+  corpo.innerHTML = linhas.map(function(l) {
+    const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
+    const statusClasse = (l.status_correcao||'').toUpperCase().indexOf('PENDENTE') > -1 ? 'pendente' : 'corrigido';
+    return '<tr>' +
+      '<td>'+(l.data||'—')+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
+      '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador||'—')+'</td>' + '<td>'+(l.tipo_frasco||'—')+'</td>' +
+      '<td>'+(l.gramatura_preforma||'—')+'</td>' + '<td>'+(l.fornecedor_preforma||'—')+'</td>' + '<td>'+(l.lote_caixa||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+abrev(l.caixa_vermelha)+'</td>' + '<td>'+(l.motivo_caixa_vermelha||'—')+'</td>' +
+      '<td>'+abrev(l.produto_rotulado)+'</td>' + '<td>'+abrev(l.condicao_rotulo)+'</td>' +
+      '<td>'+(l.defeito||'—')+'</td>' + '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' +
+      '<td>'+abrev(l.teste_producao)+'</td>' + '<td style="white-space:normal;">'+formatarPesoAltura(l)+'</td>' +
+      '<td>'+abrev(l.condicao_fechamento_saco)+'</td>' + '<td>'+abrev(l.alinhamento_paletes)+'</td>' + '<td>'+abrev(l.organizacao_linha_produtiva)+'</td>' +
+      '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
+      '<td style="max-width:200px; overflow:hidden; text-overflow:ellipsis;">'+(l.observacao||'')+'</td>' +
+      '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function renderTabelaInjecao() {
+  if (!itemId) return;
+  let linhas = linhasFiltradasPorProcesso('injecao');
+  const limite = parseInt(document.getElementById('tLimiteInjecao').value, 10);
+  linhas = filtrarBuscaEData(linhas, 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], limite, 'tHoraDeInjecao', 'tHoraAteInjecao');
+
+  const corpo = document.getElementById('tabelaInjecaoBody');
+  const vazio = document.getElementById('tabelaInjecaoVazia');
+  vazio.classList.toggle('hidden', linhas.length > 0);
+
+  corpo.innerHTML = linhas.map(function(l) {
+    const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
+    const statusClasse = (l.status_correcao||'').toUpperCase().indexOf('PENDENTE') > -1 ? 'pendente' : 'corrigido';
+    return '<tr>' +
+      '<td>'+(l.data||'—')+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
+      '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
+      '<td>'+(l.gramatura||'—')+'</td>' + '<td>'+(l.resina||'—')+'</td>' +
+      '<td>'+(l.temperatura_gate_min||'—')+'</td>' + '<td>'+(l.temperatura_gate_max||'—')+'</td>' + '<td>'+(l.temperatura_corpo_min||'—')+'</td>' + '<td>'+(l.temperatura_corpo_max||'—')+'</td>' +
+      '<td>'+abrev(l.organizacao_linha_produtiva)+'</td>' + '<td>'+abrev(l.tonalidade_preforma)+'</td>' + '<td>'+abrev(l.alinhamento_etiqueta_caixa)+'</td>' +
+      '<td>'+(l.defeito||'—')+'</td>' + '<td>'+(l.cavidade||'—')+'</td>' +
+      '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' + '<td>'+abrev(l.operador_ciente)+'</td>' +
+      '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
+      '<td style="max-width:200px; overflow:hidden; text-overflow:ellipsis;">'+(l.observacao||'')+'</td>' +
+      '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
+    '</tr>';
+  }).join('');
+}
+
+/* ---------------- Geração de PDF ---------------- */
+/* ---------------- Geração de texto para WhatsApp ---------------- */
+function formatarGramaturaWpp(valor) {
+  if (!valor) return '—';
+  const v = valor.toString().trim();
+  return (v.indexOf(',') > -1 || v.indexOf('.') > -1) ? v + 'G' : v + ',0G';
+}
+
+function agruparPorSessao(linhas) {
+  const grupos = [];
+  const indicePorSessao = {};
+  linhas.forEach(function(l) {
+    const chave = l.id_sessao || (l.equipamento + '|' + l.data + '|' + l.hora_inicio);
+    if (indicePorSessao[chave] === undefined) {
+      indicePorSessao[chave] = grupos.length;
+      grupos.push({ sessao: l, itens: [] });
+    }
+    grupos[indicePorSessao[chave]].itens.push(l);
+  });
+  return grupos;
+}
+
+function gerarWhatsApp(processo) {
+  let linhas;
+  if (processo === 'sopro') {
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500);
+  } else {
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500);
+  }
+
+  if (linhas.length === 0) { mostrarToast('Nenhuma ocorrência para gerar o texto.', true); return; }
+
+  const grupos = agruparPorSessao(linhas);
+  const agora = new Date();
+  const dataHora = String(agora.getDate()).padStart(2,'0') + '/' + String(agora.getMonth()+1).padStart(2,'0') + '/' + agora.getFullYear() + ' - ' + String(agora.getHours()).padStart(2,'0') + ':' + String(agora.getMinutes()).padStart(2,'0');
+
+  let texto = '*Inspeção da Qualidade*\n_' + dataHora + '_\n\n';
+  texto += (processo === 'sopro' ? '*Sopro*' : '*Injetora*') + '\n========\n';
+
+  grupos.forEach(function(g, idx) {
+    const s = g.sessao;
+    texto += '*_' + (s.equipamento || '—') + '_*\n';
+    if (processo === 'injecao') {
+      texto += formatarGramaturaWpp(s.gramatura) + ' - ' + (s.cor || '—') + '\n';
+      g.itens.forEach(function(item) {
+        if (!item.defeito) return;
+        const cavidades = (item.cavidade || '').split(';').filter(Boolean).join(', ');
+        texto += item.defeito + ' - ' + (cavidades || '—') + '\n';
+      });
+    } else {
+      texto += (s.tipo_frasco || '—') + ' - ' + (s.ml || '—') + '\n';
+      g.itens.forEach(function(item) {
+        if (!item.defeito) return;
+        texto += item.defeito + ' - ' + (item.criticidade || '—') + '\n';
+      });
+      const n = parseInt(s.num_postos_molde, 10) || 0;
+      for (let i = 1; i <= n; i++) {
+        if (s['peso_'+i]) texto += 'Peso - Posto ' + i + ': ' + s['peso_'+i] + ' gramas\n';
+        if (s['altura_'+i]) texto += 'Altura - Posto ' + i + ': ' + s['altura_'+i] + ' mm\n';
+      }
+    }
+    if (idx < grupos.length - 1) texto += '\n';
+  });
+
+  navigator.clipboard.writeText(texto).catch(function(){});
+  window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
+  mostrarToast('Texto copiado — abrindo o WhatsApp…');
+}
+
+function gerarPDF(processo) {
+  if (typeof window.jspdf === 'undefined') { mostrarToast('Biblioteca de PDF não carregou (verifique a conexão de rede).', true); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  const titulo = processo === 'sopro' ? 'Relatório de Inspeção da Qualidade — Processo de Sopro' : 'Relatório de Inspeção da Qualidade — Processo de Injeção';
+  doc.setFontSize(13);
+  doc.text(titulo, 14, 12);
+  doc.setFontSize(9);
+  doc.text('Gerado em ' + new Date().toLocaleString('pt-BR'), 14, 18);
+
+  let linhas, colunas, corpo;
+  if (processo === 'sopro') {
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500);
+    colunas = ['Data','Hora','Equip.','Resp.','Operador','Frasco','Gram.Pref','Fornec.Pref','LoteCx','NºCx','CxVerm','MotivoCx','Rotul.','Cond.Rót.','Defeito','Critic.','Teste','Peso/Altura','Fech.Saco','Alinh.','Org.Linha','Status','Obs.'];
+    corpo = linhas.map(function(l) {
+      return [l.data||'—', l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador||'—', l.tipo_frasco||'—',
+        l.gramatura_preforma||'—', l.fornecedor_preforma||'—', l.lote_caixa||'—', l.numero_caixa||'—', abrev(l.caixa_vermelha), l.motivo_caixa_vermelha||'—',
+        abrev(l.produto_rotulado), abrev(l.condicao_rotulo), l.defeito||'—', l.criticidade||'—', abrev(l.teste_producao),
+        formatarPesoAltura(l), abrev(l.condicao_fechamento_saco), abrev(l.alinhamento_paletes), abrev(l.organizacao_linha_produtiva),
+        l.status_correcao||'—', l.observacao||''];
+    });
+  } else {
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500);
+    colunas = ['Data','Hora','Equip.','Resp.','Operador','Cor','Gram.','Resina','T.GateMin','T.GateMax','T.CorpoMin','T.CorpoMax','Org.Linha','Tonalid.','Alinh.Etiq.','Defeito','Cavidade(s)','Critic.','Op.Ciente','Status','Obs.'];
+    corpo = linhas.map(function(l) {
+      return [l.data||'—', l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
+        l.gramatura||'—', l.resina||'—', l.temperatura_gate_min||'—', l.temperatura_gate_max||'—', l.temperatura_corpo_min||'—', l.temperatura_corpo_max||'—',
+        abrev(l.organizacao_linha_produtiva), abrev(l.tonalidade_preforma), abrev(l.alinhamento_etiqueta_caixa),
+        l.defeito||'—', l.cavidade||'—', l.criticidade||'—', abrev(l.operador_ciente),
+        l.status_correcao||'—', l.observacao||''];
+    });
+  }
+
+  doc.autoTable({
+    head: [colunas], body: corpo, startY: 22, styles: { fontSize: 6.5, cellPadding: 1.2 },
+    headStyles: { fillColor: [30,32,35], textColor: 255 }, alternateRowStyles: { fillColor: [245,245,245] },
+    margin: { left: 8, right: 8 }
+  });
+
+  const nomeArquivo = 'inspecao_' + processo + '_' + hojeISO() + '.pdf';
+  doc.save(nomeArquivo);
+}
+
+/* ---------------- Utilidades ---------------- */
+function mostrarToast(msg, isError) {
+  const existente = document.querySelector('.toast');
+  if (existente) existente.remove();
+  const t = document.createElement('div');
+  t.className = 'toast' + (isError ? ' error' : '');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(function(){ t.remove(); }, 4000);
+}
+function hojeISO() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function agoraHHMM() {
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+
+/* ---------------- Inicialização ---------------- */
+function init() {
+  renderListasNaTela();
+  renderFormInjecao();
+  renderFormSopro();
+  iniciarLogin();
+}
+init();
+
+/* Bloqueia zoom por gesto de pinça e por duplo toque (mobile) */
+document.addEventListener('gesturestart', function(e){ e.preventDefault(); });
+let ultimoToque = 0;
+document.addEventListener('touchend', function(e) {
+  const agora = Date.now();
+  if (agora - ultimoToque <= 300) e.preventDefault();
+  ultimoToque = agora;
+}, { passive: false });
+</script>
+</body>
+</html>
