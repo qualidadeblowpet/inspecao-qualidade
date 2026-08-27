@@ -740,15 +740,19 @@ async function salvarListasNaPlanilha() {
     await garantirTabelaListas(token);
     const urlBase = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/tables/TabelaListas';
 
-    // Apaga todas as linhas atuais
-    const respAtual = await fetch(urlBase + '/rows', { headers: { Authorization: 'Bearer ' + token } });
-    const jsonAtual = await respAtual.json();
-    const total = jsonAtual.value ? jsonAtual.value.length : 0;
-    for (let i = total - 1; i >= 0; i--) {
-      await fetch(urlBase + '/rows/itemAt(index=' + i + ')', { method: 'DELETE', headers: { Authorization: 'Bearer ' + token } });
-    }
+    // Apaga todas as linhas atuais de uma só vez (em vez de uma requisição por linha)
+    try {
+      const respRange = await fetch(urlBase + '/dataBodyRange', { headers: { Authorization: 'Bearer ' + token } });
+      const jsonRange = await respRange.json();
+      if (jsonRange.address) {
+        await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/range(address=\'' + encodeURIComponent(jsonRange.address) + '\')/delete', {
+          method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shift: 'Up' })
+        });
+      }
+    } catch (e) { /* tabela ainda sem linhas — segue normalmente */ }
 
-    // Grava tudo de novo
+    // Grava tudo de novo (uma única chamada)
     const valores = [];
     CHAVES_LISTAS.forEach(function(chave) {
       (listas[chave] || []).forEach(function(valor) { valores.push([chave, valor]); });
