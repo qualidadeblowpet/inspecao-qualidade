@@ -356,16 +356,6 @@
         <div class="kpi"><div class="label">Taxa de correção</div><div class="num small" id="kpiTaxa">–</div></div>
       </div>
 
-      <div class="charts-grid">
-        <div class="card"><h3>Defeitos mais frequentes</h3><div class="chart-wrap"><canvas id="chartDefeitos"></canvas></div></div>
-        <div class="card"><h3>Criticidade</h3><div class="chart-wrap"><canvas id="chartCriticidade"></canvas></div></div>
-        <div class="card"><h3>Corrigido vs. Pendente</h3><div class="chart-wrap"><canvas id="chartStatus"></canvas></div></div>
-        <div class="card"><h3>Injeção vs. Sopro</h3><div class="chart-wrap"><canvas id="chartProcesso"></canvas></div></div>
-        <div class="card"><h3>Desvios por responsável</h3><div class="chart-wrap"><canvas id="chartResponsavel"></canvas></div></div>
-        <div class="card"><h3>Desvios por equipamento</h3><div class="chart-wrap"><canvas id="chartEquipamento"></canvas></div></div>
-        <div class="card wide"><h3>Evolução diária</h3><div class="chart-wrap"><canvas id="chartEvolucao"></canvas></div></div>
-      </div>
-
       <div class="card">
         <h3>Últimas ocorrências — Sopro</h3>
         <div class="table-toolbar">
@@ -416,6 +406,16 @@
           </table>
           <div id="tabelaInjecaoVazia" class="table-empty hidden">Nenhuma ocorrência encontrada com esses filtros.</div>
         </div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="card"><h3>Defeitos mais frequentes</h3><div class="chart-wrap"><canvas id="chartDefeitos"></canvas></div></div>
+        <div class="card"><h3>Criticidade</h3><div class="chart-wrap"><canvas id="chartCriticidade"></canvas></div></div>
+        <div class="card"><h3>Corrigido vs. Pendente</h3><div class="chart-wrap"><canvas id="chartStatus"></canvas></div></div>
+        <div class="card"><h3>Injeção vs. Sopro</h3><div class="chart-wrap"><canvas id="chartProcesso"></canvas></div></div>
+        <div class="card"><h3>Desvios por responsável</h3><div class="chart-wrap"><canvas id="chartResponsavel"></canvas></div></div>
+        <div class="card"><h3>Desvios por equipamento</h3><div class="chart-wrap"><canvas id="chartEquipamento"></canvas></div></div>
+        <div class="card wide"><h3>Evolução diária</h3><div class="chart-wrap"><canvas id="chartEvolucao"></canvas></div></div>
       </div>
     </div>
 
@@ -560,6 +560,7 @@ function alternarTema(valor) {
   Array.prototype.forEach.call(group.querySelectorAll('.toggle-btn'), function(btn) {
     btn.classList.toggle('active', (valor === 'claro') === (btn.textContent === 'Claro'));
   });
+  if (itemId && paginaAtual === 'dashboard') atualizarDashboard();
 }
 
 /* ---------------- Login (MSAL) ---------------- */
@@ -1170,25 +1171,37 @@ function contarPor(linhas, campo) {
 function topN(contagem, n) { return Object.entries(contagem).sort(function(a,b){ return b[1]-a[1]; }).slice(0, n); }
 function destruirChart(id) { if (charts[id]) { charts[id].destroy(); delete charts[id]; } }
 
+function coresGrafico() {
+  const claro = document.body.classList.contains('tema-claro');
+  return {
+    tick: claro ? '#6b6f76' : '#8b8f96',
+    grid: claro ? '#e3e5e8' : '#2a2d31',
+    legenda: claro ? '#17181b' : '#edeef0'
+  };
+}
+
 function criarBarChart(canvasId, labels, valores, cor) {
   destruirChart(canvasId);
   const ctx = document.getElementById(canvasId).getContext('2d');
+  const c = coresGrafico();
   charts[canvasId] = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ data: valores, backgroundColor: cor || '#f2a93b', borderRadius: 5 }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-      scales: { x: { ticks: { color: '#8b8f96', font: { size: 10 } }, grid: { color: '#2a2d31' } }, y: { ticks: { color: '#8b8f96' }, grid: { color: '#2a2d31' }, beginAtZero: true } } } });
+      scales: { x: { ticks: { color: c.tick, font: { size: 10 } }, grid: { color: c.grid } }, y: { ticks: { color: c.tick }, grid: { color: c.grid }, beginAtZero: true } } } });
 }
 function criarDonutChart(canvasId, labels, valores, cores) {
   destruirChart(canvasId);
   const ctx = document.getElementById(canvasId).getContext('2d');
+  const c = coresGrafico();
   charts[canvasId] = new Chart(ctx, { type: 'doughnut', data: { labels: labels, datasets: [{ data: valores, backgroundColor: cores }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#edeef0', boxWidth: 12, font: { size: 11 } } } } } });
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: c.legenda, boxWidth: 12, font: { size: 11 } } } } } });
 }
 function criarLineChart(canvasId, labels, valores) {
   destruirChart(canvasId);
   const ctx = document.getElementById(canvasId).getContext('2d');
+  const c = coresGrafico();
   charts[canvasId] = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ data: valores, borderColor: '#f2a93b', backgroundColor: 'rgba(242,169,59,0.15)', fill: true, tension: 0.3 }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-      scales: { x: { ticks: { color: '#8b8f96', font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: '#8b8f96' }, grid: { color: '#2a2d31' }, beginAtZero: true } } } });
+      scales: { x: { ticks: { color: c.tick, font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: c.tick }, grid: { color: c.grid }, beginAtZero: true } } } });
 }
 
 function atualizarDashboard() {
