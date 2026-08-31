@@ -1271,6 +1271,55 @@ async function uploadFoto(token, file, idSessao, indice) {
 async function salvarSessao(processo) {
   if (!itemId) { mostrarToast('Conecte-se à planilha (Configurações) antes de salvar.', true); setPage('config'); return; }
   const pfx = processo === 'sopro' ? 'sop_' : 'inj_';
+
+  if (processo === 'injecao') {
+    const camposObrigatorios = [
+      { id: 'inj_data', label: 'Data' },
+      { id: 'inj_equipamento', label: 'Equipamento' },
+      { id: 'inj_responsavel', label: 'Responsável pela Inspeção' },
+      { id: 'inj_operador', label: 'Operador Principal' },
+      { id: 'inj_cor', label: 'Cor da Preforma' },
+      { id: 'inj_gramatura', label: 'Gramatura' },
+      { id: 'inj_resina', label: 'Resina' }
+    ];
+    const faltando = camposObrigatorios.filter(function(c) {
+      const el = document.getElementById(c.id);
+      return !el || !el.value;
+    }).map(function(c){ return c.label; });
+    if (faltando.length > 0) {
+      mostrarToast('ATENÇÃO: É necessário preencher os dados nos campos: ' + faltando.join(', ') + '.', true);
+      return;
+    }
+  }
+
+  if (processo === 'sopro') {
+    const camposObrigatorios = [
+      { id: 'sop_data', label: 'Data' },
+      { id: 'sop_equipamento', label: 'Equipamento' },
+      { id: 'sop_responsavel', label: 'Responsável pela Inspeção' },
+      { id: 'sop_operador', label: 'Operador' },
+      { id: 'sop_cor', label: 'Cor' },
+      { id: 'sop_ml', label: 'Volume (mL)' },
+      { id: 'sop_frasco', label: 'Tipo de Frasco' },
+      { id: 'sop_gramaturaPreforma', label: 'Gramatura Preforma' },
+      { id: 'sop_fornecedorPreforma', label: 'Fornecedor Preforma' },
+      { id: 'sop_loteCaixa', label: 'Lote Caixa' },
+      { id: 'sop_numeroCaixa', label: 'Número Caixa' }
+    ];
+    const faltando = camposObrigatorios.filter(function(c) {
+      const el = document.getElementById(c.id);
+      return !el || !el.value;
+    }).map(function(c){ return c.label; });
+    if (getToggleValue('sop_caixaVermelha') === 'SIM') {
+      const motivoEl = document.getElementById('sop_motivoCaixaVermelha');
+      if (!motivoEl || !motivoEl.value) faltando.push('Motivo Caixa Vermelha');
+    }
+    if (faltando.length > 0) {
+      mostrarToast('ATENÇÃO: É necessário preencher os dados nos campos: ' + faltando.join(', ') + '.', true);
+      return;
+    }
+  }
+
   const temDefeito = document.getElementById(pfx+'temDefeito').value;
   const desvios = temDefeito === 'NAO' ? [{ defeito: '', cavidade: [], criticidade: '', operadorCiente: '', status: 'SEM DESVIO', observacao: '', fotoFile: null }] : listaDesvios(processo);
   if (temDefeito === 'SIM' && desvios.length === 0) { mostrarToast('Adicione ao menos um desvio.', true); return; }
@@ -1417,7 +1466,7 @@ function linhasArrayParaObjeto(linhasArray, cabecalho, processo) {
   });
 }
 
-async function carregarDados() {
+async function carregarDados(tentativaRetry) {
   if (!itemId) return;
   try {
     const token = await getToken();
@@ -1434,7 +1483,12 @@ async function carregarDados() {
     popularFiltrosEquipResp();
     atualizarDashboard();
   } catch (err) {
-    mostrarToast('Falha de conexão ao carregar dashboard.', true);
+    console.error('Falha ao carregar dados:', err);
+    if (!tentativaRetry) {
+      setTimeout(function(){ carregarDados(true); }, 1500);
+    } else {
+      mostrarToast('Falha de conexão ao carregar dashboard.', true);
+    }
   }
 }
 
