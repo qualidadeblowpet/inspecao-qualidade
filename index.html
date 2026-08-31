@@ -1887,8 +1887,8 @@ function gerarWhatsApp(processo) {
       texto += '*' + formatarGramaturaWpp(s.gramatura) + ' - ' + (s.cor || '—') + '*\n';
       g.itens.forEach(function(item) {
         if (!item.defeito) return;
-        texto += item.defeito + ' - ' + (item.criticidade || '—') + '\n\n';
-        texto += '* CAV: ' + formatarCavidadesWpp(item.cavidade) + '\n\n';
+        texto += item.defeito + ' - ' + (item.criticidade || '—') + '\n';
+        texto += '* CAV: ' + formatarCavidadesWpp(item.cavidade) + '\n';
       });
       if (idx < grupos.length - 1) texto += '\n';
     });
