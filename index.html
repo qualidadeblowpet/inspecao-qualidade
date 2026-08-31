@@ -114,6 +114,8 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px;
   }
   .card h3 { font-family: var(--font-display); font-size: 16px; font-weight: 600; letter-spacing: 0.3px; margin: 0 0 12px; text-transform: uppercase; color: var(--text); }
+  .card-ocorrencias { background: #2c2f34; }
+  body.tema-claro .card-ocorrencias { background: var(--surface); }
 
   /* ---------- Filter bar (Power BI style) ---------- */
   .filter-bar {
@@ -345,7 +347,7 @@
         <button class="btn btn-accent" onclick="setPage('cadastroSopro')">+ Cadastro Sopro</button>
       </div>
 
-      <div class="card">
+      <div class="card card-ocorrencias">
         <h3>Últimas ocorrências — Sopro</h3>
         <div class="table-toolbar">
           <input type="text" id="tBuscaSopro" placeholder="Buscar defeito, máquina, responsável…" oninput="renderTabelaSopro()" style="min-width:220px;">
@@ -386,7 +388,7 @@
         </div>
       </div>
 
-      <div class="card">
+      <div class="card card-ocorrencias">
         <h3>Últimas ocorrências — Injeção</h3>
         <div class="table-toolbar">
           <input type="text" id="tBuscaInjecao" placeholder="Buscar defeito, máquina, responsável…" oninput="renderTabelaInjecao()" style="min-width:220px;">
@@ -1816,9 +1818,23 @@ function gerarPDF(processo) {
   doc.autoTable({
     head: [colunas], body: corpo, startY: 22,
     styles: { fontSize: 6.5, cellPadding: 1.2, overflow: 'linebreak', cellWidth: 'wrap', valign: 'middle' },
-    headStyles: { fillColor: [30,32,35], textColor: 255 }, alternateRowStyles: { fillColor: [245,245,245] },
+    headStyles: { fillColor: [30,32,35], textColor: 255, minCellHeight: 30, valign: 'bottom', halign: 'left' },
+    alternateRowStyles: { fillColor: [245,245,245] },
     tableWidth: 'auto', horizontalPageBreak: true,
-    margin: { left: 8, right: 8 }
+    margin: { left: 8, right: 8 },
+    didParseCell: function(data) {
+      if (data.section === 'head') { data.cell.text = []; }
+    },
+    didDrawCell: function(data) {
+      if (data.section === 'head') {
+        const texto = colunas[data.column.index] || '';
+        doc.setFontSize(6.5);
+        doc.setTextColor(255, 255, 255);
+        const x = data.cell.x + 2;
+        const y = data.cell.y + data.cell.height - 2;
+        doc.text(texto, x, y, { angle: 90 });
+      }
+    }
   });
 
   const nomeArquivo = 'inspecao_' + processo + '_' + hojeISO() + '.pdf';
