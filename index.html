@@ -173,6 +173,17 @@
   .badge.proc-injecao { background: rgba(91,155,242,0.15); color: var(--blue); }
   .badge.proc-sopro { background: rgba(156,123,217,0.15); color: var(--purple); }
   .table-empty { text-align: center; padding: 30px; color: var(--text-dim); font-size: 13px; }
+  .tabela-loading {
+    position: absolute; inset: 0; z-index: 5;
+    background: rgba(12,13,15,0.6); display: flex; align-items: center; justify-content: center;
+  }
+  body.tema-claro .tabela-loading { background: rgba(244,245,246,0.7); }
+  .spinner {
+    width: 26px; height: 26px; border-radius: 50%;
+    border: 3px solid var(--border); border-top-color: var(--accent);
+    animation: girar 0.7s linear infinite;
+  }
+  @keyframes girar { to { transform: rotate(360deg); } }
 
   /* ---------- Forms (cadastro) ---------- */
   .field { margin-bottom: 12px; min-width: 0; }
@@ -351,7 +362,8 @@
           <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('sopro')">🟢 WhatsApp</button>
           <button class="btn btn-outline" onclick="gerarPDF('sopro')">📄 PDF</button>
         </div>
-        <div class="table-scroll">
+        <div class="table-scroll" style="position:relative;">
+          <div class="tabela-loading hidden" id="loadingSopro"><div class="spinner"></div></div>
           <table class="occ-table">
             <thead>
               <tr>
@@ -391,7 +403,8 @@
           <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('injecao')">🟢 WhatsApp</button>
           <button class="btn btn-outline" onclick="gerarPDF('injecao')">📄 PDF</button>
         </div>
-        <div class="table-scroll">
+        <div class="table-scroll" style="position:relative;">
+          <div class="tabela-loading hidden" id="loadingInjecao"><div class="spinner"></div></div>
           <table class="occ-table">
             <thead>
               <tr>
@@ -1562,6 +1575,13 @@ function porExtenso(v) {
   return v || '—';
 }
 
+function badgeAprovadoReprovado(v) {
+  const u = (v||'').toString().toUpperCase();
+  if (u === 'APROVADO') return '<span class="badge corrigido">Aprovado</span>';
+  if (u === 'REPROVADO') return '<span class="badge pendente">Reprovado</span>';
+  return v || '—';
+}
+
 function formatarDataBR(dataISO) {
   if (!dataISO) return '—';
   const partes = dataISO.split('-');
@@ -1614,34 +1634,42 @@ function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, li
 
 function renderTabelaSopro() {
   if (!itemId) return;
-  let linhas = linhasFiltradasPorProcesso('sopro');
-  const limite = parseInt(document.getElementById('tLimiteSopro').value, 10);
-  linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], limite, 'tHoraDeSopro', 'tHoraAteSopro');
+  const loading = document.getElementById('loadingSopro');
+  loading.classList.remove('hidden');
+  setTimeout(function() {
+    let linhas = linhasFiltradasPorProcesso('sopro');
+    const limite = parseInt(document.getElementById('tLimiteSopro').value, 10);
+    linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], limite, 'tHoraDeSopro', 'tHoraAteSopro');
 
-  const corpo = document.getElementById('tabelaSoproBody');
-  const vazio = document.getElementById('tabelaSoproVazia');
-  vazio.classList.toggle('hidden', linhas.length > 0);
+    const corpo = document.getElementById('tabelaSoproBody');
+    const vazio = document.getElementById('tabelaSoproVazia');
+    vazio.classList.toggle('hidden', linhas.length > 0);
 
-  corpo.innerHTML = linhas.map(function(l) {
-    const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
-    const statusClasse = (l.status_correcao||'').toUpperCase().indexOf('PENDENTE') > -1 ? 'pendente' : 'corrigido';
-    return '<tr>' +
-      '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
-      '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador||'—')+'</td>' + '<td>'+(l.tipo_frasco||'—')+'</td>' +
-      '<td>'+(l.gramatura_preforma||'—')+'</td>' + '<td>'+(l.fornecedor_preforma||'—')+'</td>' + '<td>'+(l.lote_caixa||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+porExtenso(l.caixa_vermelha)+'</td>' + '<td>'+(l.motivo_caixa_vermelha||'—')+'</td>' +
-      '<td>'+porExtenso(l.produto_rotulado)+'</td>' + '<td>'+porExtenso(l.condicao_rotulo)+'</td>' +
-      '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' + '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' +
-      '<td>'+porExtenso(l.teste_producao)+'</td>' + '<td style="white-space:nowrap;">'+formatarPesoAltura(l)+'</td>' +
-      '<td>'+porExtenso(l.condicao_fechamento_saco)+'</td>' + '<td>'+porExtenso(l.alinhamento_paletes)+'</td>' + '<td>'+porExtenso(l.organizacao_linha_produtiva)+'</td>' +
-      '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
-      '<td class="col-obs" title="'+(l.observacao||'').replace(/"/g,'&quot;')+'">'+(l.observacao||'')+'</td>' +
-      '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
-    '</tr>';
-  }).join('');
+    corpo.innerHTML = linhas.map(function(l) {
+      const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
+      const statusClasse = (l.status_correcao||'').toUpperCase().indexOf('PENDENTE') > -1 ? 'pendente' : 'corrigido';
+      return '<tr>' +
+        '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
+        '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador||'—')+'</td>' + '<td>'+(l.tipo_frasco||'—')+'</td>' +
+        '<td>'+(l.gramatura_preforma||'—')+'</td>' + '<td>'+(l.fornecedor_preforma||'—')+'</td>' + '<td>'+(l.lote_caixa||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+porExtenso(l.caixa_vermelha)+'</td>' + '<td>'+(l.motivo_caixa_vermelha||'—')+'</td>' +
+        '<td>'+porExtenso(l.produto_rotulado)+'</td>' + '<td>'+badgeAprovadoReprovado(l.condicao_rotulo)+'</td>' +
+        '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' + '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' +
+        '<td>'+porExtenso(l.teste_producao)+'</td>' + '<td style="white-space:nowrap;">'+formatarPesoAltura(l)+'</td>' +
+        '<td>'+badgeAprovadoReprovado(l.condicao_fechamento_saco)+'</td>' + '<td>'+badgeAprovadoReprovado(l.alinhamento_paletes)+'</td>' + '<td>'+badgeAprovadoReprovado(l.organizacao_linha_produtiva)+'</td>' +
+        '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
+        '<td class="col-obs" title="'+(l.observacao||'').replace(/"/g,'&quot;')+'">'+(l.observacao||'')+'</td>' +
+        '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
+      '</tr>';
+    }).join('');
+    loading.classList.add('hidden');
+  }, 20);
 }
 
 function renderTabelaInjecao() {
   if (!itemId) return;
+  const loading = document.getElementById('loadingInjecao');
+  loading.classList.remove('hidden');
+  setTimeout(function() {
   let linhas = linhasFiltradasPorProcesso('injecao');
   const limite = parseInt(document.getElementById('tLimiteInjecao').value, 10);
   linhas = filtrarBuscaEData(linhas, 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], limite, 'tHoraDeInjecao', 'tHoraAteInjecao');
@@ -1658,7 +1686,7 @@ function renderTabelaInjecao() {
       '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
       '<td>'+(l.gramatura||'—')+'</td>' + '<td>'+(l.resina||'—')+'</td>' +
       '<td>'+(l.temperatura_gate_min||'—')+'</td>' + '<td>'+(l.temperatura_gate_max||'—')+'</td>' + '<td>'+(l.temperatura_corpo_min||'—')+'</td>' + '<td>'+(l.temperatura_corpo_max||'—')+'</td>' +
-      '<td>'+porExtenso(l.organizacao_linha_produtiva)+'</td>' + '<td>'+porExtenso(l.tonalidade_preforma)+'</td>' + '<td>'+porExtenso(l.alinhamento_etiqueta_caixa)+'</td>' +
+      '<td>'+badgeAprovadoReprovado(l.organizacao_linha_produtiva)+'</td>' + '<td>'+badgeAprovadoReprovado(l.tonalidade_preforma)+'</td>' + '<td>'+badgeAprovadoReprovado(l.alinhamento_etiqueta_caixa)+'</td>' +
       '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' + '<td style="white-space:nowrap;">'+(l.cavidade||'—')+'</td>' +
       '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' + '<td>'+porExtenso(l.operador_ciente)+'</td>' +
       '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
@@ -1666,6 +1694,8 @@ function renderTabelaInjecao() {
       '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
     '</tr>';
   }).join('');
+  loading.classList.add('hidden');
+  }, 20);
 }
 
 /* ---------------- Geração de PDF ---------------- */
