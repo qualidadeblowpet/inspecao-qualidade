@@ -287,6 +287,12 @@
     .filter-clear { align-self: stretch; margin-left: 0; }
     .quick-actions { flex-direction: column; }
     .kpi-row { grid-template-columns: 1fr 1fr !important; }
+
+    .table-toolbar input[type=text] { display: none; }
+    .table-toolbar input[type=date], .table-toolbar input[type=time], .table-toolbar select {
+      width: 100%; flex: 1 1 100%;
+    }
+    .table-toolbar button { flex: 1 1 100%; margin-left: 0 !important; }
   }
 </style>
 </head>
@@ -984,7 +990,7 @@ function renderFormInjecao() {
         '<div class="field"><label>Data</label><input type="date" id="inj_data"></div>' +
         '<div class="field"><label>Equipamento</label>'+'<select id="inj_equipamento"></select>'+'</div>' +
       '</div>' +
-      '<div class="grid-2">' +
+      '<div class="grid-2 hidden">' +
         '<div class="field"><label>Hora início</label><input type="time" id="inj_hora_inicio"></div>' +
         '<div class="field"><label>Hora conclusão</label><input type="time" id="inj_hora_fim"></div>' +
       '</div>' +
@@ -1036,7 +1042,7 @@ function renderFormSopro() {
         '<div class="field"><label>Data</label><input type="date" id="sop_data"></div>' +
         '<div class="field"><label>Equipamento</label>'+'<select id="sop_equipamento"></select>'+'</div>' +
       '</div>' +
-      '<div class="grid-2">' +
+      '<div class="grid-2 hidden">' +
         '<div class="field"><label>Hora início</label><input type="time" id="sop_hora_inicio"></div>' +
         '<div class="field"><label>Hora conclusão</label><input type="time" id="sop_hora_fim"></div>' +
       '</div>' +
@@ -1589,6 +1595,13 @@ function formatarDataBR(dataISO) {
   return partes[2] + '-' + partes[1] + '-' + partes[0];
 }
 
+function formatarTemperatura(v) {
+  if (v === undefined || v === null || v === '') return '—';
+  const n = parseFloat(v.toString().replace(',', '.'));
+  if (isNaN(n)) return v;
+  return n.toFixed(1).replace('.', ',');
+}
+
 function formatarPesoAltura(l) {
   const n = parseInt(l.num_postos_molde, 10) || 0;
   if (!n) return '—';
@@ -1685,7 +1698,7 @@ function renderTabelaInjecao() {
       '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
       '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
       '<td>'+(l.gramatura||'—')+'</td>' + '<td>'+(l.resina||'—')+'</td>' +
-      '<td>'+(l.temperatura_gate_min||'—')+'</td>' + '<td>'+(l.temperatura_gate_max||'—')+'</td>' + '<td>'+(l.temperatura_corpo_min||'—')+'</td>' + '<td>'+(l.temperatura_corpo_max||'—')+'</td>' +
+      '<td>'+formatarTemperatura(l.temperatura_gate_min)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_gate_max)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_corpo_min)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_corpo_max)+'</td>' +
       '<td>'+badgeAprovadoReprovado(l.organizacao_linha_produtiva)+'</td>' + '<td>'+badgeAprovadoReprovado(l.tonalidade_preforma)+'</td>' + '<td>'+badgeAprovadoReprovado(l.alinhamento_etiqueta_caixa)+'</td>' +
       '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' + '<td style="white-space:nowrap;">'+(l.cavidade||'—')+'</td>' +
       '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' + '<td>'+porExtenso(l.operador_ciente)+'</td>' +
@@ -1780,23 +1793,23 @@ function gerarPDF(processo) {
   let linhas, colunas, corpo;
   if (processo === 'sopro') {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500);
-    colunas = ['Data','Hora','Equip.','Resp.','Operador','Frasco','Gram.Pref','Fornec.Pref','LoteCx','NºCx','CxVerm','MotivoCx','Rotul.','Cond.Rót.','Defeito','Critic.','Teste','Peso/Altura','Fech.Saco','Alinh.','Org.Linha','Status','Obs.'];
+    colunas = ['Data','Hora','Equipamento','Resp.','Operador','Frasco','Gramatura Preforma','Fornecedor Preforma','Lote Caixa','Nº Caixa','Caixa Vermelha','Motivo','Rotulado','Condição Rótulo','Defeito','Criticidade','Teste Produção','Peso/Altura','Fechamento Saco','Alinhamento Paletes','Organização Linha','Observação'];
     corpo = linhas.map(function(l) {
-      return [l.data||'—', l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador||'—', l.tipo_frasco||'—',
-        l.gramatura_preforma||'—', l.fornecedor_preforma||'—', l.lote_caixa||'—', l.numero_caixa||'—', abrev(l.caixa_vermelha), l.motivo_caixa_vermelha||'—',
-        abrev(l.produto_rotulado), abrev(l.condicao_rotulo), l.defeito||'—', l.criticidade||'—', abrev(l.teste_producao),
-        formatarPesoAlturaTexto(l), abrev(l.condicao_fechamento_saco), abrev(l.alinhamento_paletes), abrev(l.organizacao_linha_produtiva),
-        l.status_correcao||'—', l.observacao||''];
+      return [formatarDataBR(l.data), l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador||'—', l.tipo_frasco||'—',
+        l.gramatura_preforma||'—', l.fornecedor_preforma||'—', l.lote_caixa||'—', l.numero_caixa||'—', porExtenso(l.caixa_vermelha), l.motivo_caixa_vermelha||'—',
+        porExtenso(l.produto_rotulado), porExtenso(l.condicao_rotulo), l.defeito||'—', l.criticidade||'—', porExtenso(l.teste_producao),
+        formatarPesoAlturaTexto(l), porExtenso(l.condicao_fechamento_saco), porExtenso(l.alinhamento_paletes), porExtenso(l.organizacao_linha_produtiva),
+        l.observacao||''];
     });
   } else {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500);
-    colunas = ['Data','Hora','Equip.','Resp.','Operador','Cor','Gram.','Resina','T.GateMin','T.GateMax','T.CorpoMin','T.CorpoMax','Org.Linha','Tonalid.','Alinh.Etiq.','Defeito','Cavidade(s)','Critic.','Op.Ciente','Status','Obs.'];
+    colunas = ['Data','Hora','Equipamento','Resp.','Operador','Cor','Gramatura','Resina','Temperatura Gate Mín.','Temperatura Gate Máx.','Temperatura Corpo Mín.','Temperatura Corpo Máx.','Organização Linha','Tonalidade','Alinhamento Etiqueta','Defeito','Cavidade','Criticidade','Operador Ciente','Observação'];
     corpo = linhas.map(function(l) {
-      return [l.data||'—', l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
-        l.gramatura||'—', l.resina||'—', l.temperatura_gate_min||'—', l.temperatura_gate_max||'—', l.temperatura_corpo_min||'—', l.temperatura_corpo_max||'—',
-        abrev(l.organizacao_linha_produtiva), abrev(l.tonalidade_preforma), abrev(l.alinhamento_etiqueta_caixa),
-        l.defeito||'—', l.cavidade||'—', l.criticidade||'—', abrev(l.operador_ciente),
-        l.status_correcao||'—', l.observacao||''];
+      return [formatarDataBR(l.data), l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
+        l.gramatura||'—', l.resina||'—', formatarTemperatura(l.temperatura_gate_min), formatarTemperatura(l.temperatura_gate_max), formatarTemperatura(l.temperatura_corpo_min), formatarTemperatura(l.temperatura_corpo_max),
+        porExtenso(l.organizacao_linha_produtiva), porExtenso(l.tonalidade_preforma), porExtenso(l.alinhamento_etiqueta_caixa),
+        l.defeito||'—', l.cavidade||'—', l.criticidade||'—', porExtenso(l.operador_ciente),
+        l.observacao||''];
     });
   }
 
