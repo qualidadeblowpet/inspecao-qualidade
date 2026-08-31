@@ -791,7 +791,7 @@ let colunasTextoPreparadas = false;
 
 async function prepararColunasComoTexto(token) {
   if (colunasTextoPreparadas) return;
-  const camposData = ['data', 'hora_inicio', 'hora_fim', 'criado_em'];
+  const camposData = ['data', 'hora_inicio', 'hora_fim', 'criado_em', 'cavidade', 'gramatura', 'gramatura_preforma', 'numero_caixa', 'lote_caixa'];
   const tabelas = [
     { aba: 'Injecao_App', cabecalho: CABECALHO_INJECAO },
     { aba: 'Sopro_App', cabecalho: CABECALHO_SOPRO }
@@ -1801,6 +1801,13 @@ function agruparPorSessao(linhas) {
   return grupos;
 }
 
+function formatarCavidadesWpp(valor) {
+  if (!valor) return '—';
+  const v = String(valor).trim();
+  if (v.toUpperCase() === 'TODAS') return 'Todas';
+  return v.split(';').filter(Boolean).join(', ') || '—';
+}
+
 function gerarWhatsApp(processo) {
   let linhas;
   if (processo === 'sopro') {
@@ -1815,20 +1822,27 @@ function gerarWhatsApp(processo) {
   const agora = new Date();
   const dataHora = String(agora.getDate()).padStart(2,'0') + '/' + String(agora.getMonth()+1).padStart(2,'0') + '/' + agora.getFullYear() + ' - ' + String(agora.getHours()).padStart(2,'0') + ':' + String(agora.getMinutes()).padStart(2,'0');
 
-  let texto = '*Inspeção da Qualidade*\n_' + dataHora + '_\n\n';
-  texto += (processo === 'sopro' ? '*Sopro*' : '*Injetora*') + '\n========\n';
-
-  grupos.forEach(function(g, idx) {
-    const s = g.sessao;
-    texto += '*_' + (s.equipamento || '—') + '_*\n';
-    if (processo === 'injecao') {
-      texto += formatarGramaturaWpp(s.gramatura) + ' - ' + (s.cor || '—') + '\n';
+  let texto;
+  if (processo === 'injecao') {
+    texto = '*Inspeção da Qualidade*\n_' + dataHora + '_\n';
+    texto += '*Injetora*\n========\n';
+    grupos.forEach(function(g, idx) {
+      const s = g.sessao;
+      texto += '*_' + (s.equipamento || '—') + '_*\n';
+      texto += '*' + formatarGramaturaWpp(s.gramatura) + ' - ' + (s.cor || '—') + '*\n';
       g.itens.forEach(function(item) {
         if (!item.defeito) return;
-        const cavidades = (item.cavidade || '').split(';').filter(Boolean).join(', ');
-        texto += item.defeito + ' - ' + (cavidades || '—') + '\n';
+        texto += item.defeito + ' - ' + (item.criticidade || '—') + '\n\n';
+        texto += '* CAV: ' + formatarCavidadesWpp(item.cavidade) + '\n\n';
       });
-    } else {
+      if (idx < grupos.length - 1) texto += '\n';
+    });
+  } else {
+    texto = '*Inspeção da Qualidade*\n_' + dataHora + '_\n\n';
+    texto += '*Sopro*\n========\n';
+    grupos.forEach(function(g, idx) {
+      const s = g.sessao;
+      texto += '*_' + (s.equipamento || '—') + '_*\n';
       texto += (s.tipo_frasco || '—') + ' - ' + (s.ml || '—') + '\n';
       g.itens.forEach(function(item) {
         if (!item.defeito) return;
@@ -1839,9 +1853,9 @@ function gerarWhatsApp(processo) {
         if (s['peso_'+i]) texto += 'Peso - Posto ' + i + ': ' + s['peso_'+i] + ' gramas\n';
         if (s['altura_'+i]) texto += 'Altura - Posto ' + i + ': ' + s['altura_'+i] + ' mm\n';
       }
-    }
-    if (idx < grupos.length - 1) texto += '\n';
-  });
+      if (idx < grupos.length - 1) texto += '\n';
+    });
+  }
 
   navigator.clipboard.writeText(texto).catch(function(){});
   window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
