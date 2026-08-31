@@ -114,8 +114,7 @@
     background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px;
   }
   .card h3 { font-family: var(--font-display); font-size: 16px; font-weight: 600; letter-spacing: 0.3px; margin: 0 0 12px; text-transform: uppercase; color: var(--text); }
-  .card-ocorrencias { background: #2c2f34; }
-  body.tema-claro .card-ocorrencias { background: var(--surface); }
+  .card-ocorrencias { background: var(--surface); }
 
   /* ---------- Filter bar (Power BI style) ---------- */
   .filter-bar {
@@ -146,11 +145,13 @@
   /* Responsividade mobile fica no final do CSS, perto do fechamento da tag de estilo */
 
   /* ---------- Table ---------- */
-  .table-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: center; }
+  .table-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; align-items: flex-end; }
   .table-toolbar input[type=date], .table-toolbar input[type=text], .table-toolbar input[type=time], .table-toolbar select {
     background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
     padding: 7px 10px; border-radius: 7px; font-size: 12px; height: 32px; box-sizing: border-box;
   }
+  .toolbar-field { display: flex; flex-direction: column; gap: 3px; }
+  .toolbar-field label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.4px; }
   .table-scroll { overflow-x: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
   .table-scroll::-webkit-scrollbar { height: 7px; }
   .table-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -290,7 +291,8 @@
     .quick-actions { flex-direction: column; }
     .kpi-row { grid-template-columns: 1fr 1fr !important; }
 
-    .table-toolbar input[type=text] { display: none; }
+    .toolbar-field-busca { display: none; }
+    .toolbar-field { width: 100%; flex: 1 1 100%; }
     .table-toolbar input[type=date], .table-toolbar input[type=time], .table-toolbar select {
       width: 100%; flex: 1 1 100%;
     }
@@ -350,13 +352,11 @@
       <div class="card card-ocorrencias">
         <h3>Últimas ocorrências — Sopro</h3>
         <div class="table-toolbar">
-          <input type="text" id="tBuscaSopro" placeholder="Buscar defeito, máquina, responsável…" oninput="renderTabelaSopro()" style="min-width:220px;">
-          <input type="date" id="tDataDeSopro" onchange="renderTabelaSopro()">
-          <span style="color:var(--text-dim); font-size:12px;">até</span>
-          <input type="date" id="tDataAteSopro" onchange="renderTabelaSopro()">
-          <input type="time" id="tHoraDeSopro" onchange="renderTabelaSopro()">
-          <span style="color:var(--text-dim); font-size:12px;">até</span>
-          <input type="time" id="tHoraAteSopro" onchange="renderTabelaSopro()">
+          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 220px;"><label>Buscar</label><input type="text" id="tBuscaSopro" placeholder="Defeito, máquina, responsável…" oninput="renderTabelaSopro()" style="min-width:220px; width:100%;"></div>
+          <div class="toolbar-field"><label>Data inicial</label><input type="date" id="tDataDeSopro" onchange="renderTabelaSopro()"></div>
+          <div class="toolbar-field"><label>Data final</label><input type="date" id="tDataAteSopro" onchange="renderTabelaSopro()"></div>
+          <div class="toolbar-field"><label>Horário inicial</label><input type="time" id="tHoraDeSopro" onchange="renderTabelaSopro()"></div>
+          <div class="toolbar-field"><label>Horário final</label><input type="time" id="tHoraAteSopro" onchange="renderTabelaSopro()"></div>
           <select id="tLimiteSopro" onchange="renderTabelaSopro()">
             <option value="5">5 linhas</option>
             <option value="10">10 linhas</option>
@@ -391,13 +391,11 @@
       <div class="card card-ocorrencias">
         <h3>Últimas ocorrências — Injeção</h3>
         <div class="table-toolbar">
-          <input type="text" id="tBuscaInjecao" placeholder="Buscar defeito, máquina, responsável…" oninput="renderTabelaInjecao()" style="min-width:220px;">
-          <input type="date" id="tDataDeInjecao" onchange="renderTabelaInjecao()">
-          <span style="color:var(--text-dim); font-size:12px;">até</span>
-          <input type="date" id="tDataAteInjecao" onchange="renderTabelaInjecao()">
-          <input type="time" id="tHoraDeInjecao" onchange="renderTabelaInjecao()">
-          <span style="color:var(--text-dim); font-size:12px;">até</span>
-          <input type="time" id="tHoraAteInjecao" onchange="renderTabelaInjecao()">
+          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 220px;"><label>Buscar</label><input type="text" id="tBuscaInjecao" placeholder="Defeito, máquina, responsável…" oninput="renderTabelaInjecao()" style="min-width:220px; width:100%;"></div>
+          <div class="toolbar-field"><label>Data inicial</label><input type="date" id="tDataDeInjecao" onchange="renderTabelaInjecao()"></div>
+          <div class="toolbar-field"><label>Data final</label><input type="date" id="tDataAteInjecao" onchange="renderTabelaInjecao()"></div>
+          <div class="toolbar-field"><label>Horário inicial</label><input type="time" id="tHoraDeInjecao" onchange="renderTabelaInjecao()"></div>
+          <div class="toolbar-field"><label>Horário final</label><input type="time" id="tHoraAteInjecao" onchange="renderTabelaInjecao()"></div>
           <select id="tLimiteInjecao" onchange="renderTabelaInjecao()">
             <option value="5">5 linhas</option>
             <option value="10">10 linhas</option>
@@ -1160,8 +1158,20 @@ function alternarCavidade(processo, id, num, checked) {
   if (!Array.isArray(d.cavidade)) d.cavidade = [];
   if (checked) { if (d.cavidade.indexOf(num) === -1) d.cavidade.push(num); }
   else { d.cavidade = d.cavidade.filter(function(c){ return c !== num; }); }
+  const todasBox = document.getElementById('cavTodas_'+processo+'_'+id);
+  if (todasBox) todasBox.checked = (d.cavidade.length === 72);
   const resumo = document.getElementById('cavResumo_'+processo+'_'+id);
-  if (resumo) resumo.textContent = d.cavidade.length ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…';
+  if (resumo) resumo.textContent = d.cavidade.length === 72 ? 'Todas' : d.cavidade.length ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…';
+}
+
+function alternarTodasCavidades(processo, id, marcar) {
+  const d = listaDesvios(processo).find(function(d){ return d.id === id; });
+  if (!d) return;
+  d.cavidade = marcar ? Array.from({length: 72}, function(_, i){ return i + 1; }) : [];
+  const checkboxes = document.querySelectorAll('.cav-item-'+processo+'-'+id);
+  checkboxes.forEach(function(cb){ cb.checked = marcar; });
+  const resumo = document.getElementById('cavResumo_'+processo+'_'+id);
+  if (resumo) resumo.textContent = marcar ? 'Todas' : 'Selecionar cavidades…';
 }
 
 function armazenarFoto(processo, id, files) {
@@ -1205,15 +1215,16 @@ function renderDesvios(processo) {
     let cavidadeBlock = '';
     if (processo === 'injecao') {
       const selecionadas = Array.isArray(d.cavidade) ? d.cavidade : [];
-      let opcoesCav = '';
+      const todasMarcadas = selecionadas.length === 72;
+      let opcoesCav = '<label class="cav-opt"><input type="checkbox" id="cavTodas_'+processo+'_'+d.id+'"'+(todasMarcadas?' checked':'')+' onchange="alternarTodasCavidades(\''+processo+'\','+d.id+',this.checked)"> Todas</label>';
       for (let n = 1; n <= 72; n++) {
         const marcado = selecionadas.indexOf(n) > -1 ? ' checked' : '';
-        opcoesCav += '<label class="cav-opt"><input type="checkbox" value="'+n+'"'+marcado+' onchange="alternarCavidade(\''+processo+'\','+d.id+','+n+',this.checked)"> '+n+'</label>';
+        opcoesCav += '<label class="cav-opt"><input type="checkbox" class="cav-item-'+processo+'-'+d.id+'" value="'+n+'"'+marcado+' onchange="alternarCavidade(\''+processo+'\','+d.id+','+n+',this.checked)"> '+n+'</label>';
       }
       cavidadeBlock =
         '<div class="field"><label>Cavidade(s)</label>' +
           '<details class="cav-details">' +
-            '<summary id="cavResumo_'+processo+'_'+d.id+'">'+(selecionadas.length ? selecionadas.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…')+'</summary>' +
+            '<summary id="cavResumo_'+processo+'_'+d.id+'">'+(todasMarcadas ? 'Todas' : selecionadas.length ? selecionadas.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…')+'</summary>' +
             '<div class="cav-grid">'+opcoesCav+'</div>' +
           '</details>' +
         '</div>';
@@ -1865,7 +1876,15 @@ function init() {
   renderListasNaTela();
   renderFormInjecao();
   renderFormSopro();
+  const hoje = hojeISO();
+  document.getElementById('tDataDeSopro').value = hoje;
+  document.getElementById('tDataAteSopro').value = hoje;
+  document.getElementById('tDataDeInjecao').value = hoje;
+  document.getElementById('tDataAteInjecao').value = hoje;
   iniciarLogin();
+  setInterval(function() {
+    if (itemId) carregarDados();
+  }, 30 * 60 * 1000);
 }
 init();
 
