@@ -160,6 +160,9 @@
     letter-spacing: 0.4px; border-bottom: 1px solid var(--border); white-space: nowrap;
   }
   table.occ-table td { padding: 9px 10px; border-bottom: 1px solid #1e2023; white-space: nowrap; }
+  table.occ-table td.col-obs {
+    max-width: 220px; width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: help;
+  }
   table.occ-table tr:hover td { background: var(--surface-2); }
   .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; }
   .badge.leve { background: rgba(63,182,139,0.15); color: var(--ok); }
@@ -1550,15 +1553,42 @@ function abrev(v) {
   return v || '—';
 }
 
+function porExtenso(v) {
+  const u = (v||'').toString().toUpperCase();
+  if (u === 'SIM') return 'Sim';
+  if (u === 'NÃO' || u === 'NAO') return 'Não';
+  if (u === 'APROVADO') return 'Aprovado';
+  if (u === 'REPROVADO') return 'Reprovado';
+  return v || '—';
+}
+
+function formatarDataBR(dataISO) {
+  if (!dataISO) return '—';
+  const partes = dataISO.split('-');
+  if (partes.length !== 3) return dataISO;
+  return partes[2] + '-' + partes[1] + '-' + partes[0];
+}
+
 function formatarPesoAltura(l) {
   const n = parseInt(l.num_postos_molde, 10) || 0;
   if (!n) return '—';
   const partes = [];
   for (let i = 1; i <= n; i++) {
     const p = l['peso_'+i], a = l['altura_'+i];
-    if (p || a) partes.push('P'+i+': '+(p||'—')+'g / '+(a||'—')+'mm');
+    if (p || a) partes.push('P'+i+': '+(p||'—')+'g / '+(a||'—')+' mm');
   }
-  return partes.length ? partes.join(' · ') : '—';
+  return partes.length ? partes.join('<br>') : '—';
+}
+
+function formatarPesoAlturaTexto(l) {
+  const n = parseInt(l.num_postos_molde, 10) || 0;
+  if (!n) return '—';
+  const partes = [];
+  for (let i = 1; i <= n; i++) {
+    const p = l['peso_'+i], a = l['altura_'+i];
+    if (p || a) partes.push('P'+i+': '+(p||'—')+'g / '+(a||'—')+' mm');
+  }
+  return partes.length ? partes.join('\n') : '—';
 }
 
 function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, limite, horaDeId, horaAteId) {
@@ -1596,15 +1626,15 @@ function renderTabelaSopro() {
     const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
     const statusClasse = (l.status_correcao||'').toUpperCase().indexOf('PENDENTE') > -1 ? 'pendente' : 'corrigido';
     return '<tr>' +
-      '<td>'+(l.data||'—')+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
+      '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
       '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador||'—')+'</td>' + '<td>'+(l.tipo_frasco||'—')+'</td>' +
-      '<td>'+(l.gramatura_preforma||'—')+'</td>' + '<td>'+(l.fornecedor_preforma||'—')+'</td>' + '<td>'+(l.lote_caixa||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+abrev(l.caixa_vermelha)+'</td>' + '<td>'+(l.motivo_caixa_vermelha||'—')+'</td>' +
-      '<td>'+abrev(l.produto_rotulado)+'</td>' + '<td>'+abrev(l.condicao_rotulo)+'</td>' +
-      '<td>'+(l.defeito||'—')+'</td>' + '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' +
-      '<td>'+abrev(l.teste_producao)+'</td>' + '<td style="white-space:normal;">'+formatarPesoAltura(l)+'</td>' +
-      '<td>'+abrev(l.condicao_fechamento_saco)+'</td>' + '<td>'+abrev(l.alinhamento_paletes)+'</td>' + '<td>'+abrev(l.organizacao_linha_produtiva)+'</td>' +
+      '<td>'+(l.gramatura_preforma||'—')+'</td>' + '<td>'+(l.fornecedor_preforma||'—')+'</td>' + '<td>'+(l.lote_caixa||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+porExtenso(l.caixa_vermelha)+'</td>' + '<td>'+(l.motivo_caixa_vermelha||'—')+'</td>' +
+      '<td>'+porExtenso(l.produto_rotulado)+'</td>' + '<td>'+porExtenso(l.condicao_rotulo)+'</td>' +
+      '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' + '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' +
+      '<td>'+porExtenso(l.teste_producao)+'</td>' + '<td style="white-space:nowrap;">'+formatarPesoAltura(l)+'</td>' +
+      '<td>'+porExtenso(l.condicao_fechamento_saco)+'</td>' + '<td>'+porExtenso(l.alinhamento_paletes)+'</td>' + '<td>'+porExtenso(l.organizacao_linha_produtiva)+'</td>' +
       '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
-      '<td style="max-width:200px; overflow:hidden; text-overflow:ellipsis;">'+(l.observacao||'')+'</td>' +
+      '<td class="col-obs" title="'+(l.observacao||'').replace(/"/g,'&quot;')+'">'+(l.observacao||'')+'</td>' +
       '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
     '</tr>';
   }).join('');
@@ -1624,15 +1654,15 @@ function renderTabelaInjecao() {
     const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
     const statusClasse = (l.status_correcao||'').toUpperCase().indexOf('PENDENTE') > -1 ? 'pendente' : 'corrigido';
     return '<tr>' +
-      '<td>'+(l.data||'—')+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
+      '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
       '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
       '<td>'+(l.gramatura||'—')+'</td>' + '<td>'+(l.resina||'—')+'</td>' +
       '<td>'+(l.temperatura_gate_min||'—')+'</td>' + '<td>'+(l.temperatura_gate_max||'—')+'</td>' + '<td>'+(l.temperatura_corpo_min||'—')+'</td>' + '<td>'+(l.temperatura_corpo_max||'—')+'</td>' +
-      '<td>'+abrev(l.organizacao_linha_produtiva)+'</td>' + '<td>'+abrev(l.tonalidade_preforma)+'</td>' + '<td>'+abrev(l.alinhamento_etiqueta_caixa)+'</td>' +
-      '<td>'+(l.defeito||'—')+'</td>' + '<td>'+(l.cavidade||'—')+'</td>' +
-      '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' + '<td>'+abrev(l.operador_ciente)+'</td>' +
+      '<td>'+porExtenso(l.organizacao_linha_produtiva)+'</td>' + '<td>'+porExtenso(l.tonalidade_preforma)+'</td>' + '<td>'+porExtenso(l.alinhamento_etiqueta_caixa)+'</td>' +
+      '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' + '<td style="white-space:nowrap;">'+(l.cavidade||'—')+'</td>' +
+      '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' + '<td>'+porExtenso(l.operador_ciente)+'</td>' +
       '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
-      '<td style="max-width:200px; overflow:hidden; text-overflow:ellipsis;">'+(l.observacao||'')+'</td>' +
+      '<td class="col-obs" title="'+(l.observacao||'').replace(/"/g,'&quot;')+'">'+(l.observacao||'')+'</td>' +
       '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
     '</tr>';
   }).join('');
@@ -1725,7 +1755,7 @@ function gerarPDF(processo) {
       return [l.data||'—', l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador||'—', l.tipo_frasco||'—',
         l.gramatura_preforma||'—', l.fornecedor_preforma||'—', l.lote_caixa||'—', l.numero_caixa||'—', abrev(l.caixa_vermelha), l.motivo_caixa_vermelha||'—',
         abrev(l.produto_rotulado), abrev(l.condicao_rotulo), l.defeito||'—', l.criticidade||'—', abrev(l.teste_producao),
-        formatarPesoAltura(l), abrev(l.condicao_fechamento_saco), abrev(l.alinhamento_paletes), abrev(l.organizacao_linha_produtiva),
+        formatarPesoAlturaTexto(l), abrev(l.condicao_fechamento_saco), abrev(l.alinhamento_paletes), abrev(l.organizacao_linha_produtiva),
         l.status_correcao||'—', l.observacao||''];
     });
   } else {
@@ -1741,8 +1771,10 @@ function gerarPDF(processo) {
   }
 
   doc.autoTable({
-    head: [colunas], body: corpo, startY: 22, styles: { fontSize: 6.5, cellPadding: 1.2 },
+    head: [colunas], body: corpo, startY: 22,
+    styles: { fontSize: 6.5, cellPadding: 1.2, overflow: 'linebreak', cellWidth: 'wrap', valign: 'middle' },
     headStyles: { fillColor: [30,32,35], textColor: 255 }, alternateRowStyles: { fillColor: [245,245,245] },
+    tableWidth: 'auto', horizontalPageBreak: true,
     margin: { left: 8, right: 8 }
   });
 
