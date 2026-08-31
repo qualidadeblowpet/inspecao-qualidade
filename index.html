@@ -555,13 +555,13 @@ const msalConfig = {
     redirectUri: "https://qualidadeblowpet.github.io/inspecao-qualidade/"
   }
 };
-const graphScopes = ["Files.ReadWrite.All", "User.Read"];
+const graphScopes = ["Files.ReadWrite", "User.Read"];
 /* Identificadores fixos do arquivo na nuvem (mais confiável que link de
    compartilhamento — funciona para qualquer conta com permissão no arquivo,
    sem depender do tipo/escopo do link). */
 /* Link de compartilhamento da planilha. Se você trocar o tipo de link no
    SharePoint (ex: para "Pessoas da organização com o link"), atualize aqui. */
-const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/cleber_rodrigues_blowpet_com_br/IQAWjpUUN_SbToVo1pGmdJcyAQ45D1l_a7UryTknKp9Aq0c?e=pDv6fS";
+const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/inspetor_qualidade_blowpet_com_br/IQAVEI5jhrBjSLbMGF3jGf1lAc3HeqDedlGtopBxaz_LP5A";
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
