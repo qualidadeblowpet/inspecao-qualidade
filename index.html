@@ -173,6 +173,7 @@
   .badge.grave { background: rgba(229,72,77,0.15); color: var(--danger); }
   .badge.corrigido { background: rgba(63,182,139,0.15); color: var(--ok); }
   .badge.pendente { background: rgba(229,72,77,0.15); color: var(--danger); }
+  .badge.semdesvio { background: rgba(155,160,168,0.15); color: var(--text-dim); }
   .badge.proc-injecao { background: rgba(91,155,242,0.15); color: var(--blue); }
   .badge.proc-sopro { background: rgba(156,123,217,0.15); color: var(--purple); }
   .table-empty { text-align: center; padding: 30px; color: var(--text-dim); font-size: 13px; }
@@ -1522,16 +1523,16 @@ function limparFiltros() {
 function linhasFiltradasBase() {
   const proc = document.getElementById('fProcesso').value;
   let todos = proc === 'injecao' ? dadosCache.injecao.slice() : proc === 'sopro' ? dadosCache.sopro.slice() : dadosCache.injecao.concat(dadosCache.sopro);
-  return aplicarFiltrosComuns(todos);
+  return aplicarFiltrosComuns(todos, false);
 }
 
 function linhasFiltradasPorProcesso(processoFixo) {
   const todos = dadosCache[processoFixo] ? dadosCache[processoFixo].slice() : [];
-  return aplicarFiltrosComuns(todos);
+  return aplicarFiltrosComuns(todos, true);
 }
 
-function aplicarFiltrosComuns(todos) {
-  todos = todos.filter(function(l){ return l.defeito; });
+function aplicarFiltrosComuns(todos, manterSemDefeito) {
+  if (!manterSemDefeito) todos = todos.filter(function(l){ return l.defeito; });
   const dias = parseInt(document.getElementById('fPeriodo').value, 10);
   if (dias) {
     const limite = new Date(); limite.setDate(limite.getDate() - dias);
@@ -1727,13 +1728,14 @@ function renderTabelaSopro() {
 
     corpo.innerHTML = linhas.map(function(l) {
       const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
-      const statusClasse = (l.status_correcao||'').toUpperCase().indexOf('PENDENTE') > -1 ? 'pendente' : 'corrigido';
+      const statusUpper = (l.status_correcao||'').toUpperCase();
+      const statusClasse = statusUpper.indexOf('PENDENTE') > -1 ? 'pendente' : statusUpper.indexOf('SEM DESVIO') > -1 ? 'semdesvio' : 'corrigido';
       return '<tr>' +
         '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
         '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador||'—')+'</td>' + '<td>'+(l.tipo_frasco||'—')+'</td>' +
         '<td>'+(l.gramatura_preforma||'—')+'</td>' + '<td>'+(l.fornecedor_preforma||'—')+'</td>' + '<td>'+(l.lote_caixa||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+porExtenso(l.caixa_vermelha)+'</td>' + '<td>'+(l.motivo_caixa_vermelha||'—')+'</td>' +
         '<td>'+porExtenso(l.produto_rotulado)+'</td>' + '<td>'+badgeAprovadoReprovado(l.condicao_rotulo)+'</td>' +
-        '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' + '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' +
+        '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' + '<td>'+(l.criticidade ? '<span class="badge '+critClasse+'">'+l.criticidade+'</span>' : '—')+'</td>' +
         '<td>'+porExtenso(l.teste_producao)+'</td>' + '<td style="white-space:nowrap;">'+formatarPesoAltura(l)+'</td>' +
         '<td>'+badgeAprovadoReprovado(l.condicao_fechamento_saco)+'</td>' + '<td>'+badgeAprovadoReprovado(l.alinhamento_paletes)+'</td>' + '<td>'+badgeAprovadoReprovado(l.organizacao_linha_produtiva)+'</td>' +
         '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
@@ -1760,7 +1762,8 @@ function renderTabelaInjecao() {
 
   corpo.innerHTML = linhas.map(function(l) {
     const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
-    const statusClasse = (l.status_correcao||'').toUpperCase().indexOf('PENDENTE') > -1 ? 'pendente' : 'corrigido';
+    const statusUpper = (l.status_correcao||'').toUpperCase();
+      const statusClasse = statusUpper.indexOf('PENDENTE') > -1 ? 'pendente' : statusUpper.indexOf('SEM DESVIO') > -1 ? 'semdesvio' : 'corrigido';
     return '<tr>' +
       '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
       '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
@@ -1768,7 +1771,7 @@ function renderTabelaInjecao() {
       '<td>'+formatarTemperatura(l.temperatura_gate_min)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_gate_max)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_corpo_min)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_corpo_max)+'</td>' +
       '<td>'+badgeAprovadoReprovado(l.organizacao_linha_produtiva)+'</td>' + '<td>'+badgeAprovadoReprovado(l.tonalidade_preforma)+'</td>' + '<td>'+badgeAprovadoReprovado(l.alinhamento_etiqueta_caixa)+'</td>' +
       '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' + '<td style="white-space:nowrap;">'+(l.cavidade||'—')+'</td>' +
-      '<td><span class="badge '+critClasse+'">'+(l.criticidade||'—')+'</span></td>' + '<td>'+porExtenso(l.operador_ciente)+'</td>' +
+      '<td>'+(l.criticidade ? '<span class="badge '+critClasse+'">'+l.criticidade+'</span>' : '—')+'</td>' + '<td>'+porExtenso(l.operador_ciente)+'</td>' +
       '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
       '<td class="col-obs" title="'+(l.observacao||'').replace(/"/g,'&quot;')+'">'+(l.observacao||'')+'</td>' +
       '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
