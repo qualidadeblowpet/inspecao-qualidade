@@ -1159,18 +1159,16 @@ function alternarCavidade(processo, id, num, checked) {
   if (!Array.isArray(d.cavidade)) d.cavidade = [];
   if (checked) { if (d.cavidade.indexOf(num) === -1) d.cavidade.push(num); }
   else { d.cavidade = d.cavidade.filter(function(c){ return c !== num; }); }
-  const todasBox = document.getElementById('cavTodas_'+processo+'_'+id);
-  if (todasBox) todasBox.checked = (d.cavidade.length === 72);
   const resumo = document.getElementById('cavResumo_'+processo+'_'+id);
-  if (resumo) resumo.textContent = d.cavidade.length === 72 ? 'Todas' : d.cavidade.length ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…';
+  if (resumo) resumo.textContent = d.cavidade.length ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…';
 }
 
 function alternarTodasCavidades(processo, id, marcar) {
   const d = listaDesvios(processo).find(function(d){ return d.id === id; });
   if (!d) return;
-  d.cavidade = marcar ? Array.from({length: 72}, function(_, i){ return i + 1; }) : [];
+  d.cavidade = marcar ? 'TODAS' : [];
   const checkboxes = document.querySelectorAll('.cav-item-'+processo+'-'+id);
-  checkboxes.forEach(function(cb){ cb.checked = marcar; });
+  checkboxes.forEach(function(cb){ cb.checked = false; cb.disabled = marcar; });
   const resumo = document.getElementById('cavResumo_'+processo+'_'+id);
   if (resumo) resumo.textContent = marcar ? 'Todas' : 'Selecionar cavidades…';
 }
@@ -1215,12 +1213,12 @@ function renderDesvios(processo) {
 
     let cavidadeBlock = '';
     if (processo === 'injecao') {
+      const todasMarcadas = d.cavidade === 'TODAS';
       const selecionadas = Array.isArray(d.cavidade) ? d.cavidade : [];
-      const todasMarcadas = selecionadas.length === 72;
       let opcoesCav = '<label class="cav-opt"><input type="checkbox" id="cavTodas_'+processo+'_'+d.id+'"'+(todasMarcadas?' checked':'')+' onchange="alternarTodasCavidades(\''+processo+'\','+d.id+',this.checked)"> Todas</label>';
       for (let n = 1; n <= 72; n++) {
         const marcado = selecionadas.indexOf(n) > -1 ? ' checked' : '';
-        opcoesCav += '<label class="cav-opt"><input type="checkbox" class="cav-item-'+processo+'-'+d.id+'" value="'+n+'"'+marcado+' onchange="alternarCavidade(\''+processo+'\','+d.id+','+n+',this.checked)"> '+n+'</label>';
+        opcoesCav += '<label class="cav-opt"><input type="checkbox" class="cav-item-'+processo+'-'+d.id+'" value="'+n+'"'+marcado+(todasMarcadas?' disabled':'')+' onchange="alternarCavidade(\''+processo+'\','+d.id+','+n+',this.checked)"> '+n+'</label>';
       }
       cavidadeBlock =
         '<div class="field"><label>Cavidade(s)</label>' +
@@ -1370,7 +1368,7 @@ async function salvarSessao(processo) {
       const tempCorpoMax = document.getElementById('inj_tempCorpoMax').value;
       linhasObj = desvios.map(function(d) {
         return { id_sessao: idSessao, data: data, hora_inicio: horaInicio, hora_fim: horaFim, equipamento: equipamento, responsavel: responsavel,
-          operador_principal: operador, cor: cor, gramatura: gramatura, resina: resina, defeito: d.defeito, cavidade: Array.isArray(d.cavidade) ? (d.cavidade.length === 72 ? 'TODAS' : d.cavidade.slice().sort(function(a,b){return a-b;}).join(';')) : (d.cavidade || ''),
+          operador_principal: operador, cor: cor, gramatura: gramatura, resina: resina, defeito: d.defeito, cavidade: Array.isArray(d.cavidade) ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(';') : (d.cavidade || ''),
           criticidade: d.criticidade, operador_ciente: d.operadorCiente, status_correcao: d.status, observacao: d.observacao, foto_url: d.fotoUrlFinal || '', criado_em: new Date().toISOString(),
           organizacao_linha_produtiva: organizacaoLinha, tonalidade_preforma: tonalidadePreforma, alinhamento_etiqueta_caixa: alinhamentoEtiqueta,
           temperatura_gate_min: tempGateMin, temperatura_gate_max: tempGateMax, temperatura_corpo_min: tempCorpoMin, temperatura_corpo_max: tempCorpoMax };
