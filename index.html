@@ -1946,14 +1946,38 @@ function gerarPDF(processo) {
     });
   }
 
-  doc.autoTable({
-    head: [colunas], body: corpo, startY: 22,
-    styles: { fontSize: 7, cellPadding: 1.5, overflow: 'linebreak', cellWidth: 'wrap', valign: 'middle', halign: 'center' },
-    headStyles: { fillColor: [30,32,35], textColor: 255, halign: 'center', valign: 'middle' },
-    alternateRowStyles: { fillColor: [245,245,245] },
-    tableWidth: 'auto', horizontalPageBreak: true,
-    margin: { left: 8, right: 8 }
-  });
+  if (processo === 'sopro') {
+    doc.autoTable({
+      head: [colunas], body: corpo, startY: 22,
+      styles: { fontSize: 7, cellPadding: 1.5, overflow: 'linebreak', cellWidth: 'wrap', valign: 'middle', halign: 'center' },
+      headStyles: { fillColor: [30,32,35], textColor: 255, halign: 'center', valign: 'middle' },
+      alternateRowStyles: { fillColor: [245,245,245] },
+      tableWidth: 'auto', horizontalPageBreak: true,
+      margin: { left: 8, right: 8 }
+    });
+  } else {
+    doc.autoTable({
+      head: [colunas], body: corpo, startY: 22,
+      styles: { fontSize: 6.5, cellPadding: 1.2, overflow: 'linebreak', cellWidth: 'wrap', valign: 'middle' },
+      headStyles: { fillColor: [30,32,35], textColor: 255, minCellHeight: 30, valign: 'bottom', halign: 'left' },
+      alternateRowStyles: { fillColor: [245,245,245] },
+      tableWidth: 'auto', horizontalPageBreak: true,
+      margin: { left: 8, right: 8 },
+      didParseCell: function(data) {
+        if (data.section === 'head') { data.cell.text = []; }
+      },
+      didDrawCell: function(data) {
+        if (data.section === 'head') {
+          const texto = colunas[data.column.index] || '';
+          doc.setFontSize(6.5);
+          doc.setTextColor(255, 255, 255);
+          const x = data.cell.x + data.cell.width / 2 + 2;
+          const y = data.cell.y + data.cell.height - 2;
+          doc.text(texto, x, y, { angle: 90, align: 'left' });
+        }
+      }
+    });
+  }
 
   const nomeArquivo = 'inspecao_' + processo + '_' + hojeISO() + '.pdf';
   doc.save(nomeArquivo);
