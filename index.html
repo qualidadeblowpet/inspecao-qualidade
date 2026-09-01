@@ -1930,10 +1930,10 @@ function gerarPDF(processo) {
   let linhas, colunas, corpo;
   if (processo === 'sopro') {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500);
-    colunas = ['Data','Hora','Equipamento','Responsável','Operador','Frasco','Volume','Caixa Vermelha','Defeito Encontrado','Criticidade','Peso/Altura'];
+    colunas = ['Data','Hora','Equipamento','Responsável','Operador','Frasco','Volume','Preforma','Caixa Vermelha','Lote Caixa','Nº Caixa','Defeito Encontrado','Criticidade','Peso/Altura'];
     corpo = linhas.map(function(l) {
       return [formatarDataBR(l.data), l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador||'—', l.tipo_frasco||'—',
-        l.ml||'—', porExtenso(l.caixa_vermelha), l.defeito||'—', l.criticidade||'—', formatarPesoAlturaTexto(l)];
+        l.ml||'—', l.gramatura_preforma||'—', porExtenso(l.caixa_vermelha), l.lote_caixa||'—', l.numero_caixa||'—', l.defeito||'—', l.criticidade||'—', formatarPesoAlturaTexto(l)];
     });
   } else {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500);
