@@ -1058,10 +1058,10 @@ function renderFormSopro() {
       '<div class="grid-3">' +
         '<div class="field"><label>Gramatura preforma</label>'+'<select id="sop_gramaturaPreforma"></select>'+'</div>' +
         '<div class="field"><label>Fornecedor preforma</label>'+'<select id="sop_fornecedorPreforma"></select>'+'</div>' +
-        '<div class="field"><label>Lote caixa</label><input type="text" id="sop_loteCaixa" placeholder="Ex: L2026-081"></div>' +
+        '<div class="field"><label>Lote caixa</label><input type="text" id="sop_loteCaixa" inputmode="numeric" placeholder="Ex: 2026081"></div>' +
       '</div>' +
       '<div class="grid-2">' +
-        '<div class="field"><label>Número caixa</label><input type="text" id="sop_numeroCaixa" placeholder="Ex: 0142"></div>' +
+        '<div class="field"><label>Número caixa</label><input type="text" id="sop_numeroCaixa" inputmode="numeric" placeholder="Ex: 0142"></div>' +
         toggleGroupHtml('sop_caixaVermelha', 'Caixa vermelha?', ['SIM','NÃO'], 'NÃO') +
       '</div>' +
       '<div class="field"><label>Motivo caixa vermelha</label><input type="text" id="sop_motivoCaixaVermelha" placeholder="Descreva o motivo, se houver"></div>' +
@@ -1316,6 +1316,15 @@ async function salvarSessao(processo) {
     }
     if (faltando.length > 0) {
       mostrarToast('ATENÇÃO: É necessário preencher os dados nos campos: ' + faltando.join(', ') + '.', true);
+      return;
+    }
+    const loteCaixaVal = document.getElementById('sop_loteCaixa').value;
+    const numeroCaixaVal = document.getElementById('sop_numeroCaixa').value;
+    const camposCaixaInvalidos = [];
+    if (!numeroInteiroNaoZeroValido(loteCaixaVal)) camposCaixaInvalidos.push('Lote Caixa');
+    if (!numeroInteiroNaoZeroValido(numeroCaixaVal)) camposCaixaInvalidos.push('Número Caixa');
+    if (camposCaixaInvalidos.length > 0) {
+      mostrarToast('ATENÇÃO: os campos ' + camposCaixaInvalidos.join(' e ') + ' devem conter apenas números, diferentes de 0 (não pode ser "0", "-" ou letras).', true);
       return;
     }
   }
@@ -2051,6 +2060,12 @@ function gerarPDF(processo) {
 }
 
 /* ---------------- Utilidades ---------------- */
+function numeroInteiroNaoZeroValido(valor) {
+  const v = (valor || '').toString().trim();
+  if (!/^[0-9]+$/.test(v)) return false;
+  return parseInt(v, 10) !== 0;
+}
+
 function mostrarToast(msg, isError) {
   const existente = document.querySelector('.toast');
   if (existente) existente.remove();
