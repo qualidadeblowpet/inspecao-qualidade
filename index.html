@@ -1937,12 +1937,11 @@ function gerarPDF(processo) {
     });
   } else {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500);
-    colunas = ['Data','Hora','Equipamento','Resp.','Operador','Cor','Gramatura','Resina','Temperatura Gate Mín.','Temperatura Gate Máx.','Temperatura Corpo Mín.','Temperatura Corpo Máx.','Organização Linha','Tonalidade','Alinhamento Etiqueta','Defeito','Cavidade','Criticidade','Operador Ciente'];
+    colunas = ['Data','Hora','Equipamento','Responsável','Operador','Cor','Gramatura','Resina','°C Mín - Gate','°C Máx - Gate','°C Mín - Corpo','°C Máx - Corpo','Defeito Encontrado','Cavidades','Criticidade'];
     corpo = linhas.map(function(l) {
       return [formatarDataBR(l.data), l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
         l.gramatura||'—', l.resina||'—', formatarTemperatura(l.temperatura_gate_min), formatarTemperatura(l.temperatura_gate_max), formatarTemperatura(l.temperatura_corpo_min), formatarTemperatura(l.temperatura_corpo_max),
-        porExtenso(l.organizacao_linha_produtiva), porExtenso(l.tonalidade_preforma), porExtenso(l.alinhamento_etiqueta_caixa),
-        l.defeito||'—', l.cavidade||'—', l.criticidade||'—', porExtenso(l.operador_ciente)];
+        l.defeito||'—', l.cavidade||'—', l.criticidade||'—'];
     });
   }
 
