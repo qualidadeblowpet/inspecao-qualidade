@@ -262,6 +262,35 @@
   }
   .toast.error { border-color: var(--danger); }
 
+  /* ---------- Revisão do cadastro (antes de salvar) ---------- */
+  .revisao-wrap { max-width: 760px; margin: 0 auto; }
+  .revisao-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 22px 24px; }
+  .revisao-header { margin-bottom: 18px; }
+  .revisao-header .page-title { margin-bottom: 2px; }
+  .revisao-secao { margin-bottom: 18px; }
+  .revisao-secao:last-of-type { margin-bottom: 22px; }
+  .revisao-secao-titulo {
+    font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 0.6px;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 10px; padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .revisao-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px 16px; }
+  .revisao-item { min-width: 0; }
+  .revisao-item .rlabel { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
+  .revisao-item .rvalor { font-size: 14px; color: var(--text); font-weight: 600; overflow-wrap: break-word; }
+  .revisao-item .rvalor.dim { color: var(--text-dim); font-weight: 500; }
+
+  .revisao-desvio {
+    background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 10px; padding: 12px 14px; margin-bottom: 10px;
+  }
+  .revisao-desvio:last-child { margin-bottom: 0; }
+  .revisao-desvio-num { font-family: var(--font-mono); font-size: 11px; color: var(--accent); margin-bottom: 8px; letter-spacing: 1px; }
+  .revisao-desvio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 16px; }
+
+  .revisao-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
+  .revisao-acoes .btn { padding: 14px; font-size: 15px; }
+
   @media (max-width: 900px) {
     .charts-grid { grid-template-columns: 1fr; }
 
@@ -286,6 +315,7 @@
     .main { padding: 16px; }
 
     .grid-2, .grid-3 { grid-template-columns: 1fr !important; }
+    .revisao-grid, .revisao-desvio-grid, .revisao-acoes { grid-template-columns: 1fr !important; }
     .filter-bar { flex-direction: column; align-items: stretch; }
     .filter-group select { min-width: 0; width: 100%; }
     .filter-clear { align-self: stretch; margin-left: 0; }
@@ -488,16 +518,22 @@
 
     <!-- ===================== CADASTRO INJEÇÃO ===================== -->
     <div id="pageCadastroInjecao" class="hidden">
-      <div class="page-title">Cadastro — Injeção</div>
-      <div class="page-sub">Registrar uma nova sessão de inspeção do processo de injeção</div>
-      <div id="formInjecao"></div>
+      <div id="injFormArea">
+        <div class="page-title">Cadastro — Injeção</div>
+        <div class="page-sub">Registrar uma nova sessão de inspeção do processo de injeção</div>
+        <div id="formInjecao"></div>
+      </div>
+      <div id="revisaoInjecao" class="hidden"></div>
     </div>
 
     <!-- ===================== CADASTRO SOPRO ===================== -->
     <div id="pageCadastroSopro" class="hidden">
-      <div class="page-title">Cadastro — Sopro</div>
-      <div class="page-sub">Registrar uma nova sessão de inspeção do processo de sopro</div>
-      <div id="formSopro"></div>
+      <div id="sopFormArea">
+        <div class="page-title">Cadastro — Sopro</div>
+        <div class="page-sub">Registrar uma nova sessão de inspeção do processo de sopro</div>
+        <div id="formSopro"></div>
+      </div>
+      <div id="revisaoSopro" class="hidden"></div>
     </div>
 
     <!-- ===================== CONFIGURAÇÕES ===================== -->
@@ -1023,7 +1059,7 @@ function renderFormInjecao() {
       '<div id="semDesviosInjecao" class="empty-state">Nenhum desvio adicionado ainda.</div>' +
       '<button class="btn btn-outline btn-block" id="btnAddDesvioInjecao" onclick="adicionarDesvio(\'injecao\')">+ Adicionar desvio</button>' +
     '</div>' +
-    '<button class="btn btn-accent btn-block" id="btnSalvarInjecao" onclick="salvarSessao(\'injecao\')">Salvar sessão na planilha</button>';
+    '<button class="btn btn-accent btn-block" id="btnSalvarInjecao" onclick="abrirRevisao(\'injecao\')">Salvar sessão na planilha</button>';
   preencherSelect('inj_equipamento', listas.equipInjecao);
   preencherSelect('inj_responsavel', listas.responsaveis);
   preencherSelect('inj_operador', listas.operadores);
@@ -1086,7 +1122,7 @@ function renderFormSopro() {
       '<div id="semDesviosSopro" class="empty-state">Nenhum desvio adicionado ainda.</div>' +
       '<button class="btn btn-outline btn-block" id="btnAddDesvioSopro" onclick="adicionarDesvio(\'sopro\')">+ Adicionar desvio</button>' +
     '</div>' +
-    '<button class="btn btn-accent btn-block" id="btnSalvarSopro" onclick="salvarSessao(\'sopro\')">Salvar sessão na planilha</button>';
+    '<button class="btn btn-accent btn-block" id="btnSalvarSopro" onclick="abrirRevisao(\'sopro\')">Salvar sessão na planilha</button>';
   preencherSelect('sop_equipamento', listas.equipSopro);
   preencherSelect('sop_responsavel', listas.responsaveis);
   preencherSelect('sop_operador', listas.operadoresSopro);
@@ -1268,7 +1304,7 @@ async function uploadFoto(token, file, idSessao, indice) {
   return uploadJson.webUrl || '';
 }
 
-async function salvarSessao(processo) {
+function abrirRevisao(processo) {
   if (!itemId) { mostrarToast('Conecte-se à planilha (Configurações) antes de salvar.', true); setPage('config'); return; }
   const pfx = processo === 'sopro' ? 'sop_' : 'inj_';
 
@@ -1330,6 +1366,156 @@ async function salvarSessao(processo) {
   }
 
   const temDefeito = document.getElementById(pfx+'temDefeito').value;
+  const desviosCheck = temDefeito === 'NAO' ? [] : listaDesvios(processo);
+  if (temDefeito === 'SIM' && desviosCheck.length === 0) { mostrarToast('Adicione ao menos um desvio.', true); return; }
+
+  const corpoRevisao = renderRevisaoHtml(processo, temDefeito, desviosCheck);
+  const areaId = processo === 'sopro' ? 'sopFormArea' : 'injFormArea';
+  const revisaoId = processo === 'sopro' ? 'revisaoSopro' : 'revisaoInjecao';
+  document.getElementById(revisaoId).innerHTML = corpoRevisao;
+  document.getElementById(areaId).classList.add('hidden');
+  document.getElementById(revisaoId).classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function voltarAjustarDados(processo) {
+  const areaId = processo === 'sopro' ? 'sopFormArea' : 'injFormArea';
+  const revisaoId = processo === 'sopro' ? 'revisaoSopro' : 'revisaoInjecao';
+  document.getElementById(revisaoId).classList.add('hidden');
+  document.getElementById(revisaoId).innerHTML = '';
+  document.getElementById(areaId).classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'auto' });
+}
+
+function itemRevisao(label, valor, dim) {
+  const v = (valor === undefined || valor === null || valor === '') ? '—' : valor;
+  return '<div class="revisao-item"><div class="rlabel">'+label+'</div><div class="rvalor'+((dim || v === '—') ? ' dim' : '')+'">'+v+'</div></div>';
+}
+
+function cavidadeParaTexto(cavidade) {
+  if (cavidade === 'TODAS') return 'Todas';
+  if (Array.isArray(cavidade) && cavidade.length) return cavidade.slice().sort(function(a,b){ return a-b; }).join(', ');
+  return '—';
+}
+
+function renderRevisaoHtml(processo, temDefeito, desvios) {
+  const titulo = processo === 'sopro' ? 'Revisar cadastro — Sopro' : 'Revisar cadastro — Injeção';
+  let corpo = '';
+
+  if (processo === 'sopro') {
+    const data = document.getElementById('sop_data').value;
+    const equipamento = document.getElementById('sop_equipamento').value;
+    const responsavel = document.getElementById('sop_responsavel').value;
+    const operador = document.getElementById('sop_operador').value;
+    const cor = document.getElementById('sop_cor').value;
+    const ml = document.getElementById('sop_ml').value;
+    const frasco = document.getElementById('sop_frasco').value;
+    const gramaturaPreforma = document.getElementById('sop_gramaturaPreforma').value;
+    const fornecedorPreforma = document.getElementById('sop_fornecedorPreforma').value;
+    const loteCaixa = document.getElementById('sop_loteCaixa').value;
+    const numeroCaixa = document.getElementById('sop_numeroCaixa').value;
+    const caixaVermelha = getToggleValue('sop_caixaVermelha');
+    const motivoCaixaVermelha = document.getElementById('sop_motivoCaixaVermelha').value;
+    const produtoRotulado = getToggleValue('sop_produtoRotulado');
+    const condicaoRotulo = getToggleValue('sop_condicaoRotulo');
+    const testeProducao = getToggleValue('sop_testeProducao');
+    const fechamentoSaco = getToggleValue('sop_fechamentoSaco');
+    const alinhamentoPaletes = getToggleValue('sop_alinhamentoPaletes');
+    const organizacaoLinha = getToggleValue('sop_organizacaoLinha');
+    const numPostos = parseInt(document.getElementById('sop_numPostos').value, 10) || 0;
+
+    corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Dados da sessão</div><div class="revisao-grid">' +
+      itemRevisao('Data', formatarDataBR(data)) + itemRevisao('Equipamento', equipamento) + itemRevisao('Responsável', responsavel) +
+      itemRevisao('Operador', operador) + itemRevisao('Cor', cor) + itemRevisao('Volume', ml) +
+      '</div></div>';
+
+    corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Preforma / Caixa</div><div class="revisao-grid">' +
+      itemRevisao('Tipo de frasco', frasco) + itemRevisao('Gramatura preforma', gramaturaPreforma) + itemRevisao('Fornecedor preforma', fornecedorPreforma) +
+      itemRevisao('Lote caixa', loteCaixa) + itemRevisao('Número caixa', numeroCaixa) + itemRevisao('Caixa vermelha?', porExtenso(caixaVermelha)) +
+      (caixaVermelha === 'SIM' ? itemRevisao('Motivo caixa vermelha', motivoCaixaVermelha) : '') +
+      '</div></div>';
+
+    corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Verificações de qualidade</div><div class="revisao-grid">' +
+      itemRevisao('Produto rotulado?', porExtenso(produtoRotulado)) + itemRevisao('Condição do rótulo', porExtenso(condicaoRotulo)) + itemRevisao('Teste pela produção?', porExtenso(testeProducao)) +
+      itemRevisao('Fechamento saco', porExtenso(fechamentoSaco)) + itemRevisao('Alinhamento paletes', porExtenso(alinhamentoPaletes)) + itemRevisao('Organização linha', porExtenso(organizacaoLinha)) +
+      '</div></div>';
+
+    if (numPostos > 0) {
+      let postosHtml = '';
+      for (let i = 1; i <= numPostos; i++) {
+        const pesoEl = document.getElementById('sop_peso_'+i);
+        const alturaEl = document.getElementById('sop_altura_'+i);
+        const peso = pesoEl && pesoEl.value ? pesoEl.value : '';
+        const altura = alturaEl && alturaEl.value ? alturaEl.value : '';
+        postosHtml += itemRevisao('Posto '+i, (peso || altura) ? (peso||'—')+' g / '+(altura||'—')+' mm' : '—');
+      }
+      corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Peso / Altura por posto</div><div class="revisao-grid">' + postosHtml + '</div></div>';
+    }
+  } else {
+    const data = document.getElementById('inj_data').value;
+    const equipamento = document.getElementById('inj_equipamento').value;
+    const responsavel = document.getElementById('inj_responsavel').value;
+    const operador = document.getElementById('inj_operador').value;
+    const cor = document.getElementById('inj_cor').value;
+    const gramatura = document.getElementById('inj_gramatura').value;
+    const resina = document.getElementById('inj_resina').value;
+    const organizacaoLinha = getToggleValue('inj_organizacaoLinha');
+    const tonalidadePreforma = getToggleValue('inj_tonalidadePreforma');
+    const alinhamentoEtiqueta = getToggleValue('inj_alinhamentoEtiqueta');
+    const tempGateMinEl = document.getElementById('inj_tempGateMin');
+    const tempGateMaxEl = document.getElementById('inj_tempGateMax');
+    const tempCorpoMinEl = document.getElementById('inj_tempCorpoMin');
+    const tempCorpoMaxEl = document.getElementById('inj_tempCorpoMax');
+    const tempGateMin = tempGateMinEl && tempGateMinEl.value ? tempGateMinEl.value + ' °C' : '';
+    const tempGateMax = tempGateMaxEl && tempGateMaxEl.value ? tempGateMaxEl.value + ' °C' : '';
+    const tempCorpoMin = tempCorpoMinEl && tempCorpoMinEl.value ? tempCorpoMinEl.value + ' °C' : '';
+    const tempCorpoMax = tempCorpoMaxEl && tempCorpoMaxEl.value ? tempCorpoMaxEl.value + ' °C' : '';
+
+    corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Dados da sessão</div><div class="revisao-grid">' +
+      itemRevisao('Data', formatarDataBR(data)) + itemRevisao('Equipamento', equipamento) + itemRevisao('Responsável', responsavel) +
+      itemRevisao('Operador principal', operador) + itemRevisao('Cor da preforma', cor) + itemRevisao('Gramatura', gramatura) +
+      '</div></div>';
+
+    corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Resina / Temperaturas</div><div class="revisao-grid">' +
+      itemRevisao('Resina', resina) + itemRevisao('Temp. Gate — Mín.', tempGateMin) + itemRevisao('Temp. Gate — Máx.', tempGateMax) +
+      itemRevisao('Temp. Corpo — Mín.', tempCorpoMin) + itemRevisao('Temp. Corpo — Máx.', tempCorpoMax) +
+      '</div></div>';
+
+    corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Verificações de qualidade</div><div class="revisao-grid">' +
+      itemRevisao('Organização linha', porExtenso(organizacaoLinha)) + itemRevisao('Tonalidade preforma', porExtenso(tonalidadePreforma)) + itemRevisao('Alinhamento etiqueta', porExtenso(alinhamentoEtiqueta)) +
+      '</div></div>';
+  }
+
+  let desviosHtml = '';
+  if (temDefeito === 'SIM') {
+    desviosHtml = desvios.map(function(d, idx) {
+      let campos = itemRevisao('Defeito', d.defeito);
+      if (processo === 'injecao') campos += itemRevisao('Cavidade(s)', cavidadeParaTexto(d.cavidade));
+      campos += itemRevisao('Criticidade', d.criticidade);
+      if (processo === 'injecao') campos += itemRevisao('Operador ciente?', porExtenso(d.operadorCiente));
+      campos += itemRevisao('Foto anexada', d.fotoFile ? ('📷 ' + d.fotoFile.name) : 'Não', !d.fotoFile);
+      campos += itemRevisao('Observação', d.observacao, true);
+      return '<div class="revisao-desvio"><div class="revisao-desvio-num">DESVIO ' + String(idx+1).padStart(2,'0') + '</div><div class="revisao-desvio-grid">' + campos + '</div></div>';
+    }).join('');
+  } else {
+    desviosHtml = '<p style="color:var(--text-dim); font-size:13px; margin:0;">Nenhum desvio — sessão será registrada como "Sem desvio".</p>';
+  }
+  corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Desvios encontrados' + (temDefeito === 'SIM' ? ' (' + desvios.length + ')' : '') + '</div>' + desviosHtml + '</div>';
+
+  const btnConfirmarId = processo === 'sopro' ? 'btnConfirmarSopro' : 'btnConfirmarInjecao';
+  return '<div class="revisao-wrap"><div class="revisao-card">' +
+    '<div class="revisao-header"><div class="page-title">' + titulo + '</div><div class="page-sub">Confira os dados antes de salvar na planilha. Você ainda pode ajustar qualquer campo.</div></div>' +
+    corpo +
+    '<div class="revisao-acoes">' +
+      '<button class="btn btn-outline btn-block" onclick="voltarAjustarDados(\'' + processo + '\')">← Ajustar dados</button>' +
+      '<button class="btn btn-accent btn-block" id="' + btnConfirmarId + '" onclick="confirmarSalvarSessao(\'' + processo + '\')">Confirmar e salvar ✓</button>' +
+    '</div>' +
+  '</div></div>';
+}
+
+async function confirmarSalvarSessao(processo) {
+  const pfx = processo === 'sopro' ? 'sop_' : 'inj_';
+  const temDefeito = document.getElementById(pfx+'temDefeito').value;
   const desvios = temDefeito === 'NAO' ? [{ defeito: '', cavidade: [], criticidade: '', operadorCiente: '', status: 'SEM DESVIO', observacao: '', fotoFile: null }] : listaDesvios(processo);
   if (temDefeito === 'SIM' && desvios.length === 0) { mostrarToast('Adicione ao menos um desvio.', true); return; }
 
@@ -1343,8 +1529,8 @@ async function salvarSessao(processo) {
   const nomeTabela = processo === 'sopro' ? 'TabelaSopro' : 'TabelaInjecao';
   const cabecalho = processo === 'sopro' ? CABECALHO_SOPRO : CABECALHO_INJECAO;
 
-  const btn = document.getElementById(processo === 'sopro' ? 'btnSalvarSopro' : 'btnSalvarInjecao');
-  btn.disabled = true; btn.textContent = 'Salvando…';
+  const btn = document.getElementById(processo === 'sopro' ? 'btnConfirmarSopro' : 'btnConfirmarInjecao');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
 
   try {
     const token = await getToken();
@@ -1428,6 +1614,11 @@ async function salvarSessao(processo) {
     if (resp.ok) {
       mostrarToast(valores.length + ' registro(s) salvos ✓');
       if (processo === 'sopro') { desviosSopro = []; contadorSopro = 0; renderFormSopro(); } else { desviosInjecao = []; contadorInjecao = 0; renderFormInjecao(); }
+      const revisaoId = processo === 'sopro' ? 'revisaoSopro' : 'revisaoInjecao';
+      const areaId = processo === 'sopro' ? 'sopFormArea' : 'injFormArea';
+      document.getElementById(revisaoId).classList.add('hidden');
+      document.getElementById(revisaoId).innerHTML = '';
+      document.getElementById(areaId).classList.remove('hidden');
       setPage('dashboard');
     } else {
       const json = await resp.json();
