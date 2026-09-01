@@ -1937,22 +1937,48 @@ function gerarPDF(processo) {
     });
   } else {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500);
-    colunas = ['Data','Hora','Equipamento','Responsável','Operador','Cor','Gramatura','Resina','°C Mín - Gate','°C Máx - Gate','°C Mín - Corpo','°C Máx - Corpo','Defeito Encontrado','Cavidades','Criticidade'];
+    colunas = ['Data','Hora','Equipamento','Resp.','Operador','Cor','Gramatura','Resina','Temperatura Gate Mín.','Temperatura Gate Máx.','Temperatura Corpo Mín.','Temperatura Corpo Máx.','Organização Linha','Tonalidade','Alinhamento Etiqueta','Defeito','Cavidade','Criticidade','Operador Ciente','Observação'];
     corpo = linhas.map(function(l) {
       return [formatarDataBR(l.data), l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
         l.gramatura||'—', l.resina||'—', formatarTemperatura(l.temperatura_gate_min), formatarTemperatura(l.temperatura_gate_max), formatarTemperatura(l.temperatura_corpo_min), formatarTemperatura(l.temperatura_corpo_max),
-        l.defeito||'—', l.cavidade||'—', l.criticidade||'—'];
+        porExtenso(l.organizacao_linha_produtiva), porExtenso(l.tonalidade_preforma), porExtenso(l.alinhamento_etiqueta_caixa),
+        l.defeito||'—', l.cavidade||'—', l.criticidade||'—', porExtenso(l.operador_ciente),
+        l.observacao||''];
     });
   }
 
-  doc.autoTable({
-    head: [colunas], body: corpo, startY: 22,
-    styles: { fontSize: 7, cellPadding: 1.5, overflow: 'linebreak', cellWidth: 'wrap', valign: 'middle', halign: 'center' },
-    headStyles: { fillColor: [30,32,35], textColor: 255, halign: 'center', valign: 'middle' },
-    alternateRowStyles: { fillColor: [245,245,245] },
-    tableWidth: 'auto', horizontalPageBreak: true,
-    margin: { left: 8, right: 8 }
-  });
+  if (processo === 'sopro') {
+    doc.autoTable({
+      head: [colunas], body: corpo, startY: 22,
+      styles: { fontSize: 7, cellPadding: 1.5, overflow: 'linebreak', cellWidth: 'wrap', valign: 'middle', halign: 'center' },
+      headStyles: { fillColor: [30,32,35], textColor: 255, halign: 'center', valign: 'middle' },
+      alternateRowStyles: { fillColor: [245,245,245] },
+      tableWidth: 'auto', horizontalPageBreak: true,
+      margin: { left: 8, right: 8 }
+    });
+  } else {
+    doc.autoTable({
+      head: [colunas], body: corpo, startY: 22,
+      styles: { fontSize: 6.5, cellPadding: 1.2, overflow: 'linebreak', cellWidth: 'wrap', valign: 'middle' },
+      headStyles: { fillColor: [30,32,35], textColor: 255, minCellHeight: 30, valign: 'bottom', halign: 'left' },
+      alternateRowStyles: { fillColor: [245,245,245] },
+      tableWidth: 'auto', horizontalPageBreak: true,
+      margin: { left: 8, right: 8 },
+      didParseCell: function(data) {
+        if (data.section === 'head') { data.cell.text = []; }
+      },
+      didDrawCell: function(data) {
+        if (data.section === 'head') {
+          const texto = colunas[data.column.index] || '';
+          doc.setFontSize(6.5);
+          doc.setTextColor(255, 255, 255);
+          const x = data.cell.x + 2;
+          const y = data.cell.y + data.cell.height - 2;
+          doc.text(texto, x, y, { angle: 90 });
+        }
+      }
+    });
+  }
 
   const nomeArquivo = 'inspecao_' + processo + '_' + hojeISO() + '.pdf';
   doc.save(nomeArquivo);
