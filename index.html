@@ -478,7 +478,7 @@
         <div class="card"><h3>Defeitos mais frequentes</h3><div class="chart-wrap"><canvas id="chartDefeitos"></canvas></div></div>
         <div class="card"><h3>Desvios por equipamento</h3><div class="chart-wrap"><canvas id="chartEquipamento"></canvas></div></div>
         <div class="card wide"><h3>Evolução diária</h3><div class="chart-wrap"><canvas id="chartEvolucao"></canvas></div></div>
-        <div class="card wide"><h3>Intervalo entre cadastros — últimas 48 horas</h3><div class="chart-wrap"><canvas id="chart48h"></canvas></div></div>
+        <div class="card wide"><h3>Intervalo entre inspeções — últimas 48 horas</h3><div class="chart-wrap"><canvas id="chart48h"></canvas></div></div>
         <div class="card"><h3>Criticidade</h3><div class="chart-wrap"><canvas id="chartCriticidade"></canvas></div></div>
         <div class="card"><h3>Corrigido vs. Pendente</h3><div class="chart-wrap"><canvas id="chartStatus"></canvas></div></div>
         <div class="card"><h3>Injeção vs. Sopro</h3><div class="chart-wrap"><canvas id="chartProcesso"></canvas></div></div>
@@ -1595,7 +1595,18 @@ function atualizarGrafico48h() {
     rotulosDate.push(new Date(base.getTime() - i * 3600000));
   }
   const labels = rotulosDate.map(function(d) {
-    return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + ' ' + String(d.getHours()).padStart(2,'0') + 'h';
+    return String(d.getHours()).padStart(2,'0') + 'h';
+  });
+  const gruposData = [];
+  rotulosDate.forEach(function(d, i) {
+    const chave = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
+    const rotulo = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+    const ultimo = gruposData[gruposData.length - 1];
+    if (!ultimo || ultimo.chave !== chave) {
+      gruposData.push({ chave: chave, label: rotulo, startIdx: i, endIdx: i });
+    } else {
+      ultimo.endIdx = i;
+    }
   });
   const contInj = new Array(48).fill(0);
   const contSop = new Array(48).fill(0);
@@ -1622,17 +1633,73 @@ function atualizarGrafico48h() {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const c = coresGrafico();
+
+  const pontoMaiorOndeHaInspecao = function(context) {
+    const v = context.raw;
+    return (v && v > 0) ? 5 : 2;
+  };
+  const pontoHoverMaiorOndeHaInspecao = function(context) {
+    const v = context.raw;
+    return (v && v > 0) ? 7 : 3;
+  };
+
+  const bandaDatasPlugin = {
+    id: 'bandaDatas',
+    afterDraw: function(chart, args, opts) {
+      const grupos = opts && opts.grupos;
+      if (!grupos || !grupos.length) return;
+      const xScale = chart.scales.x;
+      const chartArea = chart.chartArea;
+      const bandHeight = 18;
+      const bandTop = xScale.bottom - bandHeight;
+      const ctx = chart.ctx;
+      ctx.save();
+      ctx.font = '10px sans-serif';
+      ctx.fillStyle = opts.textColor || '#8b8f96';
+      ctx.strokeStyle = opts.lineColor || 'rgba(255,255,255,0.15)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.beginPath();
+      ctx.moveTo(chartArea.left, bandTop);
+      ctx.lineTo(chartArea.right, bandTop);
+      ctx.stroke();
+      grupos.forEach(function(g, idx) {
+        const pxStart = xScale.getPixelForTick(g.startIdx);
+        const pxEnd = xScale.getPixelForTick(g.endIdx);
+        const leftBound = idx === 0 ? chartArea.left : (xScale.getPixelForTick(g.startIdx - 1) + pxStart) / 2;
+        const rightBound = idx === grupos.length - 1 ? chartArea.right : (pxEnd + xScale.getPixelForTick(g.endIdx + 1)) / 2;
+        const centerX = (leftBound + rightBound) / 2;
+        ctx.fillText(g.label, centerX, bandTop + bandHeight / 2 + 1);
+        if (idx > 0) {
+          ctx.beginPath();
+          ctx.moveTo(leftBound, xScale.top);
+          ctx.lineTo(leftBound, xScale.bottom);
+          ctx.stroke();
+        }
+      });
+      ctx.restore();
+    }
+  };
+
   charts['chart48h'] = new Chart(ctx, {
     type: 'line',
     data: { labels: labels, datasets: [
-      { label: 'Injeção', data: contInj, borderColor: '#9c7bd9', backgroundColor: 'rgba(156,123,217,0.12)', fill: true, tension: 0.25, pointRadius: 2 },
-      { label: 'Sopro', data: contSop, borderColor: '#5b9bf2', backgroundColor: 'rgba(91,155,242,0.12)', fill: true, tension: 0.25, pointRadius: 2 }
+      { label: 'Injeção', data: contInj, borderColor: '#9c7bd9', backgroundColor: 'rgba(156,123,217,0.12)', fill: true, tension: 0.25, borderWidth: 1.5, pointRadius: pontoMaiorOndeHaInspecao, pointHoverRadius: pontoHoverMaiorOndeHaInspecao },
+      { label: 'Sopro', data: contSop, borderColor: '#5b9bf2', backgroundColor: 'rgba(91,155,242,0.12)', fill: true, tension: 0.25, borderWidth: 1.5, pointRadius: pontoMaiorOndeHaInspecao, pointHoverRadius: pontoHoverMaiorOndeHaInspecao }
     ] },
+    plugins: [bandaDatasPlugin],
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: true, labels: { color: c.legenda, boxWidth: 12, font: { size: 11 } } } },
+      plugins: {
+        legend: { display: true, labels: { color: c.legenda, boxWidth: 12, font: { size: 11 } } },
+        bandaDatas: { grupos: gruposData, textColor: c.tick, lineColor: c.grid }
+      },
       scales: {
-        x: { ticks: { color: c.tick, font: { size: 9 }, maxRotation: 60, minRotation: 45, autoSkip: true, maxTicksLimit: 12 }, grid: { display: false } },
+        x: {
+          ticks: { color: c.tick, font: { size: 9 }, maxRotation: 0, minRotation: 0, autoSkip: false },
+          grid: { display: false },
+          afterFit: function(scale) { scale.height += 18; }
+        },
         y: { ticks: { color: c.tick, precision: 0 }, grid: { color: c.grid }, beginAtZero: true }
       }
     }
