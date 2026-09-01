@@ -1835,10 +1835,10 @@ function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, li
   if (horaDeId && horaAteId) {
     const horaDe = document.getElementById(horaDeId).value;
     const horaAte = document.getElementById(horaAteId).value;
-    if (horaDe) linhas = linhas.filter(function(l){ return !l.hora_inicio || l.hora_inicio >= horaDe; });
-    if (horaAte) linhas = linhas.filter(function(l){ return !l.hora_inicio || l.hora_inicio <= horaAte; });
+    if (horaDe) linhas = linhas.filter(function(l){ return !l.hora_fim || l.hora_fim >= horaDe; });
+    if (horaAte) linhas = linhas.filter(function(l){ return !l.hora_fim || l.hora_fim <= horaAte; });
   }
-  linhas.sort(function(a,b){ return (b.data||'').localeCompare(a.data||'') || (b.hora_inicio||'').localeCompare(a.hora_inicio||''); });
+  linhas.sort(function(a,b){ return (b.data||'').localeCompare(a.data||'') || (b.hora_fim||'').localeCompare(a.hora_fim||''); });
   return linhas.slice(0, limite || 200);
 }
 
@@ -1860,7 +1860,7 @@ function renderTabelaSopro() {
       const statusUpper = (l.status_correcao||'').toUpperCase();
       const statusClasse = statusUpper.indexOf('PENDENTE') > -1 ? 'pendente' : statusUpper.indexOf('SEM DESVIO') > -1 ? 'semdesvio' : 'corrigido';
       return '<tr>' +
-        '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
+        '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_fim||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
         '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador||'—')+'</td>' + '<td>'+(l.tipo_frasco||'—')+'</td>' + '<td>'+(l.ml||'—')+'</td>' +
         '<td>'+(l.gramatura_preforma||'—')+'</td>' + '<td>'+(l.fornecedor_preforma||'—')+'</td>' + '<td>'+(l.lote_caixa||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+porExtenso(l.caixa_vermelha)+'</td>' + '<td>'+(l.motivo_caixa_vermelha||'—')+'</td>' +
         '<td>'+porExtenso(l.produto_rotulado)+'</td>' + '<td>'+badgeAprovadoReprovado(l.condicao_rotulo)+'</td>' +
@@ -1894,7 +1894,7 @@ function renderTabelaInjecao() {
     const statusUpper = (l.status_correcao||'').toUpperCase();
       const statusClasse = statusUpper.indexOf('PENDENTE') > -1 ? 'pendente' : statusUpper.indexOf('SEM DESVIO') > -1 ? 'semdesvio' : 'corrigido';
     return '<tr>' +
-      '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_inicio||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
+      '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_fim||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
       '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
       '<td>'+(l.gramatura||'—')+'</td>' + '<td>'+(l.resina||'—')+'</td>' +
       '<td>'+formatarTemperatura(l.temperatura_gate_min)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_gate_max)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_corpo_min)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_corpo_max)+'</td>' +
@@ -2008,14 +2008,14 @@ function gerarPDF(processo) {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500);
     colunas = ['Data','Hora','Equipamento','Responsável','Operador','Frasco','Volume','Preforma','Caixa Vermelha','Lote Caixa','Nº Caixa','Defeito Encontrado','Criticidade','Peso/Altura'];
     corpo = linhas.map(function(l) {
-      return [formatarDataBR(l.data), l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador||'—', l.tipo_frasco||'—',
+      return [formatarDataBR(l.data), l.hora_fim||'—', l.equipamento||'—', l.responsavel||'—', l.operador||'—', l.tipo_frasco||'—',
         l.ml||'—', l.gramatura_preforma||'—', porExtenso(l.caixa_vermelha), l.lote_caixa||'—', l.numero_caixa||'—', l.defeito||'—', l.criticidade||'—', formatarPesoAlturaTexto(l)];
     });
   } else {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500);
     colunas = ['Data','Hora','Equipamento','Resp.','Operador','Cor','Gramatura','Resina','Temperatura Gate Mín.','Temperatura Gate Máx.','Temperatura Corpo Mín.','Temperatura Corpo Máx.','Organização Linha','Tonalidade','Alinhamento Etiqueta','Defeito','Cavidade','Criticidade','Operador Ciente'];
     corpo = linhas.map(function(l) {
-      return [formatarDataBR(l.data), l.hora_inicio||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
+      return [formatarDataBR(l.data), l.hora_fim||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
         l.gramatura||'—', l.resina||'—', formatarTemperatura(l.temperatura_gate_min), formatarTemperatura(l.temperatura_gate_max), formatarTemperatura(l.temperatura_corpo_min), formatarTemperatura(l.temperatura_corpo_max),
         porExtenso(l.organizacao_linha_produtiva), porExtenso(l.tonalidade_preforma), porExtenso(l.alinhamento_etiqueta_caixa),
         l.defeito||'—', l.cavidade||'—', l.criticidade||'—', porExtenso(l.operador_ciente)];
