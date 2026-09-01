@@ -322,7 +322,7 @@
     .quick-actions { flex-direction: column; }
     .kpi-row { grid-template-columns: 1fr 1fr !important; }
 
-    .toolbar-field-busca { display: none; }
+    .toolbar-field-busca, .toolbar-field-hora, .campo-linhas { display: none; }
     .toolbar-field { width: 100%; flex: 1 1 100%; }
     .table-toolbar input[type=date], .table-toolbar input[type=time], .table-toolbar select {
       width: 100%; flex: 1 1 100%;
@@ -383,12 +383,25 @@
       <div class="card card-ocorrencias">
         <h3>Últimas ocorrências — Sopro</h3>
         <div class="table-toolbar">
-          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 220px;"><label>Buscar</label><input type="text" id="tBuscaSopro" placeholder="Defeito, máquina, responsável…" oninput="renderTabelaSopro()" style="min-width:220px; width:100%;"></div>
+          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 140px;"><label>Buscar</label><input type="text" id="tBuscaSopro" placeholder="Defeito, máquina…" oninput="renderTabelaSopro()" style="min-width:140px; width:100%;"></div>
           <div class="toolbar-field"><label>Data inicial</label><input type="date" id="tDataDeSopro" onchange="renderTabelaSopro()"></div>
           <div class="toolbar-field"><label>Data final</label><input type="date" id="tDataAteSopro" onchange="renderTabelaSopro()"></div>
-          <div class="toolbar-field"><label>Horário inicial</label><input type="time" id="tHoraDeSopro" onchange="renderTabelaSopro()"></div>
-          <div class="toolbar-field"><label>Horário final</label><input type="time" id="tHoraAteSopro" onchange="renderTabelaSopro()"></div>
-          <select id="tLimiteSopro" onchange="renderTabelaSopro()">
+          <div class="toolbar-field toolbar-field-hora"><label>Horário inicial</label><input type="time" id="tHoraDeSopro" onchange="renderTabelaSopro()"></div>
+          <div class="toolbar-field toolbar-field-hora"><label>Horário final</label><input type="time" id="tHoraAteSopro" onchange="renderTabelaSopro()"></div>
+          <select id="tCadastrosSopro" onchange="renderTabelaSopro()">
+            <option value="">Todos os cadastros</option>
+            <option value="1">Último 1 cadastro</option>
+            <option value="2">Últimos 2 cadastros</option>
+            <option value="3">Últimos 3 cadastros</option>
+            <option value="4">Últimos 4 cadastros</option>
+            <option value="5">Últimos 5 cadastros</option>
+            <option value="6">Últimos 6 cadastros</option>
+            <option value="7">Últimos 7 cadastros</option>
+            <option value="8">Últimos 8 cadastros</option>
+            <option value="9">Últimos 9 cadastros</option>
+            <option value="10">Últimos 10 cadastros</option>
+          </select>
+          <select id="tLimiteSopro" class="campo-linhas" onchange="renderTabelaSopro()">
             <option value="5">5 linhas</option>
             <option value="10">10 linhas</option>
             <option value="15">15 linhas</option>
@@ -422,12 +435,25 @@
       <div class="card card-ocorrencias">
         <h3>Últimas ocorrências — Injeção</h3>
         <div class="table-toolbar">
-          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 220px;"><label>Buscar</label><input type="text" id="tBuscaInjecao" placeholder="Defeito, máquina, responsável…" oninput="renderTabelaInjecao()" style="min-width:220px; width:100%;"></div>
+          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 140px;"><label>Buscar</label><input type="text" id="tBuscaInjecao" placeholder="Defeito, máquina…" oninput="renderTabelaInjecao()" style="min-width:140px; width:100%;"></div>
           <div class="toolbar-field"><label>Data inicial</label><input type="date" id="tDataDeInjecao" onchange="renderTabelaInjecao()"></div>
           <div class="toolbar-field"><label>Data final</label><input type="date" id="tDataAteInjecao" onchange="renderTabelaInjecao()"></div>
-          <div class="toolbar-field"><label>Horário inicial</label><input type="time" id="tHoraDeInjecao" onchange="renderTabelaInjecao()"></div>
-          <div class="toolbar-field"><label>Horário final</label><input type="time" id="tHoraAteInjecao" onchange="renderTabelaInjecao()"></div>
-          <select id="tLimiteInjecao" onchange="renderTabelaInjecao()">
+          <div class="toolbar-field toolbar-field-hora"><label>Horário inicial</label><input type="time" id="tHoraDeInjecao" onchange="renderTabelaInjecao()"></div>
+          <div class="toolbar-field toolbar-field-hora"><label>Horário final</label><input type="time" id="tHoraAteInjecao" onchange="renderTabelaInjecao()"></div>
+          <select id="tCadastrosInjecao" onchange="renderTabelaInjecao()">
+            <option value="">Todos os cadastros</option>
+            <option value="1">Último 1 cadastro</option>
+            <option value="2">Últimos 2 cadastros</option>
+            <option value="3">Últimos 3 cadastros</option>
+            <option value="4">Últimos 4 cadastros</option>
+            <option value="5">Últimos 5 cadastros</option>
+            <option value="6">Últimos 6 cadastros</option>
+            <option value="7">Últimos 7 cadastros</option>
+            <option value="8">Últimos 8 cadastros</option>
+            <option value="9">Últimos 9 cadastros</option>
+            <option value="10">Últimos 10 cadastros</option>
+          </select>
+          <select id="tLimiteInjecao" class="campo-linhas" onchange="renderTabelaInjecao()">
             <option value="5">5 linhas</option>
             <option value="10">10 linhas</option>
             <option value="15">15 linhas</option>
@@ -1711,11 +1737,13 @@ function limparFiltros() {
   document.getElementById('tDataAteSopro').value = '';
   document.getElementById('tHoraDeSopro').value = '';
   document.getElementById('tHoraAteSopro').value = '';
+  document.getElementById('tCadastrosSopro').value = '';
   document.getElementById('tBuscaInjecao').value = '';
   document.getElementById('tDataDeInjecao').value = '';
   document.getElementById('tDataAteInjecao').value = '';
   document.getElementById('tHoraDeInjecao').value = '';
   document.getElementById('tHoraAteInjecao').value = '';
+  document.getElementById('tCadastrosInjecao').value = '';
   atualizarDashboard();
 }
 
@@ -2012,7 +2040,7 @@ function formatarPesoAlturaTexto(l) {
   return partes.length ? partes.join('\n') : '—';
 }
 
-function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, limite, horaDeId, horaAteId) {
+function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, limite, horaDeId, horaAteId, cadastrosId) {
   const busca = (document.getElementById(buscaId).value || '').toLowerCase().trim();
   if (busca) {
     linhas = linhas.filter(function(l) {
@@ -2030,6 +2058,23 @@ function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, li
     if (horaAte) linhas = linhas.filter(function(l){ return !l.hora_fim || l.hora_fim <= horaAte; });
   }
   linhas.sort(function(a,b){ return (b.data||'').localeCompare(a.data||'') || (b.hora_fim||'').localeCompare(a.hora_fim||''); });
+
+  const qtdCadastros = cadastrosId ? parseInt((document.getElementById(cadastrosId) || {}).value, 10) : NaN;
+  if (qtdCadastros > 0) {
+    // Filtra pelos últimos N CADASTROS (sessões), não linhas soltas — uma sessão com vários
+    // desvios entra inteira. Quando esse filtro está ativo, ele manda mais que "Linhas".
+    const sessoesPermitidas = {};
+    let contagem = 0;
+    for (let i = 0; i < linhas.length && contagem < qtdCadastros; i++) {
+      const chave = linhas[i].id_sessao || (linhas[i].equipamento + '|' + linhas[i].data + '|' + linhas[i].hora_fim);
+      if (!sessoesPermitidas[chave]) { sessoesPermitidas[chave] = true; contagem++; }
+    }
+    return linhas.filter(function(l) {
+      const chave = l.id_sessao || (l.equipamento + '|' + l.data + '|' + l.hora_fim);
+      return sessoesPermitidas[chave];
+    });
+  }
+
   return linhas.slice(0, limite || 200);
 }
 
@@ -2040,7 +2085,7 @@ function renderTabelaSopro() {
   setTimeout(function() {
     let linhas = linhasFiltradasPorProcesso('sopro');
     const limite = parseInt(document.getElementById('tLimiteSopro').value, 10);
-    linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], limite, 'tHoraDeSopro', 'tHoraAteSopro');
+    linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], limite, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
 
     const corpo = document.getElementById('tabelaSoproBody');
     const vazio = document.getElementById('tabelaSoproVazia');
@@ -2074,7 +2119,7 @@ function renderTabelaInjecao() {
   setTimeout(function() {
   let linhas = linhasFiltradasPorProcesso('injecao');
   const limite = parseInt(document.getElementById('tLimiteInjecao').value, 10);
-  linhas = filtrarBuscaEData(linhas, 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], limite, 'tHoraDeInjecao', 'tHoraAteInjecao');
+  linhas = filtrarBuscaEData(linhas, 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], limite, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
 
   const corpo = document.getElementById('tabelaInjecaoBody');
   const vazio = document.getElementById('tabelaInjecaoVazia');
@@ -2133,9 +2178,9 @@ function formatarCavidadesWpp(valor) {
 function gerarWhatsApp(processo) {
   let linhas;
   if (processo === 'sopro') {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500);
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
   } else {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500);
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
   }
 
   if (linhas.length === 0) { mostrarToast('Nenhuma ocorrência para gerar o texto.', true); return; }
@@ -2196,14 +2241,14 @@ function gerarPDF(processo) {
 
   let linhas, colunas, corpo;
   if (processo === 'sopro') {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500);
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
     colunas = ['Data','Hora','Equipamento','Responsável','Operador','Frasco','Volume','Preforma','Caixa Vermelha','Lote Caixa','Nº Caixa','Defeito Encontrado','Criticidade','Peso/Altura'];
     corpo = linhas.map(function(l) {
       return [formatarDataBR(l.data), l.hora_fim||'—', l.equipamento||'—', l.responsavel||'—', l.operador||'—', l.tipo_frasco||'—',
         l.ml||'—', l.gramatura_preforma||'—', porExtenso(l.caixa_vermelha), l.lote_caixa||'—', l.numero_caixa||'—', l.defeito||'—', l.criticidade||'—', formatarPesoAlturaTexto(l)];
     });
   } else {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500);
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
     colunas = ['Data','Hora','Equipamento','Resp.','Operador','Cor','Gramatura','Resina','Temperatura Gate Mín.','Temperatura Gate Máx.','Temperatura Corpo Mín.','Temperatura Corpo Máx.','Organização Linha','Tonalidade','Alinhamento Etiqueta','Defeito','Cavidade','Criticidade','Operador Ciente'];
     corpo = linhas.map(function(l) {
       return [formatarDataBR(l.data), l.hora_fim||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
