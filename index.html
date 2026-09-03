@@ -291,6 +291,31 @@
   .revisao-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 4px; }
   .revisao-acoes .btn { padding: 14px; font-size: 15px; }
 
+  /* ---------- Pergunta: enviar cadastro salvo por WhatsApp? ---------- */
+  .wa-confirma-overlay {
+    position: fixed; inset: 0; z-index: 150; background: rgba(0,0,0,0.55);
+    display: flex; align-items: center; justify-content: center; padding: 24px;
+  }
+  .wa-confirma-overlay.hidden { display: none; }
+  .wa-confirma-card {
+    width: 100%; max-width: 420px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px 28px 26px; text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45);
+  }
+  .wa-confirma-icon {
+    width: 56px; height: 56px; border-radius: 50%; margin: 0 auto 18px;
+    background: rgba(63,182,139,0.15); color: var(--ok);
+    display: flex; align-items: center; justify-content: center; font-size: 28px;
+  }
+  .wa-confirma-titulo { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text); margin: 0 0 8px; text-transform: none; }
+  .wa-confirma-sub { font-size: 13.5px; color: var(--text-dim); margin: 0 0 26px; line-height: 1.5; }
+  .wa-confirma-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .wa-confirma-acoes .btn { padding: 13px; font-size: 14.5px; }
+
+  /* ---------- Tabelas "Últimas Ocorrências": altura fixa (~15 linhas) com rolagem vertical ---------- */
+  .table-scroll { max-height: 550px; overflow-y: auto; }
+  .occ-table thead th { position: sticky; top: 0; background: var(--surface); z-index: 2; }
+
   @media (max-width: 900px) {
     .charts-grid { grid-template-columns: 1fr; }
 
@@ -349,6 +374,18 @@
     <span class="mark">INSPEÇÃO</span>
   </div>
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="fecharMenuMobile()"></div>
+
+  <div class="wa-confirma-overlay hidden" id="waConfirmaOverlay">
+    <div class="wa-confirma-card">
+      <div class="wa-confirma-icon">✓</div>
+      <h2 class="wa-confirma-titulo">Cadastro salvo com sucesso!</h2>
+      <p class="wa-confirma-sub">Deseja enviar esse cadastro por WhatsApp agora?</p>
+      <div class="wa-confirma-acoes">
+        <button class="btn btn-outline btn-block" onclick="responderPerguntaWhatsApp(false)">Não</button>
+        <button class="btn btn-accent btn-block" onclick="responderPerguntaWhatsApp(true)">🟢 Sim, enviar</button>
+      </div>
+    </div>
+  </div>
 
   <div class="sidebar" id="sidebar">
     <div class="sidebar-brand"><span class="mark">INSPEÇÃO</span><span class="dot" id="statusDotSide"></span></div>
@@ -410,6 +447,8 @@
             <option value="30">30 linhas</option>
             <option value="35">35 linhas</option>
             <option value="50">50 linhas</option>
+            <option value="100">100 linhas</option>
+            <option value="todos">Todas as linhas</option>
           </select>
           <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('sopro')">🟢 WhatsApp</button>
           <button class="btn btn-outline" onclick="gerarPDF('sopro')">📄 PDF</button>
@@ -462,6 +501,8 @@
             <option value="30">30 linhas</option>
             <option value="35">35 linhas</option>
             <option value="50">50 linhas</option>
+            <option value="100">100 linhas</option>
+            <option value="todos">Todas as linhas</option>
           </select>
           <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('injecao')">🟢 WhatsApp</button>
           <button class="btn btn-outline" onclick="gerarPDF('injecao')">📄 PDF</button>
@@ -1645,7 +1686,7 @@ async function confirmarSalvarSessao(processo) {
       document.getElementById(revisaoId).classList.add('hidden');
       document.getElementById(revisaoId).innerHTML = '';
       document.getElementById(areaId).classList.remove('hidden');
-      setPage('dashboard');
+      abrirPerguntaWhatsApp(processo, linhasObj);
     } else {
       const json = await resp.json();
       mostrarToast('Erro ao salvar: ' + (json.error ? json.error.message : resp.status), true);
@@ -2084,7 +2125,8 @@ function renderTabelaSopro() {
   loading.classList.remove('hidden');
   setTimeout(function() {
     let linhas = linhasFiltradasPorProcesso('sopro');
-    const limite = parseInt(document.getElementById('tLimiteSopro').value, 10);
+    const limiteValorSopro = document.getElementById('tLimiteSopro').value;
+    const limite = limiteValorSopro === 'todos' ? Infinity : parseInt(limiteValorSopro, 10);
     linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], limite, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
 
     const corpo = document.getElementById('tabelaSoproBody');
@@ -2118,7 +2160,8 @@ function renderTabelaInjecao() {
   loading.classList.remove('hidden');
   setTimeout(function() {
   let linhas = linhasFiltradasPorProcesso('injecao');
-  const limite = parseInt(document.getElementById('tLimiteInjecao').value, 10);
+  const limiteValorInjecao = document.getElementById('tLimiteInjecao').value;
+  const limite = limiteValorInjecao === 'todos' ? Infinity : parseInt(limiteValorInjecao, 10);
   linhas = filtrarBuscaEData(linhas, 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], limite, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
 
   const corpo = document.getElementById('tabelaInjecaoBody');
@@ -2175,16 +2218,7 @@ function formatarCavidadesWpp(valor) {
   return v.split(';').filter(Boolean).join(', ') || '—';
 }
 
-function gerarWhatsApp(processo) {
-  let linhas;
-  if (processo === 'sopro') {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
-  } else {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
-  }
-
-  if (linhas.length === 0) { mostrarToast('Nenhuma ocorrência para gerar o texto.', true); return; }
-
+function montarTextoWhatsApp(processo, linhas) {
   const grupos = agruparPorSessao(linhas);
   const agora = new Date();
   const dataHora = String(agora.getDate()).padStart(2,'0') + '/' + String(agora.getMonth()+1).padStart(2,'0') + '/' + agora.getFullYear() + ' - ' + String(agora.getHours()).padStart(2,'0') + ':' + String(agora.getMinutes()).padStart(2,'0');
@@ -2223,10 +2257,44 @@ function gerarWhatsApp(processo) {
       if (idx < grupos.length - 1) texto += '\n';
     });
   }
+  return texto;
+}
 
+function gerarWhatsApp(processo) {
+  let linhas;
+  if (processo === 'sopro') {
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
+  } else {
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
+  }
+
+  if (linhas.length === 0) { mostrarToast('Nenhuma ocorrência para gerar o texto.', true); return; }
+
+  const texto = montarTextoWhatsApp(processo, linhas);
   navigator.clipboard.writeText(texto).catch(function(){});
   window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
   mostrarToast('Texto copiado — abrindo o WhatsApp…');
+}
+
+/* ---------------- Pergunta: enviar cadastro recém-salvo por WhatsApp? ---------------- */
+let waPendente = null;
+
+function abrirPerguntaWhatsApp(processo, linhasObj) {
+  waPendente = { processo: processo, linhasObj: linhasObj };
+  document.getElementById('waConfirmaOverlay').classList.remove('hidden');
+}
+
+function responderPerguntaWhatsApp(enviar) {
+  document.getElementById('waConfirmaOverlay').classList.add('hidden');
+  const pendente = waPendente;
+  waPendente = null;
+  if (enviar && pendente && pendente.linhasObj && pendente.linhasObj.length > 0) {
+    const texto = montarTextoWhatsApp(pendente.processo, pendente.linhasObj);
+    navigator.clipboard.writeText(texto).catch(function(){});
+    window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank');
+    mostrarToast('Texto copiado — abrindo o WhatsApp…');
+  }
+  setPage('dashboard');
 }
 
 function gerarPDF(processo) {
