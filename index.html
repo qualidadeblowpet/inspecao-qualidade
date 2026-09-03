@@ -106,6 +106,8 @@
   .conn-label { font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 6px; }
   .quick-actions { display: flex; gap: 10px; margin-bottom: 16px; }
   .quick-actions .btn { flex: 1; }
+  .quick-actions .filter-clear, .quick-actions .btn-outline { flex: 0 0 auto; }
+  .quick-actions .btn-outline { align-self: flex-end; }
   .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); display: inline-block; }
   .status-dot.online { background: var(--ok); box-shadow: 0 0 5px var(--ok); }
   .status-dot.offline { background: var(--danger); box-shadow: 0 0 5px var(--danger); }
@@ -345,6 +347,7 @@
     .filter-group select { min-width: 0; width: 100%; }
     .filter-clear { align-self: stretch; margin-left: 0; }
     .quick-actions { flex-direction: column; }
+    .quick-actions .btn-outline { align-self: stretch; }
     .kpi-row { grid-template-columns: 1fr 1fr !important; }
 
     .toolbar-field-busca, .toolbar-field-hora, .campo-linhas { display: none; }
@@ -415,6 +418,8 @@
       <div class="quick-actions">
         <button class="btn btn-accent" onclick="setPage('cadastroInjecao')">+ Cadastro Injeção</button>
         <button class="btn btn-accent" onclick="setPage('cadastroSopro')">+ Cadastro Sopro</button>
+        <button class="filter-clear" onclick="limparFiltros()">Limpar filtros</button>
+        <button class="btn btn-outline" onclick="carregarDados(true)">↻ Atualizar</button>
       </div>
 
       <div class="card card-ocorrencias">
