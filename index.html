@@ -1201,7 +1201,7 @@ function renderFormInjecao() {
     '<div class="card"><h3>Dados da sessão</h3>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Data</label><input type="date" id="inj_data"></div>' +
-        '<div class="field"><label>Equipamento</label>'+'<select id="inj_equipamento" onchange="atualizarAlertaMaquina(\'injecao\')"></select>'+'</div>' +
+        '<div class="field"><label>Equipamento</label>'+'<select id="inj_equipamento" onchange="atualizarAlertaMaquina(\'injecao\'); carregarDados();"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-2 hidden">' +
         '<div class="field"><label>Hora início</label><input type="time" id="inj_hora_inicio"></div>' +
@@ -1254,7 +1254,7 @@ function renderFormSopro() {
     '<div class="card"><h3>Dados da sessão</h3>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Data</label><input type="date" id="sop_data"></div>' +
-        '<div class="field"><label>Equipamento</label>'+'<select id="sop_equipamento" onchange="atualizarAlertaMaquina(\'sopro\')"></select>'+'</div>' +
+        '<div class="field"><label>Equipamento</label>'+'<select id="sop_equipamento" onchange="atualizarAlertaMaquina(\'sopro\'); carregarDados();"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-2 hidden">' +
         '<div class="field"><label>Hora início</label><input type="time" id="sop_hora_inicio"></div>' +
