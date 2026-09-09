@@ -179,6 +179,34 @@
   .badge.proc-injecao { background: rgba(91,155,242,0.15); color: var(--blue); }
   .badge.proc-sopro { background: rgba(156,123,217,0.15); color: var(--purple); }
   .table-empty { text-align: center; padding: 30px; color: var(--text-dim); font-size: 13px; }
+
+  /* ---------- Análise do período por máquina ---------- */
+  .analise-topo { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .analise-sub { font-size: 12px; color: var(--text-dim); margin: -6px 0 16px; }
+  .analise-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+  .analise-secao-titulo { font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin: 4px 0 12px; }
+  .analise-vazio { color: var(--text-dim); font-size: 13px; padding: 18px 0; text-align: center; }
+  .analise-maquina { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
+  .analise-maquina-topo { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
+  .analise-maquina-nome { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .analise-tendencia { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .analise-tendencia.up { background: rgba(229,72,77,0.15); color: var(--danger); }
+  .analise-tendencia.down { background: rgba(63,182,139,0.15); color: var(--ok); }
+  .analise-tendencia.stable { background: rgba(155,160,168,0.15); color: var(--text-dim); }
+  .analise-stats { display: flex; gap: 28px; margin-bottom: 6px; }
+  .analise-stat .label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+  .analise-stat .num { font-family: var(--font-display); font-size: 20px; font-weight: 700; }
+  .analise-bloco { margin-top: 14px; }
+  .analise-bloco-titulo { font-size: 10.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .analise-defeito-linha { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .analise-defeito-linha:last-child { border-bottom: none; }
+  .analise-def-nome { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .analise-def-direita { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+  .analise-def-vol { color: var(--text-dim); font-size: 12px; }
+  .analise-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .analise-tag { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px; font-size: 12px; }
+  .analise-tag b { font-weight: 700; }
+  .analise-tag.cav-destaque { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); font-weight: 700; }
   .tabela-loading {
     position: absolute; inset: 0; z-index: 5;
     background: rgba(12,13,15,0.6); display: flex; align-items: center; justify-content: center;
@@ -349,6 +377,11 @@
     .quick-actions { flex-direction: column; }
     .quick-actions .btn-outline { align-self: stretch; }
     .kpi-row { grid-template-columns: 1fr 1fr !important; }
+    .analise-kpis { grid-template-columns: 1fr 1fr !important; }
+    .analise-topo { flex-direction: column; align-items: stretch; }
+    .analise-topo button { align-self: stretch; }
+    .analise-maquina-topo { flex-direction: column; align-items: flex-start; }
+    .analise-stats { gap: 20px; }
 
     .toolbar-field-busca, .toolbar-field-hora, .campo-linhas { display: none; }
     .toolbar-field { width: 100%; flex: 1 1 100%; }
@@ -479,6 +512,14 @@
         <div class="card"><h3>Corrigido vs. Pendente</h3><div class="chart-wrap"><canvas id="chartStatus"></canvas></div></div>
         <div class="card"><h3>Injeção vs. Sopro</h3><div class="chart-wrap"><canvas id="chartProcesso"></canvas></div></div>
         <div class="card"><h3>Desvios por responsável</h3><div class="chart-wrap"><canvas id="chartResponsavel"></canvas></div></div>
+      </div>
+
+      <div class="card">
+        <div class="analise-topo">
+          <h3 style="margin:0;">Análise do período por máquina</h3>
+          <button class="btn btn-outline" onclick="gerarAnaliseIA()">🔎 Analisar período</button>
+        </div>
+        <div id="analiseResultado"><div class="analise-vazio">Clique em "Analisar período" para gerar um resumo dos dados filtrados acima, separado por máquina.</div></div>
       </div>
     </div>
 
@@ -2068,6 +2109,215 @@ function atualizarDashboard() {
 
   renderTabelaSopro();
   renderTabelaInjecao();
+  resetAnaliseIA();
+}
+
+/* ---------------- Análise do período por máquina (Opção A: local, sem IA externa) ---------------- */
+function resetAnaliseIA() {
+  const el = document.getElementById('analiseResultado');
+  if (!el) return;
+  el.innerHTML = '<div class="analise-vazio">Clique em "Analisar período" para gerar um resumo dos dados filtrados acima, separado por máquina.</div>';
+}
+
+function chaveSessao(l) {
+  return l.id_sessao || (l.equipamento + '|' + l.data + '|' + l.hora_fim);
+}
+
+function contarSessoesUnicas(linhas) {
+  return new Set(linhas.map(chaveSessao)).size;
+}
+
+function chaveProduto(l) {
+  if (l.processo === 'sopro') {
+    return (l.tipo_frasco || '—') + (l.ml ? ' · ' + l.ml + ' mL' : '');
+  }
+  return (l.cor || '—') + (l.gramatura ? ' · ' + l.gramatura + 'g' : '');
+}
+
+function produtosInspecionados(linhasMaquina) {
+  const porChave = {};
+  linhasMaquina.forEach(function(l) {
+    const chave = chaveProduto(l);
+    if (!porChave[chave]) porChave[chave] = new Set();
+    porChave[chave].add(chaveSessao(l));
+  });
+  return Object.keys(porChave).map(function(chave) {
+    return { produto: chave, cadastros: porChave[chave].size };
+  }).sort(function(a, b) { return b.cadastros - a.cadastros; });
+}
+
+function top3Defeitos(desviosMaquina) {
+  const porDefeito = {};
+  desviosMaquina.forEach(function(l) {
+    const nome = l.defeito || '—';
+    if (!porDefeito[nome]) porDefeito[nome] = { qtd: 0, criticidades: {} };
+    porDefeito[nome].qtd++;
+    const crit = (l.criticidade || '—').toUpperCase();
+    porDefeito[nome].criticidades[crit] = (porDefeito[nome].criticidades[crit] || 0) + 1;
+  });
+  return Object.keys(porDefeito).map(function(nome) {
+    const info = porDefeito[nome];
+    const critPrincipal = Object.entries(info.criticidades).sort(function(a, b) { return b[1] - a[1]; })[0][0];
+    return { nome: nome, qtd: info.qtd, criticidade: critPrincipal };
+  }).sort(function(a, b) { return b.qtd - a.qtd; }).slice(0, 3);
+}
+
+function cavidadesRecorrentes(desviosMaquina) {
+  const porCavidade = {};
+  desviosMaquina.forEach(function(l) {
+    const bruto = (l.cavidade || '').toString().trim();
+    if (!bruto || bruto.toUpperCase() === 'TODAS') return;
+    bruto.split(';').map(function(c) { return c.trim(); }).filter(Boolean).forEach(function(cav) {
+      if (!porCavidade[cav]) porCavidade[cav] = { qtd: 0, defeitos: {} };
+      porCavidade[cav].qtd++;
+      const nomeDefeito = l.defeito || '—';
+      porCavidade[cav].defeitos[nomeDefeito] = (porCavidade[cav].defeitos[nomeDefeito] || 0) + 1;
+    });
+  });
+  return Object.keys(porCavidade).map(function(cav) {
+    const info = porCavidade[cav];
+    const defeitoPrincipal = Object.entries(info.defeitos).sort(function(a, b) { return b[1] - a[1]; })[0][0];
+    return { cavidade: cav, qtd: info.qtd, defeito: defeitoPrincipal };
+  }).sort(function(a, b) { return b.qtd - a.qtd; }).slice(0, 4);
+}
+
+function contarDesviosJanela(equip, diasIni, diasFim) {
+  const agora = new Date();
+  const limiteFim = new Date(agora); limiteFim.setDate(limiteFim.getDate() - diasFim); limiteFim.setHours(0, 0, 0, 0);
+  const limiteIni = new Date(agora); limiteIni.setDate(limiteIni.getDate() - diasIni); limiteIni.setHours(0, 0, 0, 0);
+  let base = dadosCache.injecao.concat(dadosCache.sopro).filter(function(l) { return l.equipamento === equip && l.defeito; });
+  const resp = document.getElementById('fResponsavel').value;
+  if (resp) base = base.filter(function(l) { return l.responsavel === resp; });
+  const crit = document.getElementById('fCriticidade').value;
+  if (crit) base = base.filter(function(l) { return (l.criticidade || '').toUpperCase() === crit; });
+  return base.filter(function(l) {
+    if (!l.data) return false;
+    const d = new Date(l.data);
+    return d >= limiteIni && d < limiteFim;
+  }).length;
+}
+
+function tendenciaMaquina(equip, dias) {
+  if (!dias) return null;
+  const atual = contarDesviosJanela(equip, dias, 0);
+  const anterior = contarDesviosJanela(equip, dias * 2, dias);
+  return atual - anterior;
+}
+
+function formatarDataBRDate(d) {
+  return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
+}
+
+function renderCardMaquina(equip, todasLinhasFiltro, dias) {
+  const linhasMaquina = todasLinhasFiltro.filter(function(l) { return l.equipamento === equip; });
+  const desviosMaquina = linhasMaquina.filter(function(l) { return l.defeito; });
+  const cadastros = contarSessoesUnicas(linhasMaquina);
+  const isInjecao = linhasMaquina.length && linhasMaquina[0].processo === 'injecao';
+  const procLabel = isInjecao ? 'Injeção' : 'Sopro';
+  const procBadgeClasse = isInjecao ? 'proc-injecao' : 'proc-sopro';
+
+  const trend = tendenciaMaquina(equip, dias);
+  let trendHtml;
+  if (trend === null) {
+    trendHtml = '<span class="analise-tendencia stable">— sem período de comparação</span>';
+  } else if (trend > 0) {
+    trendHtml = '<span class="analise-tendencia up">▲ +' + trend + ' vs. período anterior</span>';
+  } else if (trend < 0) {
+    trendHtml = '<span class="analise-tendencia down">▼ ' + trend + ' vs. período anterior</span>';
+  } else {
+    trendHtml = '<span class="analise-tendencia stable">= estável vs. período anterior</span>';
+  }
+
+  const top3 = top3Defeitos(desviosMaquina);
+  const critClasse = function(c) { return c === 'GRAVE' ? 'grave' : c === 'MÉDIO' ? 'medio' : 'leve'; };
+  const top3Html = top3.length ? top3.map(function(d, i) {
+    return '<div class="analise-defeito-linha">' +
+      '<div class="analise-def-nome">' + (i + 1) + '. ' + d.nome + '</div>' +
+      '<div class="analise-def-direita"><span class="analise-def-vol">' + d.qtd + 'x</span><span class="badge ' + critClasse(d.criticidade) + '">' + d.criticidade + '</span></div>' +
+    '</div>';
+  }).join('') : '<div class="analise-vazio" style="padding:8px 0;">Sem desvios no período.</div>';
+
+  const produtos = produtosInspecionados(linhasMaquina);
+  const produtosHtml = produtos.length ? '<div class="analise-tags">' + produtos.map(function(p) {
+    return '<span class="analise-tag"><b>' + p.produto + '</b> — ' + p.cadastros + ' cadastro' + (p.cadastros === 1 ? '' : 's') + '</span>';
+  }).join('') + '</div>' : '<div class="analise-vazio" style="padding:8px 0;">Nenhum produto identificado.</div>';
+
+  let cavidadesHtml = '';
+  if (isInjecao) {
+    const cavidades = cavidadesRecorrentes(desviosMaquina);
+    cavidadesHtml = '<div class="analise-bloco"><div class="analise-bloco-titulo">Cavidades que mais repetiram defeitos</div>' +
+      (cavidades.length ? '<div class="analise-tags">' + cavidades.map(function(c, i) {
+        return '<span class="analise-tag' + (i === 0 ? ' cav-destaque' : '') + '">Cav. ' + c.cavidade + ' — ' + c.qtd + ' ocorrência' + (c.qtd === 1 ? '' : 's') + ' (' + c.defeito + ')</span>';
+      }).join('') + '</div>' : '<div class="analise-vazio" style="padding:8px 0;">Sem cavidades recorrentes no período.</div>') +
+    '</div>';
+  }
+
+  return '<div class="analise-maquina">' +
+    '<div class="analise-maquina-topo">' +
+      '<div class="analise-maquina-nome">' + equip + ' <span class="badge ' + procBadgeClasse + '">' + procLabel + '</span></div>' +
+      trendHtml +
+    '</div>' +
+    '<div class="analise-stats">' +
+      '<div class="analise-stat"><div class="label">Cadastros</div><div class="num">' + cadastros + '</div></div>' +
+      '<div class="analise-stat"><div class="label">Desvios</div><div class="num">' + desviosMaquina.length + '</div></div>' +
+    '</div>' +
+    '<div class="analise-bloco"><div class="analise-bloco-titulo">Top 3 defeitos no período</div>' + top3Html + '</div>' +
+    '<div class="analise-bloco"><div class="analise-bloco-titulo">Produtos inspecionados</div>' + produtosHtml + '</div>' +
+    cavidadesHtml +
+  '</div>';
+}
+
+function gerarAnaliseIA() {
+  const el = document.getElementById('analiseResultado');
+  if (!el || !itemId) return;
+
+  const proc = document.getElementById('fProcesso').value;
+  let base = proc === 'injecao' ? dadosCache.injecao.slice() : proc === 'sopro' ? dadosCache.sopro.slice() : dadosCache.injecao.concat(dadosCache.sopro);
+  const todasLinhas = aplicarFiltrosComuns(base, true);
+  const linhasDesvio = todasLinhas.filter(function(l) { return l.defeito; });
+
+  if (!todasLinhas.length) {
+    el.innerHTML = '<div class="analise-vazio">Nenhum cadastro encontrado para os filtros atuais.</div>';
+    return;
+  }
+
+  const dias = parseInt(document.getElementById('fPeriodo').value, 10) || 0;
+  const procTexto = document.getElementById('fProcesso').selectedOptions[0].text;
+  const periodoTexto = document.getElementById('fPeriodo').selectedOptions[0].text;
+  let periodoRange = periodoTexto;
+  if (dias) {
+    const agora = new Date();
+    const ini = new Date(agora); ini.setDate(ini.getDate() - dias);
+    periodoRange = formatarDataBRDate(ini) + ' a ' + formatarDataBRDate(agora) + ' (' + periodoTexto + ')';
+  }
+  let ultimoCadastro = null;
+  todasLinhas.forEach(function(l) {
+    if (!l.criado_em) return;
+    const d = new Date(l.criado_em);
+    if (!isNaN(d.getTime()) && (!ultimoCadastro || d > ultimoCadastro)) ultimoCadastro = d;
+  });
+  const ultimoCadastroTexto = ultimoCadastro ? formatarDataBRDate(ultimoCadastro) + ' às ' + String(ultimoCadastro.getHours()).padStart(2, '0') + ':' + String(ultimoCadastro.getMinutes()).padStart(2, '0') : '—';
+
+  const cadastros = contarSessoesUnicas(todasLinhas);
+  const graves = linhasDesvio.filter(function(l) { return (l.criticidade || '').toUpperCase() === 'GRAVE'; }).length;
+
+  const equipamentos = Array.from(new Set(todasLinhas.map(function(l) { return l.equipamento; }).filter(Boolean)));
+  equipamentos.sort(function(a, b) {
+    const da = todasLinhas.filter(function(l) { return l.equipamento === a && l.defeito; }).length;
+    const db = todasLinhas.filter(function(l) { return l.equipamento === b && l.defeito; }).length;
+    return db - da || a.localeCompare(b);
+  });
+
+  let html = '<p class="analise-sub">Período: ' + periodoRange + ' · Processo: ' + procTexto + ' · Gerado a partir do último cadastro em ' + ultimoCadastroTexto + '</p>';
+  html += '<div class="analise-kpis">' +
+    '<div class="kpi"><div class="label">Cadastros no período</div><div class="num">' + cadastros + '</div></div>' +
+    '<div class="kpi"><div class="label">Desvios encontrados</div><div class="num">' + linhasDesvio.length + '</div></div>' +
+    '<div class="kpi"><div class="label">Desvios graves</div><div class="num">' + graves + '</div></div>' +
+  '</div>';
+  html += '<div class="analise-secao-titulo">Por máquina</div>';
+  html += equipamentos.map(function(equip) { return renderCardMaquina(equip, todasLinhas, dias); }).join('');
+
+  el.innerHTML = html;
 }
 
 /* ---------------- Tabela de últimas ocorrências ---------------- */
