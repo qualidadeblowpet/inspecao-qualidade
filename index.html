@@ -396,7 +396,9 @@
     <div class="nav-section-label">Principal</div>
     <button class="nav-item active" data-page="dashboard" onclick="setPage('dashboard')"><span class="ic">▦</span> Dashboard</button>
     <button class="nav-item" data-page="cadastroInjecao" onclick="setPage('cadastroInjecao')"><span class="ic">●</span> Cadastro Injeção</button>
+    <button class="nav-item" data-page="ocorrenciaInjecao" onclick="setPage('ocorrenciaInjecao')"><span class="ic">▤</span> Ocorrência - Injeção</button>
     <button class="nav-item" data-page="cadastroSopro" onclick="setPage('cadastroSopro')"><span class="ic">●</span> Cadastro Sopro</button>
+    <button class="nav-item" data-page="ocorrenciaSopro" onclick="setPage('ocorrenciaSopro')"><span class="ic">▤</span> Ocorrência - Sopro</button>
 
     <div class="nav-section-label">Sistema</div>
     <button class="nav-item" data-page="config" onclick="setPage('config')"><span class="ic">⚙</span> Configurações</button>
@@ -420,114 +422,6 @@
         <button class="btn btn-accent" onclick="setPage('cadastroSopro')">+ Cadastro Sopro</button>
         <button class="filter-clear" onclick="limparFiltros()">Limpar filtros</button>
         <button class="btn btn-outline" onclick="carregarDados(true)">↻ Atualizar</button>
-      </div>
-
-      <div class="card card-ocorrencias">
-        <h3>Últimas ocorrências — Sopro</h3>
-        <div class="table-toolbar">
-          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 140px;"><label>Buscar</label><input type="text" id="tBuscaSopro" placeholder="Defeito, máquina…" oninput="renderTabelaSopro()" style="min-width:140px; width:100%;"></div>
-          <div class="toolbar-field"><label>Data inicial</label><input type="date" id="tDataDeSopro" onchange="renderTabelaSopro()"></div>
-          <div class="toolbar-field"><label>Data final</label><input type="date" id="tDataAteSopro" onchange="renderTabelaSopro()"></div>
-          <div class="toolbar-field toolbar-field-hora"><label>Horário inicial</label><input type="time" id="tHoraDeSopro" onchange="renderTabelaSopro()"></div>
-          <div class="toolbar-field toolbar-field-hora"><label>Horário final</label><input type="time" id="tHoraAteSopro" onchange="renderTabelaSopro()"></div>
-          <select id="tCadastrosSopro" onchange="renderTabelaSopro()">
-            <option value="">Todos os cadastros</option>
-            <option value="1">Último 1 cadastro</option>
-            <option value="2">Últimos 2 cadastros</option>
-            <option value="3">Últimos 3 cadastros</option>
-            <option value="4">Últimos 4 cadastros</option>
-            <option value="5">Últimos 5 cadastros</option>
-            <option value="6">Últimos 6 cadastros</option>
-            <option value="7">Últimos 7 cadastros</option>
-            <option value="8">Últimos 8 cadastros</option>
-            <option value="9">Últimos 9 cadastros</option>
-            <option value="10">Últimos 10 cadastros</option>
-          </select>
-          <select id="tLimiteSopro" class="campo-linhas" onchange="renderTabelaSopro()">
-            <option value="5">5 linhas</option>
-            <option value="10">10 linhas</option>
-            <option value="15">15 linhas</option>
-            <option value="20" selected>20 linhas</option>
-            <option value="25">25 linhas</option>
-            <option value="30">30 linhas</option>
-            <option value="35">35 linhas</option>
-            <option value="50">50 linhas</option>
-            <option value="100">100 linhas</option>
-            <option value="todos">Todas as linhas</option>
-          </select>
-          <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('sopro')">🟢 WhatsApp</button>
-          <button class="btn btn-outline" onclick="gerarPDF('sopro')">📄 PDF</button>
-        </div>
-        <div class="table-scroll" style="position:relative;">
-          <div class="tabela-loading hidden" id="loadingSopro"><div class="spinner"></div></div>
-          <table class="occ-table">
-            <thead>
-              <tr>
-                <th>Data</th><th>Hora</th><th>Equipamento</th><th>Responsável</th><th>Operador</th><th>Frasco</th><th>Volume (mL)</th>
-                <th>Preforma</th><th>Fornecedor</th><th>Lote Caixa</th><th>Nº Caixa</th><th>Caixa Vermelha</th><th>Motivo Cx Vermelha</th>
-                <th>Rotulado</th><th>Condição Rotulagem</th><th>Defeito Encontrado</th><th>Criticidade</th>
-                <th>Teste Produção</th><th>Peso / Altura</th><th>Fechamento Saco</th><th>Alinhamento Palete</th><th>Organização Linha</th>
-                <th>Status</th><th>Observação</th><th>Foto</th>
-              </tr>
-            </thead>
-            <tbody id="tabelaSoproBody"></tbody>
-          </table>
-          <div id="tabelaSoproVazia" class="table-empty hidden">Nenhuma ocorrência encontrada com esses filtros.</div>
-        </div>
-      </div>
-
-      <div class="card card-ocorrencias">
-        <h3>Últimas ocorrências — Injeção</h3>
-        <div class="table-toolbar">
-          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 140px;"><label>Buscar</label><input type="text" id="tBuscaInjecao" placeholder="Defeito, máquina…" oninput="renderTabelaInjecao()" style="min-width:140px; width:100%;"></div>
-          <div class="toolbar-field"><label>Data inicial</label><input type="date" id="tDataDeInjecao" onchange="renderTabelaInjecao()"></div>
-          <div class="toolbar-field"><label>Data final</label><input type="date" id="tDataAteInjecao" onchange="renderTabelaInjecao()"></div>
-          <div class="toolbar-field toolbar-field-hora"><label>Horário inicial</label><input type="time" id="tHoraDeInjecao" onchange="renderTabelaInjecao()"></div>
-          <div class="toolbar-field toolbar-field-hora"><label>Horário final</label><input type="time" id="tHoraAteInjecao" onchange="renderTabelaInjecao()"></div>
-          <select id="tCadastrosInjecao" onchange="renderTabelaInjecao()">
-            <option value="">Todos os cadastros</option>
-            <option value="1">Último 1 cadastro</option>
-            <option value="2">Últimos 2 cadastros</option>
-            <option value="3">Últimos 3 cadastros</option>
-            <option value="4">Últimos 4 cadastros</option>
-            <option value="5">Últimos 5 cadastros</option>
-            <option value="6">Últimos 6 cadastros</option>
-            <option value="7">Últimos 7 cadastros</option>
-            <option value="8">Últimos 8 cadastros</option>
-            <option value="9">Últimos 9 cadastros</option>
-            <option value="10">Últimos 10 cadastros</option>
-          </select>
-          <select id="tLimiteInjecao" class="campo-linhas" onchange="renderTabelaInjecao()">
-            <option value="5">5 linhas</option>
-            <option value="10">10 linhas</option>
-            <option value="15">15 linhas</option>
-            <option value="20" selected>20 linhas</option>
-            <option value="25">25 linhas</option>
-            <option value="30">30 linhas</option>
-            <option value="35">35 linhas</option>
-            <option value="50">50 linhas</option>
-            <option value="100">100 linhas</option>
-            <option value="todos">Todas as linhas</option>
-          </select>
-          <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('injecao')">🟢 WhatsApp</button>
-          <button class="btn btn-outline" onclick="gerarPDF('injecao')">📄 PDF</button>
-        </div>
-        <div class="table-scroll" style="position:relative;">
-          <div class="tabela-loading hidden" id="loadingInjecao"><div class="spinner"></div></div>
-          <table class="occ-table">
-            <thead>
-              <tr>
-                <th>Data</th><th>Hora</th><th>Equipamento</th><th>Responsável</th><th>Operador</th><th>Cor</th>
-                <th>Gramatura</th><th>Resina</th><th>°C Mín - Gate</th><th>°C Máx - Gate</th><th>°C Mín - Corpo</th><th>°C Max - Corpo</th>
-                <th>Organização Linha</th><th>Tonalidade</th><th>Alinhamento Etiqueta</th>
-                <th>Defeito Detectado</th><th>Cavidade</th><th>Criticidade</th>
-                <th>Operador Ciente</th><th>Status</th><th>Observação</th><th>Foto</th>
-              </tr>
-            </thead>
-            <tbody id="tabelaInjecaoBody"></tbody>
-          </table>
-          <div id="tabelaInjecaoVazia" class="table-empty hidden">Nenhuma ocorrência encontrada com esses filtros.</div>
-        </div>
       </div>
 
       <div class="filter-bar">
@@ -598,6 +492,71 @@
       <div id="revisaoInjecao" class="hidden"></div>
     </div>
 
+    <!-- ===================== OCORRÊNCIA — INJEÇÃO ===================== -->
+    <div id="pageOcorrenciaInjecao" class="hidden">
+      <div class="page-title">Ocorrência — Injeção</div>
+      <div class="page-sub">Últimas ocorrências registradas no processo de injeção</div>
+
+      <div class="quick-actions">
+        <button class="filter-clear" onclick="limparFiltrosOcorrenciaInjecao()">Limpar filtros</button>
+        <button class="btn btn-outline" onclick="carregarDados(true)">↻ Atualizar</button>
+      </div>
+
+      <div class="card card-ocorrencias">
+        <h3>Últimas ocorrências — Injeção</h3>
+        <div class="table-toolbar">
+          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 140px;"><label>Buscar</label><input type="text" id="tBuscaInjecao" placeholder="Defeito, máquina…" oninput="renderTabelaInjecao()" style="min-width:140px; width:100%;"></div>
+          <div class="toolbar-field"><label>Data inicial</label><input type="date" id="tDataDeInjecao" onchange="renderTabelaInjecao()"></div>
+          <div class="toolbar-field"><label>Data final</label><input type="date" id="tDataAteInjecao" onchange="renderTabelaInjecao()"></div>
+          <div class="toolbar-field toolbar-field-hora"><label>Horário inicial</label><input type="time" id="tHoraDeInjecao" onchange="renderTabelaInjecao()"></div>
+          <div class="toolbar-field toolbar-field-hora"><label>Horário final</label><input type="time" id="tHoraAteInjecao" onchange="renderTabelaInjecao()"></div>
+          <select id="tCadastrosInjecao" onchange="renderTabelaInjecao()">
+            <option value="">Todos os cadastros</option>
+            <option value="1">Último 1 cadastro</option>
+            <option value="2">Últimos 2 cadastros</option>
+            <option value="3">Últimos 3 cadastros</option>
+            <option value="4">Últimos 4 cadastros</option>
+            <option value="5">Últimos 5 cadastros</option>
+            <option value="6">Últimos 6 cadastros</option>
+            <option value="7">Últimos 7 cadastros</option>
+            <option value="8">Últimos 8 cadastros</option>
+            <option value="9">Últimos 9 cadastros</option>
+            <option value="10">Últimos 10 cadastros</option>
+          </select>
+          <select id="tLimiteInjecao" class="campo-linhas" onchange="renderTabelaInjecao()">
+            <option value="5">5 linhas</option>
+            <option value="10">10 linhas</option>
+            <option value="15">15 linhas</option>
+            <option value="20" selected>20 linhas</option>
+            <option value="25">25 linhas</option>
+            <option value="30">30 linhas</option>
+            <option value="35">35 linhas</option>
+            <option value="50">50 linhas</option>
+            <option value="100">100 linhas</option>
+            <option value="todos">Todas as linhas</option>
+          </select>
+          <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('injecao')">🟢 WhatsApp</button>
+          <button class="btn btn-outline" onclick="gerarPDF('injecao')">📄 PDF</button>
+        </div>
+        <div class="table-scroll" style="position:relative;">
+          <div class="tabela-loading hidden" id="loadingInjecao"><div class="spinner"></div></div>
+          <table class="occ-table">
+            <thead>
+              <tr>
+                <th>Data</th><th>Hora</th><th>Equipamento</th><th>Responsável</th><th>Operador</th><th>Cor</th>
+                <th>Gramatura</th><th>Resina</th><th>°C Mín - Gate</th><th>°C Máx - Gate</th><th>°C Mín - Corpo</th><th>°C Max - Corpo</th>
+                <th>Organização Linha</th><th>Tonalidade</th><th>Alinhamento Etiqueta</th>
+                <th>Defeito Detectado</th><th>Cavidade</th><th>Criticidade</th>
+                <th>Operador Ciente</th><th>Status</th><th>Observação</th><th>Foto</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaInjecaoBody"></tbody>
+          </table>
+          <div id="tabelaInjecaoVazia" class="table-empty hidden">Nenhuma ocorrência encontrada com esses filtros.</div>
+        </div>
+      </div>
+    </div>
+
     <!-- ===================== CADASTRO SOPRO ===================== -->
     <div id="pageCadastroSopro" class="hidden">
       <div id="sopFormArea">
@@ -606,6 +565,71 @@
         <div id="formSopro"></div>
       </div>
       <div id="revisaoSopro" class="hidden"></div>
+    </div>
+
+    <!-- ===================== OCORRÊNCIA — SOPRO ===================== -->
+    <div id="pageOcorrenciaSopro" class="hidden">
+      <div class="page-title">Ocorrência — Sopro</div>
+      <div class="page-sub">Últimas ocorrências registradas no processo de sopro</div>
+
+      <div class="quick-actions">
+        <button class="filter-clear" onclick="limparFiltrosOcorrenciaSopro()">Limpar filtros</button>
+        <button class="btn btn-outline" onclick="carregarDados(true)">↻ Atualizar</button>
+      </div>
+
+      <div class="card card-ocorrencias">
+        <h3>Últimas ocorrências — Sopro</h3>
+        <div class="table-toolbar">
+          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 140px;"><label>Buscar</label><input type="text" id="tBuscaSopro" placeholder="Defeito, máquina…" oninput="renderTabelaSopro()" style="min-width:140px; width:100%;"></div>
+          <div class="toolbar-field"><label>Data inicial</label><input type="date" id="tDataDeSopro" onchange="renderTabelaSopro()"></div>
+          <div class="toolbar-field"><label>Data final</label><input type="date" id="tDataAteSopro" onchange="renderTabelaSopro()"></div>
+          <div class="toolbar-field toolbar-field-hora"><label>Horário inicial</label><input type="time" id="tHoraDeSopro" onchange="renderTabelaSopro()"></div>
+          <div class="toolbar-field toolbar-field-hora"><label>Horário final</label><input type="time" id="tHoraAteSopro" onchange="renderTabelaSopro()"></div>
+          <select id="tCadastrosSopro" onchange="renderTabelaSopro()">
+            <option value="">Todos os cadastros</option>
+            <option value="1">Último 1 cadastro</option>
+            <option value="2">Últimos 2 cadastros</option>
+            <option value="3">Últimos 3 cadastros</option>
+            <option value="4">Últimos 4 cadastros</option>
+            <option value="5">Últimos 5 cadastros</option>
+            <option value="6">Últimos 6 cadastros</option>
+            <option value="7">Últimos 7 cadastros</option>
+            <option value="8">Últimos 8 cadastros</option>
+            <option value="9">Últimos 9 cadastros</option>
+            <option value="10">Últimos 10 cadastros</option>
+          </select>
+          <select id="tLimiteSopro" class="campo-linhas" onchange="renderTabelaSopro()">
+            <option value="5">5 linhas</option>
+            <option value="10">10 linhas</option>
+            <option value="15">15 linhas</option>
+            <option value="20" selected>20 linhas</option>
+            <option value="25">25 linhas</option>
+            <option value="30">30 linhas</option>
+            <option value="35">35 linhas</option>
+            <option value="50">50 linhas</option>
+            <option value="100">100 linhas</option>
+            <option value="todos">Todas as linhas</option>
+          </select>
+          <button class="btn btn-outline" style="margin-left:auto;" onclick="gerarWhatsApp('sopro')">🟢 WhatsApp</button>
+          <button class="btn btn-outline" onclick="gerarPDF('sopro')">📄 PDF</button>
+        </div>
+        <div class="table-scroll" style="position:relative;">
+          <div class="tabela-loading hidden" id="loadingSopro"><div class="spinner"></div></div>
+          <table class="occ-table">
+            <thead>
+              <tr>
+                <th>Data</th><th>Hora</th><th>Equipamento</th><th>Responsável</th><th>Operador</th><th>Frasco</th><th>Volume (mL)</th>
+                <th>Preforma</th><th>Fornecedor</th><th>Lote Caixa</th><th>Nº Caixa</th><th>Caixa Vermelha</th><th>Motivo Cx Vermelha</th>
+                <th>Rotulado</th><th>Condição Rotulagem</th><th>Defeito Encontrado</th><th>Criticidade</th>
+                <th>Teste Produção</th><th>Peso / Altura</th><th>Fechamento Saco</th><th>Alinhamento Palete</th><th>Organização Linha</th>
+                <th>Status</th><th>Observação</th><th>Foto</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaSoproBody"></tbody>
+          </table>
+          <div id="tabelaSoproVazia" class="table-empty hidden">Nenhuma ocorrência encontrada com esses filtros.</div>
+        </div>
+      </div>
     </div>
 
     <!-- ===================== CONFIGURAÇÕES ===================== -->
@@ -729,10 +753,12 @@ const statusCorrecao = ['CORRIGIDO', 'FICOU PENDENTE'];
 function setPage(p) {
   paginaAtual = p;
   document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.toggle('active', el.dataset.page === p); });
-  ['dashboard','cadastroInjecao','cadastroSopro','config'].forEach(function(id) {
+  ['dashboard','cadastroInjecao','ocorrenciaInjecao','cadastroSopro','ocorrenciaSopro','config'].forEach(function(id) {
     document.getElementById('page' + id.charAt(0).toUpperCase() + id.slice(1)).classList.toggle('hidden', id !== p);
   });
   if (p === 'dashboard') carregarDados();
+  if (p === 'ocorrenciaInjecao') renderTabelaInjecao();
+  if (p === 'ocorrenciaSopro') renderTabelaSopro();
   fecharMenuMobile();
   window.scrollTo(0, 0);
 }
@@ -1791,6 +1817,26 @@ function limparFiltros() {
   document.getElementById('tHoraAteInjecao').value = '';
   document.getElementById('tCadastrosInjecao').value = '';
   atualizarDashboard();
+}
+
+function limparFiltrosOcorrenciaSopro() {
+  document.getElementById('tBuscaSopro').value = '';
+  document.getElementById('tDataDeSopro').value = '';
+  document.getElementById('tDataAteSopro').value = '';
+  document.getElementById('tHoraDeSopro').value = '';
+  document.getElementById('tHoraAteSopro').value = '';
+  document.getElementById('tCadastrosSopro').value = '';
+  renderTabelaSopro();
+}
+
+function limparFiltrosOcorrenciaInjecao() {
+  document.getElementById('tBuscaInjecao').value = '';
+  document.getElementById('tDataDeInjecao').value = '';
+  document.getElementById('tDataAteInjecao').value = '';
+  document.getElementById('tHoraDeInjecao').value = '';
+  document.getElementById('tHoraAteInjecao').value = '';
+  document.getElementById('tCadastrosInjecao').value = '';
+  renderTabelaInjecao();
 }
 
 function linhasFiltradasBase() {
