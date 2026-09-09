@@ -1858,6 +1858,10 @@ async function carregarDados(tentativaRetry) {
     };
     popularFiltrosEquipResp();
     atualizarDashboard();
+    // Recarrega o alerta de histórico recente do Cadastro, caso um equipamento já esteja
+    // selecionado ali (ex.: usuário abriu o Cadastro antes dos dados terminarem de carregar)
+    atualizarAlertaMaquina('injecao');
+    atualizarAlertaMaquina('sopro');
   } catch (err) {
     console.error('Falha ao carregar dados:', err);
     if (!tentativaRetry) {
@@ -2261,8 +2265,8 @@ function atualizarAlertaMaquina(processo) {
   const equipId = processo === 'injecao' ? 'inj_equipamento' : 'sop_equipamento';
   const alertaId = processo === 'injecao' ? 'alertaMaquinaInjecao' : 'alertaMaquinaSopro';
   const el = document.getElementById(alertaId);
-  if (!el) return;
   const equipSel = document.getElementById(equipId);
+  if (!el || !equipSel) return;
   const equip = equipSel.value;
   if (!equip) { el.innerHTML = ''; return; }
 
