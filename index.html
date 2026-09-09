@@ -108,6 +108,7 @@
   .quick-actions .btn { flex: 1; }
   .quick-actions .filter-clear, .quick-actions .btn-outline { flex: 0 0 auto; }
   .quick-actions .btn-outline { align-self: flex-end; }
+  .quick-actions .btn-accent { flex: 0 0 auto; width: 190px; }
   .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-dim); display: inline-block; }
   .status-dot.online { background: var(--ok); box-shadow: 0 0 5px var(--ok); }
   .status-dot.offline { background: var(--danger); box-shadow: 0 0 5px var(--danger); }
@@ -128,6 +129,11 @@
   .filter-group select {
     background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
     padding: 7px 10px; border-radius: 7px; font-size: 12px; font-family: var(--font-body); min-width: 130px;
+  }
+  .filter-group input[type=date], .filter-group input[type=time] {
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    padding: 7px 10px; border-radius: 7px; font-size: 12px; font-family: var(--font-body);
+    box-sizing: border-box; height: 33px;
   }
   .filter-clear {
     margin-left: auto; background: transparent; border: 1px solid var(--border); color: var(--text-dim);
@@ -374,9 +380,11 @@
     .revisao-grid, .revisao-desvio-grid, .revisao-acoes { grid-template-columns: 1fr !important; }
     .filter-bar { flex-direction: column; align-items: stretch; }
     .filter-group select { min-width: 0; width: 100%; }
+    .filter-group input[type=date], .filter-group input[type=time] { width: 100%; }
     .filter-clear { align-self: stretch; margin-left: 0; }
     .quick-actions { flex-direction: column; }
     .quick-actions .btn-outline { align-self: stretch; }
+    .quick-actions .btn-accent { width: 100%; }
     .kpi-row { grid-template-columns: 1fr 1fr !important; }
     .analise-kpis { grid-template-columns: 1fr 1fr !important; }
     .analise-maquinas-grid { grid-template-columns: 1fr !important; }
@@ -455,8 +463,6 @@
       <div class="quick-actions">
         <button class="btn btn-accent" onclick="setPage('cadastroInjecao')">+ Cadastro Injeção</button>
         <button class="btn btn-accent" onclick="setPage('cadastroSopro')">+ Cadastro Sopro</button>
-        <button class="filter-clear" onclick="limparFiltros()">Limpar filtros</button>
-        <button class="btn btn-outline" onclick="carregarDados(true)">↻ Atualizar</button>
       </div>
 
       <div class="filter-bar">
@@ -470,12 +476,33 @@
         </div>
         <div class="filter-group">
           <label>Período</label>
-          <select id="fPeriodo" onchange="atualizarDashboard()">
+          <select id="fPeriodo" onchange="onFPeriodoChange()">
+            <option value="personalizado">Personalizado</option>
+            <option value="0.25">Últimas 6 horas</option>
+            <option value="0.5">Últimas 12 horas</option>
+            <option value="1">Último 1 dia</option>
+            <option value="2">Últimos 2 dias</option>
             <option value="7">Últimos 7 dias</option>
             <option value="30" selected>Últimos 30 dias</option>
             <option value="90">Últimos 90 dias</option>
             <option value="0">Todo o período</option>
           </select>
+        </div>
+        <div class="filter-group filtro-personalizado-campo hidden">
+          <label>Data início</label>
+          <input type="date" id="fPersonalizadoDataInicio" onchange="atualizarDashboard()">
+        </div>
+        <div class="filter-group filtro-personalizado-campo hidden">
+          <label>Data fim</label>
+          <input type="date" id="fPersonalizadoDataFim" onchange="atualizarDashboard()">
+        </div>
+        <div class="filter-group filtro-personalizado-campo hidden">
+          <label>Hora início</label>
+          <input type="time" id="fPersonalizadoHoraInicio" onchange="atualizarDashboard()">
+        </div>
+        <div class="filter-group filtro-personalizado-campo hidden">
+          <label>Hora fim</label>
+          <input type="time" id="fPersonalizadoHoraFim" onchange="atualizarDashboard()">
         </div>
         <div class="filter-group">
           <label>Equipamento</label>
@@ -507,19 +534,18 @@
 
       <div class="charts-grid">
         <div class="card wide"><h3>Intervalo entre inspeções — últimas 48 horas</h3><div class="chart-wrap"><canvas id="chart48h"></canvas></div></div>
+        <div class="card wide">
+          <div class="analise-topo">
+            <h3 style="margin:0;">Análise do período por máquina</h3>
+            <button class="btn btn-outline" onclick="gerarAnaliseIA()">🔎 Analisar período</button>
+          </div>
+          <div id="analiseResultado"><div class="analise-vazio">Clique em "Analisar período" para gerar um resumo dos dados filtrados acima, separado por máquina.</div></div>
+        </div>
         <div class="card"><h3>Defeitos mais frequentes</h3><div class="chart-wrap"><canvas id="chartDefeitos"></canvas></div></div>
         <div class="card"><h3>Desvios por equipamento</h3><div class="chart-wrap"><canvas id="chartEquipamento"></canvas></div></div>
         <div class="card wide"><h3>Evolução diária</h3><div class="chart-wrap"><canvas id="chartEvolucao"></canvas></div></div>
         <div class="card"><h3>Injeção vs. Sopro</h3><div class="chart-wrap"><canvas id="chartProcesso"></canvas></div></div>
         <div class="card"><h3>Desvios por responsável</h3><div class="chart-wrap"><canvas id="chartResponsavel"></canvas></div></div>
-      </div>
-
-      <div class="card">
-        <div class="analise-topo">
-          <h3 style="margin:0;">Análise do período por máquina</h3>
-          <button class="btn btn-outline" onclick="gerarAnaliseIA()">🔎 Analisar período</button>
-        </div>
-        <div id="analiseResultado"><div class="analise-vazio">Clique em "Analisar período" para gerar um resumo dos dados filtrados acima, separado por máquina.</div></div>
       </div>
     </div>
 
@@ -1839,9 +1865,24 @@ function popularFiltrosEquipResp() {
   preencherSelect('fResponsavel', responsaveis, true);
 }
 
+function atualizarVisibilidadePersonalizado() {
+  const personalizado = document.getElementById('fPeriodo').value === 'personalizado';
+  document.querySelectorAll('.filtro-personalizado-campo').forEach(function(el){ el.classList.toggle('hidden', !personalizado); });
+}
+
+function onFPeriodoChange() {
+  atualizarVisibilidadePersonalizado();
+  atualizarDashboard();
+}
+
 function limparFiltros() {
   document.getElementById('fProcesso').value = 'todos';
   document.getElementById('fPeriodo').value = '30';
+  document.getElementById('fPersonalizadoDataInicio').value = '';
+  document.getElementById('fPersonalizadoDataFim').value = '';
+  document.getElementById('fPersonalizadoHoraInicio').value = '';
+  document.getElementById('fPersonalizadoHoraFim').value = '';
+  atualizarVisibilidadePersonalizado();
   document.getElementById('fEquipamento').value = '';
   document.getElementById('fResponsavel').value = '';
   document.getElementById('fCriticidade').value = '';
@@ -1893,10 +1934,22 @@ function linhasFiltradasPorProcesso(processoFixo) {
 
 function aplicarFiltrosComuns(todos, manterSemDefeito) {
   if (!manterSemDefeito) todos = todos.filter(function(l){ return l.defeito; });
-  const dias = parseInt(document.getElementById('fPeriodo').value, 10);
-  if (dias) {
-    const limite = new Date(); limite.setDate(limite.getDate() - dias);
-    todos = todos.filter(function(l){ return !l.data || new Date(l.data) >= limite; });
+  const periodoVal = document.getElementById('fPeriodo').value;
+  if (periodoVal === 'personalizado') {
+    const dataIni = document.getElementById('fPersonalizadoDataInicio').value;
+    const dataFim = document.getElementById('fPersonalizadoDataFim').value;
+    const horaIni = document.getElementById('fPersonalizadoHoraInicio').value;
+    const horaFim = document.getElementById('fPersonalizadoHoraFim').value;
+    if (dataIni) todos = todos.filter(function(l){ return !l.data || l.data >= dataIni; });
+    if (dataFim) todos = todos.filter(function(l){ return !l.data || l.data <= dataFim; });
+    if (horaIni) todos = todos.filter(function(l){ return !l.hora_fim || l.hora_fim >= horaIni; });
+    if (horaFim) todos = todos.filter(function(l){ return !l.hora_fim || l.hora_fim <= horaFim; });
+  } else {
+    const horas = (parseFloat(periodoVal) || 0) * 24;
+    if (horas) {
+      const limite = new Date(); limite.setTime(limite.getTime() - horas * 60 * 60 * 1000);
+      todos = todos.filter(function(l){ return !l.data || new Date(l.data + 'T' + (l.hora_fim || '00:00')) >= limite; });
+    }
   }
   const equip = document.getElementById('fEquipamento').value;
   if (equip) todos = todos.filter(function(l){ return l.equipamento === equip; });
@@ -2272,13 +2325,25 @@ function gerarAnaliseIA() {
     return;
   }
 
-  const dias = parseInt(document.getElementById('fPeriodo').value, 10) || 0;
+  const periodoVal = document.getElementById('fPeriodo').value;
+  const periodoValNum = parseFloat(periodoVal);
+  // Janela de comparação (vs. período anterior) só faz sentido para múltiplos inteiros de dias;
+  // "Personalizado" e as opções em horas (6h/12h) ficam sem comparação de tendência.
+  const dias = (periodoVal !== 'personalizado' && Number.isInteger(periodoValNum) && periodoValNum > 0) ? periodoValNum : 0;
   const procTexto = document.getElementById('fProcesso').selectedOptions[0].text;
   const periodoTexto = document.getElementById('fPeriodo').selectedOptions[0].text;
   let periodoRange = periodoTexto;
-  if (dias) {
+  if (periodoVal === 'personalizado') {
+    const dIni = document.getElementById('fPersonalizadoDataInicio').value;
+    const dFim = document.getElementById('fPersonalizadoDataFim').value;
+    const hIni = document.getElementById('fPersonalizadoHoraInicio').value;
+    const hFim = document.getElementById('fPersonalizadoHoraFim').value;
+    if (dIni || dFim) {
+      periodoRange = (dIni ? formatarDataBR(dIni) : '—') + (hIni ? ' ' + hIni : '') + ' a ' + (dFim ? formatarDataBR(dFim) : '—') + (hFim ? ' ' + hFim : '') + ' (Personalizado)';
+    }
+  } else if (periodoValNum) {
     const agora = new Date();
-    const ini = new Date(agora); ini.setDate(ini.getDate() - dias);
+    const ini = new Date(agora); ini.setTime(ini.getTime() - periodoValNum * 24 * 60 * 60 * 1000);
     periodoRange = formatarDataBRDate(ini) + ' a ' + formatarDataBRDate(agora) + ' (' + periodoTexto + ')';
   }
   let ultimoCadastro = null;
