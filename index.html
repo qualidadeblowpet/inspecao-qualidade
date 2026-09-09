@@ -214,6 +214,11 @@
   .analise-tag { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px; font-size: 12px; }
   .analise-tag b { font-weight: 700; }
   .analise-tag.cav-destaque { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); font-weight: 700; }
+
+  /* ---------- Alerta de histórico recente da máquina (Cadastro) ---------- */
+  .alerta-maquina { border: 1px solid var(--accent); background: var(--accent-dim); border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
+  .alerta-maquina-titulo { font-size: 13px; font-weight: 700; color: var(--accent); margin-bottom: 4px; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .alerta-maquina-sub { font-size: 12px; color: var(--text-dim); margin-bottom: 10px; }
   .tabela-loading {
     position: absolute; inset: 0; z-index: 5;
     background: rgba(12,13,15,0.6); display: flex; align-items: center; justify-content: center;
@@ -1188,10 +1193,11 @@ function gerarIdSessao() { return 'S' + Date.now(); }
 function renderFormInjecao() {
   const el = document.getElementById('formInjecao');
   el.innerHTML =
+    '<div id="alertaMaquinaInjecao"></div>' +
     '<div class="card"><h3>Dados da sessão</h3>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Data</label><input type="date" id="inj_data"></div>' +
-        '<div class="field"><label>Equipamento</label>'+'<select id="inj_equipamento"></select>'+'</div>' +
+        '<div class="field"><label>Equipamento</label>'+'<select id="inj_equipamento" onchange="atualizarAlertaMaquina(\'injecao\')"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-2 hidden">' +
         '<div class="field"><label>Hora início</label><input type="time" id="inj_hora_inicio"></div>' +
@@ -1240,10 +1246,11 @@ function renderFormInjecao() {
 function renderFormSopro() {
   const el = document.getElementById('formSopro');
   el.innerHTML =
+    '<div id="alertaMaquinaSopro"></div>' +
     '<div class="card"><h3>Dados da sessão</h3>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Data</label><input type="date" id="sop_data"></div>' +
-        '<div class="field"><label>Equipamento</label>'+'<select id="sop_equipamento"></select>'+'</div>' +
+        '<div class="field"><label>Equipamento</label>'+'<select id="sop_equipamento" onchange="atualizarAlertaMaquina(\'sopro\')"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-2 hidden">' +
         '<div class="field"><label>Hora início</label><input type="time" id="sop_hora_inicio"></div>' +
@@ -2173,7 +2180,7 @@ function contarSessoesUnicas(linhas) {
 
 function chaveProduto(l) {
   if (l.processo === 'sopro') {
-    return (l.tipo_frasco || '—') + (l.ml ? ' · ' + l.ml + ' mL' : '');
+    return (l.tipo_frasco || '—') + (l.ml ? ' · ' + l.ml : '');
   }
   return (l.cor || '—') + (l.gramatura ? ' · ' + l.gramatura + 'g' : '');
 }
@@ -2223,6 +2230,87 @@ function cavidadesRecorrentes(desviosMaquina) {
     const defeitoPrincipal = Object.entries(info.defeitos).sort(function(a, b) { return b[1] - a[1]; })[0][0];
     return { cavidade: cav, qtd: info.qtd, defeito: defeitoPrincipal };
   }).sort(function(a, b) { return b.qtd - a.qtd; }).slice(0, 4);
+}
+
+/* ---------------- Alerta de histórico recente da máquina (Cadastro Injeção/Sopro) ---------------- */
+function ultimasSessoesMaquina(processo, equip, limiteHoras, maxSessoes) {
+  const cache = dadosCache[processo] || [];
+  const linhasMaquina = cache.filter(function(l) { return l.equipamento === equip; });
+  const porSessao = {};
+  linhasMaquina.forEach(function(l) {
+    const chave = chaveSessao(l);
+    if (!porSessao[chave]) porSessao[chave] = [];
+    porSessao[chave].push(l);
+  });
+  const sessoes = Object.keys(porSessao).map(function(chave) {
+    const linhas = porSessao[chave];
+    const ref = linhas[0];
+    return { linhas: linhas, timestamp: new Date((ref.data || '') + 'T' + (ref.hora_fim || ref.hora_inicio || '00:00')) };
+  }).filter(function(s) { return !isNaN(s.timestamp.getTime()); })
+    .sort(function(a, b) { return b.timestamp - a.timestamp; });
+  if (!sessoes.length) return [];
+  const limite = new Date(sessoes[0].timestamp.getTime() - limiteHoras * 60 * 60 * 1000);
+  return sessoes.filter(function(s) { return s.timestamp >= limite; }).slice(0, maxSessoes);
+}
+
+function atualizarAlertaMaquina(processo) {
+  const equipId = processo === 'injecao' ? 'inj_equipamento' : 'sop_equipamento';
+  const alertaId = processo === 'injecao' ? 'alertaMaquinaInjecao' : 'alertaMaquinaSopro';
+  const el = document.getElementById(alertaId);
+  if (!el) return;
+  const equipSel = document.getElementById(equipId);
+  const equip = equipSel.value;
+  if (!equip) { el.innerHTML = ''; return; }
+
+  const sessoes = ultimasSessoesMaquina(processo, equip, 7, 3);
+  if (!sessoes.length) { el.innerHTML = ''; return; }
+
+  const maisRecente = sessoes[0].timestamp;
+  const maisAntiga = sessoes[sessoes.length - 1].timestamp;
+  const janelaMin = Math.round((maisRecente.getTime() - maisAntiga.getTime()) / 60000);
+  const janelaTxt = sessoes.length < 2 ? '' : ' (janela de ' + Math.floor(janelaMin / 60) + 'h' + String(janelaMin % 60).padStart(2, '0') + ')';
+
+  const todasLinhas = [];
+  sessoes.forEach(function(s) { todasLinhas.push.apply(todasLinhas, s.linhas); });
+  const desvios = todasLinhas.filter(function(l) { return l.defeito; });
+
+  const produtos = produtosInspecionados(todasLinhas);
+  const produtosHtml = produtos.length ? '<div class="analise-bloco" style="margin-top:0;"><div class="analise-bloco-titulo">Produtos cadastrados</div><div class="analise-tags">' + produtos.map(function(p) {
+    return '<span class="analise-tag"><b>' + p.produto + '</b> — ' + p.cadastros + ' cadastro' + (p.cadastros === 1 ? '' : 's') + '</span>';
+  }).join('') + '</div></div>' : '';
+
+  const critClasse = function(c) { return c === 'GRAVE' ? 'grave' : c === 'MÉDIO' ? 'medio' : 'leve'; };
+  let defeitosHtml;
+  if (desvios.length) {
+    const top3 = top3Defeitos(desvios);
+    defeitosHtml = '<div class="analise-bloco"' + (produtos.length ? '' : ' style="margin-top:0;"') + '><div class="analise-bloco-titulo">Defeitos encontrados</div>' + top3.map(function(d) {
+      return '<div class="analise-defeito-linha"><div class="analise-def-nome">' + d.nome + '</div><div class="analise-def-direita"><span class="analise-def-vol">' + d.qtd + 'x</span><span class="badge ' + critClasse(d.criticidade) + '">' + d.criticidade + '</span></div></div>';
+    }).join('') + '</div>';
+  } else {
+    defeitosHtml = '<div class="analise-bloco"' + (produtos.length ? '' : ' style="margin-top:0;"') + '><div class="analise-vazio" style="padding:4px 0;">Últimos cadastros desta máquina sem desvios registrados.</div></div>';
+  }
+
+  let cavidadesHtml = '';
+  if (processo === 'injecao' && desvios.length) {
+    const cavidades = cavidadesRecorrentes(desvios);
+    if (cavidades.length) {
+      cavidadesHtml = '<div class="analise-bloco"><div class="analise-bloco-titulo">Cavidades que mais repetiram defeitos</div><div class="analise-tags">' + cavidades.map(function(c, i) {
+        return '<span class="analise-tag' + (i === 0 ? ' cav-destaque' : '') + '">Cav. ' + c.cavidade + ' — ' + c.qtd + ' ocorrência' + (c.qtd === 1 ? '' : 's') + ' (' + c.defeito + ')</span>';
+      }).join('') + '</div></div>';
+    }
+  }
+
+  const equipTexto = equipSel.selectedOptions[0].text;
+  const horaRecente = String(maisRecente.getHours()).padStart(2, '0') + ':' + String(maisRecente.getMinutes()).padStart(2, '0');
+  const hoje = new Date();
+  const quandoTxt = (hoje.toDateString() === maisRecente.toDateString()) ? 'hoje' : formatarDataBRDate(maisRecente);
+  const cadastrosTxt = sessoes.length === 1 ? 'no último cadastro' : 'nos últimos ' + sessoes.length + ' cadastros';
+
+  el.innerHTML = '<div class="alerta-maquina">' +
+    '<div class="alerta-maquina-titulo">⚠ Fique atento nesta inspeção — histórico recente de ' + equipTexto + '</div>' +
+    '<div class="alerta-maquina-sub">Baseado ' + cadastrosTxt + ' desta máquina' + janelaTxt + ' (mais recente: ' + quandoTxt + ' às ' + horaRecente + ').</div>' +
+    produtosHtml + defeitosHtml + cavidadesHtml +
+  '</div>';
 }
 
 function contarDesviosJanela(equip, diasIni, diasFim) {
