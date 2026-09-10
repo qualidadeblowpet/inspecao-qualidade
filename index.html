@@ -93,7 +93,9 @@
   .nav-item:hover { background: var(--surface); color: var(--text); }
   .nav-item.active { background: var(--accent); color: #1a1200; font-weight: 700; }
 
-  .sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding-top: 12px; }
+  .sidebar-footer { margin-top: auto; padding-top: 10px; }
+  .sidebar-versao { font-size: 10.5px; color: var(--text-dim); opacity: 0.75; padding: 0 10px 8px; }
+  .sidebar-footer-inner { border-top: 1px solid var(--border); padding-top: 12px; }
   .sidebar-user { font-size: 11px; color: var(--text-dim); padding: 0 10px 8px; word-break: break-all; }
   .sidebar-footer button {
     width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--text-dim);
@@ -487,9 +489,12 @@
     <button class="nav-item" data-page="config" onclick="setPage('config')"><span class="ic">⚙</span> Configurações</button>
 
     <div class="sidebar-footer">
-      <div class="sidebar-user" id="userEmail"></div>
-      <div class="conn-label" style="padding:0 10px 10px;"><span id="statusDot" class="status-dot"></span><span id="statusText">verificando…</span></div>
-      <button onclick="logout()">Sair da conta</button>
+      <div class="sidebar-versao" id="sidebarVersao"></div>
+      <div class="sidebar-footer-inner">
+        <div class="sidebar-user" id="userEmail"></div>
+        <div class="conn-label" style="padding:0 10px 10px;"><span id="statusDot" class="status-dot"></span><span id="statusText">verificando…</span></div>
+        <button onclick="logout()">Sair da conta</button>
+      </div>
     </div>
   </div>
 
@@ -846,6 +851,11 @@ const graphScopes = ["Files.ReadWrite", "User.Read"];
 /* Link de compartilhamento da planilha. Se você trocar o tipo de link no
    SharePoint (ex: para "Pessoas da organização com o link"), atualize aqui. */
 const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/inspetor_qualidade_blowpet_com_br/IQAVEI5jhrBjSLbMGF3jGf1lAc3HeqDedlGtopBxaz_LP5A";
+
+/* Data/hora da última atualização deste arquivo (index.html) — atualizar manualmente
+   a cada nova versão publicada, só pra controle de qual versão está em uso em cada
+   dispositivo. Exibido no rodapé do menu lateral. */
+const ULTIMA_ATUALIZACAO_SISTEMA = '09/09/2026 22:10';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -3366,6 +3376,8 @@ function agoraHHMM() {
 
 /* ---------------- Inicialização ---------------- */
 function init() {
+  const elVersao = document.getElementById('sidebarVersao');
+  if (elVersao) elVersao.textContent = 'Sistema atualizado em ' + ULTIMA_ATUALIZACAO_SISTEMA;
   renderListasNaTela();
   renderFormInjecao();
   renderFormSopro();
