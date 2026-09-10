@@ -795,7 +795,7 @@ const graphScopes = ["Files.ReadWrite", "User.Read"];
    SharePoint (ex: para "Pessoas da organização com o link"), atualize aqui. */
 const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/inspetor_qualidade_blowpet_com_br/IQAVEI5jhrBjSLbMGF3jGf1lAc3HeqDedlGtopBxaz_LP5A";
 
-const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max'];
+const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
 
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
@@ -932,6 +932,7 @@ async function conectarPlanilha() {
       itemId = json.id; driveId = json.parentReference.driveId;
       dot.className = 'status-dot online'; dotSide.style.background = 'var(--ok)'; label.textContent = 'conectado';
       await carregarListasDaPlanilha();
+      await garantirColunasInjecao(token);
       await prepararColunasComoTexto(token);
       carregarDados();
       return true;
@@ -998,11 +999,33 @@ function letraColuna(indiceZeroBased) {
   return letra;
 }
 
+let colunasInjecaoPreparadas = false;
+
+// Garante que as colunas novas (ex.: OP, Nº Caixa) existam na tabela TabelaInjecao,
+// criando-as no final da tabela quando ainda não existirem — sem reordenar colunas
+// já existentes, pra não bagunçar os dados já cadastrados anteriormente.
+async function garantirColunasInjecao(token) {
+  if (colunasInjecaoPreparadas) return;
+  try {
+    const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaInjecao/columns', { headers: { Authorization: 'Bearer ' + token } });
+    const json = await resp.json();
+    const colunasExistentes = (json.value || []).map(function(c) { return c.name; });
+    const colunasNovas = ['op', 'numero_caixa'].filter(function(nome) { return colunasExistentes.indexOf(nome) === -1; });
+    for (const nome of colunasNovas) {
+      await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaInjecao/columns/add', {
+        method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: nome })
+      });
+    }
+  } catch (e) { /* segue mesmo se falhar — as colunas podem já existir ou a tabela ainda não estar pronta */ }
+  colunasInjecaoPreparadas = true;
+}
+
 let colunasTextoPreparadas = false;
 
 async function prepararColunasComoTexto(token) {
   if (colunasTextoPreparadas) return;
-  const camposData = ['data', 'hora_inicio', 'hora_fim', 'criado_em', 'cavidade', 'gramatura', 'gramatura_preforma', 'numero_caixa', 'lote_caixa'];
+  const camposData = ['data', 'hora_inicio', 'hora_fim', 'criado_em', 'cavidade', 'gramatura', 'gramatura_preforma', 'numero_caixa', 'lote_caixa', 'op'];
   const tabelas = [
     { aba: 'Injecao_App', cabecalho: CABECALHO_INJECAO },
     { aba: 'Sopro_App', cabecalho: CABECALHO_SOPRO }
@@ -1208,7 +1231,11 @@ function renderFormInjecao() {
         '<div class="field"><label>Hora conclusão</label><input type="time" id="inj_hora_fim"></div>' +
       '</div>' +
       '<div class="field"><label>Responsável pela inspeção</label>'+'<select id="inj_responsavel"></select>'+'</div>' +
-      '<div class="field"><label>Operador principal</label>'+'<select id="inj_operador"></select>'+'</div>' +
+      '<div class="grid-3">' +
+        '<div class="field"><label>OP</label><input type="text" id="inj_op" placeholder="Ex: OP-2026-0451"></div>' +
+        '<div class="field"><label>Nº Caixa</label><input type="text" id="inj_numeroCaixa" inputmode="numeric" placeholder="Ex: 0142"></div>' +
+        '<div class="field"><label>Operador principal</label>'+'<select id="inj_operador"></select>'+'</div>' +
+      '</div>' +
       '<div class="grid-3">' +
         '<div class="field"><label>Cor da preforma</label>'+'<select id="inj_cor"></select>'+'</div>' +
         '<div class="field"><label>Gramatura</label>'+'<select id="inj_gramatura"></select>'+'</div>' +
@@ -1502,6 +1529,11 @@ function abrirRevisao(processo) {
       mostrarToast('ATENÇÃO: É necessário preencher os dados nos campos: ' + faltando.join(', ') + '.', true);
       return;
     }
+    const numeroCaixaInjVal = document.getElementById('inj_numeroCaixa').value;
+    if (numeroCaixaInjVal && !numeroInteiroNaoZeroValido(numeroCaixaInjVal)) {
+      mostrarToast('ATENÇÃO: o campo Nº Caixa deve conter apenas números, diferente de 0 (não pode ser "0", "-" ou letras).', true);
+      return;
+    }
   }
 
   if (processo === 'sopro') {
@@ -1631,6 +1663,8 @@ function renderRevisaoHtml(processo, temDefeito, desvios) {
     const data = document.getElementById('inj_data').value;
     const equipamento = document.getElementById('inj_equipamento').value;
     const responsavel = document.getElementById('inj_responsavel').value;
+    const op = document.getElementById('inj_op').value;
+    const numeroCaixaInj = document.getElementById('inj_numeroCaixa').value;
     const operador = document.getElementById('inj_operador').value;
     const cor = document.getElementById('inj_cor').value;
     const gramatura = document.getElementById('inj_gramatura').value;
@@ -1649,7 +1683,8 @@ function renderRevisaoHtml(processo, temDefeito, desvios) {
 
     corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Dados da sessão</div><div class="revisao-grid">' +
       itemRevisao('Data', formatarDataBR(data)) + itemRevisao('Equipamento', equipamento) + itemRevisao('Responsável', responsavel) +
-      itemRevisao('Operador principal', operador) + itemRevisao('Cor da preforma', cor) + itemRevisao('Gramatura', gramatura) +
+      itemRevisao('OP', op) + itemRevisao('Nº Caixa', numeroCaixaInj) + itemRevisao('Operador principal', operador) +
+      itemRevisao('Cor da preforma', cor) + itemRevisao('Gramatura', gramatura) +
       '</div></div>';
 
     corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Resina / Temperaturas</div><div class="revisao-grid">' +
@@ -1727,6 +1762,8 @@ async function confirmarSalvarSessao(processo) {
 
     let linhasObj;
     if (processo === 'injecao') {
+      const op = document.getElementById('inj_op').value;
+      const numeroCaixaInj = document.getElementById('inj_numeroCaixa').value;
       const operador = document.getElementById('inj_operador').value;
       const cor = document.getElementById('inj_cor').value;
       const gramatura = document.getElementById('inj_gramatura').value;
@@ -1743,7 +1780,8 @@ async function confirmarSalvarSessao(processo) {
           operador_principal: operador, cor: cor, gramatura: gramatura, resina: resina, defeito: d.defeito, cavidade: Array.isArray(d.cavidade) ? d.cavidade.slice().sort(function(a,b){return a-b;}).join(';') : (d.cavidade || ''),
           criticidade: d.criticidade, operador_ciente: d.operadorCiente, status_correcao: d.status, observacao: d.observacao, foto_url: d.fotoUrlFinal || '', criado_em: new Date().toISOString(),
           organizacao_linha_produtiva: organizacaoLinha, tonalidade_preforma: tonalidadePreforma, alinhamento_etiqueta_caixa: alinhamentoEtiqueta,
-          temperatura_gate_min: tempGateMin, temperatura_gate_max: tempGateMax, temperatura_corpo_min: tempCorpoMin, temperatura_corpo_max: tempCorpoMax };
+          temperatura_gate_min: tempGateMin, temperatura_gate_max: tempGateMax, temperatura_corpo_min: tempCorpoMin, temperatura_corpo_max: tempCorpoMax,
+          op: op, numero_caixa: numeroCaixaInj };
       });
     } else {
       const cor = document.getElementById('sop_cor').value;
@@ -2678,12 +2716,15 @@ function montarTextoWhatsApp(processo, linhas) {
 
   let texto;
   if (processo === 'injecao') {
-    texto = '*Inspeção da Qualidade*\n_' + dataHora + '_\n';
+    texto = '*Inspeção da Qualidade*\n_' + dataHora + '_\n\n';
     texto += '*Injetora*\n========\n';
     grupos.forEach(function(g, idx) {
       const s = g.sessao;
       texto += '*_' + (s.equipamento || '—') + '_*\n';
       texto += '*' + formatarGramaturaWpp(s.gramatura) + ' - ' + (s.cor || '—') + '*\n';
+      if (s.op || s.numero_caixa) {
+        texto += '*_OP: ' + (s.op || '—') + '-' + (s.numero_caixa || '—') + '_*\n';
+      }
       g.itens.forEach(function(item) {
         if (!item.defeito) return;
         texto += item.defeito + ' - ' + (item.criticidade || '—') + '\n';
