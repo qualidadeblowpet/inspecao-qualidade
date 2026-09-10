@@ -9,6 +9,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
 
@@ -2810,26 +2811,26 @@ function renderCardMaquina(equip, todasLinhasFiltro, dias) {
   '</div>';
 }
 
-function gerarAnaliseIA() {
-  const el = document.getElementById('analiseResultado');
-  if (!el || !itemId) return;
-
-  const proc = document.getElementById('fProcesso').value;
+// Monta o HTML da "Análise do período por máquina" (KPIs + cards por máquina).
+// procForcado força um processo específico ('injecao' ou 'sopro'), ignorando o filtro
+// #fProcesso da tela — usado pra anexar a análise já separada por processo no PDF exportado
+// de cada tabela de Ocorrências. Sem procForcado, usa o filtro da tela normalmente (Dashboard).
+// Retorna null quando não há nenhum cadastro pros filtros/processo em questão.
+function construirAnalisePeriodoHtml(procForcado) {
+  const selProcesso = document.getElementById('fProcesso');
+  const proc = procForcado || selProcesso.value;
   let base = proc === 'injecao' ? dadosCache.injecao.slice() : proc === 'sopro' ? dadosCache.sopro.slice() : dadosCache.injecao.concat(dadosCache.sopro);
   const todasLinhas = aplicarFiltrosComuns(base, true);
   const linhasDesvio = todasLinhas.filter(function(l) { return l.defeito; });
 
-  if (!todasLinhas.length) {
-    el.innerHTML = '<div class="analise-vazio">Nenhum cadastro encontrado para os filtros atuais.</div>';
-    return;
-  }
+  if (!todasLinhas.length) return null;
 
   const periodoVal = document.getElementById('fPeriodo').value;
   const periodoValNum = parseFloat(periodoVal);
   // Janela de comparação (vs. período anterior) só faz sentido para múltiplos inteiros de dias;
   // "Personalizado" e as opções em horas (6h/12h) ficam sem comparação de tendência.
   const dias = (periodoVal !== 'personalizado' && Number.isInteger(periodoValNum) && periodoValNum > 0) ? periodoValNum : 0;
-  const procTexto = document.getElementById('fProcesso').selectedOptions[0].text;
+  const procTexto = procForcado ? (procForcado === 'sopro' ? 'Sopro' : 'Injeção') : selProcesso.selectedOptions[0].text;
   const periodoTexto = document.getElementById('fPeriodo').selectedOptions[0].text;
   let periodoRange = periodoTexto;
   if (periodoVal === 'personalizado') {
@@ -2872,7 +2873,14 @@ function gerarAnaliseIA() {
   html += '<div class="analise-secao-titulo">Por máquina</div>';
   html += '<div class="analise-maquinas-grid">' + equipamentos.map(function(equip) { return renderCardMaquina(equip, todasLinhas, dias); }).join('') + '</div>';
 
-  el.innerHTML = html;
+  return html;
+}
+
+function gerarAnaliseIA() {
+  const el = document.getElementById('analiseResultado');
+  if (!el || !itemId) return;
+  const html = construirAnalisePeriodoHtml();
+  el.innerHTML = html || '<div class="analise-vazio">Nenhum cadastro encontrado para os filtros atuais.</div>';
 }
 
 /* ---------------- Tabela de últimas ocorrências ---------------- */
@@ -3156,7 +3164,7 @@ function responderPerguntaWhatsApp(enviar) {
   setPage('dashboard');
 }
 
-function gerarPDF(processo) {
+async function gerarPDF(processo) {
   if (typeof window.jspdf === 'undefined') { mostrarToast('Biblioteca de PDF não carregou (verifique a conexão de rede).', true); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
@@ -3218,8 +3226,117 @@ function gerarPDF(processo) {
     });
   }
 
+  await adicionarAnaliseAoPDF(doc, processo);
+
   const nomeArquivo = 'inspecao_' + processo + '_' + hojeISO() + '.pdf';
   doc.save(nomeArquivo);
+}
+
+// Anexa ao final do PDF (páginas novas) a "Análise do período por máquina" já filtrada só pro
+// processo daquele relatório (mesmos filtros Período/Equipamento/Responsável/Criticidade da tela),
+// capturada como imagem em boa qualidade (html2canvas em escala 2x) — sempre em tema claro,
+// independente do tema atual da tela, pra ficar legível impresso. Pagina automaticamente se o
+// conteúdo (muitas máquinas) não couber numa página só.
+async function adicionarAnaliseAoPDF(doc, processo) {
+  const tituloProc = processo === 'sopro' ? 'Sopro' : 'Injeção';
+
+  doc.addPage();
+  doc.setFontSize(13);
+  doc.text('Análise do período por máquina — ' + tituloProc, 14, 12);
+  doc.setFontSize(9);
+  doc.text('Gerado em ' + new Date().toLocaleString('pt-BR'), 14, 18);
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 8;
+
+  if (typeof html2canvas === 'undefined') {
+    doc.setFontSize(10);
+    doc.text('Não foi possível gerar a análise por máquina (biblioteca de captura de imagem não carregou).', 14, 30);
+    return;
+  }
+
+  const analiseHtml = construirAnalisePeriodoHtml(processo);
+  if (!analiseHtml) {
+    doc.setFontSize(10);
+    doc.text('Nenhum cadastro encontrado para os filtros selecionados neste processo.', 14, 30);
+    return;
+  }
+
+  // Container fora da tela, sempre com as variáveis do tema claro (independente do tema em uso),
+  // pra a imagem sair legível e consistente no PDF impresso.
+  const wrap = document.createElement('div');
+  wrap.style.cssText = [
+    'position:fixed', 'left:-9999px', 'top:0', 'width:1400px', 'padding:22px',
+    'background:#f4f5f6', 'color:#17181b', 'font-family:var(--font-body)',
+    '--bg:#f4f5f6', '--sidebar:#ffffff', '--surface:#ffffff', '--surface-2:#eceef0', '--border:#d8dade',
+    '--text:#17181b', '--text-dim:#6b6f76', '--accent:#f2a93b', '--accent-dim:#f6e2bd',
+    '--danger:#e5484d', '--warn:#f2a93b', '--ok:#3fb68b', '--blue:#5b9bf2', '--purple:#9c7bd9'
+  ].join(';');
+  wrap.innerHTML = analiseHtml;
+  document.body.appendChild(wrap);
+
+  // Pontos de corte "seguros" (em px CSS, relativos ao topo do wrap): o rodapé de cada
+  // linha do grid de máquinas, pra nunca partir um card de máquina ao meio entre páginas.
+  const wrapTopoRect = wrap.getBoundingClientRect().top;
+  const cards = Array.from(wrap.querySelectorAll('.analise-maquina'));
+  const linhas = [];
+  cards.forEach(function(c) {
+    const r = c.getBoundingClientRect();
+    const topo = Math.round(r.top - wrapTopoRect);
+    const fundo = Math.round(r.bottom - wrapTopoRect);
+    let linha = linhas.find(function(l) { return Math.abs(l.topo - topo) < 4; });
+    if (!linha) { linhas.push({ topo: topo, fundo: fundo }); }
+    else linha.fundo = Math.max(linha.fundo, fundo);
+  });
+  linhas.sort(function(a, b) { return a.topo - b.topo; });
+  const alturaWrapCss = wrap.scrollHeight;
+  const quebrasCss = [0].concat(linhas.map(function(l) { return l.fundo; })).concat([alturaWrapCss]);
+
+  let canvas;
+  try {
+    canvas = await html2canvas(wrap, { scale: 2, backgroundColor: '#f4f5f6', useCORS: true });
+  } catch (e) {
+    wrap.remove();
+    doc.setFontSize(10);
+    doc.text('Não foi possível gerar a imagem da análise por máquina.', 14, 30);
+    return;
+  }
+  wrap.remove();
+
+  const escala = canvas.height / alturaWrapCss;
+  const quebrasPx = Array.from(new Set(quebrasCss.map(function(v) { return Math.round(v * escala); })))
+    .filter(function(v) { return v > 0 && v <= canvas.height; })
+    .sort(function(a, b) { return a - b; });
+
+  const imgWidthMm = pageWidth - margin * 2;
+  const pxPerMm = canvas.width / imgWidthMm;
+  const alturaPrimeiraPaginaMm = pageHeight - 24 - margin;
+  const alturaDemaisPaginasMm = pageHeight - margin * 2;
+
+  let offsetPx = 0;
+  let primeiraFatia = true;
+  while (offsetPx < canvas.height) {
+    const alturaDisponivelMm = primeiraFatia ? alturaPrimeiraPaginaMm : alturaDemaisPaginasMm;
+    const alturaMaxPx = Math.max(1, Math.round(alturaDisponivelMm * pxPerMm));
+    const limitePx = Math.min(canvas.height, offsetPx + alturaMaxPx);
+    // Usa a última quebra "segura" (fim de uma linha de cards) dentro do espaço disponível;
+    // se nenhuma quebra couber (linha mais alta que uma página inteira), corta no limite mesmo.
+    const candidatos = quebrasPx.filter(function(q) { return q > offsetPx && q <= limitePx; });
+    const corte = candidatos.length ? candidatos[candidatos.length - 1] : limitePx;
+    const alturaFatiaPx = corte - offsetPx;
+    const fatia = document.createElement('canvas');
+    fatia.width = canvas.width;
+    fatia.height = alturaFatiaPx;
+    fatia.getContext('2d').drawImage(canvas, 0, offsetPx, canvas.width, alturaFatiaPx, 0, 0, canvas.width, alturaFatiaPx);
+    const dataUrl = fatia.toDataURL('image/png');
+    const alturaFatiaMm = alturaFatiaPx / pxPerMm;
+    const y = primeiraFatia ? 24 : margin;
+    if (!primeiraFatia) doc.addPage();
+    doc.addImage(dataUrl, 'PNG', margin, y, imgWidthMm, alturaFatiaMm);
+    offsetPx = corte;
+    primeiraFatia = false;
+  }
 }
 
 /* ---------------- Utilidades ---------------- */
