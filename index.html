@@ -857,7 +857,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
    dispositivo. Exibido no rodapé do menu lateral. */
 const ULTIMA_ATUALIZACAO_SISTEMA = '09/09/2026 22:10';
 
-const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa'];
+const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
 
 /* ---------------- Cadastro de cavidades por gramatura (aba própria, histórico append-only) ---------------- */
@@ -1085,7 +1085,7 @@ async function garantirColunasInjecao(token) {
     const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaInjecao/columns', { headers: { Authorization: 'Bearer ' + token } });
     const json = await resp.json();
     const colunasExistentes = (json.value || []).map(function(c) { return c.name; });
-    const colunasNovas = ['op', 'numero_caixa'].filter(function(nome) { return colunasExistentes.indexOf(nome) === -1; });
+    const colunasNovas = ['op', 'numero_caixa', 'cavidade_todas'].filter(function(nome) { return colunasExistentes.indexOf(nome) === -1; });
     for (const nome of colunasNovas) {
       await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaInjecao/columns/add', {
         method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
@@ -2164,7 +2164,11 @@ async function confirmarSalvarSessao(processo) {
           criticidade: d.criticidade, operador_ciente: d.operadorCiente, status_correcao: d.status, observacao: d.observacao, foto_url: d.fotoUrlFinal || '', criado_em: new Date().toISOString(),
           organizacao_linha_produtiva: organizacaoLinha, tonalidade_preforma: tonalidadePreforma, alinhamento_etiqueta_caixa: alinhamentoEtiqueta,
           temperatura_gate_min: tempGateMin, temperatura_gate_max: tempGateMax, temperatura_corpo_min: tempCorpoMin, temperatura_corpo_max: tempCorpoMax,
-          op: op, numero_caixa: numeroCaixaInj };
+          op: op, numero_caixa: numeroCaixaInj,
+          // Guarda que "Todas as ativas" foi marcado nesse desvio — mesmo gravando a lista real das
+          // cavidades no banco (pra análises/relatórios ficarem corretos), isso permite mostrar só
+          // "Todas" na mensagem do WhatsApp em vez da lista enorme (ver formatarCavidadesWpp).
+          cavidade_todas: d.cavTodasMarcada ? 'SIM' : '' };
       });
     } else {
       const cor = document.getElementById('sop_cor').value;
@@ -3136,13 +3140,25 @@ function agruparPorSessao(linhas) {
 // depois de cada ';' — a coluna Cavidade tem largura FIXA (ver columnStyles em gerarPDF) e o
 // autoTable quebra o texto em quantas linhas forem necessárias dentro dessa largura (nunca no meio
 // de um número), sem nunca ultrapassar a página na horizontal.
-function formatarCavidadePDF(valor) {
+// todasFlag vem da coluna cavidade_todas — 'SIM' quando "Todas as ativas" foi marcado no cadastro
+// desse desvio. A planilha continua guardando a lista real das cavidades (pra análises internas),
+// mas no PDF exportado mostramos só "Todas" em vez da lista enorme, deixando o relatório mais
+// compacto — mesma regra já aplicada na mensagem do WhatsApp (ver formatarCavidadesWpp).
+function formatarCavidadePDF(valor, todasFlag) {
+  if (String(todasFlag || '').toUpperCase() === 'SIM') return 'Todas';
   const texto = (valor || '').toString().trim();
   if (!texto) return '—';
+  if (texto.toUpperCase() === 'TODAS') return 'Todas';
   return texto.split(';').join('; ');
 }
 
-function formatarCavidadesWpp(valor) {
+// todasFlag vem da coluna cavidade_todas — 'SIM' quando "Todas as ativas" foi marcado no cadastro
+// desse desvio. O banco continua guardando a lista real das cavidades (pros relatórios/análises),
+// mas na mensagem do WhatsApp mostramos só "Todas" em vez de listar 40-70 números, que deixava a
+// mensagem enorme. Cadastros antigos (sem essa coluna, ou salvos ainda como a palavra "TODAS") não
+// são afetados — continuam mostrando "Todas" (legado) ou a lista, como já era.
+function formatarCavidadesWpp(valor, todasFlag) {
+  if (String(todasFlag || '').toUpperCase() === 'SIM') return 'Todas';
   if (!valor) return '—';
   const v = String(valor).trim();
   if (v.toUpperCase() === 'TODAS') return 'Todas';
@@ -3168,7 +3184,7 @@ function montarTextoWhatsApp(processo, linhas) {
       g.itens.forEach(function(item) {
         if (!item.defeito) return;
         texto += item.defeito + ' - ' + (item.criticidade || '—') + '\n';
-        texto += '* CAV: ' + formatarCavidadesWpp(item.cavidade) + '\n';
+        texto += '* CAV: ' + formatarCavidadesWpp(item.cavidade, item.cavidade_todas) + '\n';
       });
       if (idx < grupos.length - 1) texto += '\n';
     });
@@ -3254,7 +3270,7 @@ async function gerarPDF(processo) {
       return [formatarDataBR(l.data), l.hora_fim||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
         l.gramatura||'—', l.resina||'—', formatarTemperatura(l.temperatura_gate_min), formatarTemperatura(l.temperatura_gate_max), formatarTemperatura(l.temperatura_corpo_min), formatarTemperatura(l.temperatura_corpo_max),
         porExtenso(l.organizacao_linha_produtiva), porExtenso(l.tonalidade_preforma), porExtenso(l.alinhamento_etiqueta_caixa),
-        l.defeito||'—', formatarCavidadePDF(l.cavidade), l.criticidade||'—', porExtenso(l.operador_ciente)];
+        l.defeito||'—', formatarCavidadePDF(l.cavidade, l.cavidade_todas), l.criticidade||'—', porExtenso(l.operador_ciente)];
     });
   }
 
