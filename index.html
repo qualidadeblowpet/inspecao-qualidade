@@ -289,9 +289,13 @@
   .cav-grid::-webkit-scrollbar { width: 7px; }
   .cav-grid::-webkit-scrollbar-track { background: transparent; }
   .cav-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-  .cav-opt { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-dim); padding: 3px 4px; border-radius: 5px; cursor: pointer; }
-  .cav-opt:hover { background: var(--surface); }
-  .cav-opt input { margin: 0; }
+  /* Especificidade reforçada (.cav-grid .cav-opt) pra vencer ".field label"/".field input" —
+     o grid de cavidades fica dentro de um .field, e sem isso o label perde o display:flex e o
+     checkbox herda width:100% do ".field input", esticando de forma visualmente estranha. */
+  .cav-grid .cav-opt { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-dim); padding: 3px 4px; border-radius: 5px; cursor: pointer; }
+  .cav-grid .cav-opt.cav-opt-todas { grid-column: 1 / -1; font-weight: 700; color: var(--text); border-bottom: 1px solid var(--border); padding-bottom: 6px; margin-bottom: 2px; }
+  .cav-grid .cav-opt:hover { background: var(--surface); }
+  .cav-grid .cav-opt input { margin: 0; width: auto; }
 
   .config-note { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
   .config-note code { background: var(--surface-2); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; }
@@ -353,6 +357,28 @@
   .wa-confirma-sub { font-size: 13.5px; color: var(--text-dim); margin: 0 0 26px; line-height: 1.5; }
   .wa-confirma-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .wa-confirma-acoes .btn { padding: 13px; font-size: 14.5px; }
+
+  /* ---------- Cadastro/alerta de cavidades por gramatura ---------- */
+  .cav-cadastro-overlay {
+    position: fixed; inset: 0; z-index: 160; background: rgba(0,0,0,0.55);
+    display: flex; align-items: center; justify-content: center; padding: 24px; overflow-y: auto;
+  }
+  .cav-cadastro-overlay.hidden { display: none; }
+  .cav-cadastro-card {
+    width: 100%; max-width: 520px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px 28px 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.45); margin: auto;
+  }
+  .cav-cadastro-icon {
+    width: 48px; height: 48px; border-radius: 50%; margin: 0 0 14px;
+    background: var(--accent-dim); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+  }
+  .cav-cadastro-titulo { font-family: var(--font-display); font-size: 17px; font-weight: 700; color: var(--text); margin: 0 0 8px; text-transform: none; }
+  .cav-cadastro-sub { font-size: 13px; color: var(--text-dim); margin: 0 0 20px; line-height: 1.55; }
+  .cav-cadastro-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
+  .cav-cadastro-acoes .btn { padding: 13px; font-size: 14.5px; }
+  .cav-isoladas-nota { font-size: 11.5px; color: var(--text-dim); margin-top: 8px; }
+  .cav-isoladas-tag { display: inline-block; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; margin: 2px 2px 0 0; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
 
   /* ---------- Tabelas "Últimas Ocorrências": altura fixa (~15 linhas) com rolagem vertical ---------- */
   .table-scroll { max-height: 550px; overflow-y: auto; }
@@ -436,6 +462,10 @@
         <button class="btn btn-accent btn-block" onclick="responderPerguntaWhatsApp(true)">🟢 Sim, enviar</button>
       </div>
     </div>
+  </div>
+
+  <div class="cav-cadastro-overlay hidden" id="cavCadastroOverlay">
+    <div class="cav-cadastro-card" id="cavCadastroCardBody"></div>
   </div>
 
   <div class="sidebar" id="sidebar">
@@ -771,6 +801,27 @@
         <div class="field"><label>Operadores — Sopro (um por linha)</label><textarea id="listaOperadoresSopro" rows="3"></textarea></div>
         <button class="btn btn-accent" id="btnSalvarListas" onclick="salvarListas()">Salvar listas</button>
       </div>
+
+      <div class="card">
+        <h3>Cavidades por gramatura — Injeção</h3>
+        <p class="config-note" style="margin-bottom:12px;">
+          Define quantas cavidades tem o molde de cada gramatura e quais estão isoladas (fora de uso)
+          no momento. É isso que restringe as opções do campo "Cavidade(s)" no Cadastro de Injeção.
+          Fica guardado numa aba própria da planilha (<code>Cavidades_App</code>), com histórico de
+          cada atualização — o cadastro mais recente de cada gramatura é sempre o que vale.
+        </p>
+        <div class="grid-2" style="align-items:end;">
+          <div class="field"><label>Gramatura</label><select id="cavConfigGramatura"></select></div>
+          <button class="btn btn-outline" style="height:42px;" onclick="abrirCadastroCavidadesConfig()">Cadastrar / atualizar</button>
+        </div>
+        <div class="table-scroll" style="margin-top:16px;">
+          <table class="occ-table" id="tabelaCavidadesConfig">
+            <thead><tr><th>Gramatura</th><th>Total de cavidades</th><th>Isoladas atualmente</th><th>Cadastrado em</th><th></th></tr></thead>
+            <tbody id="tabelaCavidadesConfigBody"></tbody>
+          </table>
+          <div id="tabelaCavidadesConfigVazia" class="table-empty hidden">Nenhuma gramatura cadastrada ainda.</div>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -798,12 +849,24 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
 
+/* ---------------- Cadastro de cavidades por gramatura (aba própria, histórico append-only) ---------------- */
+const NOME_ABA_CAVIDADES = 'Cavidades_App';
+const NOME_TABELA_CAVIDADES = 'TabelaCavidades';
+const CABECALHO_CAVIDADES = ['gramatura','total_cavidades','cavidades_isoladas','data_cadastro','hora_cadastro','responsavel'];
+
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
 let paginaAtual = 'dashboard';
 let dadosCache = { injecao: [], sopro: [] };
 let charts = {};
 let desviosInjecao = [], contadorInjecao = 0;
 let desviosSopro = [], contadorSopro = 0;
+
+let cavidadesCache = [];           // registros carregados da aba Cavidades_App (histórico completo)
+let cavidadesAtivasAtual = null;   // cavidades ativas (array) pra gramatura selecionada no Cadastro Injeção; null = sem restrição (legado)
+let isoladasAtuaisAtual = [];      // cavidades isoladas do cadastro aplicado no momento
+let gramaturaCavResolvida = null;  // gramatura já resolvida (perguntada/aplicada) nesta passagem pelo formulário
+let gramaturaCavPendente = '';     // gramatura sendo tratada no modal de cadastro/alerta agora
+let registroCavPendente = null;    // último registro encontrado pra essa gramatura (ou null = cadastro novo)
 
 let listas = {
   responsaveis: ['Juliana', 'Kenedy', 'Pablo', 'Tiago', 'Lucas', 'Kenneth', 'Arthur'],
@@ -934,6 +997,7 @@ async function conectarPlanilha() {
       await carregarListasDaPlanilha();
       await garantirColunasInjecao(token);
       await prepararColunasComoTexto(token);
+      await carregarCavidadesDaPlanilha();
       carregarDados();
       return true;
     } else {
@@ -1044,6 +1108,289 @@ async function prepararColunasComoTexto(token) {
     }
   }
   colunasTextoPreparadas = true;
+}
+
+/* ---------------- Cadastro de cavidades por gramatura (aba Cavidades_App / TabelaCavidades) ---------------- */
+
+function dataISOparaBR(iso) {
+  if (!iso) return '—';
+  const partes = String(iso).split('-');
+  return partes.length === 3 ? (partes[2] + '/' + partes[1] + '/' + partes[0]) : iso;
+}
+
+async function garantirTabelaCavidades(token) {
+  // Verifica se a planilha (worksheet) "Cavidades_App" existe
+  const respWs = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets', { headers: { Authorization: 'Bearer ' + token } });
+  const jsonWs = await respWs.json();
+  const existeWs = (jsonWs.value || []).some(function(w){ return w.name === NOME_ABA_CAVIDADES; });
+
+  if (!existeWs) {
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: NOME_ABA_CAVIDADES })
+    });
+  }
+
+  // Verifica se a tabela já existe dentro dela
+  const respTb = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables', { headers: { Authorization: 'Bearer ' + token } });
+  const jsonTb = await respTb.json();
+  const existeTb = (jsonTb.value || []).some(function(t){ return t.name === NOME_TABELA_CAVIDADES; });
+
+  if (!existeTb) {
+    const faixa = 'A1:' + letraColuna(CABECALHO_CAVIDADES.length - 1) + '1';
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/range(address=\'' + faixa + '\')', {
+      method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [CABECALHO_CAVIDADES] })
+    });
+    const respAdd = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: NOME_ABA_CAVIDADES + '!' + faixa, hasHeaders: true })
+    });
+    const jsonAdd = await respAdd.json();
+    if (jsonAdd.id) {
+      await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + jsonAdd.id, {
+        method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: NOME_TABELA_CAVIDADES })
+      });
+    }
+    // trava data_cadastro/hora_cadastro como Texto, pra Excel não converter automaticamente
+    ['data_cadastro', 'hora_cadastro'].forEach(async function(campo) {
+      const idx = CABECALHO_CAVIDADES.indexOf(campo);
+      const col = letraColuna(idx);
+      try {
+        await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/range(address=\'' + col + ':' + col + '\')', {
+          method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ numberFormat: [['@']] })
+        });
+      } catch (e) { /* segue mesmo se falhar */ }
+    });
+    return false; // tabela recém-criada, ainda vazia
+  }
+  return true;
+}
+
+async function carregarCavidadesDaPlanilha() {
+  try {
+    const token = await getToken();
+    const jaExistia = await garantirTabelaCavidades(token);
+    if (!jaExistia) { cavidadesCache = []; renderCavidadesConfig(); return; }
+    const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows', { headers: { Authorization: 'Bearer ' + token } });
+    const json = await resp.json();
+    cavidadesCache = (json.value || []).map(function(row) {
+      const v = row.values[0];
+      const obj = {};
+      CABECALHO_CAVIDADES.forEach(function(campo, i) { obj[campo] = v[i]; });
+      return obj;
+    });
+    renderCavidadesConfig();
+  } catch (err) {
+    console.error('Erro ao carregar cadastro de cavidades da planilha:', err);
+    cavidadesCache = [];
+  }
+}
+
+// Ao trocar a gramatura no Cadastro de Injeção: se não houver cadastro de cavidades pra ela, abre a
+// tela de cadastro novo; se já houver, mostra o último cadastro e pergunta se mantém ou atualiza.
+function verificarCavidadesGramatura() {
+  const gramatura = document.getElementById('inj_gramatura').value;
+  if (!gramatura) { cavidadesAtivasAtual = null; isoladasAtuaisAtual = []; gramaturaCavResolvida = null; renderDesvios('injecao'); return; }
+  if (gramaturaCavResolvida === gramatura) return; // já resolvido nesta passagem pelo formulário
+  gramaturaCavPendente = gramatura;
+  const registros = cavidadesCache.filter(function(r){ return r.gramatura === gramatura; });
+  registroCavPendente = registros.length ? registros[registros.length - 1] : null; // último cadastro = mais recente (sempre gravado no fim da tabela)
+  if (!registroCavPendente) {
+    abrirCadastroCavidades();
+  } else {
+    abrirAlertaCavidades();
+  }
+}
+
+function montarGridIsoladas(total, isoladas) {
+  const t = parseInt(total, 10) || 0;
+  if (!t) return '<span style="font-size:12px;color:var(--text-dim);">Informe o total de cavidades para liberar a lista.</span>';
+  let html = '';
+  for (let n = 1; n <= t; n++) {
+    html += '<label class="cav-opt"><input type="checkbox" class="cavIsoladaChk" value="'+n+'"'+(isoladas.indexOf(n)>-1?' checked':'')+'> '+n+'</label>';
+  }
+  return html;
+}
+
+function abrirCadastroCavidades() {
+  const gramatura = gramaturaCavPendente;
+  const base = registroCavPendente;
+  const totalPre = base ? base.total_cavidades : '';
+  const isoladasPre = base && base.cavidades_isoladas ? String(base.cavidades_isoladas).split(',').filter(Boolean).map(Number) : [];
+  const overlay = document.getElementById('cavCadastroOverlay');
+  const body = document.getElementById('cavCadastroCardBody');
+  body.innerHTML =
+    '<div class="cav-cadastro-icon">🧩</div>' +
+    '<h2 class="cav-cadastro-titulo">Cadastro de cavidades — gramatura ' + gramatura + '</h2>' +
+    '<p class="cav-cadastro-sub">' + (base
+      ? 'Atualize o total de cavidades do molde e quais estão isoladas atualmente. O cadastro anterior fica guardado no histórico.'
+      : 'Ainda não existe um cadastro de cavidades para esta gramatura. Informe o total de cavidades do molde e, se houver, quais estão isoladas (fora de uso) atualmente. A partir daí, só as cavidades ativas ficam disponíveis para seleção no campo "Cavidade(s)".') + '</p>' +
+    '<div class="field"><label>Total de cavidades do molde</label><input type="number" id="cavTotalInput" min="1" value="'+(totalPre||'')+'" placeholder="Ex: 72" oninput="atualizarGridIsoladasCadastro()"></div>' +
+    '<div class="field" style="margin-top:14px;"><label>Cavidades isoladas (opcional — deixe todas desmarcadas se nenhuma)</label>' +
+      '<details class="cav-details" open>' +
+        '<summary id="cavIsoladasResumo">' + (isoladasPre.length ? isoladasPre.join(', ') : 'Nenhuma cavidade isolada selecionada') + '</summary>' +
+        '<div class="cav-grid" id="cavIsoladasGrid">' + montarGridIsoladas(totalPre, isoladasPre) + '</div>' +
+      '</details>' +
+    '</div>' +
+    '<div class="cav-cadastro-acoes">' +
+      '<button class="btn btn-outline" onclick="cancelarCadastroCavidades()">Cancelar</button>' +
+      '<button class="btn btn-accent" onclick="salvarCadastroCavidades()">Salvar cadastro</button>' +
+    '</div>';
+  overlay.classList.remove('hidden');
+  body.querySelectorAll('.cavIsoladaChk').forEach(function(cb){ cb.addEventListener('change', atualizarResumoIsoladasCadastro); });
+}
+
+function atualizarGridIsoladasCadastro() {
+  const total = document.getElementById('cavTotalInput').value;
+  const marcadasAntes = Array.from(document.querySelectorAll('.cavIsoladaChk:checked')).map(function(cb){ return parseInt(cb.value, 10); });
+  const grid = document.getElementById('cavIsoladasGrid');
+  grid.innerHTML = montarGridIsoladas(total, marcadasAntes);
+  grid.querySelectorAll('.cavIsoladaChk').forEach(function(cb){ cb.addEventListener('change', atualizarResumoIsoladasCadastro); });
+  atualizarResumoIsoladasCadastro();
+}
+
+function atualizarResumoIsoladasCadastro() {
+  const marcadas = Array.from(document.querySelectorAll('.cavIsoladaChk:checked')).map(function(cb){ return parseInt(cb.value, 10); }).sort(function(a,b){ return a-b; });
+  const resumo = document.getElementById('cavIsoladasResumo');
+  if (resumo) resumo.textContent = marcadas.length ? marcadas.join(', ') : 'Nenhuma cavidade isolada selecionada';
+}
+
+function fecharCadastroCavidades() {
+  document.getElementById('cavCadastroOverlay').classList.add('hidden');
+  document.getElementById('cavCadastroCardBody').innerHTML = '';
+}
+
+// Cancelar sem cadastrar: não trava o preenchimento — cai no modo antigo (1-72 livre) pra essa gramatura,
+// e não pergunta de novo enquanto o formulário atual estiver aberto.
+function cancelarCadastroCavidades() {
+  gramaturaCavResolvida = gramaturaCavPendente;
+  cavidadesAtivasAtual = null; isoladasAtuaisAtual = [];
+  renderDesvios('injecao');
+  fecharCadastroCavidades();
+}
+
+function abrirAlertaCavidades() {
+  const gramatura = gramaturaCavPendente;
+  const registro = registroCavPendente;
+  const isoladas = registro.cavidades_isoladas ? String(registro.cavidades_isoladas).split(',').filter(Boolean).map(Number) : [];
+  const total = parseInt(registro.total_cavidades, 10) || 0;
+  const quandoTxt = dataISOparaBR(registro.data_cadastro) + (registro.hora_cadastro ? (' às ' + registro.hora_cadastro) : '');
+  const isoladasTxt = isoladas.length
+    ? isoladas.map(function(n){ return '<span class="cav-isoladas-tag">'+n+'</span>'; }).join('')
+    : '<span class="cav-isoladas-tag">Nenhuma</span>';
+  const overlay = document.getElementById('cavCadastroOverlay');
+  const body = document.getElementById('cavCadastroCardBody');
+  body.innerHTML =
+    '<div class="cav-cadastro-icon" style="margin-left:auto;margin-right:auto;">🧩</div>' +
+    '<h2 class="cav-cadastro-titulo" style="text-align:center;">Cadastro de cavidades encontrado</h2>' +
+    '<p class="cav-cadastro-sub" style="text-align:center;">O molde da gramatura <b>'+gramatura+'</b> tem <b>'+total+' cavidades</b>, sendo <b>'+isoladas.length+' isolada'+(isoladas.length===1?'':'s')+'</b> atualmente (cadastro de '+quandoTxt+'):</p>' +
+    '<div style="text-align:center;margin-bottom:6px;">'+isoladasTxt+'</div>' +
+    '<p class="cav-cadastro-sub" style="text-align:center;margin-top:16px;">Deseja manter esse cadastro ou atualizar as cavidades isoladas antes de continuar?</p>' +
+    '<div class="cav-cadastro-acoes">' +
+      '<button class="btn btn-outline" onclick="abrirCadastroCavidades()">Atualizar cadastro</button>' +
+      '<button class="btn btn-accent" onclick="confirmarManterCavidades()">Manter cadastro</button>' +
+    '</div>';
+  overlay.classList.remove('hidden');
+}
+
+function confirmarManterCavidades() {
+  aplicarRegistroCavidades(registroCavPendente);
+  fecharCadastroCavidades();
+}
+
+async function salvarCadastroCavidades() {
+  const gramatura = gramaturaCavPendente;
+  const total = parseInt(document.getElementById('cavTotalInput').value, 10);
+  if (!total || total < 1) { mostrarToast('Informe o total de cavidades do molde (maior que zero).', true); return; }
+  const isoladas = Array.from(document.querySelectorAll('.cavIsoladaChk:checked')).map(function(cb){ return parseInt(cb.value, 10); }).sort(function(a,b){ return a-b; });
+  if (isoladas.length >= total) { mostrarToast('O número de cavidades isoladas não pode ser igual ou maior que o total do molde.', true); return; }
+  const btn = document.querySelector('#cavCadastroCardBody .cav-cadastro-acoes .btn-accent');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
+  try {
+    const token = await getToken();
+    await garantirTabelaCavidades(token);
+    const respEl = document.getElementById('inj_responsavel');
+    const novoRegistro = {
+      gramatura: gramatura,
+      total_cavidades: String(total),
+      cavidades_isoladas: isoladas.join(','),
+      data_cadastro: hojeISO(),
+      hora_cadastro: agoraHHMM(),
+      responsavel: respEl ? respEl.value : ''
+    };
+    const valores = CABECALHO_CAVIDADES.map(function(campo) { return novoRegistro[campo]; });
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [valores] })
+    });
+    cavidadesCache.push(novoRegistro);
+    aplicarRegistroCavidades(novoRegistro);
+    fecharCadastroCavidades();
+    mostrarToast('Cadastro de cavidades salvo com sucesso.');
+  } catch (err) {
+    mostrarToast('Erro ao salvar o cadastro de cavidades. Tente novamente.', true);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Salvar cadastro'; }
+  }
+}
+
+// Aplica um registro de cavidades: se a gramatura ainda estiver selecionada no Cadastro de Injeção,
+// restringe o campo Cavidade(s) do formulário atual; sempre atualiza a listagem em Configurações.
+function aplicarRegistroCavidades(registro) {
+  const gramaturaSelect = document.getElementById('inj_gramatura');
+  if (gramaturaSelect && gramaturaSelect.value === registro.gramatura) {
+    const total = parseInt(registro.total_cavidades, 10) || 0;
+    const isoladas = registro.cavidades_isoladas ? String(registro.cavidades_isoladas).split(',').filter(Boolean).map(Number) : [];
+    const ativas = [];
+    for (let n = 1; n <= total; n++) { if (isoladas.indexOf(n) === -1) ativas.push(n); }
+    cavidadesAtivasAtual = ativas;
+    isoladasAtuaisAtual = isoladas;
+    gramaturaCavResolvida = registro.gramatura;
+    renderDesvios('injecao');
+  }
+  renderCavidadesConfig();
+}
+
+/* ---------------- Configurações: listagem/edição de cavidades por gramatura ---------------- */
+
+function ultimoRegistroCavidadePorGramatura() {
+  const mapa = {};
+  cavidadesCache.forEach(function(r){ mapa[r.gramatura] = r; }); // última ocorrência sobrescreve (ordem = ordem de inserção na planilha)
+  return mapa;
+}
+
+function renderCavidadesConfig() {
+  const selectGram = document.getElementById('cavConfigGramatura');
+  if (!selectGram) return; // página de Configurações ainda não foi montada
+  preencherSelect('cavConfigGramatura', listas.gramaturas);
+  const mapa = ultimoRegistroCavidadePorGramatura();
+  const gramaturasComCadastro = Object.keys(mapa).sort(function(a,b){ return a.localeCompare(b, 'pt-BR', { numeric: true, sensitivity: 'base' }); });
+  const corpo = document.getElementById('tabelaCavidadesConfigBody');
+  const vazio = document.getElementById('tabelaCavidadesConfigVazia');
+  vazio.classList.toggle('hidden', gramaturasComCadastro.length > 0);
+  corpo.innerHTML = gramaturasComCadastro.map(function(g) {
+    const r = mapa[g];
+    const isoladas = r.cavidades_isoladas ? String(r.cavidades_isoladas).split(',').filter(Boolean) : [];
+    const gEsc = g.replace(/'/g, "\\'");
+    return '<tr><td>'+g+'</td><td>'+r.total_cavidades+'</td><td>'+(isoladas.length ? isoladas.join(', ') : 'Nenhuma')+'</td><td>'+dataISOparaBR(r.data_cadastro)+(r.hora_cadastro?(' '+r.hora_cadastro):'')+'</td>' +
+      '<td><button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="editarCavidadesConfig(\''+gEsc+'\')">Editar</button></td></tr>';
+  }).join('');
+}
+
+function editarCavidadesConfig(gramatura) {
+  gramaturaCavPendente = gramatura;
+  const registros = cavidadesCache.filter(function(r){ return r.gramatura === gramatura; });
+  registroCavPendente = registros.length ? registros[registros.length - 1] : null;
+  abrirCadastroCavidades();
+}
+
+function abrirCadastroCavidadesConfig() {
+  const gramatura = document.getElementById('cavConfigGramatura').value;
+  if (!gramatura) { mostrarToast('Selecione uma gramatura.', true); return; }
+  editarCavidadesConfig(gramatura);
 }
 
 async function garantirTabelaListas(token) {
@@ -1206,6 +1553,7 @@ async function salvarListas() {
   listas.operadoresSopro = parse('listaOperadoresSopro');
   renderFormInjecao();
   renderFormSopro();
+  renderCavidadesConfig();
 
   const btn = document.getElementById('btnSalvarListas');
   if (btn) { btn.disabled = true; btn.textContent = 'Salvando na planilha…'; }
@@ -1218,6 +1566,7 @@ async function salvarListas() {
 function gerarIdSessao() { return 'S' + Date.now(); }
 
 function renderFormInjecao() {
+  cavidadesAtivasAtual = null; isoladasAtuaisAtual = []; gramaturaCavResolvida = null;
   const el = document.getElementById('formInjecao');
   el.innerHTML =
     '<div id="alertaMaquinaInjecao"></div>' +
@@ -1238,7 +1587,7 @@ function renderFormInjecao() {
       '</div>' +
       '<div class="grid-3">' +
         '<div class="field"><label>Cor da preforma</label>'+'<select id="inj_cor"></select>'+'</div>' +
-        '<div class="field"><label>Gramatura</label>'+'<select id="inj_gramatura"></select>'+'</div>' +
+        '<div class="field"><label>Gramatura</label>'+'<select id="inj_gramatura" onchange="verificarCavidadesGramatura()"></select>'+'</div>' +
         '<div class="field"><label>Resina</label>'+'<select id="inj_resina"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-3">' +
@@ -1406,11 +1755,22 @@ function alternarCavidade(processo, id, num, checked) {
 function alternarTodasCavidades(processo, id, marcar) {
   const d = listaDesvios(processo).find(function(d){ return d.id === id; });
   if (!d) return;
-  d.cavidade = marcar ? 'TODAS' : [];
+  // Com cadastro de cavidades resolvido pra gramatura da sessão, "Todas as ativas" grava a lista real
+  // das cavidades ativas (nunca mais a palavra "TODAS") e marca visualmente cada uma delas, travadas
+  // (não dá pra desmarcar uma individual enquanto "Todas as ativas" estiver ligado). Sem cadastro
+  // (modo legado), mantém o comportamento antigo (individuais ficam desmarcadas/travadas).
+  const restrito = (processo === 'injecao' && !!cavidadesAtivasAtual);
+  if (restrito) {
+    d.cavTodasMarcada = marcar;
+    d.cavidade = marcar ? cavidadesAtivasAtual.slice() : [];
+  } else {
+    d.cavidade = marcar ? 'TODAS' : [];
+  }
   const checkboxes = document.querySelectorAll('.cav-item-'+processo+'-'+id);
-  checkboxes.forEach(function(cb){ cb.checked = false; cb.disabled = marcar; });
+  checkboxes.forEach(function(cb){ cb.checked = restrito ? marcar : false; cb.disabled = marcar; });
   const resumo = document.getElementById('cavResumo_'+processo+'_'+id);
-  if (resumo) resumo.textContent = marcar ? 'Todas' : 'Selecionar cavidades…';
+  const rotulo = restrito ? ('Todas as ativas ('+cavidadesAtivasAtual.length+')') : 'Todas';
+  if (resumo) resumo.textContent = marcar ? rotulo : 'Selecionar cavidades…';
 }
 
 function armazenarFoto(processo, id, files) {
@@ -1453,19 +1813,24 @@ function renderDesvios(processo) {
 
     let cavidadeBlock = '';
     if (processo === 'injecao') {
-      const todasMarcadas = d.cavidade === 'TODAS';
+      const modoRestrito = !!cavidadesAtivasAtual;
+      const listaCav = modoRestrito ? cavidadesAtivasAtual : Array.from({length:72}, function(_,i){ return i+1; });
+      const todasMarcadas = modoRestrito ? !!d.cavTodasMarcada : (d.cavidade === 'TODAS');
       const selecionadas = Array.isArray(d.cavidade) ? d.cavidade : [];
-      let opcoesCav = '<label class="cav-opt"><input type="checkbox" id="cavTodas_'+processo+'_'+d.id+'"'+(todasMarcadas?' checked':'')+' onchange="alternarTodasCavidades(\''+processo+'\','+d.id+',this.checked)"> Todas</label>';
-      for (let n = 1; n <= 72; n++) {
+      const rotuloTodas = modoRestrito ? ('Todas as ativas ('+listaCav.length+')') : 'Todas';
+      let opcoesCav = '<label class="cav-opt cav-opt-todas"><input type="checkbox" id="cavTodas_'+processo+'_'+d.id+'"'+(todasMarcadas?' checked':'')+' onchange="alternarTodasCavidades(\''+processo+'\','+d.id+',this.checked)"> '+rotuloTodas+'</label>';
+      listaCav.forEach(function(n) {
         const marcado = selecionadas.indexOf(n) > -1 ? ' checked' : '';
         opcoesCav += '<label class="cav-opt"><input type="checkbox" class="cav-item-'+processo+'-'+d.id+'" value="'+n+'"'+marcado+(todasMarcadas?' disabled':'')+' onchange="alternarCavidade(\''+processo+'\','+d.id+','+n+',this.checked)"> '+n+'</label>';
-      }
+      });
+      const notaIsoladas = (modoRestrito && isoladasAtuaisAtual.length)
+        ? '<div class="cav-isoladas-nota">Cavidades isoladas neste molde (não aparecem aqui): '+isoladasAtuaisAtual.join(', ')+'</div>' : '';
       cavidadeBlock =
         '<div class="field"><label>Cavidade(s)</label>' +
           '<details class="cav-details">' +
-            '<summary id="cavResumo_'+processo+'_'+d.id+'">'+(todasMarcadas ? 'Todas' : selecionadas.length ? selecionadas.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…')+'</summary>' +
+            '<summary id="cavResumo_'+processo+'_'+d.id+'">'+(todasMarcadas ? rotuloTodas : selecionadas.length ? selecionadas.slice().sort(function(a,b){return a-b;}).join(', ') : 'Selecionar cavidades…')+'</summary>' +
             '<div class="cav-grid">'+opcoesCav+'</div>' +
-          '</details>' +
+          '</details>' + notaIsoladas +
         '</div>';
     }
 
