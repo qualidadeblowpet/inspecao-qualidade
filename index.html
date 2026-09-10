@@ -2831,7 +2831,6 @@ function construirAnalisePeriodoHtml(procForcado) {
   const proc = procForcado || selProcesso.value;
   let base = proc === 'injecao' ? dadosCache.injecao.slice() : proc === 'sopro' ? dadosCache.sopro.slice() : dadosCache.injecao.concat(dadosCache.sopro);
   const todasLinhas = aplicarFiltrosComuns(base, true);
-  const linhasDesvio = todasLinhas.filter(function(l) { return l.defeito; });
 
   if (!todasLinhas.length) return null;
 
@@ -2856,6 +2855,31 @@ function construirAnalisePeriodoHtml(procForcado) {
     const ini = new Date(agora); ini.setTime(ini.getTime() - periodoValNum * 24 * 60 * 60 * 1000);
     periodoRange = formatarDataBRDate(ini) + ' a ' + formatarDataBRDate(agora) + ' (' + periodoTexto + ')';
   }
+
+  return montarAnaliseHtmlDeLinhas(todasLinhas, procTexto, periodoRange, dias);
+}
+
+// Data (min/max) realmente presente num conjunto de linhas já filtrado — usado pra descrever
+// com exatidão o período de um relatório PDF, cujo filtro (toolbar da própria tabela) é
+// independente do filtro "Período" do Dashboard.
+function periodoTextoDeLinhas(linhas) {
+  let min = null, max = null;
+  linhas.forEach(function(l) {
+    if (!l.data) return;
+    if (!min || l.data < min) min = l.data;
+    if (!max || l.data > max) max = l.data;
+  });
+  if (!min) return '—';
+  return min === max ? formatarDataBR(min) : (formatarDataBR(min) + ' a ' + formatarDataBR(max));
+}
+
+// Monta o HTML (KPIs + cards por máquina) a partir de um conjunto de linhas JÁ FILTRADO
+// (não filtra nada aqui) — compartilhado entre a Análise do Dashboard (filtro Período/
+// Equipamento/Responsável/Criticidade da tela) e a Análise anexada ao PDF (mesmo filtro da
+// tabela exportada: busca/data/horário/cadastros da própria página de Ocorrência).
+function montarAnaliseHtmlDeLinhas(todasLinhas, procTexto, periodoRangeTexto, dias) {
+  const linhasDesvio = todasLinhas.filter(function(l) { return l.defeito; });
+
   let ultimoCadastro = null;
   todasLinhas.forEach(function(l) {
     if (!l.criado_em) return;
@@ -2874,7 +2898,7 @@ function construirAnalisePeriodoHtml(procForcado) {
     return db - da || a.localeCompare(b);
   });
 
-  let html = '<p class="analise-sub">Período: ' + periodoRange + ' · Processo: ' + procTexto + ' · Gerado a partir do último cadastro em ' + ultimoCadastroTexto + '</p>';
+  let html = '<p class="analise-sub">Período: ' + periodoRangeTexto + ' · Processo: ' + procTexto + ' · Gerado a partir do último cadastro em ' + ultimoCadastroTexto + '</p>';
   html += '<div class="analise-kpis">' +
     '<div class="kpi"><div class="label">Cadastros no período</div><div class="num">' + cadastros + '</div></div>' +
     '<div class="kpi"><div class="label">Desvios encontrados</div><div class="num">' + linhasDesvio.length + '</div></div>' +
@@ -2884,6 +2908,19 @@ function construirAnalisePeriodoHtml(procForcado) {
   html += '<div class="analise-maquinas-grid">' + equipamentos.map(function(equip) { return renderCardMaquina(equip, todasLinhas, dias); }).join('') + '</div>';
 
   return html;
+}
+
+// Versão usada pelo PDF exportado: recebe as MESMAS linhas já filtradas que foram usadas pra
+// montar a tabela do relatório (busca/data/horário/cadastros da toolbar da página de Ocorrência),
+// em vez de reconsultar o filtro Período/Equipamento/Responsável/Criticidade do Dashboard — que é
+// independente e podia ficar dessincronizado do filtro realmente usado pra exportar o PDF.
+function construirAnaliseHtmlParaPDF(linhasFiltradas, processo) {
+  if (!linhasFiltradas.length) return null;
+  const procTexto = processo === 'sopro' ? 'Sopro' : 'Injeção';
+  const periodoRangeTexto = periodoTextoDeLinhas(linhasFiltradas) + ' (mesmo filtro usado na exportação)';
+  // Sem comparação de tendência aqui: o intervalo vem da toolbar da tabela (arbitrário), sem
+  // uma janela "período anterior" equivalente bem definida como as opções fixas do Dashboard.
+  return montarAnaliseHtmlDeLinhas(linhasFiltradas, procTexto, periodoRangeTexto, 0);
 }
 
 function gerarAnaliseIA() {
@@ -3236,18 +3273,21 @@ async function gerarPDF(processo) {
     });
   }
 
-  await adicionarAnaliseAoPDF(doc, processo);
+  await adicionarAnaliseAoPDF(doc, processo, linhas);
 
   const nomeArquivo = 'inspecao_' + processo + '_' + hojeISO() + '.pdf';
   doc.save(nomeArquivo);
 }
 
-// Anexa ao final do PDF (páginas novas) a "Análise do período por máquina" já filtrada só pro
-// processo daquele relatório (mesmos filtros Período/Equipamento/Responsável/Criticidade da tela),
-// capturada como imagem em boa qualidade (html2canvas em escala 2x) — sempre em tema claro,
-// independente do tema atual da tela, pra ficar legível impresso. Pagina automaticamente se o
-// conteúdo (muitas máquinas) não couber numa página só.
-async function adicionarAnaliseAoPDF(doc, processo) {
+// Anexa ao final do PDF (páginas novas) a "Análise do período por máquina" usando as MESMAS
+// linhas (linhasFiltradas) já filtradas pra montar a tabela desse relatório — busca/data/
+// horário/cadastros da toolbar da própria página de Ocorrência, e não o filtro Período/
+// Equipamento/Responsável/Criticidade do Dashboard (que é independente e pode estar
+// dessincronizado do filtro realmente usado pra exportar o PDF). Capturada como imagem em boa
+// qualidade (html2canvas em escala 2x) — sempre em tema claro, independente do tema atual da
+// tela, pra ficar legível impresso. Pagina automaticamente se o conteúdo (muitas máquinas) não
+// couber numa página só.
+async function adicionarAnaliseAoPDF(doc, processo, linhasFiltradas) {
   const tituloProc = processo === 'sopro' ? 'Sopro' : 'Injeção';
 
   doc.addPage();
@@ -3266,7 +3306,7 @@ async function adicionarAnaliseAoPDF(doc, processo) {
     return;
   }
 
-  const analiseHtml = construirAnalisePeriodoHtml(processo);
+  const analiseHtml = construirAnaliseHtmlParaPDF(linhasFiltradas, processo);
   if (!analiseHtml) {
     doc.setFontSize(10);
     doc.text('Nenhum cadastro encontrado para os filtros selecionados neste processo.', 14, 30);
