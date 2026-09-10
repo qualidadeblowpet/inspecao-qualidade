@@ -3218,8 +3218,6 @@ async function gerarPDF(processo) {
   const titulo = processo === 'sopro' ? 'Relatório de Inspeção da Qualidade — Processo de Sopro' : 'Relatório de Inspeção da Qualidade — Processo de Injeção';
   doc.setFontSize(13);
   doc.text(titulo, 14, 12);
-  doc.setFontSize(9);
-  doc.text('Gerado em ' + new Date().toLocaleString('pt-BR'), 14, 18);
 
   let linhas, colunas, corpo;
   if (processo === 'sopro') {
@@ -3240,9 +3238,11 @@ async function gerarPDF(processo) {
     });
   }
 
+  const startYTabela = await inserirAnaliseAntesDaTabela(doc, processo, linhas);
+
   if (processo === 'sopro') {
     doc.autoTable({
-      head: [colunas], body: corpo, startY: 22,
+      head: [colunas], body: corpo, startY: startYTabela,
       styles: { fontSize: 7, cellPadding: 1.5, overflow: 'linebreak', cellWidth: 'wrap', valign: 'middle', halign: 'center' },
       headStyles: { fillColor: [30,32,35], textColor: 255, halign: 'center', valign: 'middle' },
       alternateRowStyles: { fillColor: [245,245,245] },
@@ -3251,7 +3251,7 @@ async function gerarPDF(processo) {
     });
   } else {
     doc.autoTable({
-      head: [colunas], body: corpo, startY: 22,
+      head: [colunas], body: corpo, startY: startYTabela,
       styles: { fontSize: 6.5, cellPadding: 1.2, overflow: 'linebreak', cellWidth: 'wrap', valign: 'middle' },
       headStyles: { fillColor: [30,32,35], textColor: 255, minCellHeight: 30, valign: 'bottom', halign: 'left' },
       alternateRowStyles: { fillColor: [245,245,245] },
@@ -3273,44 +3273,31 @@ async function gerarPDF(processo) {
     });
   }
 
-  await adicionarAnaliseAoPDF(doc, processo, linhas);
-
   const nomeArquivo = 'inspecao_' + processo + '_' + hojeISO() + '.pdf';
   doc.save(nomeArquivo);
 }
 
-// Anexa ao final do PDF (páginas novas) a "Análise do período por máquina" usando as MESMAS
-// linhas (linhasFiltradas) já filtradas pra montar a tabela desse relatório — busca/data/
-// horário/cadastros da toolbar da própria página de Ocorrência, e não o filtro Período/
-// Equipamento/Responsável/Criticidade do Dashboard (que é independente e pode estar
-// dessincronizado do filtro realmente usado pra exportar o PDF). Capturada como imagem em boa
-// qualidade (html2canvas em escala 2x) — sempre em tema claro, independente do tema atual da
-// tela, pra ficar legível impresso. Pagina automaticamente se o conteúdo (muitas máquinas) não
-// couber numa página só.
-async function adicionarAnaliseAoPDF(doc, processo, linhasFiltradas) {
-  doc.addPage();
-
+// Insere, logo ABAIXO do título (antes da tabela) a "Análise do período por máquina" usando as
+// MESMAS linhas (linhasFiltradas) já filtradas pra montar a tabela desse relatório — busca/
+// data/horário/cadastros da toolbar da própria página de Ocorrência, e não o filtro Período/
+// Equipamento/Responsável/Criticidade do Dashboard. Capturada como imagem em boa qualidade
+// (html2canvas em escala 2x) — sempre em tema claro, independente do tema atual da tela.
+// Retorna o Y (mm) onde a tabela deve começar (logo depois da arte, sem espaço em branco) —
+// na mesma página, se a arte coube nela, ou na página seguinte, se precisou paginar.
+async function inserirAnaliseAntesDaTabela(doc, processo, linhasFiltradas) {
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 8;
+  const yInicio = 16; // logo abaixo do título (sem linha de "Gerado em")
+  const espacoAposArte = 3;
 
-  if (typeof html2canvas === 'undefined') {
-    doc.setFontSize(10);
-    doc.text('Não foi possível gerar a análise por máquina (biblioteca de captura de imagem não carregou).', 14, 16);
-    return;
-  }
+  if (typeof html2canvas === 'undefined') return yInicio;
 
   const analiseHtml = construirAnaliseHtmlParaPDF(linhasFiltradas, processo);
-  if (!analiseHtml) {
-    doc.setFontSize(10);
-    doc.text('Nenhum cadastro encontrado para os filtros selecionados neste processo.', 14, 16);
-    return;
-  }
+  if (!analiseHtml) return yInicio;
 
   // Container fora da tela, sempre com as variáveis do tema claro (independente do tema em uso),
-  // pra a imagem sair legível e consistente no PDF impresso. Fundo branco (não cinza), já que
-  // não tem mais título/cabeçalho na página — a informação de processo/data já vai dentro da
-  // própria imagem (linha "Período: ... · Processo: ...").
+  // pra a imagem sair legível e consistente no PDF impresso.
   const wrap = document.createElement('div');
   wrap.style.cssText = [
     'position:fixed', 'left:-9999px', 'top:0', 'width:1400px', 'padding:22px',
@@ -3334,27 +3321,25 @@ async function adicionarAnaliseAoPDF(doc, processo, linhasFiltradas) {
   // linha do grid de máquinas, pra nunca partir um card de máquina ao meio entre páginas.
   const wrapTopoRect = wrap.getBoundingClientRect().top;
   const cards = Array.from(wrap.querySelectorAll('.analise-maquina'));
-  const linhas = [];
+  const linhasQuebra = [];
   cards.forEach(function(c) {
     const r = c.getBoundingClientRect();
     const topo = Math.round(r.top - wrapTopoRect);
     const fundo = Math.round(r.bottom - wrapTopoRect);
-    let linha = linhas.find(function(l) { return Math.abs(l.topo - topo) < 4; });
-    if (!linha) { linhas.push({ topo: topo, fundo: fundo }); }
+    let linha = linhasQuebra.find(function(l) { return Math.abs(l.topo - topo) < 4; });
+    if (!linha) { linhasQuebra.push({ topo: topo, fundo: fundo }); }
     else linha.fundo = Math.max(linha.fundo, fundo);
   });
-  linhas.sort(function(a, b) { return a.topo - b.topo; });
+  linhasQuebra.sort(function(a, b) { return a.topo - b.topo; });
   const alturaWrapCss = wrap.scrollHeight;
-  const quebrasCss = [0].concat(linhas.map(function(l) { return l.fundo; })).concat([alturaWrapCss]);
+  const quebrasCss = [0].concat(linhasQuebra.map(function(l) { return l.fundo; })).concat([alturaWrapCss]);
 
   let canvas;
   try {
     canvas = await html2canvas(wrap, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
   } catch (e) {
     wrap.remove();
-    doc.setFontSize(10);
-    doc.text('Não foi possível gerar a imagem da análise por máquina.', 14, 16);
-    return;
+    return yInicio;
   }
   wrap.remove();
 
@@ -3365,14 +3350,27 @@ async function adicionarAnaliseAoPDF(doc, processo, linhasFiltradas) {
 
   const imgWidthMm = pageWidth - margin * 2;
   const pxPerMm = canvas.width / imgWidthMm;
-  // Sem título/cabeçalho na página (já removido), então todas as páginas — inclusive a
-  // primeira — usam a mesma altura útil (só a margem).
-  const alturaPaginaMm = pageHeight - margin * 2;
+  const alturaTotalMm = canvas.height / pxPerMm;
+  const espacoDisponivelPg1 = pageHeight - yInicio - margin;
 
+  // Caso comum: a arte inteira cabe abaixo do título, na própria página 1 — sem paginar, sem
+  // deixar espaço em branco antes da tabela.
+  if (alturaTotalMm <= espacoDisponivelPg1) {
+    doc.addImage(canvas.toDataURL('image/png'), 'PNG', margin, yInicio, imgWidthMm, alturaTotalMm);
+    return yInicio + alturaTotalMm + espacoAposArte;
+  }
+
+  // Não coube inteira: pagina em fatias (cortando sempre entre linhas de cards) — a 1ª fatia
+  // ainda na página 1 (abaixo do título), as demais em páginas novas; a tabela então começa
+  // logo depois da última fatia, na mesma página dela.
+  const alturaPaginaMm = pageHeight - margin * 2;
   let offsetPx = 0;
   let primeiraFatia = true;
+  let yFinal = yInicio;
   while (offsetPx < canvas.height) {
-    const alturaMaxPx = Math.max(1, Math.round(alturaPaginaMm * pxPerMm));
+    const alturaDisponivelMm = primeiraFatia ? espacoDisponivelPg1 : alturaPaginaMm;
+    const yFatia = primeiraFatia ? yInicio : margin;
+    const alturaMaxPx = Math.max(1, Math.round(alturaDisponivelMm * pxPerMm));
     const limitePx = Math.min(canvas.height, offsetPx + alturaMaxPx);
     // Usa a última quebra "segura" (fim de uma linha de cards) dentro do espaço disponível;
     // se nenhuma quebra couber (linha mais alta que uma página inteira), corta no limite mesmo.
@@ -3386,10 +3384,12 @@ async function adicionarAnaliseAoPDF(doc, processo, linhasFiltradas) {
     const dataUrl = fatia.toDataURL('image/png');
     const alturaFatiaMm = alturaFatiaPx / pxPerMm;
     if (!primeiraFatia) doc.addPage();
-    doc.addImage(dataUrl, 'PNG', margin, margin, imgWidthMm, alturaFatiaMm);
+    doc.addImage(dataUrl, 'PNG', margin, yFatia, imgWidthMm, alturaFatiaMm);
+    yFinal = yFatia + alturaFatiaMm + espacoAposArte;
     offsetPx = corte;
     primeiraFatia = false;
   }
+  return yFinal;
 }
 
 /* ---------------- Utilidades ---------------- */
