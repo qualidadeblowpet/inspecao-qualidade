@@ -3288,13 +3288,7 @@ async function gerarPDF(processo) {
 // tela, pra ficar legível impresso. Pagina automaticamente se o conteúdo (muitas máquinas) não
 // couber numa página só.
 async function adicionarAnaliseAoPDF(doc, processo, linhasFiltradas) {
-  const tituloProc = processo === 'sopro' ? 'Sopro' : 'Injeção';
-
   doc.addPage();
-  doc.setFontSize(13);
-  doc.text('Análise do período por máquina — ' + tituloProc, 14, 12);
-  doc.setFontSize(9);
-  doc.text('Gerado em ' + new Date().toLocaleString('pt-BR'), 14, 18);
 
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -3302,29 +3296,39 @@ async function adicionarAnaliseAoPDF(doc, processo, linhasFiltradas) {
 
   if (typeof html2canvas === 'undefined') {
     doc.setFontSize(10);
-    doc.text('Não foi possível gerar a análise por máquina (biblioteca de captura de imagem não carregou).', 14, 30);
+    doc.text('Não foi possível gerar a análise por máquina (biblioteca de captura de imagem não carregou).', 14, 16);
     return;
   }
 
   const analiseHtml = construirAnaliseHtmlParaPDF(linhasFiltradas, processo);
   if (!analiseHtml) {
     doc.setFontSize(10);
-    doc.text('Nenhum cadastro encontrado para os filtros selecionados neste processo.', 14, 30);
+    doc.text('Nenhum cadastro encontrado para os filtros selecionados neste processo.', 14, 16);
     return;
   }
 
   // Container fora da tela, sempre com as variáveis do tema claro (independente do tema em uso),
-  // pra a imagem sair legível e consistente no PDF impresso.
+  // pra a imagem sair legível e consistente no PDF impresso. Fundo branco (não cinza), já que
+  // não tem mais título/cabeçalho na página — a informação de processo/data já vai dentro da
+  // própria imagem (linha "Período: ... · Processo: ...").
   const wrap = document.createElement('div');
   wrap.style.cssText = [
     'position:fixed', 'left:-9999px', 'top:0', 'width:1400px', 'padding:22px',
-    'background:#f4f5f6', 'color:#17181b', 'font-family:var(--font-body)',
-    '--bg:#f4f5f6', '--sidebar:#ffffff', '--surface:#ffffff', '--surface-2:#eceef0', '--border:#d8dade',
+    'background:#ffffff', 'color:#17181b', 'font-family:var(--font-body)',
+    '--bg:#ffffff', '--sidebar:#ffffff', '--surface:#ffffff', '--surface-2:#eceef0', '--border:#d8dade',
     '--text:#17181b', '--text-dim:#6b6f76', '--accent:#f2a93b', '--accent-dim:#f6e2bd',
     '--danger:#e5484d', '--warn:#f2a93b', '--ok:#3fb68b', '--blue:#5b9bf2', '--purple:#9c7bd9'
   ].join(';');
   wrap.innerHTML = analiseHtml;
   document.body.appendChild(wrap);
+
+  // Grid de máquinas com até 4 colunas (1 coluna por máquina, até 4) — cabe mais máquina por
+  // linha/página do que o grid de 2 colunas usado na tela do Dashboard.
+  const gridMaquinas = wrap.querySelector('.analise-maquinas-grid');
+  const qtdMaquinasWrap = wrap.querySelectorAll('.analise-maquina').length;
+  if (gridMaquinas && qtdMaquinasWrap) {
+    gridMaquinas.style.gridTemplateColumns = 'repeat(' + Math.max(1, Math.min(qtdMaquinasWrap, 4)) + ', 1fr)';
+  }
 
   // Pontos de corte "seguros" (em px CSS, relativos ao topo do wrap): o rodapé de cada
   // linha do grid de máquinas, pra nunca partir um card de máquina ao meio entre páginas.
@@ -3345,11 +3349,11 @@ async function adicionarAnaliseAoPDF(doc, processo, linhasFiltradas) {
 
   let canvas;
   try {
-    canvas = await html2canvas(wrap, { scale: 2, backgroundColor: '#f4f5f6', useCORS: true });
+    canvas = await html2canvas(wrap, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
   } catch (e) {
     wrap.remove();
     doc.setFontSize(10);
-    doc.text('Não foi possível gerar a imagem da análise por máquina.', 14, 30);
+    doc.text('Não foi possível gerar a imagem da análise por máquina.', 14, 16);
     return;
   }
   wrap.remove();
@@ -3361,14 +3365,14 @@ async function adicionarAnaliseAoPDF(doc, processo, linhasFiltradas) {
 
   const imgWidthMm = pageWidth - margin * 2;
   const pxPerMm = canvas.width / imgWidthMm;
-  const alturaPrimeiraPaginaMm = pageHeight - 24 - margin;
-  const alturaDemaisPaginasMm = pageHeight - margin * 2;
+  // Sem título/cabeçalho na página (já removido), então todas as páginas — inclusive a
+  // primeira — usam a mesma altura útil (só a margem).
+  const alturaPaginaMm = pageHeight - margin * 2;
 
   let offsetPx = 0;
   let primeiraFatia = true;
   while (offsetPx < canvas.height) {
-    const alturaDisponivelMm = primeiraFatia ? alturaPrimeiraPaginaMm : alturaDemaisPaginasMm;
-    const alturaMaxPx = Math.max(1, Math.round(alturaDisponivelMm * pxPerMm));
+    const alturaMaxPx = Math.max(1, Math.round(alturaPaginaMm * pxPerMm));
     const limitePx = Math.min(canvas.height, offsetPx + alturaMaxPx);
     // Usa a última quebra "segura" (fim de uma linha de cards) dentro do espaço disponível;
     // se nenhuma quebra couber (linha mais alta que uma página inteira), corta no limite mesmo.
@@ -3381,9 +3385,8 @@ async function adicionarAnaliseAoPDF(doc, processo, linhasFiltradas) {
     fatia.getContext('2d').drawImage(canvas, 0, offsetPx, canvas.width, alturaFatiaPx, 0, 0, canvas.width, alturaFatiaPx);
     const dataUrl = fatia.toDataURL('image/png');
     const alturaFatiaMm = alturaFatiaPx / pxPerMm;
-    const y = primeiraFatia ? 24 : margin;
     if (!primeiraFatia) doc.addPage();
-    doc.addImage(dataUrl, 'PNG', margin, y, imgWidthMm, alturaFatiaMm);
+    doc.addImage(dataUrl, 'PNG', margin, margin, imgWidthMm, alturaFatiaMm);
     offsetPx = corte;
     primeiraFatia = false;
   }
