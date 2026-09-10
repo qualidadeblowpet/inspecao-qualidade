@@ -1892,6 +1892,8 @@ function abrirRevisao(processo) {
       { id: 'inj_data', label: 'Data' },
       { id: 'inj_equipamento', label: 'Equipamento' },
       { id: 'inj_responsavel', label: 'Responsável pela Inspeção' },
+      { id: 'inj_op', label: 'OP' },
+      { id: 'inj_numeroCaixa', label: 'Nº Caixa' },
       { id: 'inj_operador', label: 'Operador Principal' },
       { id: 'inj_cor', label: 'Cor da Preforma' },
       { id: 'inj_gramatura', label: 'Gramatura' },
@@ -1905,8 +1907,13 @@ function abrirRevisao(processo) {
       mostrarToast('ATENÇÃO: É necessário preencher os dados nos campos: ' + faltando.join(', ') + '.', true);
       return;
     }
+    const opInjVal = document.getElementById('inj_op').value;
+    if (/^0+$/.test(opInjVal.trim())) {
+      mostrarToast('ATENÇÃO: o campo OP não pode conter apenas "0".', true);
+      return;
+    }
     const numeroCaixaInjVal = document.getElementById('inj_numeroCaixa').value;
-    if (numeroCaixaInjVal && !numeroInteiroNaoZeroValido(numeroCaixaInjVal)) {
+    if (!numeroInteiroNaoZeroValido(numeroCaixaInjVal)) {
       mostrarToast('ATENÇÃO: o campo Nº Caixa deve conter apenas números, diferente de 0 (não pode ser "0", "-" ou letras).', true);
       return;
     }
