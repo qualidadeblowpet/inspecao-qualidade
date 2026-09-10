@@ -3129,27 +3129,17 @@ function agruparPorSessao(linhas) {
   return grupos;
 }
 
-// Formata a coluna Cavidade do PDF de Injeção. Quando a lista de cavidades é longa (muitos
-// números separados por ';', ex.: "Todas as ativas" de um molde com 70+ cavidades), o texto
-// não tem espaços pra o autoTable quebrar sozinho — vira uma "palavra" enorme, a coluna fica
-// gigante e desconfigura o resto da tabela (paisagem, com várias outras colunas). Aqui a lista
-// longa é quebrada em duas linhas o mais equilibrado possível, cortando só nos ';' (nunca no
-// meio de um número), mantendo a tabela horizontal intacta.
+// Formata a coluna Cavidade do PDF de Injeção. A lista de cavidades (números separados por ';',
+// ex.: "Todas as ativas" de um molde com 70+ cavidades) não tem espaços — sem isso o autoTable não
+// tem onde quebrar linha, vira uma "palavra" enorme e a coluna cresce sem limite, empurrando as
+// colunas seguintes (Criticidade, Operador Ciente) pra fora da página. Aqui só inserimos um espaço
+// depois de cada ';' — a coluna Cavidade tem largura FIXA (ver columnStyles em gerarPDF) e o
+// autoTable quebra o texto em quantas linhas forem necessárias dentro dessa largura (nunca no meio
+// de um número), sem nunca ultrapassar a página na horizontal.
 function formatarCavidadePDF(valor) {
   const texto = (valor || '').toString().trim();
   if (!texto) return '—';
-  if (texto.length <= 18) return texto;
-  const partes = texto.split(';');
-  const alvo = Math.ceil(texto.length / 2);
-  let linha1 = '';
-  let i = 0;
-  for (; i < partes.length; i++) {
-    const proxima = linha1 ? (linha1 + ';' + partes[i]) : partes[i];
-    if (linha1 && proxima.length > alvo) break;
-    linha1 = proxima;
-  }
-  const linha2 = partes.slice(i).join(';');
-  return linha2 ? (linha1 + ';\n' + linha2) : linha1;
+  return texto.split(';').join('; ');
 }
 
 function formatarCavidadesWpp(valor) {
@@ -3282,10 +3272,24 @@ async function gerarPDF(processo) {
   } else {
     doc.autoTable({
       head: [colunas], body: corpo, startY: startYTabela,
-      styles: { fontSize: 6.5, cellPadding: 1.2, overflow: 'linebreak', cellWidth: 'wrap', valign: 'middle' },
+      styles: { fontSize: 6.5, cellPadding: 1.2, overflow: 'linebreak', valign: 'middle' },
       headStyles: { fillColor: [30,32,35], textColor: 255, minCellHeight: 30, valign: 'bottom', halign: 'left' },
       alternateRowStyles: { fillColor: [245,245,245] },
-      tableWidth: 'auto', horizontalPageBreak: true,
+      // Larguras fixas (mm) pras 19 colunas — somam ~265mm, dentro dos ~281mm disponíveis numa
+      // página A4 paisagem (297mm - 8mm de margem de cada lado). Com largura fixa (em vez de
+      // 'wrap', que deixava cada coluna crescer conforme o conteúdo), o autoTable SEMPRE quebra o
+      // texto em mais linhas dentro da própria célula quando necessário (Defeito e principalmente
+      // Cavidade, que pode ter listas bem longas), em vez de empurrar colunas pra uma página extra
+      // na horizontal — o relatório pode ganhar mais páginas por causa de linhas mais altas, mas as
+      // 19 colunas de uma mesma linha nunca mais ficam divididas entre páginas diferentes.
+      columnStyles: {
+        0: { cellWidth: 15 }, 1: { cellWidth: 9 }, 2: { cellWidth: 14 }, 3: { cellWidth: 12 },
+        4: { cellWidth: 16 }, 5: { cellWidth: 11 }, 6: { cellWidth: 10 }, 7: { cellWidth: 15 },
+        8: { cellWidth: 9 }, 9: { cellWidth: 9 }, 10: { cellWidth: 9 }, 11: { cellWidth: 9 },
+        12: { cellWidth: 10 }, 13: { cellWidth: 10 }, 14: { cellWidth: 10 }, 15: { cellWidth: 38 },
+        16: { cellWidth: 38 }, 17: { cellWidth: 11 }, 18: { cellWidth: 10 }
+      },
+      tableWidth: 'auto', horizontalPageBreak: false,
       margin: { left: 8, right: 8 },
       didParseCell: function(data) {
         if (data.section === 'head') { data.cell.text = []; }
