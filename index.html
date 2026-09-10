@@ -3122,6 +3122,29 @@ function agruparPorSessao(linhas) {
   return grupos;
 }
 
+// Formata a coluna Cavidade do PDF de Injeção. Quando a lista de cavidades é longa (muitos
+// números separados por ';', ex.: "Todas as ativas" de um molde com 70+ cavidades), o texto
+// não tem espaços pra o autoTable quebrar sozinho — vira uma "palavra" enorme, a coluna fica
+// gigante e desconfigura o resto da tabela (paisagem, com várias outras colunas). Aqui a lista
+// longa é quebrada em duas linhas o mais equilibrado possível, cortando só nos ';' (nunca no
+// meio de um número), mantendo a tabela horizontal intacta.
+function formatarCavidadePDF(valor) {
+  const texto = (valor || '').toString().trim();
+  if (!texto) return '—';
+  if (texto.length <= 18) return texto;
+  const partes = texto.split(';');
+  const alvo = Math.ceil(texto.length / 2);
+  let linha1 = '';
+  let i = 0;
+  for (; i < partes.length; i++) {
+    const proxima = linha1 ? (linha1 + ';' + partes[i]) : partes[i];
+    if (linha1 && proxima.length > alvo) break;
+    linha1 = proxima;
+  }
+  const linha2 = partes.slice(i).join(';');
+  return linha2 ? (linha1 + ';\n' + linha2) : linha1;
+}
+
 function formatarCavidadesWpp(valor) {
   if (!valor) return '—';
   const v = String(valor).trim();
@@ -3234,7 +3257,7 @@ async function gerarPDF(processo) {
       return [formatarDataBR(l.data), l.hora_fim||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
         l.gramatura||'—', l.resina||'—', formatarTemperatura(l.temperatura_gate_min), formatarTemperatura(l.temperatura_gate_max), formatarTemperatura(l.temperatura_corpo_min), formatarTemperatura(l.temperatura_corpo_max),
         porExtenso(l.organizacao_linha_produtiva), porExtenso(l.tonalidade_preforma), porExtenso(l.alinhamento_etiqueta_caixa),
-        l.defeito||'—', l.cavidade||'—', l.criticidade||'—', porExtenso(l.operador_ciente)];
+        l.defeito||'—', formatarCavidadePDF(l.cavidade), l.criticidade||'—', porExtenso(l.operador_ciente)];
     });
   }
 
