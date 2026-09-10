@@ -3282,12 +3282,22 @@ async function gerarPDF(processo) {
       // Cavidade, que pode ter listas bem longas), em vez de empurrar colunas pra uma página extra
       // na horizontal — o relatório pode ganhar mais páginas por causa de linhas mais altas, mas as
       // 19 colunas de uma mesma linha nunca mais ficam divididas entre páginas diferentes.
+      // Larguras calculadas medindo o texto real (doc.getTextWidth) que cada coluna precisa mostrar
+      // sem quebrar linha — com folga — exceto a Cavidade (única liberada pra quebrar, ver acima):
+      // Data/Hora/Equipamento/Resp./Operador/Cor/Gramatura/Resina cobrem o maior valor já visto
+      // nessas colunas; Organização Linha/Tonalidade/Alinhamento Etiqueta cobrem "Reprovado" (maior
+      // que "Aprovado"); Criticidade cobre "GRAVE"; Defeito cobre com folga o maior defeito já visto
+      // ("Rebarba na Superfície de Vedação"). Cavidade recebe o espaço que sobra até fechar os
+      // ~281mm disponíveis (297mm - 8mm de margem de cada lado), o que também alinha a borda direita
+      // da tabela com a esquerda. Como as listas de Equipamento/Responsável/Operador/Cor/Resina/
+      // Defeito são configuráveis (Configurações), um item futuro muito mais longo que os atuais
+      // ainda poderia quebrar linha — avise se isso acontecer que a gente aumenta a coluna.
       columnStyles: {
         0: { cellWidth: 15 }, 1: { cellWidth: 9 }, 2: { cellWidth: 14 }, 3: { cellWidth: 12 },
-        4: { cellWidth: 16 }, 5: { cellWidth: 11 }, 6: { cellWidth: 10 }, 7: { cellWidth: 15 },
+        4: { cellWidth: 16 }, 5: { cellWidth: 11 }, 6: { cellWidth: 10 }, 7: { cellWidth: 18 },
         8: { cellWidth: 9 }, 9: { cellWidth: 9 }, 10: { cellWidth: 9 }, 11: { cellWidth: 9 },
-        12: { cellWidth: 10 }, 13: { cellWidth: 10 }, 14: { cellWidth: 10 }, 15: { cellWidth: 38 },
-        16: { cellWidth: 38 }, 17: { cellWidth: 11 }, 18: { cellWidth: 10 }
+        12: { cellWidth: 15 }, 13: { cellWidth: 15 }, 14: { cellWidth: 15 }, 15: { cellWidth: 42 },
+        16: { cellWidth: 31 }, 17: { cellWidth: 12 }, 18: { cellWidth: 10 }
       },
       tableWidth: 'auto', horizontalPageBreak: false,
       margin: { left: 8, right: 8 },
