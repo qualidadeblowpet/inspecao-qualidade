@@ -2630,6 +2630,16 @@ function produtosInspecionados(linhasMaquina) {
   }).sort(function(a, b) { return b.cadastros - a.cadastros; });
 }
 
+// Ordem de gravidade pra ranquear e ordenar os selos de criticidade (GRAVE é sempre o mais relevante).
+const ORDEM_CRITICIDADE = { 'GRAVE': 3, 'MÉDIO': 2, 'LEVE': 1 };
+function rankCriticidade(c) { return ORDEM_CRITICIDADE[(c || '').toUpperCase()] || 0; }
+
+// Ranking do "Top 3 defeitos no período": cada defeito continua sendo UMA linha (sem repetir o
+// nome), mas agora mostra um selo pra cada criticidade que ele teve no período (ex.: um defeito com
+// ocorrências LEVE e MÉDIO mostra os dois selos, não só o predominante). O critério de ordenação
+// passou a ser a criticidade PRIMEIRO (a pior criticidade do defeito manda — GRAVE sempre na
+// frente de MÉDIO, que sempre vem antes de LEVE, não importa o volume) e o volume total como
+// desempate dentro da mesma criticidade.
 function top3Defeitos(desviosMaquina) {
   const porDefeito = {};
   desviosMaquina.forEach(function(l) {
@@ -2641,9 +2651,12 @@ function top3Defeitos(desviosMaquina) {
   });
   return Object.keys(porDefeito).map(function(nome) {
     const info = porDefeito[nome];
-    const critPrincipal = Object.entries(info.criticidades).sort(function(a, b) { return b[1] - a[1]; })[0][0];
-    return { nome: nome, qtd: info.qtd, criticidade: critPrincipal };
-  }).sort(function(a, b) { return b.qtd - a.qtd; }).slice(0, 3);
+    const criticidadesPresentes = Object.keys(info.criticidades).sort(function(a, b) { return rankCriticidade(b) - rankCriticidade(a); });
+    return { nome: nome, qtd: info.qtd, criticidades: criticidadesPresentes, criticidadePior: criticidadesPresentes[0] };
+  }).sort(function(a, b) {
+    const diffCrit = rankCriticidade(b.criticidadePior) - rankCriticidade(a.criticidadePior);
+    return diffCrit !== 0 ? diffCrit : (b.qtd - a.qtd);
+  }).slice(0, 3);
 }
 
 function cavidadesRecorrentes(desviosMaquina) {
@@ -2717,7 +2730,8 @@ function atualizarAlertaMaquina(processo) {
   if (desvios.length) {
     const top3 = top3Defeitos(desvios);
     defeitosHtml = '<div class="analise-bloco"' + (produtos.length ? '' : ' style="margin-top:0;"') + '><div class="analise-bloco-titulo">Defeitos encontrados</div>' + top3.map(function(d) {
-      return '<div class="analise-defeito-linha"><div class="analise-def-nome">' + d.nome + '</div><div class="analise-def-direita"><span class="analise-def-vol">' + d.qtd + 'x</span><span class="badge ' + critClasse(d.criticidade) + '">' + d.criticidade + '</span></div></div>';
+      const selos = d.criticidades.map(function(c) { return '<span class="badge ' + critClasse(c) + '">' + c + '</span>'; }).join('');
+      return '<div class="analise-defeito-linha"><div class="analise-def-nome">' + d.nome + '</div><div class="analise-def-direita"><span class="analise-def-vol">' + d.qtd + 'x</span>' + selos + '</div></div>';
     }).join('') + '</div>';
   } else {
     defeitosHtml = '<div class="analise-bloco"' + (produtos.length ? '' : ' style="margin-top:0;"') + '><div class="analise-vazio" style="padding:4px 0;">Últimos cadastros desta máquina sem desvios registrados.</div></div>';
@@ -2796,9 +2810,10 @@ function renderCardMaquina(equip, todasLinhasFiltro, dias) {
   const top3 = top3Defeitos(desviosMaquina);
   const critClasse = function(c) { return c === 'GRAVE' ? 'grave' : c === 'MÉDIO' ? 'medio' : 'leve'; };
   const top3Html = top3.length ? top3.map(function(d, i) {
+    const selos = d.criticidades.map(function(c) { return '<span class="badge ' + critClasse(c) + '">' + c + '</span>'; }).join('');
     return '<div class="analise-defeito-linha">' +
       '<div class="analise-def-nome">' + (i + 1) + '. ' + d.nome + '</div>' +
-      '<div class="analise-def-direita"><span class="analise-def-vol">' + d.qtd + 'x</span><span class="badge ' + critClasse(d.criticidade) + '">' + d.criticidade + '</span></div>' +
+      '<div class="analise-def-direita"><span class="analise-def-vol">' + d.qtd + 'x</span>' + selos + '</div>' +
     '</div>';
   }).join('') : '<div class="analise-vazio" style="padding:8px 0;">Sem desvios no período.</div>';
 
