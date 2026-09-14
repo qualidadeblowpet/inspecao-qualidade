@@ -1960,6 +1960,29 @@ function abrirRevisao(processo) {
   const desviosCheck = temDefeito === 'NAO' ? [] : listaDesvios(processo);
   if (temDefeito === 'SIM' && desviosCheck.length === 0) { mostrarToast('Adicione ao menos um desvio.', true); return; }
 
+  // Quando há defeito, todos os campos de cada card "Desvio #N" passam a ser obrigatórios,
+  // com uma única exceção: Observação continua livre. Criticidade/Status/Operador ciente? não
+  // entram nessa checagem porque a tela já não permite deixá-los em branco (vêm com um valor
+  // padrão pré-selecionado desde que o desvio é adicionado) — só Defeito, Cavidade(s) (só
+  // Injeção) e Foto podem ficar vazios hoje, então são esses que passam a bloquear o salvamento.
+  if (temDefeito === 'SIM') {
+    const desviosIncompletos = [];
+    desviosCheck.forEach(function(d, idx) {
+      const faltandoDesvio = [];
+      if (!d.defeito) faltandoDesvio.push('Defeito encontrado');
+      if (processo === 'injecao') {
+        const cavidadePreenchida = Array.isArray(d.cavidade) ? d.cavidade.length > 0 : !!d.cavidade;
+        if (!cavidadePreenchida) faltandoDesvio.push('Cavidade(s)');
+      }
+      if (!d.fotoFile) faltandoDesvio.push('Foto do desvio');
+      if (faltandoDesvio.length > 0) desviosIncompletos.push('Desvio #' + (idx + 1) + ' (' + faltandoDesvio.join(', ') + ')');
+    });
+    if (desviosIncompletos.length > 0) {
+      mostrarToast('ATENÇÃO: preencha todos os campos dos desvios — só Observação é opcional. ' + desviosIncompletos.join('; ') + '.', true);
+      return;
+    }
+  }
+
   const corpoRevisao = renderRevisaoHtml(processo, temDefeito, desviosCheck);
   const areaId = processo === 'sopro' ? 'sopFormArea' : 'injFormArea';
   const revisaoId = processo === 'sopro' ? 'revisaoSopro' : 'revisaoInjecao';
