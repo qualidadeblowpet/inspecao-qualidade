@@ -47,6 +47,11 @@
   body.tema-claro ::placeholder { color: #9a9ea4; }
 
   * { box-sizing: border-box; }
+  /* Desliga o "font boosting" automático do Safari/iOS: sem isso, o WebKit aumenta sozinho o
+     tamanho de textos dentro de áreas com rolagem horizontal (como as tabelas de Ocorrência) —
+     e faz isso de forma desigual entre colunas, deixando números colados por ";" (ex.: a coluna
+     Cavidade) visivelmente maiores que o resto da tabela no celular, mesmo usando o mesmo CSS. */
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); -webkit-font-smoothing: antialiased; }
   ::placeholder { color: #55585e; }
   .hidden { display: none !important; }
