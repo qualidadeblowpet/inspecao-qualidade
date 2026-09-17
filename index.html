@@ -1913,7 +1913,12 @@ function renderDesvios(processo) {
                               : '<div class="field"><label>Criticidade</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'criticidade\',this.value)">'+opcoesCrit+'</select></div>') +
       '<div class="grid-2">' + cienteBlock + '<div class="field"><label>Status</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'status\',this.value)">'+opcoesStatus+'</select></div></div>' +
       '<div class="field"><label>Foto do desvio</label>' +
-        '<input type="file" accept="image/*" capture="environment" onchange="armazenarFoto(\''+processo+'\','+d.id+',this.files)">' +
+        /* Sem capture="environment" de propósito: assim o Android mostra um seletor (Câmera ou
+           Galeria) em vez de abrir direto o app de Câmera nativo, que é pesado e pode fazer o
+           Android encerrar o processo do navegador por pouca memória — quem quiser continuar
+           tirando a foto na hora ainda pode, só escolhendo "Câmera" no seletor; ver
+           /areas/app-planilha-nuvem.md. */
+        '<input type="file" accept="image/*" onchange="armazenarFoto(\''+processo+'\','+d.id+',this.files)">' +
         (d.fotoPerdida ? '<div style="font-size:11px; color:var(--warn); margin-top:5px;">⚠ Rascunho recuperado — a foto anterior não pôde ser mantida, anexe novamente.</div>'
           : '<div id="fotoLabel_'+processo+'_'+d.id+'" style="font-size:11px; color:var(--text-dim); margin-top:5px;">'+(d.fotoFile ? d.fotoFile.name : 'Nenhuma foto selecionada')+'</div>') +
       '</div>' +
