@@ -5,11 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 <meta name="format-detection" content="telephone=no">
 <title>Inspeção de Qualidade</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<!-- Chart.js, jsPDF, jspdf-autotable e html2canvas NÃO são carregadas aqui de propósito — só são
+     usadas no Dashboard (gráficos) e na exportação de PDF, então passaram a ser carregadas sob
+     demanda (ver carregarScript/garantirChartJs/garantirLibsPDF) só quando essas telas são usadas.
+     Isso deixa a aba mais leve durante o Cadastro — principalmente ao abrir a câmera pra foto do
+     desvio, quando o Android pode encerrar o processo do navegador por pouca memória; uma aba mais
+     leve reduz a chance dela ser a escolhida. MSAL continua carregando aqui porque é necessário
+     já na tela de login, antes de qualquer coisa acontecer. -->
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
 
@@ -847,9 +850,57 @@ const msalConfig = {
     clientId: "f518fc60-a544-45d1-89a9-97e9f6b523ad",
     authority: "https://login.microsoftonline.com/b38f2dcb-4251-4b93-977a-f469eb315033",
     redirectUri: "https://qualidadeblowpet.github.io/inspecao-qualidade/"
+  },
+  // localStorage (em vez do padrão sessionStorage) faz o login sobreviver a um recarregamento
+  // forçado da aba — como o que o Android faz ao encerrar o processo do navegador por pouca
+  // memória (ex.: ao abrir a câmera pra foto do desvio). Com sessionStorage, esse recarregamento
+  // derrubava o login também; com localStorage, o usuário volta direto pro app, sem logar de novo.
+  cache: {
+    cacheLocation: 'localStorage',
+    storeAuthStateInCookie: false
   }
 };
 const graphScopes = ["Files.ReadWrite", "User.Read"];
+
+/* ---------------- Carregamento tardio (lazy) de bibliotecas pesadas ---------------- */
+/* Chart.js (Dashboard) e jsPDF/jspdf-autotable/html2canvas (exportação de PDF) só são
+   carregadas quando a tela que realmente precisa delas é usada, em vez de sempre no
+   carregamento da página. Isso mantém a aba mais leve durante o Cadastro — a tela onde a
+   câmera nativa é aberta pra foto do desvio, e onde o Android tem mais chance de encerrar o
+   processo do navegador por pouca memória. */
+const _scriptsCarregados = {};
+function carregarScript(src) {
+  if (_scriptsCarregados[src]) return _scriptsCarregados[src];
+  _scriptsCarregados[src] = new Promise(function(resolve, reject) {
+    const el = document.createElement('script');
+    el.src = src;
+    el.onload = function() { resolve(); };
+    el.onerror = function() { delete _scriptsCarregados[src]; reject(new Error('Falha ao carregar ' + src)); };
+    document.head.appendChild(el);
+  });
+  return _scriptsCarregados[src];
+}
+let _chartJsPronto = null;
+function garantirChartJs() {
+  if (typeof Chart !== 'undefined') return Promise.resolve();
+  if (!_chartJsPronto) {
+    _chartJsPronto = carregarScript('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js')
+      .catch(function(e) { _chartJsPronto = null; throw e; });
+  }
+  return _chartJsPronto;
+}
+let _libsPdfProntas = null;
+function garantirLibsPDF() {
+  if (typeof window.jspdf !== 'undefined' && typeof html2canvas !== 'undefined') return Promise.resolve();
+  if (!_libsPdfProntas) {
+    // Ordem importa: jspdf-autotable é um plugin que se registra em cima do jsPDF já carregado.
+    _libsPdfProntas = carregarScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
+      .then(function() { return carregarScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js'); })
+      .then(function() { return carregarScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'); })
+      .catch(function(e) { _libsPdfProntas = null; throw e; });
+  }
+  return _libsPdfProntas;
+}
 /* Identificadores fixos do arquivo na nuvem (mais confiável que link de
    compartilhamento — funciona para qualquer conta com permissão no arquivo,
    sem depender do tipo/escopo do link). */
@@ -1014,6 +1065,10 @@ async function conectarPlanilha() {
       await garantirColunasInjecao(token);
       await prepararColunasComoTexto(token);
       await carregarCavidadesDaPlanilha();
+      // Recupera rascunho do Cadastro (se houver) só depois que listas/cavidades já carregaram —
+      // garante que os dropdowns e a lógica de cavidade por gramatura estejam prontos pra restaurar corretamente.
+      restaurarRascunho('injecao');
+      restaurarRascunho('sopro');
       carregarDados();
       return true;
     } else {
@@ -1793,6 +1848,7 @@ function armazenarFoto(processo, id, files) {
   const d = listaDesvios(processo).find(function(d){ return d.id === id; });
   if (!d) return;
   d.fotoFile = files && files[0] ? files[0] : null;
+  if (d.fotoPerdida && d.fotoFile) { d.fotoPerdida = false; renderDesvios(processo); return; }
   const label = document.getElementById('fotoLabel_'+processo+'_'+id);
   if (label) label.textContent = d.fotoFile ? d.fotoFile.name : 'Nenhuma foto selecionada';
 }
@@ -1858,7 +1914,8 @@ function renderDesvios(processo) {
       '<div class="grid-2">' + cienteBlock + '<div class="field"><label>Status</label><select onchange="atualizarDesvio(\''+processo+'\','+d.id+',\'status\',this.value)">'+opcoesStatus+'</select></div></div>' +
       '<div class="field"><label>Foto do desvio</label>' +
         '<input type="file" accept="image/*" capture="environment" onchange="armazenarFoto(\''+processo+'\','+d.id+',this.files)">' +
-        '<div id="fotoLabel_'+processo+'_'+d.id+'" style="font-size:11px; color:var(--text-dim); margin-top:5px;">'+(d.fotoFile ? d.fotoFile.name : 'Nenhuma foto selecionada')+'</div>' +
+        (d.fotoPerdida ? '<div style="font-size:11px; color:var(--warn); margin-top:5px;">⚠ Rascunho recuperado — a foto anterior não pôde ser mantida, anexe novamente.</div>'
+          : '<div id="fotoLabel_'+processo+'_'+d.id+'" style="font-size:11px; color:var(--text-dim); margin-top:5px;">'+(d.fotoFile ? d.fotoFile.name : 'Nenhuma foto selecionada')+'</div>') +
       '</div>' +
       '<div class="field"><label>Observação</label><textarea oninput="atualizarDesvio(\''+processo+'\','+d.id+',\'observacao\',this.value)">'+d.observacao+'</textarea></div>' +
     '</div>';
@@ -1887,6 +1944,124 @@ async function uploadFoto(token, file, idSessao, indice) {
   if (!uploadResp.ok) throw new Error(uploadJson.error ? uploadJson.error.message : 'falha no upload');
   return uploadJson.webUrl || '';
 }
+
+/* ---------------- Rascunho automático do Cadastro (Sopro e Injeção) ---------------- */
+/* Salva o progresso do formulário no próprio celular (localStorage) enquanto o usuário
+   preenche, e recupera automaticamente se a aba precisar recarregar (ex.: quando o Android
+   encerra o processo do navegador por pouca memória ao abrir a câmera pra foto do desvio — ver
+   /areas/app-planilha-nuvem.md). A única coisa que não é possível recuperar é o arquivo da foto
+   em si (não pode ser guardado assim); nesse caso o desvio some com o aviso "Foto do desvio" pra
+   pra ser anexada de novo, o resto dos campos volta preenchido. O rascunho é limpo assim que a
+   sessão é salva de verdade na planilha. */
+function coletarCamposFormulario(processo) {
+  const pfx = processo === 'sopro' ? 'sop_' : 'inj_';
+  const area = document.getElementById(processo === 'sopro' ? 'sopFormArea' : 'injFormArea');
+  if (!area) return null;
+  const campos = {};
+  area.querySelectorAll('[id^="'+pfx+'"]').forEach(function(el) {
+    if (['INPUT','SELECT','TEXTAREA'].indexOf(el.tagName) === -1) return;
+    if (el.type === 'file') return;
+    campos[el.id] = el.value;
+  });
+  area.querySelectorAll('.toggle-group[id^="'+pfx+'"]').forEach(function(el) {
+    campos[el.id] = el.dataset.value || '';
+  });
+  return campos;
+}
+
+function salvarRascunho(processo) {
+  try {
+    const campos = coletarCamposFormulario(processo);
+    if (!campos) return;
+    const desvios = listaDesvios(processo).map(function(d) {
+      return { id: d.id, defeito: d.defeito, cavidade: d.cavidade, cavTodasMarcada: !!d.cavTodasMarcada,
+        criticidade: d.criticidade, operadorCiente: d.operadorCiente, status: d.status, observacao: d.observacao,
+        temFotoPendente: !!d.fotoFile };
+    });
+    localStorage.setItem('rascunho_cadastro_' + processo, JSON.stringify({ campos: campos, desvios: desvios, salvoEm: new Date().toISOString() }));
+  } catch (e) { /* localStorage indisponível/cheio — rascunho é só um extra, não trava o app */ }
+}
+
+function limparRascunho(processo) {
+  try { localStorage.removeItem('rascunho_cadastro_' + processo); } catch (e) {}
+}
+
+function restaurarRascunho(processo) {
+  let rascunho;
+  try {
+    const bruto = localStorage.getItem('rascunho_cadastro_' + processo);
+    if (!bruto) return;
+    rascunho = JSON.parse(bruto);
+  } catch (e) { return; }
+  if (!rascunho || !rascunho.campos) return;
+  const pfx = processo === 'sopro' ? 'sop_' : 'inj_';
+  const area = document.getElementById(processo === 'sopro' ? 'sopFormArea' : 'injFormArea');
+  if (!area) return;
+
+  // Campos simples (texto/select/textarea)
+  Object.keys(rascunho.campos).forEach(function(id) {
+    const el = document.getElementById(id);
+    if (!el || ['INPUT','SELECT','TEXTAREA'].indexOf(el.tagName) === -1 || el.type === 'file') return;
+    el.value = rascunho.campos[id];
+  });
+
+  // Postos de molde (Sopro) só existem no DOM depois que o Número de postos é aplicado
+  if (processo === 'sopro' && rascunho.campos['sop_numPostos']) {
+    renderPostosMolde(rascunho.campos['sop_numPostos']);
+    for (let i = 1; i <= 4; i++) {
+      ['sop_peso_'+i, 'sop_altura_'+i].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el && rascunho.campos[id] !== undefined) el.value = rascunho.campos[id];
+      });
+    }
+  }
+
+  // Grupos de alternância (Aprovado/Reprovado, Sim/Não, etc.)
+  area.querySelectorAll('.toggle-group[id]').forEach(function(grupo) {
+    const valor = rascunho.campos[grupo.id];
+    if (valor) selecionarToggle(grupo.id, valor);
+  });
+
+  // Seção de desvios: reaplica "Foi identificado algum defeito?" pra desbloquear/bloquear a
+  // seção do jeito certo, e então substitui a lista pela restaurada
+  const temDefeito = rascunho.campos[pfx + 'temDefeito'] || 'NAO';
+  const campoTemDefeito = document.getElementById(pfx + 'temDefeito');
+  if (campoTemDefeito) campoTemDefeito.value = temDefeito;
+  alternarSecaoDesvios(processo, temDefeito);
+
+  if (temDefeito === 'SIM' && Array.isArray(rascunho.desvios) && rascunho.desvios.length) {
+    const restaurados = rascunho.desvios.map(function(d) {
+      return { id: d.id, defeito: d.defeito || '', cavidade: d.cavidade || [], cavTodasMarcada: !!d.cavTodasMarcada,
+        criticidade: d.criticidade || 'LEVE', operadorCiente: d.operadorCiente || 'SIM', status: d.status || 'FICOU PENDENTE',
+        observacao: d.observacao || '', fotoFile: null, fotoPerdida: !!d.temFotoPendente };
+    });
+    const maiorId = restaurados.reduce(function(m, d) { return Math.max(m, d.id || 0); }, 0);
+    if (processo === 'sopro') { desviosSopro = restaurados; contadorSopro = Math.max(contadorSopro, maiorId); }
+    else { desviosInjecao = restaurados; contadorInjecao = Math.max(contadorInjecao, maiorId); }
+  }
+
+  // Injeção: reaplica a gramatura restaurada — o mesmo fluxo de quando o usuário seleciona
+  // manualmente, incluindo o modal de cavidades se houver cadastro pra ela. O próprio fluxo
+  // chama renderDesvios('injecao') de novo ao concluir, já refletindo os desvios restaurados acima.
+  if (processo === 'injecao') { verificarCavidadesGramatura(); } else { renderDesvios('sopro'); }
+
+  mostrarToast('Rascunho salvo automaticamente foi recuperado no Cadastro ' + (processo === 'sopro' ? 'Sopro' : 'Injeção') + '.');
+}
+
+// Salva o rascunho automaticamente a cada alteração no formulário (delegado no container, então
+// continua funcionando mesmo depois de renderFormInjecao()/renderFormSopro() recriarem o HTML
+// interno). Debounced pra não escrever no localStorage a cada tecla digitada.
+(function configurarAutosaveRascunho() {
+  ['injecao', 'sopro'].forEach(function(processo) {
+    const area = document.getElementById(processo === 'sopro' ? 'sopFormArea' : 'injFormArea');
+    if (!area) return;
+    let timer = null;
+    const agendar = function() { clearTimeout(timer); timer = setTimeout(function() { salvarRascunho(processo); }, 600); };
+    area.addEventListener('input', agendar);
+    area.addEventListener('change', agendar);
+    area.addEventListener('click', agendar);
+  });
+})();
 
 function abrirRevisao(processo) {
   if (!itemId) { mostrarToast('Conecte-se à planilha (Configurações) antes de salvar.', true); setPage('config'); return; }
@@ -2242,6 +2417,7 @@ async function confirmarSalvarSessao(processo) {
     const resp = await fetch(url, { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ values: valores }) });
     if (resp.ok) {
       mostrarToast(valores.length + ' registro(s) salvos ✓');
+      limparRascunho(processo);
       if (processo === 'sopro') { desviosSopro = []; contadorSopro = 0; renderFormSopro(); } else { desviosInjecao = []; contadorInjecao = 0; renderFormInjecao(); }
       const revisaoId = processo === 'sopro' ? 'revisaoSopro' : 'revisaoInjecao';
       const areaId = processo === 'sopro' ? 'sopFormArea' : 'injFormArea';
@@ -2588,7 +2764,7 @@ function atualizarGrafico48h() {
   });
 }
 
-function atualizarDashboard() {
+async function atualizarDashboard() {
   if (!itemId) return;
   const linhas = linhasFiltradasBase();
 
@@ -2600,24 +2776,32 @@ function atualizarDashboard() {
   document.getElementById('kpiGraves').textContent = graves;
   document.getElementById('kpiTaxa').textContent = total ? Math.round(((total - pendentes) / total) * 100) + '%' : '–';
 
-  const porDefeito = topN(contarPor(linhas, 'defeito'), 8);
-  criarBarChart('chartDefeitos', porDefeito.map(function(x){return x[0];}), porDefeito.map(function(x){return x[1];}));
+  // Chart.js só é carregado aqui, na primeira vez que o Dashboard precisa desenhar um gráfico
+  // (ver garantirChartJs). Os KPIs/tabelas acima e abaixo não dependem dela, então continuam
+  // funcionando normalmente mesmo se o carregamento falhar (ex.: sem internet no momento).
+  let chartsDisponiveis = true;
+  try { await garantirChartJs(); } catch (e) { chartsDisponiveis = false; mostrarToast('Não foi possível carregar os gráficos (verifique a conexão).', true); }
 
-  const porProcesso = contarPor(linhas, 'processo');
-  const procLabels = Object.keys(porProcesso);
-  criarDonutChart('chartProcesso', procLabels.map(function(p){return p==='sopro'?'Sopro':'Injeção';}), procLabels.map(function(p){return porProcesso[p];}), ['#5b9bf2','#9c7bd9']);
+  if (chartsDisponiveis) {
+    const porDefeito = topN(contarPor(linhas, 'defeito'), 8);
+    criarBarChart('chartDefeitos', porDefeito.map(function(x){return x[0];}), porDefeito.map(function(x){return x[1];}));
 
-  const porResp = topN(contarPor(linhas, 'responsavel'), 8);
-  criarBarChart('chartResponsavel', porResp.map(function(x){return x[0];}), porResp.map(function(x){return x[1];}), '#5b9bf2');
+    const porProcesso = contarPor(linhas, 'processo');
+    const procLabels = Object.keys(porProcesso);
+    criarDonutChart('chartProcesso', procLabels.map(function(p){return p==='sopro'?'Sopro':'Injeção';}), procLabels.map(function(p){return porProcesso[p];}), ['#5b9bf2','#9c7bd9']);
 
-  const porEquip = topN(contarPor(linhas, 'equipamento'), 8);
-  criarBarChart('chartEquipamento', porEquip.map(function(x){return x[0];}), porEquip.map(function(x){return x[1];}), '#9c7bd9');
+    const porResp = topN(contarPor(linhas, 'responsavel'), 8);
+    criarBarChart('chartResponsavel', porResp.map(function(x){return x[0];}), porResp.map(function(x){return x[1];}), '#5b9bf2');
 
-  const porData = contarPor(linhas, 'data');
-  const datasOrdenadas = Object.keys(porData).sort();
-  criarLineChart('chartEvolucao', datasOrdenadas, datasOrdenadas.map(function(d){return porData[d];}));
+    const porEquip = topN(contarPor(linhas, 'equipamento'), 8);
+    criarBarChart('chartEquipamento', porEquip.map(function(x){return x[0];}), porEquip.map(function(x){return x[1];}), '#9c7bd9');
 
-  atualizarGrafico48h();
+    const porData = contarPor(linhas, 'data');
+    const datasOrdenadas = Object.keys(porData).sort();
+    criarLineChart('chartEvolucao', datasOrdenadas, datasOrdenadas.map(function(d){return porData[d];}));
+
+    atualizarGrafico48h();
+  }
 
   renderTabelaSopro();
   renderTabelaInjecao();
@@ -3291,6 +3475,8 @@ function responderPerguntaWhatsApp(enviar) {
 }
 
 async function gerarPDF(processo) {
+  // jsPDF/jspdf-autotable/html2canvas só são carregadas aqui, na hora de exportar — ver garantirLibsPDF.
+  try { await garantirLibsPDF(); } catch (e) { /* segue pro aviso abaixo */ }
   if (typeof window.jspdf === 'undefined') { mostrarToast('Biblioteca de PDF não carregou (verifique a conexão de rede).', true); return; }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
