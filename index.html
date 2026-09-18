@@ -204,7 +204,11 @@
   .analise-secao-titulo { font-size: 11px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; margin: 4px 0 12px; }
   .analise-vazio { color: var(--text-dim); font-size: 13px; padding: 18px 0; text-align: center; }
   .analise-maquinas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .analise-maquina { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 0; }
+  /* min-width:0 é necessário aqui: sem isso, um item de grid CSS não encolhe abaixo do seu
+     conteúdo mínimo (ex.: um nome de defeito comprido sem quebra), e com 4 colunas (PDF) a
+     largura mínima somada pode passar da largura do container — empurrando cards/texto pra
+     fora da área capturada pelo html2canvas e cortando informação no PDF exportado. */
+  .analise-maquina { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; margin-bottom: 0; min-width: 0; }
   .analise-maquina-topo { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
   .analise-maquina-nome { font-size: 15px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
   .analise-tendencia { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
@@ -216,10 +220,15 @@
   .analise-stat .num { font-family: var(--font-display); font-size: 20px; font-weight: 700; }
   .analise-bloco { margin-top: 14px; }
   .analise-bloco-titulo { font-size: 10.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
-  .analise-defeito-linha { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .analise-defeito-linha { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
   .analise-defeito-linha:last-child { border-bottom: none; }
-  .analise-def-nome { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .analise-def-direita { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; }
+  /* Antes: white-space:nowrap + text-overflow:ellipsis cortava (às vezes sem nem mostrar "...")
+     nomes de defeito compridos quando a máquina 4 colunas (relatório PDF) deixava pouco espaço
+     por card — perdendo informação. Agora o texto quebra em mais linhas em vez de cortar; a
+     altura maior do card já é respeitada pela paginação do PDF (corta só entre cards, nunca no
+     meio de um). */
+  .analise-def-nome { flex: 1; min-width: 0; }
+  .analise-def-direita { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; white-space: nowrap; }
   .analise-def-vol { color: var(--text-dim); font-size: 12px; }
   .analise-tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .analise-tag { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px; font-size: 12px; }
@@ -3542,12 +3551,14 @@ async function gerarPDF(processo) {
       // da tabela com a esquerda. Como as listas de Equipamento/Responsável/Operador/Cor/Resina/
       // Defeito são configuráveis (Configurações), um item futuro muito mais longo que os atuais
       // ainda poderia quebrar linha — avise se isso acontecer que a gente aumenta a coluna.
+      // Resina foi ampliada de 18mm pra 22mm (tirando 4mm da Cavidade) pra caber "PetPCR - Cirklo"
+      // sem quebrar (16,1mm de texto + folga, contra ~19,6mm úteis na célula).
       columnStyles: {
         0: { cellWidth: 15 }, 1: { cellWidth: 9 }, 2: { cellWidth: 14 }, 3: { cellWidth: 12 },
-        4: { cellWidth: 16 }, 5: { cellWidth: 11 }, 6: { cellWidth: 10 }, 7: { cellWidth: 18 },
+        4: { cellWidth: 16 }, 5: { cellWidth: 11 }, 6: { cellWidth: 10 }, 7: { cellWidth: 22 },
         8: { cellWidth: 9 }, 9: { cellWidth: 9 }, 10: { cellWidth: 9 }, 11: { cellWidth: 9 },
         12: { cellWidth: 15 }, 13: { cellWidth: 15 }, 14: { cellWidth: 15 }, 15: { cellWidth: 42 },
-        16: { cellWidth: 31 }, 17: { cellWidth: 12 }, 18: { cellWidth: 10 }
+        16: { cellWidth: 27 }, 17: { cellWidth: 12 }, 18: { cellWidth: 10 }
       },
       tableWidth: 'auto', horizontalPageBreak: false,
       margin: { left: 8, right: 8 },
