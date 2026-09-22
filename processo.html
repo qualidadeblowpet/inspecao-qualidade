@@ -25,6 +25,21 @@
   .status-dot.offline{background:var(--danger);}
   .linklike{color:var(--text-dim);text-decoration:underline;cursor:pointer;font-size:12px;background:none;border:none;padding:0;font-family:var(--font-body);}
   .sub{font-size:13px;color:var(--text-dim);margin:0 0 22px;}
+  .tabnav{display:flex;gap:8px;margin-bottom:18px;border-bottom:1px solid var(--border);}
+  .tabbtn{background:none;border:none;color:var(--text-dim);font-family:var(--font-display);font-weight:700;font-size:14px;
+    letter-spacing:.4px;text-transform:uppercase;padding:8px 4px 12px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;}
+  .tabbtn.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .tablewrap{overflow-x:auto;margin:0 -20px;padding:0 20px;}
+  .datatable{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap;}
+  .datatable th{text-align:left;color:var(--text-dim);text-transform:uppercase;font-size:10px;letter-spacing:.4px;
+    padding:8px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);}
+  .datatable td{padding:8px 10px;border-bottom:1px solid #1e2023;font-family:var(--font-mono);}
+  .datatable tbody tr:hover{background:var(--surface-2);}
+  .critpill{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.3px;font-family:var(--font-body);}
+  .critpill.sim{background:rgba(63,182,139,.15);color:var(--ok);}
+  .critpill.nao{background:rgba(229,72,77,.15);color:var(--danger);}
+  .critpill.vazio{background:rgba(139,143,150,.15);color:var(--text-dim);}
+  .emptystate{font-size:13px;color:var(--text-dim);text-align:center;padding:30px 10px;}
   .steps{display:flex;gap:6px;margin-bottom:20px;}
   .step{flex:1;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
     color:var(--text-dim);padding:8px 4px;border-radius:8px;background:var(--surface);border:1px solid var(--border);}
@@ -128,6 +143,13 @@
       <button class="linklike" onclick="logout()">sair</button>
     </div>
   </div>
+
+  <div class="tabnav">
+    <button class="tabbtn active" id="tabbtnCadastro" onclick="mudarAba('cadastro')">Cadastro</button>
+    <button class="tabbtn" id="tabbtnDashboard" onclick="mudarAba('dashboard')">Dashboard</button>
+  </div>
+
+  <div id="tabCadastro">
   <p class="sub">Cadastro por Planilha — Injeção · <span id="userEmail"></span></p>
 
   <div class="steps">
@@ -223,6 +245,59 @@
       <p class="note">Ao salvar, tanto o valor medido quanto o limite (mín/máx) usado na comparação são gravados juntos na planilha — para permitir montar gráficos depois comparando o histórico com o critério vigente em cada momento.</p>
     </div>
   </div>
+
+  </div><!-- /#tabCadastro -->
+
+  <!-- ===== ABA DASHBOARD ===== -->
+  <div id="tabDashboard" hidden>
+    <div class="card">
+      <h3>Registros de Injeção</h3>
+      <p class="desc">Carrega os registros já salvos na planilha (aba <code>Registros_Injecao</code>). Use os filtros pra encontrar um horário, máquina ou parâmetro específico.</p>
+      <button class="btn btn-accent btn-block" id="btnCarregarDash" onclick="carregarRegistrosInjecao()">Carregar registros</button>
+      <div id="dashLoading" class="loading-row" hidden><div class="spinner"></div> Carregando…</div>
+    </div>
+
+    <div class="card" id="dashFiltrosCard" hidden>
+      <div class="sectiontitle" style="margin-top:0;">Filtros</div>
+      <div class="grid-2" style="margin-bottom:12px;">
+        <div class="field"><label>Data de</label><input type="date" id="fData_de"></div>
+        <div class="field"><label>Data até</label><input type="date" id="fData_ate"></div>
+      </div>
+      <div class="grid-2" style="margin-bottom:12px;">
+        <div class="field"><label>Máquina</label><select id="fMaquina"><option value="">Todas</option></select></div>
+        <div class="field"><label>Parâmetro</label><select id="fParametro"><option value="">Todos</option></select></div>
+      </div>
+      <div class="grid-2">
+        <div class="field"><label>Responsável</label><select id="fResponsavel"><option value="">Todos</option></select></div>
+        <div class="field"><label>Critério</label>
+          <select id="fCriterio">
+            <option value="">Todos</option>
+            <option value="NÃO">Só fora do limite</option>
+            <option value="SIM">Só dentro do limite</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px;">
+        <button class="btn btn-outline" style="flex:1;" onclick="limparFiltrosDash()">Limpar filtros</button>
+        <button class="btn btn-accent" style="flex:1;" onclick="aplicarFiltrosDash()">Filtrar</button>
+      </div>
+    </div>
+
+    <div class="card" id="dashResultCard" hidden>
+      <div class="sectiontitle" style="margin-top:0;" id="dashContagem">0 registros</div>
+      <div class="tablewrap">
+        <table class="datatable" id="dashTable">
+          <thead>
+            <tr>
+              <th>Data</th><th>Hora</th><th>Máquina</th><th>Responsável</th><th>Parâmetro</th>
+              <th>Valor</th><th>Mín</th><th>Máx</th><th>Critério</th>
+            </tr>
+          </thead>
+          <tbody id="dashTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div><!-- /#tabDashboard -->
 
   </div><!-- /#app -->
 
@@ -602,6 +677,165 @@ async function salvarRegistro(){
     mostrarToast('Falha de conexão: ' + err.message, true);
     btn.disabled = false; btn.textContent = 'Confirmar e salvar ✓';
   }
+}
+
+// =============================================================================
+// Aba Dashboard — carrega e filtra os registros já salvos (TabelaRegistrosInjecao)
+// =============================================================================
+var registrosCarregados = null; // array de objetos {data,hora,maquina,responsavel,gramatura,cor,resina,parametro,valor_medido,tolerancia_min_aplicada,tolerancia_max_aplicada,dentro_criterio,criado_em}
+var registrosFiltrados = null;
+
+function mudarAba(aba){
+  document.getElementById('tabCadastro').hidden = (aba !== 'cadastro');
+  document.getElementById('tabDashboard').hidden = (aba !== 'dashboard');
+  document.getElementById('tabbtnCadastro').classList.toggle('active', aba === 'cadastro');
+  document.getElementById('tabbtnDashboard').classList.toggle('active', aba === 'dashboard');
+  if (aba === 'dashboard' && registrosCarregados === null) carregarRegistrosInjecao();
+}
+
+// Corrige valores que o Excel converteu automaticamente em data/hora (serial),
+// caso a coluna ainda não estivesse formatada como Texto no momento do cadastro
+// (mesma lógica defensiva do App Inspeção Qualidade).
+function normalizarValorDataHora(campo, valor){
+  if (valor === null || valor === undefined || valor === '') return valor;
+  var ehNumero = typeof valor === 'number' || (typeof valor === 'string' && valor.trim() !== '' && !isNaN(valor) && /^[0-9.]+$/.test(valor.trim()));
+  if (!ehNumero) return valor;
+  var serial = parseFloat(valor);
+  var baseMs = Date.UTC(1899, 11, 30);
+  var dataConvertida = new Date(baseMs + serial * 86400000);
+  if (campo === 'data'){
+    return String(dataConvertida.getUTCDate()).padStart(2,'0') + '/' + String(dataConvertida.getUTCMonth()+1).padStart(2,'0') + '/' + dataConvertida.getUTCFullYear();
+  }
+  if (campo === 'hora' || campo === 'criado_em'){
+    var fracaoDia = serial % 1;
+    var totalMinutos = Math.round(fracaoDia * 24 * 60);
+    var hh = Math.floor(totalMinutos / 60) % 24, mm = totalMinutos % 60;
+    return String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+  }
+  return valor;
+}
+
+async function carregarRegistrosInjecao(){
+  if (!itemId){ mostrarToast('Ainda conectando com a planilha, aguarde um instante e tente de novo.', true); return; }
+  var btn = document.getElementById('btnCarregarDash');
+  var loading = document.getElementById('dashLoading');
+  btn.disabled = true; loading.hidden = false;
+  document.getElementById('dashFiltrosCard').hidden = true;
+  document.getElementById('dashResultCard').hidden = true;
+  try {
+    var token = await getToken();
+    var resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaRegistrosInjecao/rows', { headers: { Authorization: 'Bearer ' + token } });
+    if (!resp.ok){
+      mostrarToast('Não consegui carregar os registros (a aba/tabela existe na planilha?).', true);
+      return;
+    }
+    var json = await resp.json();
+    registrosCarregados = (json.value || []).map(function(row){
+      var v = row.values[0];
+      var obj = {};
+      COLS_INJ.forEach(function(campo, i){ obj[campo] = normalizarValorDataHora(campo, v[i]); });
+      return obj;
+    });
+    registrosCarregados.sort(function(a,b){ return (b.criado_em||'').localeCompare(a.criado_em||''); });
+    popularFiltrosDash();
+    registrosFiltrados = registrosCarregados;
+    renderTabelaRegistros(registrosFiltrados);
+    document.getElementById('dashFiltrosCard').hidden = false;
+    document.getElementById('dashResultCard').hidden = false;
+    btn.textContent = 'Atualizar registros';
+  } catch (err) {
+    mostrarToast('Falha de conexão ao carregar registros: ' + err.message, true);
+  } finally {
+    btn.disabled = false; loading.hidden = true;
+  }
+}
+
+function valoresUnicos(campo){
+  var vistos = {}, lista = [];
+  registrosCarregados.forEach(function(r){
+    var v = r[campo];
+    if (v && !vistos[v]){ vistos[v] = true; lista.push(v); }
+  });
+  lista.sort();
+  return lista;
+}
+
+function popularFiltrosDash(){
+  var selects = [
+    { id:'fMaquina', campo:'maquina', todos:'Todas' },
+    { id:'fParametro', campo:'parametro', todos:'Todos' },
+    { id:'fResponsavel', campo:'responsavel', todos:'Todos' }
+  ];
+  selects.forEach(function(s){
+    var el = document.getElementById(s.id);
+    var atual = el.value;
+    el.innerHTML = '<option value="">'+s.todos+'</option>' + valoresUnicos(s.campo).map(function(v){ return '<option value="'+v.replace(/"/g,'&quot;')+'">'+v+'</option>'; }).join('');
+    el.value = atual;
+  });
+}
+
+function paraDataISO(dataBR){
+  // "06/09/2026" -> "2026-09-06" pra comparar com <input type=date>
+  var m = String(dataBR||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!m) return '';
+  return m[3] + '-' + m[2] + '-' + m[1];
+}
+
+function aplicarFiltrosDash(){
+  var de = document.getElementById('fData_de').value;
+  var ate = document.getElementById('fData_ate').value;
+  var maquina = document.getElementById('fMaquina').value;
+  var parametro = document.getElementById('fParametro').value;
+  var responsavel = document.getElementById('fResponsavel').value;
+  var criterio = document.getElementById('fCriterio').value;
+
+  registrosFiltrados = registrosCarregados.filter(function(r){
+    if (maquina && r.maquina !== maquina) return false;
+    if (parametro && r.parametro !== parametro) return false;
+    if (responsavel && r.responsavel !== responsavel) return false;
+    if (criterio && r.dentro_criterio !== criterio) return false;
+    if (de || ate){
+      var iso = paraDataISO(r.data);
+      if (!iso) return false;
+      if (de && iso < de) return false;
+      if (ate && iso > ate) return false;
+    }
+    return true;
+  });
+  renderTabelaRegistros(registrosFiltrados);
+}
+
+function limparFiltrosDash(){
+  document.getElementById('fData_de').value = '';
+  document.getElementById('fData_ate').value = '';
+  document.getElementById('fMaquina').value = '';
+  document.getElementById('fParametro').value = '';
+  document.getElementById('fResponsavel').value = '';
+  document.getElementById('fCriterio').value = '';
+  registrosFiltrados = registrosCarregados;
+  renderTabelaRegistros(registrosFiltrados);
+}
+
+function renderTabelaRegistros(lista){
+  document.getElementById('dashContagem').textContent = lista.length + ' registro(s)';
+  var tbody = document.getElementById('dashTbody');
+  if (lista.length === 0){
+    tbody.innerHTML = '<tr><td colspan="9"><div class="emptystate">Nenhum registro encontrado com esses filtros.</div></td></tr>';
+    return;
+  }
+  // Mostra no máximo 500 linhas de uma vez, pra não travar o navegador — refina o filtro pra ver mais.
+  var LIMITE = 500;
+  var cortada = lista.length > LIMITE;
+  var mostrar = cortada ? lista.slice(0, LIMITE) : lista;
+  tbody.innerHTML = mostrar.map(function(r){
+    var crit = r.dentro_criterio === 'SIM' ? 'sim' : r.dentro_criterio === 'NÃO' ? 'nao' : 'vazio';
+    var critLabel = r.dentro_criterio === 'SIM' ? 'OK' : r.dentro_criterio === 'NÃO' ? 'Fora' : '—';
+    return '<tr>' +
+      '<td>'+(r.data||'—')+'</td><td>'+(r.hora||'—')+'</td><td>'+(r.maquina||'—')+'</td><td>'+(r.responsavel||'—')+'</td>' +
+      '<td>'+(r.parametro||'—')+'</td><td>'+(r.valor_medido||'—')+'</td><td>'+(r.tolerancia_min_aplicada||'—')+'</td><td>'+(r.tolerancia_max_aplicada||'—')+'</td>' +
+      '<td><span class="critpill '+crit+'">'+critLabel+'</span></td>' +
+    '</tr>';
+  }).join('') + (cortada ? '<tr><td colspan="9"><div class="emptystate">Mostrando '+LIMITE+' de '+lista.length+' — use os filtros pra refinar.</div></td></tr>' : '');
 }
 
 // =============================================================================
