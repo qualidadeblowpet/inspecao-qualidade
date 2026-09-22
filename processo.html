@@ -10,7 +10,7 @@
   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
   :root{
     --bg:#0c0d0f; --sidebar:#111214; --surface:#17181b; --surface-2:#1e2023; --border:#2a2d31;
-    --text:#edeef0; --text-dim:#8b8f96; --accent:#f2a93b; --ok:#3fb68b; --danger:#e5484d; --warn:#f2a93b; --blue:#5b9bf2;
+    --text:#edeef0; --text-dim:#8b8f96; --accent:#f2a93b; --ok:#3fb68b; --danger:#e5484d; --warn:#f2a93b; --blue:#5b9bf2; --purple:#9c7bd9;
     --font-display:'Barlow Condensed','Arial Narrow',sans-serif; --font-body:'Inter',system-ui,sans-serif; --font-mono:'JetBrains Mono',monospace;
   }
   *{box-sizing:border-box;}
@@ -52,7 +52,7 @@
     padding:9px 16px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:var(--font-body);}
   .dv3-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--text-dim);margin:0 0 12px;}
   .dv3-legend span{display:inline-flex;align-items:center;gap:6px;}
-  .dv3-legend i{width:16px;height:2px;display:inline-block;background:var(--accent);}
+  .dv3-legend i{width:16px;height:2px;display:inline-block;background:var(--purple);}
   .dv3-legend i.dv3-max{background:none;border-top:2px dashed var(--danger);}
   .dv3-legend i.dv3-min{background:none;border-top:2px dashed var(--ok);}
   .dv3-legend i.dv3-dot{width:8px;height:8px;border-radius:50%;background:var(--danger);}
@@ -69,7 +69,7 @@
   .dv3-plabel{width:260px;flex-shrink:0;padding:10px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px;
     background:var(--surface);position:sticky;left:0;z-index:2;border-right:1px solid var(--border);}
   .dv3-plabel .dv3-pname{font-size:11.5px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .dv3-plabel .dv3-plim{font-size:10px;color:var(--text-dim);font-family:var(--font-mono);}
+  .dv3-plabel .dv3-plim{font-size:10px;color:var(--text-dim);font-family:var(--font-body);}
   .dv3-pchartwrap{flex:1;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
   .dv3-pchartwrap::-webkit-scrollbar{height:6px;}
   .dv3-pchartwrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
@@ -78,7 +78,7 @@
     border-left:1px solid var(--border);padding:8px 16px;background:var(--surface);}
   .dv3-stats .dv3-st{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:10.5px;}
   .dv3-stats .dv3-st .dv3-sl{color:var(--text-dim);text-transform:uppercase;letter-spacing:.3px;}
-  .dv3-stats .dv3-st .dv3-sv{font-family:var(--font-mono);font-weight:700;font-size:12px;}
+  .dv3-stats .dv3-st .dv3-sv{font-family:var(--font-body);font-weight:700;font-size:12px;}
   .dv3-stats .dv3-st .dv3-sv.bad{color:var(--danger);}
   .dv3-stats .dv3-st .dv3-sv.ok{color:var(--ok);}
   .dv3-semdados{flex:1;display:flex;align-items:center;padding:10px 14px;font-size:11.5px;color:var(--text-dim);}
@@ -144,6 +144,8 @@
   .prow input.ok{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok) inset;}
   .prow input.bad{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger) inset;}
   .prow input.warn{border-color:var(--warn);box-shadow:0 0 0 1px var(--warn) inset;}
+  .prow-texto{grid-template-columns:1fr 1fr;}
+  .prow-texto input{font-family:var(--font-body);text-align:left;}
   .statuswrap{display:flex;justify-content:center;}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   .field{margin-bottom:0;}
@@ -190,12 +192,12 @@
   .widetable th,.widetable td{padding:7px 9px;border-bottom:1px solid #1e2023;border-right:1px solid #1e2023;}
   .widetable thead th{position:sticky;top:0;background:var(--surface);color:var(--text-dim);text-transform:uppercase;
     font-size:9.5px;letter-spacing:.3px;z-index:2;text-align:left;}
-  .widetable th.wt-fixo,.widetable td.wt-fixo{position:sticky;left:0;background:var(--surface);z-index:1;font-family:var(--font-mono);}
+  .widetable th.wt-fixo,.widetable td.wt-fixo{position:sticky;left:0;background:var(--surface);z-index:1;font-family:var(--font-body);}
   .widetable thead th.wt-fixo{z-index:3;}
   .widetable th.wt-param{min-width:34px;max-width:34px;height:120px;vertical-align:bottom;padding:6px 3px;}
   .widetable .wt-paramtxt{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;font-weight:600;
     text-transform:none;letter-spacing:0;font-size:10.5px;color:var(--text-dim);}
-  .widetable td.wt-param{text-align:center;font-family:var(--font-mono);}
+  .widetable td.wt-param{text-align:center;font-family:var(--font-body);}
   .widetable td.wt-param.ok{color:var(--ok);}
   .widetable td.wt-param.bad{background:rgba(229,72,77,.14);color:var(--danger);font-weight:700;}
   .widetable tbody tr:hover td{background:var(--surface-2);}
@@ -382,7 +384,8 @@
       </div>
       <ul class="warnlist" id="avisoList" hidden></ul>
       <div class="slot-list" id="slotList"></div>
-      <button class="btn btn-outline btn-block" style="margin-top:14px;" onclick="voltarUpload()">Ler outra planilha</button>
+      <button class="btn btn-accent btn-block" style="margin-top:14px;" id="btnSalvarTodos" onclick="salvarTodosPendentes()">Confirmar e salvar todos ✓</button>
+      <button class="btn btn-outline btn-block" style="margin-top:10px;" onclick="voltarUpload()">Ler outra planilha</button>
     </div>
   </div>
 
@@ -395,12 +398,10 @@
 
       <div class="sectiontitle">Identificação</div>
       <div class="grid-2" style="margin-bottom:14px;">
-        <div class="field"><label>Máquina</label><input id="dMaquina" value=""></div>
-        <div class="field"><label>Responsável</label><input id="dOperador" value=""></div>
-        <div class="field"><label>Gramatura</label><input id="dGramatura" value=""></div>
-        <div class="field"><label>Hora</label><input id="dHora" value=""></div>
-        <div class="field"><label>Cor</label><input id="dCor" value=""></div>
-        <div class="field"><label>Resina</label><input id="dResina" value=""></div>
+        <div class="field"><label>Máquina</label><input id="dMaquina" value="" oninput="resultado.cabecalho.maquina=this.value" onchange="renderParams()"></div>
+        <div class="field"><label>Responsável</label><input id="dOperador" value="" oninput="registroAtual.operador=this.value"></div>
+        <div class="field"><label>Gramatura</label><input id="dGramatura" value="" oninput="resultado.cabecalho.gramatura=this.value" onchange="renderParams()"></div>
+        <div class="field"><label>Hora</label><input id="dHora" value="" oninput="registroAtual.horario=this.value"></div>
       </div>
 
       <div class="legend">
@@ -410,7 +411,7 @@
         <span class="none"><i></i>Sem tolerância cadastrada</span>
       </div>
 
-      <div class="sectiontitle">Parâmetros (41)</div>
+      <div class="sectiontitle">Parâmetros</div>
       <div id="paramRows"></div>
 
       <div class="actions">
@@ -713,6 +714,16 @@ function renderSummary(){
       '<span class="chev">›</span>' +
     '</div>';
   }).join('');
+
+  var pendentes = resultado.registros.filter(function(r){ return !r.salvo; }).length;
+  var btnTodos = document.getElementById('btnSalvarTodos');
+  if (btnTodos){
+    if (pendentes === 0){
+      btnTodos.disabled = true; btnTodos.textContent = 'Todos os horários já estão salvos ✓';
+    } else {
+      btnTodos.disabled = false; btnTodos.textContent = 'Confirmar e salvar todos ('+pendentes+') ✓';
+    }
+  }
 }
 
 function goSummary(){ renderSummary(); show('viewSummary'); setSteps('done','done','active'); }
@@ -725,18 +736,44 @@ function goDetail(idx){
   document.getElementById('dOperador').value = registroAtual.operador || '';
   document.getElementById('dGramatura').value = c.gramatura || '';
   document.getElementById('dHora').value = registroAtual.horario || '';
-  document.getElementById('dCor').value = registroAtual.cor || '';
-  document.getElementById('dResina').value = registroAtual.resina || '';
   renderParams();
   var btn = document.getElementById('btnSalvarDetail');
   btn.disabled = false; btn.textContent = 'Confirmar e salvar ✓';
   show('viewDetail'); setSteps('done','done','active');
 }
 
+// Atualiza só a linha de um parâmetro (valor + selo) sem re-renderizar a lista toda,
+// pra não perder o foco/cursor de quem está digitando.
+function atualizarValorParametro(idx, novoValor){
+  registroAtual.valores[idx].valor = novoValor;
+  var c = resultado.cabecalho;
+  var v = registroAtual.valores[idx];
+  var r = statusDoValor(registroAtual, v, c);
+  var status = r.status;
+  var label = status==='ok'?'OK':status==='bad'?'Fora':status==='warn'?'Conferir':'—';
+  var row = document.querySelectorAll('#paramRows .prow-param')[idx];
+  if (!row) return;
+  var inputEl = row.querySelector('input');
+  inputEl.className = (status==='none'?'':status);
+  var pill = row.querySelector('.flagpill');
+  if (pill){ pill.className = 'flagpill ' + status; pill.textContent = label; }
+}
+
 function renderParams(){
   var c = resultado.cabecalho;
   var el = document.getElementById('paramRows');
-  el.innerHTML = registroAtual.valores.map(function(v){
+
+  var corResinaHtml =
+    '<div class="prow prow-texto">' +
+      '<div><div class="pname">Cor</div></div>' +
+      '<input id="dCor" value="'+(registroAtual.cor||'').replace(/"/g,'&quot;')+'" oninput="registroAtual.cor=this.value" onchange="renderParams()">' +
+    '</div>' +
+    '<div class="prow prow-texto">' +
+      '<div><div class="pname">Resina</div></div>' +
+      '<input id="dResina" value="'+(registroAtual.resina||'').replace(/"/g,'&quot;')+'" oninput="registroAtual.resina=this.value" onchange="renderParams()">' +
+    '</div>';
+
+  var paramsHtml = registroAtual.valores.map(function(v, idx){
     var r = statusDoValor(registroAtual, v, c);
     var status = r.status;
     var label = status==='ok'?'OK':status==='bad'?'Fora':status==='warn'?'Conferir':'—';
@@ -747,12 +784,14 @@ function renderParams(){
       limiteTxt = '<div class="plimite">Limite: '+mn+' a '+mx+'</div>';
     }
     var titulo = v.nota ? ' title="'+v.nota.replace(/"/g,'&quot;')+'"' : '';
-    return '<div class="prow">' +
+    return '<div class="prow prow-param">' +
       '<div><div class="pname">'+v.parametro+'</div>'+limiteTxt+'</div>' +
-      '<input class="'+(status==='none'?'':status)+'"'+titulo+' value="'+v.valor+'">' +
+      '<input class="'+(status==='none'?'':status)+'"'+titulo+' value="'+v.valor+'" oninput="atualizarValorParametro('+idx+',this.value)">' +
       '<div class="statuswrap"><span class="flagpill '+status+'">'+label+'</span></div>' +
     '</div>';
   }).join('');
+
+  el.innerHTML = corResinaHtml + paramsHtml;
 }
 
 // =============================================================================
@@ -803,6 +842,52 @@ async function salvarRegistro(){
   } catch (err) {
     mostrarToast('Falha de conexão: ' + err.message, true);
     btn.disabled = false; btn.textContent = 'Confirmar e salvar ✓';
+  }
+}
+
+// Salva de uma vez todos os horários da planilha atual que ainda não estão "Salvo ✓"
+// (um POST por horário, pra planilha ficar consistente mesmo se algum falhar no meio).
+async function salvarTodosPendentes(){
+  if (!itemId){ mostrarToast('Ainda conectando com a planilha, aguarde um instante e tente de novo.', true); return; }
+  var pendentes = resultado.registros.filter(function(r){ return !r.salvo; });
+  if (pendentes.length === 0){ mostrarToast('Todos os horários já estão salvos.'); return; }
+
+  var btn = document.getElementById('btnSalvarTodos');
+  btn.disabled = true; btn.textContent = 'Salvando ' + pendentes.length + ' horário(s)…';
+
+  var token;
+  try {
+    token = await getToken();
+    await prepararColunasTextoRegistrosInjecao(token);
+  } catch (err) {
+    mostrarToast('Falha de conexão: ' + err.message, true);
+    renderSummary();
+    return;
+  }
+
+  var okCount = 0, falhas = [];
+  for (var i = 0; i < pendentes.length; i++){
+    var reg = pendentes[i];
+    try {
+      var linhas = montarLinhasParaSalvar(reg, resultado.cabecalho);
+      var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaRegistrosInjecao/rows/add';
+      var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: linhas }) });
+      if (resp.ok){
+        reg.salvo = true; okCount++;
+      } else {
+        var json = await resp.json().catch(function(){ return {}; });
+        falhas.push(reg.horario + ' (' + (json.error ? json.error.message : resp.status) + ')');
+      }
+    } catch (err) {
+      falhas.push(reg.horario + ' (' + err.message + ')');
+    }
+  }
+
+  renderSummary();
+  if (falhas.length === 0){
+    mostrarToast(okCount + ' horário(s) salvos com sucesso ✓');
+  } else {
+    mostrarToast(okCount + ' salvo(s), ' + falhas.length + ' falharam: ' + falhas.join('; '), true);
   }
 }
 
@@ -1120,6 +1205,8 @@ function drawAxisV3(pontos){
   });
 }
 
+var _dv3GradSeq = 0;
+
 function drawMiniV3(svg, serie, lmin, lmax, nome){
   var W = dashAXIS_W, H = 64, padT = 8, padB = 8;
   var vals = serie.map(function(p){ return p.v; });
@@ -1133,16 +1220,37 @@ function drawMiniV3(svg, serie, lmin, lmax, nome){
   var svgns = 'http://www.w3.org/2000/svg';
   function el(tag,attrs){ var e=document.createElementNS(svgns,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
 
+  var corLinha = '#9c7bd9';
+
   if (lmax!=null) svg.appendChild(el('line',{x1:0,y1:y(lmax),x2:W,y2:y(lmax),stroke:'#e5484d','stroke-width':1.3,'stroke-dasharray':'4,3'}));
   if (lmin!=null) svg.appendChild(el('line',{x1:0,y1:y(lmin),x2:W,y2:y(lmin),stroke:'#3fb68b','stroke-width':1.3,'stroke-dasharray':'4,3'}));
 
-  var d = serie.map(function(p,i){ return (i===0?'M':'L')+xAtDashV3(p.t)+' '+y(p.v); }).join(' ');
-  svg.appendChild(el('path',{d:d, fill:'none', stroke:'#f2a93b','stroke-width':1.8,'stroke-linecap':'round','stroke-linejoin':'round'}));
+  var pontos = serie.map(function(p){ return { x: xAtDashV3(p.t), y: y(p.v) }; });
+  var d = pontos.map(function(pt,i){ return (i===0?'M':'L')+pt.x+' '+pt.y; }).join(' ');
+
+  // Área preenchida sob a linha (gradiente da cor até transparente, na base do gráfico).
+  if (pontos.length > 1){
+    var gradId = 'dv3grad' + (_dv3GradSeq++);
+    var defs = el('defs', {});
+    var grad = el('linearGradient', { id: gradId, x1:'0', y1:'0', x2:'0', y2:'1' });
+    grad.appendChild(el('stop', { offset:'0%', 'stop-color': corLinha, 'stop-opacity': '0.35' }));
+    grad.appendChild(el('stop', { offset:'100%', 'stop-color': corLinha, 'stop-opacity': '0' }));
+    defs.appendChild(grad);
+    svg.appendChild(defs);
+    var baseline = H - padB;
+    var areaD = d + ' L' + pontos[pontos.length-1].x + ' ' + baseline + ' L' + pontos[0].x + ' ' + baseline + ' Z';
+    svg.appendChild(el('path', { d: areaD, fill: 'url(#'+gradId+')', stroke: 'none' }));
+  }
+
+  svg.appendChild(el('path',{d:d, fill:'none', stroke:corLinha,'stroke-width':1.8,'stroke-linecap':'round','stroke-linejoin':'round'}));
 
   var tooltip = document.getElementById('dv3tooltip');
   serie.forEach(function(p){
     var fora = (lmin!=null && p.v<lmin) || (lmax!=null && p.v>lmax);
-    svg.appendChild(el('circle',{cx:xAtDashV3(p.t),cy:y(p.v),r:fora?3.2:2,fill:fora?'#e5484d':'#f2a93b'}));
+    var corPonto = fora ? '#e5484d' : corLinha;
+    // halo suave + anel, imitando o estilo de marcador pedido (referência enviada).
+    svg.appendChild(el('circle',{cx:xAtDashV3(p.t),cy:y(p.v),r:fora?6:5,fill:corPonto,'fill-opacity':'0.18'}));
+    svg.appendChild(el('circle',{cx:xAtDashV3(p.t),cy:y(p.v),r:fora?3.6:3,fill:'#17181b',stroke:corPonto,'stroke-width':'1.6'}));
     var hit = el('circle',{cx:xAtDashV3(p.t),cy:y(p.v),r:7,fill:'transparent'});
     hit.addEventListener('mouseenter', function(){
       var fmt = String(p.t.getHours()).padStart(2,'0')+'h '+String(p.t.getDate()).padStart(2,'0')+'/'+String(p.t.getMonth()+1).padStart(2,'0');
