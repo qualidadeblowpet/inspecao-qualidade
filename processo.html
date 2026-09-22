@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle de Processo — BlowPet</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+  :root{
+    --bg:#0c0d0f; --sidebar:#111214; --surface:#17181b; --surface-2:#1e2023; --border:#2a2d31;
+    --text:#edeef0; --text-dim:#8b8f96; --accent:#f2a93b; --ok:#3fb68b; --danger:#e5484d; --warn:#f2a93b; --blue:#5b9bf2;
+    --font-display:'Barlow Condensed','Arial Narrow',sans-serif; --font-body:'Inter',system-ui,sans-serif; --font-mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-body);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:760px;margin:0 auto;padding:20px 18px 60px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .brand{display:flex;align-items:baseline;gap:8px;}
+  .brand .mark{font-family:var(--font-display);font-weight:700;font-size:22px;color:var(--accent);letter-spacing:.4px;}
+  .statuswrap-top{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim);}
+  .status-dot{width:8px;height:8px;border-radius:50%;background:var(--text-dim);flex-shrink:0;}
+  .status-dot.online{background:var(--ok);box-shadow:0 0 5px var(--ok);}
+  .status-dot.offline{background:var(--danger);}
+  .linklike{color:var(--text-dim);text-decoration:underline;cursor:pointer;font-size:12px;background:none;border:none;padding:0;font-family:var(--font-body);}
+  .sub{font-size:13px;color:var(--text-dim);margin:0 0 22px;}
+  .steps{display:flex;gap:6px;margin-bottom:20px;}
+  .step{flex:1;text-align:center;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;
+    color:var(--text-dim);padding:8px 4px;border-radius:8px;background:var(--surface);border:1px solid var(--border);}
+  .step.active{color:#1a1200;background:var(--accent);border-color:var(--accent);}
+  .step.done{color:var(--ok);border-color:var(--ok);}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+  .card h3{font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:.3px;margin:0 0 6px;text-transform:uppercase;}
+  .card p.desc{font-size:13px;color:var(--text-dim);margin:0 0 18px;line-height:1.5;}
+  .drop{border:2px dashed var(--border);border-radius:12px;padding:36px 16px;text-align:center;color:var(--text-dim);margin-bottom:16px;}
+  .drop .icon{font-size:34px;margin-bottom:10px;}
+  .drop .hint{font-size:12px;margin-top:6px;}
+  .drop.hasfile{border-color:var(--ok);color:var(--text);}
+  input[type=file]{display:none;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:9px;border:none;
+    font-weight:700;font-size:14px;cursor:pointer;font-family:var(--font-body);}
+  .btn-accent{background:var(--accent);color:#1a1200;}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+  .btn-block{width:100%;}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .btn:active{transform:scale(.98);}
+  .loading-row{display:flex;align-items:center;gap:12px;padding:14px 4px;color:var(--text-dim);font-size:13px;}
+  .spinner{width:22px;height:22px;border-radius:50%;border:3px solid var(--border);border-top-color:var(--accent);
+    animation:spin .8s linear infinite;flex-shrink:0;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .header-info{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px;margin-bottom:16px;}
+  .header-info .hi{background:var(--surface-2);border:1px solid var(--border);border-radius:9px;padding:10px 12px;}
+  .header-info .hi .hl{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+  .header-info .hi .hv{font-size:14px;font-weight:700;}
+  .slot-list{display:flex;flex-direction:column;gap:8px;}
+  .slot{display:flex;align-items:center;gap:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;
+    padding:12px 14px;cursor:pointer;}
+  .slot:hover{border-color:var(--accent);}
+  .slot .hora{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--accent);width:52px;flex-shrink:0;}
+  .slot .op{flex:1;font-size:13.5px;}
+  .slot .op .opname{font-weight:600;}
+  .slot .op .opsub{font-size:11px;color:var(--text-dim);}
+  .flagpill{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.3px;}
+  .flagpill.ok{background:rgba(63,182,139,.15);color:var(--ok);}
+  .flagpill.warn{background:rgba(242,169,59,.18);color:var(--warn);}
+  .flagpill.bad{background:rgba(229,72,77,.15);color:var(--danger);}
+  .flagpill.none{background:rgba(139,143,150,.15);color:var(--text-dim);}
+  .flagpill.salvo{background:rgba(91,155,242,.18);color:var(--blue);}
+  .chev{color:var(--text-dim);font-size:16px;}
+  .backlink{display:flex;align-items:center;gap:6px;color:var(--text-dim);font-size:12.5px;cursor:pointer;margin-bottom:14px;}
+  .backlink:hover{color:var(--text);}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--text-dim);margin-bottom:16px;}
+  .legend span{display:inline-flex;align-items:center;gap:5px;}
+  .legend i{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .legend .ok i{background:var(--ok);} .legend .warn i{background:var(--warn);} .legend .bad i{background:var(--danger);} .legend .none i{background:var(--text-dim);}
+  .prow{display:grid;grid-template-columns:1fr 100px 74px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #1e2023;}
+  .prow:last-child{border-bottom:none;}
+  .prow .pname{font-size:12.5px;}
+  .prow .plimite{font-size:10.5px;color:var(--text-dim);margin-top:1px;}
+  .prow input{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);padding:8px 9px;
+    border-radius:7px;font-size:13px;font-family:var(--font-mono);text-align:center;}
+  .prow input.ok{border-color:var(--ok);box-shadow:0 0 0 1px var(--ok) inset;}
+  .prow input.bad{border-color:var(--danger);box-shadow:0 0 0 1px var(--danger) inset;}
+  .prow input.warn{border-color:var(--warn);box-shadow:0 0 0 1px var(--warn) inset;}
+  .statuswrap{display:flex;justify-content:center;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .field{margin-bottom:0;}
+  .field label{display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;text-transform:uppercase;letter-spacing:.4px;}
+  .field input,.field select{width:100%;background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+    padding:10px 11px;border-radius:8px;font-size:13.5px;font-family:var(--font-body);}
+  .sectiontitle{font-family:var(--font-display);font-size:12.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+    color:var(--accent);margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+  .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;}
+  .note{font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-top:6px;}
+  .errlist{font-size:12.5px;color:var(--danger);line-height:1.7;padding-left:18px;margin:0 0 16px;}
+  .warnlist{font-size:12px;color:var(--text-dim);line-height:1.7;padding-left:18px;margin:0 0 16px;}
+  .err{color:var(--danger);font-size:13px;}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--surface-2);border:1px solid var(--border);
+    color:var(--text);padding:12px 18px;border-radius:10px;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.4);z-index:50;max-width:90vw;}
+  .toast.err{border-color:var(--danger);color:var(--danger);}
+  [hidden]{display:none!important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== LOGIN ===== -->
+  <div id="viewLogin">
+    <div class="card" style="margin-top:60px;text-align:center;">
+      <div class="brand" style="justify-content:center;margin-bottom:4px;"><span class="mark">CONTROLE DE PROCESSO</span></div>
+      <p class="sub">BlowPet — Injeção</p>
+      <h3>Entrar com a conta Microsoft</h3>
+      <p class="desc">Use sua conta @blowpet.com.br para acessar a planilha de registros na nuvem.</p>
+      <button class="btn btn-accent btn-block" id="btnLoginMicrosoft">Entrar com Microsoft</button>
+      <p class="err" id="loginMsg" style="margin-top:12px;"></p>
+    </div>
+  </div>
+
+  <!-- ===== APP (pós-login) ===== -->
+  <div id="app" hidden>
+
+  <div class="topbar">
+    <div class="brand"><span class="mark">CONTROLE DE PROCESSO</span></div>
+    <div class="statuswrap-top">
+      <span class="status-dot" id="statusDot"></span>
+      <span id="statusText">conectando…</span>
+      <button class="linklike" onclick="logout()">sair</button>
+    </div>
+  </div>
+  <p class="sub">Cadastro por Planilha — Injeção · <span id="userEmail"></span></p>
+
+  <div class="steps">
+    <div class="step" id="stepA">1. Planilha</div>
+    <div class="step" id="stepB">2. Lendo</div>
+    <div class="step" id="stepC">3. Revisão</div>
+  </div>
+
+  <!-- ===== TELA 1: UPLOAD ===== -->
+  <div id="viewUpload">
+    <div class="card">
+      <h3>Enviar planilha preenchida</h3>
+      <p class="desc">Envie o arquivo .xlsx no formato do Checklist de Parâmetros (Injetoras) — o mesmo gerado pela transcrição da foto do checklist. O app identifica automaticamente máquina, preforma, operadores por horário e os valores de cada parâmetro, já comparando com as tolerâncias cadastradas.</p>
+      <div class="drop" id="dropZone">
+        <div class="icon">📄</div>
+        <div id="dropLabel">Nenhuma planilha selecionada</div>
+        <div class="hint">.xlsx — mesma estrutura de célula da skill de transcrição</div>
+      </div>
+      <input type="file" id="fileInput" accept=".xlsx">
+      <button class="btn btn-outline btn-block" style="margin-bottom:10px;" onclick="document.getElementById('fileInput').click()">Escolher arquivo</button>
+      <button class="btn btn-accent btn-block" id="btnLer" disabled onclick="lerPlanilha()">Ler planilha</button>
+    </div>
+  </div>
+
+  <!-- ===== TELA 2: PROCESSANDO ===== -->
+  <div id="viewProcessing" hidden>
+    <div class="card">
+      <h3>Lendo a planilha…</h3>
+      <div class="loading-row"><div class="spinner"></div> Lendo cabeçalho (data, máquina, preforma)…</div>
+      <div class="loading-row"><div class="spinner"></div> Localizando os horários preenchidos…</div>
+      <div class="loading-row"><div class="spinner"></div> Comparando os 41 parâmetros com as tolerâncias cadastradas…</div>
+    </div>
+  </div>
+
+  <!-- ===== TELA 2b: ERRO DE FORMATO ===== -->
+  <div id="viewError" hidden>
+    <div class="card">
+      <h3>Não foi possível ler essa planilha</h3>
+      <p class="desc">A estrutura do arquivo não bate com o formato esperado. Confira os pontos abaixo (o guia completo está na skill de transcrição, <code>transcrever-checklist-injecao</code>):</p>
+      <ul class="errlist" id="errList"></ul>
+      <button class="btn btn-outline btn-block" onclick="voltarUpload()">Escolher outro arquivo</button>
+    </div>
+  </div>
+
+  <!-- ===== TELA 3: RESUMO ===== -->
+  <div id="viewSummary" hidden>
+    <div class="card">
+      <h3 id="summaryTitle">Registros identificados</h3>
+      <p class="desc">Confira os dados do cabeçalho e depois revise cada horário antes de salvar. Nenhum registro é gravado até você confirmar.</p>
+      <div class="header-info">
+        <div class="hi"><div class="hl">Data</div><div class="hv" id="hData">—</div></div>
+        <div class="hi"><div class="hl">Máquina</div><div class="hv" id="hMaquina">—</div></div>
+        <div class="hi"><div class="hl">Preforma (gramatura)</div><div class="hv" id="hGramatura">—</div></div>
+        <div class="hi"><div class="hl">Cor / Resina</div><div class="hv" id="hCorResina">—</div></div>
+      </div>
+      <ul class="warnlist" id="avisoList" hidden></ul>
+      <div class="slot-list" id="slotList"></div>
+      <button class="btn btn-outline btn-block" style="margin-top:14px;" onclick="voltarUpload()">Ler outra planilha</button>
+    </div>
+  </div>
+
+  <!-- ===== TELA 4: REVISÃO DE UM HORÁRIO ===== -->
+  <div id="viewDetail" hidden>
+    <div class="backlink" onclick="goSummary()">← Ver os outros horários</div>
+    <div class="card">
+      <h3 id="detailTitle">Revisar</h3>
+      <p class="desc">Os valores abaixo foram lidos da planilha e comparados com a tolerância cadastrada (Máquina + Gramatura + Cor + Resina). Toque em qualquer campo para corrigir antes de salvar.</p>
+
+      <div class="sectiontitle">Identificação</div>
+      <div class="grid-2" style="margin-bottom:14px;">
+        <div class="field"><label>Máquina</label><input id="dMaquina" value=""></div>
+        <div class="field"><label>Responsável</label><input id="dOperador" value=""></div>
+        <div class="field"><label>Gramatura</label><input id="dGramatura" value=""></div>
+        <div class="field"><label>Hora</label><input id="dHora" value=""></div>
+        <div class="field"><label>Cor</label><input id="dCor" value=""></div>
+        <div class="field"><label>Resina</label><input id="dResina" value=""></div>
+      </div>
+
+      <div class="legend">
+        <span class="ok"><i></i>Dentro do limite</span>
+        <span class="bad"><i></i>Fora do limite</span>
+        <span class="warn"><i></i>Baixa confiança — conferir</span>
+        <span class="none"><i></i>Sem tolerância cadastrada</span>
+      </div>
+
+      <div class="sectiontitle">Parâmetros (41)</div>
+      <div id="paramRows"></div>
+
+      <div class="actions">
+        <button class="btn btn-outline" onclick="goSummary()">Ajustar depois</button>
+        <button class="btn btn-accent" id="btnSalvarDetail" onclick="salvarRegistro()">Confirmar e salvar ✓</button>
+      </div>
+      <p class="note">Ao salvar, tanto o valor medido quanto o limite (mín/máx) usado na comparação são gravados juntos na planilha — para permitir montar gráficos depois comparando o histórico com o critério vigente em cada momento.</p>
+    </div>
+  </div>
+
+  </div><!-- /#app -->
+
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script>
+// =============================================================================
+// CONFIG — login e planilha
+// =============================================================================
+const msalConfig = {
+  auth: {
+    clientId: "f518fc60-a544-45d1-89a9-97e9f6b523ad",
+    authority: "https://login.microsoftonline.com/b38f2dcb-4251-4b93-977a-f469eb315033",
+    redirectUri: "https://qualidadeblowpet.github.io/inspecao-qualidade/processo.html"
+  }
+};
+const graphScopes = ["Files.ReadWrite", "User.Read"];
+// Link de compartilhamento da planilha "Controle de Processo - BlowPet.xlsx" (SharePoint/OneDrive).
+const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/inspetor_qualidade_blowpet_com_br/IQDmQnijbPcDTY0p9dqG2ESpAd5D74uyEA8w9oWVNHuR9O0?e=F1ABfi";
+
+const COLS_INJ = ['id_sessao','data','hora','maquina','responsavel','gramatura','cor','resina','parametro','valor_medido','tolerancia_min_aplicada','tolerancia_max_aplicada','dentro_criterio','criado_em'];
+
+let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
+let tolerancias = []; // { maquina, gramatura, cor, resina, parametro, valor_min, valor_max, ativo } (chaves normalizadas)
+let colunasTextoPreparadas = false;
+
+// =============================================================================
+// Lógica de leitura da planilha (mesma lógica validada em test-parser.js /
+// prototipo-cadastro-planilha.html — leitura por NOME do parâmetro, não por
+// posição da linha).
+// =============================================================================
+const PARAMETROS_INJECAO = [
+  'Temperatura de água gelada', 'Temperatura água da torre', 'Temperatura PET (cone)',
+  'Ponto de orvalho (secador)', 'Nível do silo (%)', 'Pressão de injeção (teórico)',
+  'Pressão de injeção (real)', 'Velocidade de injeção (1º perfil)', 'Velocidade de injeção (2º perfil)',
+  'Velocidade de injeção (3º perfil)', 'Velocidade de injeção (4º perfil)', 'Velocidade de injeção (5º perfil)',
+  'Tempo de injeção', 'Pressão de recalque (1º perfil)', 'Pressão de recalque (2º perfil)',
+  'Pressão de recalque (3º perfil)', 'Pressão de recalque (4º perfil)', 'Pressão de recalque (5º perfil)',
+  'Tempo de recalque (1º perfil)', 'Tempo de recalque (2º perfil)', 'Tempo de recalque (3º perfil)',
+  'Tempo de recalque (4º perfil)', 'Tempo de recalque (5º perfil)', 'Tempo total de recalque',
+  'Percurso', 'Tempo de abertura de agulha', 'Comprimento do shotpot', 'Almofada de massa',
+  'Velocidade da rosca', 'Tempo de plastificação', 'Contrapressão', 'Temperatura do canhão',
+  'Temperatura do molde', 'Temperatura de agulha', 'Temperatura do óleo', 'Tempo de refrigeração',
+  'Tempo de ciclo (total)', 'Número de batidas (set)', 'Cavidades ativas',
+  'Velocidade do pigmentador (RPM)', 'Tempo do pigmentador (seg.)'
+];
+
+function norm(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,' '); }
+function colLetterFromIndex(i){ return String.fromCharCode(65+i); }
+
+function cellStr(ws, addr){
+  var c = ws[addr];
+  if (!c) return '';
+  var v = (c.w !== undefined ? c.w : (c.v !== undefined && c.v !== null ? c.v : ''));
+  return String(v).trim();
+}
+
+function celulaInfo(ws, addr){
+  var c = ws[addr];
+  if (!c) return { duvidosa:false, nota:'' };
+  var hasComment = Array.isArray(c.c) && c.c.length > 0;
+  var nota = hasComment ? c.c.map(function(x){return x.t;}).join(' ') : '';
+  var fill = c.s && c.s.patternType === 'solid' && c.s.fgColor && c.s.fgColor.rgb;
+  var yellow = !!(fill && fill.toUpperCase().endsWith('FFF2CC'));
+  return { duvidosa: hasComment || yellow, nota: nota };
+}
+
+// "23.4" (formatado pelo SheetJS com ponto) -> "23,4" (padrão BR usado no resto da planilha).
+// Só converte quando o valor é claramente um número decimal; texto (ex: "BAR", "—") não muda.
+function paraBR(valorStr){
+  if (/^-?\d+\.\d+$/.test(valorStr)) return valorStr.replace('.', ',');
+  return valorStr;
+}
+// Converte de volta pra número JS pra comparar com tolerância — aceita tanto "," quanto "." como decimal.
+function paraNumero(valorStr){
+  if (valorStr === undefined || valorStr === null) return NaN;
+  var s = String(valorStr).trim();
+  if (s === '' || s === '—' || s === '-') return NaN;
+  s = s.replace(',', '.');
+  var n = parseFloat(s);
+  return isNaN(n) ? NaN : n;
+}
+
+function parseChecklist(ws){
+  var erros = [];
+  var avisos = [];
+  var data = cellStr(ws,'B2');
+  var maquina = cellStr(ws,'B3');
+  var preformaRaw = cellStr(ws,'B4');
+  var gramMatch = preformaRaw.match(/-?\d+(?:[.,]\d+)?/);
+  var gramatura = gramMatch ? gramMatch[0] : '';
+
+  var paramColStart = 8, paramColEnd = 48;
+  var nomeParaLinha = {};
+  var linhasVistas = [];
+  for (var r = paramColStart; r <= paramColEnd; r++){
+    var nome = cellStr(ws, 'A'+r);
+    linhasVistas.push({ linha:r, nome:nome });
+    if (!nome) continue;
+    var chave = norm(nome);
+    if (nomeParaLinha[chave] !== undefined){
+      avisos.push('Nome de parâmetro repetido em A8:A48: "'+nome+'" aparece mais de uma vez (linha '+nomeParaLinha[chave]+' e linha '+r+').');
+    }
+    nomeParaLinha[chave] = r;
+  }
+
+  PARAMETROS_INJECAO.forEach(function(nomeParam){
+    if (nomeParaLinha[norm(nomeParam)] === undefined){
+      erros.push('Parâmetro "'+nomeParam+'" não foi encontrado em A8:A48 (procurado por nome, não por posição).');
+    }
+  });
+
+  linhasVistas.forEach(function(lv){
+    if (!lv.nome) return;
+    var achou = PARAMETROS_INJECAO.some(function(p){ return norm(p) === norm(lv.nome); });
+    if (!achou) avisos.push('Linha '+lv.linha+' tem um nome ("'+lv.nome+'") que não corresponde a nenhum dos 41 parâmetros esperados.');
+  });
+
+  var registros = [];
+  if (erros.length === 0){
+    for (var ci = 2; ci <= 9; ci++){
+      var colL = colLetterFromIndex(ci);
+      var horario = cellStr(ws, colL+'7');
+      var operador = cellStr(ws, colL+'6');
+      var temDado = false;
+      for (var rr = paramColStart; rr <= paramColEnd; rr++){
+        if (cellStr(ws, colL+rr) !== ''){ temDado = true; break; }
+      }
+      if (!temDado) continue;
+
+      var valores = PARAMETROS_INJECAO.map(function(nomeParam){
+        var row = nomeParaLinha[norm(nomeParam)];
+        var addr = colL+row;
+        var valor = cellStr(ws, addr);
+        if (valor === '') valor = '—';
+        valor = paraBR(valor);
+        var info = celulaInfo(ws, addr);
+        return { parametro: nomeParam, valor: valor, confianca: info.duvidosa ? 'baixa' : 'alta', nota: info.nota };
+      });
+
+      var cor = cellStr(ws, colL+'49');
+      var resina = cellStr(ws, colL+'50');
+      registros.push({ horario:horario, operador:operador, cor:cor, resina:resina, valores:valores, salvo:false });
+    }
+  }
+
+  return { cabecalho:{ data:data, maquina:maquina, gramatura:gramatura, preformaRaw:preformaRaw }, registros:registros, erros:erros, avisos:avisos };
+}
+
+// =============================================================================
+// Tolerâncias — busca por Máquina + Gramatura + Cor + Resina + Parâmetro
+// =============================================================================
+function buscarTolerancia(maquina, gramatura, cor, resina, parametro){
+  var chaveM = norm(maquina), chaveG = norm(gramatura), chaveC = norm(cor), chaveR = norm(resina), chaveP = norm(parametro);
+  for (var i = 0; i < tolerancias.length; i++){
+    var t = tolerancias[i];
+    if (t.ativoFalso) continue;
+    if (t._maquina === chaveM && t._gramatura === chaveG && t._cor === chaveC && t._resina === chaveR && t._parametro === chaveP){
+      return t;
+    }
+  }
+  return null;
+}
+
+// status: 'warn' (baixa confiança, precisa conferir antes de tudo) > 'bad'/'ok' (comparação com tolerância) > 'none' (sem tolerância cadastrada ou valor não numérico)
+function statusDoValor(reg, v, cabecalho){
+  if (v.confianca === 'baixa') return { status:'warn', tol:null };
+  var tol = buscarTolerancia(cabecalho.maquina, cabecalho.gramatura, reg.cor, reg.resina, v.parametro);
+  if (!tol) return { status:'none', tol:null };
+  var n = paraNumero(v.valor);
+  if (isNaN(n)) return { status:'none', tol:tol };
+  var min = paraNumero(tol.valor_min), max = paraNumero(tol.valor_max);
+  var dentro = true;
+  if (!isNaN(min) && n < min) dentro = false;
+  if (!isNaN(max) && n > max) dentro = false;
+  return { status: dentro ? 'ok' : 'bad', tol:tol };
+}
+
+// =============================================================================
+// UI — estado
+// =============================================================================
+var resultado = null;
+var registroAtual = null;
+
+var fileInput, btnLer, dropZone, dropLabel, arquivoEscolhido = null;
+
+function show(id){
+  ['viewUpload','viewProcessing','viewError','viewSummary','viewDetail'].forEach(function(v){
+    document.getElementById(v).hidden = (v !== id);
+  });
+}
+function setSteps(a,b,c){
+  document.getElementById('stepA').className = 'step' + (a?' '+a:'');
+  document.getElementById('stepB').className = 'step' + (b?' '+b:'');
+  document.getElementById('stepC').className = 'step' + (c?' '+c:'');
+}
+function mostrarToast(msg, isErr){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isErr ? ' err' : '');
+  t.hidden = false;
+  clearTimeout(t._h);
+  t._h = setTimeout(function(){ t.hidden = true; }, 4500);
+}
+
+function voltarUpload(){
+  arquivoEscolhido = null;
+  fileInput.value = '';
+  dropLabel.textContent = 'Nenhuma planilha selecionada';
+  dropZone.classList.remove('hasfile');
+  btnLer.disabled = true;
+  show('viewUpload'); setSteps('active','','');
+}
+
+function lerPlanilha(){
+  if (!arquivoEscolhido) return;
+  show('viewProcessing'); setSteps('done','active','');
+
+  var reader = new FileReader();
+  reader.onload = function(e){
+    setTimeout(function(){
+      try {
+        var data = new Uint8Array(e.target.result);
+        var wb = XLSX.read(data, { type:'array', cellStyles:true, cellComment:true, cellNF:true });
+        var ws = wb.Sheets[wb.SheetNames[0]];
+        resultado = parseChecklist(ws);
+      } catch (err) {
+        resultado = { cabecalho:{}, registros:[], erros:['Não consegui abrir o arquivo como planilha Excel: ' + err.message], avisos:[] };
+      }
+
+      if (resultado.erros.length > 0){
+        document.getElementById('errList').innerHTML = resultado.erros.map(function(e){ return '<li>'+e+'</li>'; }).join('');
+        show('viewError'); setSteps('done','',''); return;
+      }
+      if (resultado.registros.length === 0){
+        resultado.erros = ['Nenhum horário com dados foi encontrado (colunas C:J da tabela de parâmetros vieram todas vazias).'];
+        document.getElementById('errList').innerHTML = resultado.erros.map(function(e){ return '<li>'+e+'</li>'; }).join('');
+        show('viewError'); setSteps('done','',''); return;
+      }
+
+      renderSummary();
+      show('viewSummary'); setSteps('done','done','active');
+    }, 300);
+  };
+  reader.readAsArrayBuffer(arquivoEscolhido);
+}
+
+function renderSummary(){
+  var c = resultado.cabecalho;
+  document.getElementById('summaryTitle').textContent = resultado.registros.length + ' registro(s) identificado(s)';
+  document.getElementById('hData').textContent = c.data || '—';
+  document.getElementById('hMaquina').textContent = c.maquina || '—';
+  document.getElementById('hGramatura').textContent = c.preformaRaw || c.gramatura || '—';
+  var primeiro = resultado.registros[0];
+  document.getElementById('hCorResina').textContent = (primeiro.cor || '—') + ' / ' + (primeiro.resina || '—');
+
+  var avisoEl = document.getElementById('avisoList');
+  if (resultado.avisos.length > 0){
+    avisoEl.hidden = false;
+    avisoEl.innerHTML = resultado.avisos.map(function(a){ return '<li>'+a+'</li>'; }).join('');
+  } else {
+    avisoEl.hidden = true;
+  }
+
+  var el = document.getElementById('slotList');
+  el.innerHTML = resultado.registros.map(function(reg, idx){
+    var flag, label;
+    if (reg.salvo){
+      flag = 'salvo'; label = 'Salvo ✓';
+    } else {
+      var nBad = 0, nWarn = 0;
+      reg.valores.forEach(function(v){
+        var r = statusDoValor(reg, v, resultado.cabecalho);
+        if (r.status === 'bad') nBad++; else if (r.status === 'warn') nWarn++;
+      });
+      if (nBad > 0){ flag = 'bad'; label = nBad + ' fora do limite'; }
+      else if (nWarn > 0){ flag = 'warn'; label = nWarn + ' p/ conferir'; }
+      else { flag = 'ok'; label = 'OK'; }
+    }
+    return '<div class="slot" onclick="goDetail('+idx+')">' +
+      '<div class="hora">'+reg.horario+'</div>' +
+      '<div class="op"><div class="opname">'+(reg.operador||'—')+'</div><div class="opsub">41 parâmetros lidos</div></div>' +
+      '<span class="flagpill '+flag+'">'+label+'</span>' +
+      '<span class="chev">›</span>' +
+    '</div>';
+  }).join('');
+}
+
+function goSummary(){ renderSummary(); show('viewSummary'); setSteps('done','done','active'); }
+
+function goDetail(idx){
+  registroAtual = resultado.registros[idx];
+  var c = resultado.cabecalho;
+  document.getElementById('detailTitle').textContent = 'Revisar — ' + registroAtual.horario + ' (' + (registroAtual.operador||'—') + ')';
+  document.getElementById('dMaquina').value = c.maquina || '';
+  document.getElementById('dOperador').value = registroAtual.operador || '';
+  document.getElementById('dGramatura').value = c.gramatura || '';
+  document.getElementById('dHora').value = registroAtual.horario || '';
+  document.getElementById('dCor').value = registroAtual.cor || '';
+  document.getElementById('dResina').value = registroAtual.resina || '';
+  renderParams();
+  var btn = document.getElementById('btnSalvarDetail');
+  btn.disabled = false; btn.textContent = 'Confirmar e salvar ✓';
+  show('viewDetail'); setSteps('done','done','active');
+}
+
+function renderParams(){
+  var c = resultado.cabecalho;
+  var el = document.getElementById('paramRows');
+  el.innerHTML = registroAtual.valores.map(function(v){
+    var r = statusDoValor(registroAtual, v, c);
+    var status = r.status;
+    var label = status==='ok'?'OK':status==='bad'?'Fora':status==='warn'?'Conferir':'—';
+    var limiteTxt = '';
+    if (r.tol){
+      var mn = r.tol.valor_min === '' ? '—' : r.tol.valor_min;
+      var mx = r.tol.valor_max === '' ? '—' : r.tol.valor_max;
+      limiteTxt = '<div class="plimite">Limite: '+mn+' a '+mx+'</div>';
+    }
+    var titulo = v.nota ? ' title="'+v.nota.replace(/"/g,'&quot;')+'"' : '';
+    return '<div class="prow">' +
+      '<div><div class="pname">'+v.parametro+'</div>'+limiteTxt+'</div>' +
+      '<input class="'+(status==='none'?'':status)+'"'+titulo+' value="'+v.valor+'">' +
+      '<div class="statuswrap"><span class="flagpill '+status+'">'+label+'</span></div>' +
+    '</div>';
+  }).join('');
+}
+
+// =============================================================================
+// Salvar — grava os 41 parâmetros do horário atual na tabela Registros_Injecao
+// =============================================================================
+function gerarIdSessao(){
+  if (window.crypto && window.crypto.randomUUID) return window.crypto.randomUUID();
+  return 'sess-' + Date.now() + '-' + Math.random().toString(36).slice(2,10);
+}
+
+function montarLinhasParaSalvar(reg, cabecalho){
+  var idSessao = gerarIdSessao();
+  var criadoEm = new Date().toISOString();
+  return reg.valores.map(function(v){
+    var r = statusDoValor(reg, v, cabecalho);
+    var dentro = r.status === 'ok' ? 'SIM' : r.status === 'bad' ? 'NÃO' : '';
+    var obj = {
+      id_sessao: idSessao, data: cabecalho.data, hora: reg.horario, maquina: cabecalho.maquina,
+      responsavel: reg.operador, gramatura: cabecalho.gramatura, cor: reg.cor, resina: reg.resina,
+      parametro: v.parametro, valor_medido: v.valor,
+      tolerancia_min_aplicada: r.tol ? r.tol.valor_min : '', tolerancia_max_aplicada: r.tol ? r.tol.valor_max : '',
+      dentro_criterio: dentro, criado_em: criadoEm
+    };
+    return COLS_INJ.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; });
+  });
+}
+
+async function salvarRegistro(){
+  if (!itemId){ mostrarToast('Ainda conectando com a planilha, aguarde um instante e tente de novo.', true); return; }
+  var btn = document.getElementById('btnSalvarDetail');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  try {
+    var linhas = montarLinhasParaSalvar(registroAtual, resultado.cabecalho);
+    var token = await getToken();
+    await prepararColunasTextoRegistrosInjecao(token);
+    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaRegistrosInjecao/rows/add';
+    var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: linhas }) });
+    if (resp.ok){
+      registroAtual.salvo = true;
+      mostrarToast(linhas.length + ' parâmetro(s) salvos — horário ' + registroAtual.horario + ' ✓');
+      btn.textContent = 'Salvo ✓';
+      goSummary();
+    } else {
+      var json = await resp.json().catch(function(){ return {}; });
+      mostrarToast('Erro ao salvar: ' + (json.error ? json.error.message : resp.status), true);
+      btn.disabled = false; btn.textContent = 'Confirmar e salvar ✓';
+    }
+  } catch (err) {
+    mostrarToast('Falha de conexão: ' + err.message, true);
+    btn.disabled = false; btn.textContent = 'Confirmar e salvar ✓';
+  }
+}
+
+// =============================================================================
+// Login (MSAL) + conexão com a planilha (padrão idêntico ao App Inspeção Qualidade)
+// =============================================================================
+async function getToken(){
+  // Hook só usado em teste automatizado (headless) — nunca ativo em produção.
+  if (window.__TEST_TOKEN__) return window.__TEST_TOKEN__;
+  await msalPronto;
+  var req = { scopes: graphScopes, account: contaAtual };
+  try {
+    var res = await msalInstance.acquireTokenSilent(req);
+    return res.accessToken;
+  } catch (e) {
+    await msalInstance.acquireTokenRedirect(req);
+    return new Promise(function(){});
+  }
+}
+function logout(){ msalInstance.logoutRedirect(); }
+
+async function iniciarLogin(){
+  if (typeof msal === 'undefined'){
+    document.getElementById('loginMsg').textContent = 'A biblioteca de login não carregou (possível bloqueio de rede). Tente por outra rede ou avise o TI para liberar cdn.jsdelivr.net.';
+    return;
+  }
+  msalInstance = new msal.PublicClientApplication(msalConfig);
+  msalPronto = msalInstance.initialize();
+  await msalPronto;
+
+  try {
+    var resposta = await msalInstance.handleRedirectPromise();
+    if (resposta && resposta.account){ contaAtual = resposta.account; aposLogin(); return; }
+  } catch (e) {
+    document.getElementById('loginMsg').textContent = 'Erro no login: ' + e.message;
+  }
+
+  var contas = msalInstance.getAllAccounts();
+  if (contas.length > 0){ contaAtual = contas[0]; aposLogin(); }
+
+  document.getElementById('btnLoginMicrosoft').onclick = async function(){
+    try { await msalInstance.loginRedirect({ scopes: graphScopes }); }
+    catch (e) { document.getElementById('loginMsg').textContent = 'Erro no login: ' + e.message; }
+  };
+}
+
+function aposLogin(){
+  document.getElementById('viewLogin').hidden = true;
+  document.getElementById('app').hidden = false;
+  document.getElementById('userEmail').textContent = contaAtual.username;
+  conectarPlanilha();
+}
+
+function letraColuna(indiceZeroBased){
+  var n = indiceZeroBased + 1, letra = '';
+  while (n > 0){ var resto = (n - 1) % 26; letra = String.fromCharCode(65 + resto) + letra; n = Math.floor((n - 1) / 26); }
+  return letra;
+}
+
+async function prepararColunasTextoRegistrosInjecao(token){
+  if (colunasTextoPreparadas) return;
+  var camposTexto = ['data', 'hora', 'gramatura', 'criado_em'];
+  for (var i = 0; i < camposTexto.length; i++){
+    var idx = COLS_INJ.indexOf(camposTexto[i]);
+    if (idx === -1) continue;
+    var col = letraColuna(idx);
+    try {
+      await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Registros_Injecao/range(address=\'' + col + ':' + col + '\')', {
+        method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ numberFormat: [['@']] })
+      });
+    } catch (e) { /* segue mesmo se falhar numa coluna */ }
+  }
+  colunasTextoPreparadas = true;
+}
+
+async function carregarTolerancias(token){
+  try {
+    var resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Tolerancias_App/tables/TabelaTolerancias/rows', { headers: { Authorization: 'Bearer ' + token } });
+    if (!resp.ok){ tolerancias = []; return; }
+    var json = await resp.json();
+    tolerancias = (json.value || []).map(function(row){
+      var v = row.values[0]; // processo, maquina, gramatura, cor, resina, parametro, valor_min, valor_max, ativo
+      var ativo = v[8];
+      return {
+        processo: v[0], maquina: v[1], gramatura: v[2], cor: v[3], resina: v[4], parametro: v[5],
+        valor_min: v[6] !== undefined && v[6] !== null ? String(v[6]) : '', valor_max: v[7] !== undefined && v[7] !== null ? String(v[7]) : '',
+        ativoFalso: (ativo === false || ativo === 'FALSE' || ativo === 'Não' || ativo === 'NAO' || ativo === 0 || ativo === '0'),
+        _maquina: norm(v[1]), _gramatura: norm(v[2]), _cor: norm(v[3]), _resina: norm(v[4]), _parametro: norm(v[5])
+      };
+    });
+  } catch (e) {
+    console.error('Falha ao carregar tolerâncias (segue sem elas, tudo aparece como "sem tolerância cadastrada"):', e);
+    tolerancias = [];
+  }
+}
+
+async function conectarPlanilha(){
+  var dot = document.getElementById('statusDot');
+  var label = document.getElementById('statusText');
+  label.textContent = 'conectando…';
+  try {
+    var token = await getToken();
+    var base64 = btoa(LINK_PLANILHA_PADRAO).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+    var sharingId = 'u!' + base64;
+    var resp = await fetch('https://graph.microsoft.com/v1.0/shares/' + sharingId + '/driveItem', { headers: { Authorization: 'Bearer ' + token } });
+    var json = await resp.json();
+    if (json.id){
+      itemId = json.id; driveId = json.parentReference.driveId;
+      dot.className = 'status-dot online'; label.textContent = 'conectado';
+      await carregarTolerancias(token);
+      return true;
+    } else {
+      dot.className = 'status-dot offline'; label.textContent = 'erro na planilha — confira o link de compartilhamento'; return false;
+    }
+  } catch (err) {
+    dot.className = 'status-dot offline'; label.textContent = 'offline'; return false;
+  }
+}
+
+// =============================================================================
+// Boot
+// =============================================================================
+function iniciarUI(){
+  fileInput = document.getElementById('fileInput');
+  btnLer = document.getElementById('btnLer');
+  dropZone = document.getElementById('dropZone');
+  dropLabel = document.getElementById('dropLabel');
+  fileInput.addEventListener('change', function(){
+    var f = fileInput.files[0];
+    if (!f) return;
+    arquivoEscolhido = f;
+    dropLabel.textContent = f.name;
+    dropZone.classList.add('hasfile');
+    btnLer.disabled = false;
+  });
+  show('viewUpload'); setSteps('active','','');
+}
+
+iniciarUI();
+// window.__SKIP_LOGIN__ é usado só em teste automatizado (headless), pra pular o
+// login Microsoft de verdade e testar o resto do fluxo com fetch/getToken simulados.
+if (window.__SKIP_LOGIN__){
+  contaAtual = { username: 'teste@blowpet.com.br' };
+  aposLogin();
+} else {
+  iniciarLogin();
+}
+</script>
+
+</body>
+</html>
