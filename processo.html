@@ -898,8 +898,8 @@ async function salvarTodosPendentes(){
 // parâmetro (41), todos empilhados, com eixo de tempo compartilhado no topo.
 // =============================================================================
 var registrosCarregados = null; // array de objetos {data,hora,maquina,responsavel,gramatura,cor,resina,parametro,valor_medido,tolerancia_min_aplicada,tolerancia_max_aplicada,dentro_criterio,criado_em}
-var dashPX_PER_HOUR = 26;
-var dashSTART = null, dashEND = null, dashAXIS_W = 0;
+var dashPX_PER_PONTO = 56; // espaçamento fixo entre horários consecutivos no eixo (não é proporcional ao tempo real decorrido)
+var dashSTART = null, dashEND = null, dashAXIS_W = 0, dashPONTO_INDEX = {};
 
 var PAGINAS_IDS = { dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', carregarDados:'pageCarregarDados' };
 
@@ -1080,7 +1080,11 @@ function aplicarFiltrosDashV3(){
   renderDashboardV3(seriesPorParametro, maquina, gramatura, cor, resina);
 }
 
-function xAtDashV3(d){ return 10 + ((d - dashSTART) / 36e5) * dashPX_PER_HOUR; }
+function xAtDashV3(d){
+  var idx = dashPONTO_INDEX[d.getTime()];
+  if (idx === undefined) idx = 0;
+  return 10 + idx * dashPX_PER_PONTO;
+}
 
 function renderDashboardV3(seriesPorParametro, maquina, gramatura, cor, resina){
   var todosPontos = [];
@@ -1104,15 +1108,19 @@ function renderDashboardV3(seriesPorParametro, maquina, gramatura, cor, resina){
   todosPontos.sort(function(a,b){ return a-b; });
   dashSTART = todosPontos[0];
   dashEND = todosPontos[todosPontos.length-1];
-  var totalHours = Math.max(1, Math.round((dashEND - dashSTART) / 36e5));
-  dashAXIS_W = Math.max(240, totalHours * dashPX_PER_HOUR + 20);
 
-  // pontos únicos (datetimes distintos) pra desenhar o eixo — só os horários com leitura real
+  // pontos únicos (datetimes distintos) pra desenhar o eixo — só os horários com leitura real.
+  // O espaçamento no eixo X segue a ORDEM dos pontos, não o tempo real decorrido entre eles —
+  // assim um intervalo sem lançamento (ex.: da noite pra manhã seguinte) não abre um vão vazio
+  // enorme no gráfico; os horários ficam lado a lado, uniformemente espaçados.
   var vistos = {}, pontosUnicos = [];
   todosPontos.forEach(function(t){
     var k = t.getTime();
     if (!vistos[k]){ vistos[k] = true; pontosUnicos.push(t); }
   });
+  dashPONTO_INDEX = {};
+  pontosUnicos.forEach(function(t, i){ dashPONTO_INDEX[t.getTime()] = i; });
+  dashAXIS_W = Math.max(240, pontosUnicos.length * dashPX_PER_PONTO + 20);
 
   drawAxisV3(pontosUnicos);
 
