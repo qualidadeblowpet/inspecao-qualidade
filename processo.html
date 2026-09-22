@@ -159,13 +159,65 @@
     color:var(--text);padding:12px 18px;border-radius:10px;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.4);z-index:50;max-width:90vw;}
   .toast.err{border-color:var(--danger);color:var(--danger);}
   [hidden]{display:none!important;}
+
+  /* ---- Shell: menu lateral (sidebar) ---- */
+  #app{display:flex;min-height:100vh;}
+  .mobile-topbar{display:none;}
+  .sidebar{width:232px;flex-shrink:0;background:var(--sidebar);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;padding:20px 14px;position:sticky;top:0;height:100vh;}
+  .sidebar-brand{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 8px 20px;}
+  .sidebar-brand .mark{font-family:var(--font-display);font-weight:700;font-size:17px;color:var(--accent);letter-spacing:.4px;}
+  .nav-section-label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.2px;padding:14px 10px 6px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 10px;border-radius:8px;cursor:pointer;
+    color:var(--text-dim);font-size:14px;font-weight:500;margin-bottom:2px;border:none;background:transparent;
+    width:100%;text-align:left;font-family:var(--font-body);}
+  .nav-item .ic{width:18px;text-align:center;font-size:15px;}
+  .nav-item:hover{background:var(--surface);color:var(--text);}
+  .nav-item.active{background:var(--accent);color:#1a1200;font-weight:700;}
+  .sidebar-footer{margin-top:auto;border-top:1px solid var(--border);padding-top:12px;}
+  .sidebar-user{font-size:11px;color:var(--text-dim);padding:0 10px 8px;word-break:break-all;}
+  .sidebar-footer button{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);
+    padding:9px;border-radius:8px;font-size:12px;cursor:pointer;font-family:var(--font-body);}
+  .main{flex:1;min-width:0;padding:24px 28px 60px;max-width:1280px;}
+  .page-title{font-family:var(--font-display);font-size:24px;font-weight:700;letter-spacing:.3px;margin:0 0 18px;text-transform:uppercase;}
+  .sidebar-overlay{display:none;}
+
+  /* ---- Tabela larga (Dados Cadastrados) ---- */
+  .widetablewrap{overflow:auto;max-height:70vh;border:1px solid var(--border);border-radius:12px;}
+  .widetable{border-collapse:collapse;font-size:11.5px;white-space:nowrap;}
+  .widetable th,.widetable td{padding:7px 9px;border-bottom:1px solid #1e2023;border-right:1px solid #1e2023;}
+  .widetable thead th{position:sticky;top:0;background:var(--surface);color:var(--text-dim);text-transform:uppercase;
+    font-size:9.5px;letter-spacing:.3px;z-index:2;text-align:left;}
+  .widetable th.wt-fixo,.widetable td.wt-fixo{position:sticky;left:0;background:var(--surface);z-index:1;font-family:var(--font-mono);}
+  .widetable thead th.wt-fixo{z-index:3;}
+  .widetable th.wt-param{min-width:34px;max-width:34px;height:120px;vertical-align:bottom;padding:6px 3px;}
+  .widetable .wt-paramtxt{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;font-weight:600;
+    text-transform:none;letter-spacing:0;font-size:10.5px;color:var(--text-dim);}
+  .widetable td.wt-param{text-align:center;font-family:var(--font-mono);}
+  .widetable td.wt-param.ok{color:var(--ok);}
+  .widetable td.wt-param.bad{background:rgba(229,72,77,.14);color:var(--danger);font-weight:700;}
+  .widetable tbody tr:hover td{background:var(--surface-2);}
+
+  @media (max-width: 900px){
+    .mobile-topbar{display:flex;align-items:center;gap:10px;background:var(--sidebar);border-bottom:1px solid var(--border);
+      padding:12px 16px;position:sticky;top:0;z-index:30;}
+    .mobile-topbar .mark{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--accent);}
+    .btn-menu{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:8px;
+      padding:8px 12px;font-size:16px;cursor:pointer;}
+    #app{display:block;}
+    .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:40;transform:translateX(-100%);
+      transition:transform .2s ease;box-shadow:8px 0 24px rgba(0,0,0,.4);}
+    .sidebar.aberta{transform:translateX(0);}
+    .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:35;}
+    .sidebar-overlay.ativa{display:block;}
+    .main{padding:16px;}
+  }
 </style>
 </head>
 <body>
-<div class="wrap">
 
   <!-- ===== LOGIN ===== -->
-  <div id="viewLogin">
+  <div id="viewLogin" class="wrap">
     <div class="card" style="margin-top:60px;text-align:center;">
       <div class="brand" style="justify-content:center;margin-bottom:4px;"><span class="mark">CONTROLE DE PROCESSO</span></div>
       <p class="sub">BlowPet — Injeção</p>
@@ -179,22 +231,99 @@
   <!-- ===== APP (pós-login) ===== -->
   <div id="app" hidden>
 
-  <div class="topbar">
-    <div class="brand"><span class="mark">CONTROLE DE PROCESSO</span></div>
-    <div class="statuswrap-top">
-      <span class="status-dot" id="statusDot"></span>
-      <span id="statusText">conectando…</span>
-      <button class="linklike" onclick="logout()">sair</button>
+    <div class="mobile-topbar">
+      <button class="btn-menu" onclick="alternarMenuMobile()">☰</button>
+      <span class="mark">CONTROLE DE PROCESSO</span>
     </div>
-  </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="fecharMenuMobile()"></div>
 
-  <div class="tabnav">
-    <button class="tabbtn active" id="tabbtnCadastro" onclick="mudarAba('cadastro')">Cadastro</button>
-    <button class="tabbtn" id="tabbtnDashboard" onclick="mudarAba('dashboard')">Dashboard</button>
-  </div>
+    <div class="sidebar" id="sidebar">
+      <div class="sidebar-brand"><span class="mark">CONTROLE DE PROCESSO</span><span class="status-dot" id="statusDot"></span></div>
+      <div class="nav-section-label">Injeção</div>
+      <button class="nav-item active" data-page="dashboard" onclick="mudarPagina('dashboard')"><span class="ic">▦</span> Dashboard</button>
+      <button class="nav-item" data-page="dadosCadastrados" onclick="mudarPagina('dadosCadastrados')"><span class="ic">▤</span> Dados Cadastrados</button>
+      <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><span class="ic">⇧</span> Carregar Dados</button>
+      <div class="sidebar-footer">
+        <div class="sidebar-user"><span id="statusText">conectando…</span><br><span id="userEmail"></span></div>
+        <button onclick="logout()">Sair</button>
+      </div>
+    </div>
 
-  <div id="tabCadastro">
-  <p class="sub">Cadastro por Planilha — Injeção · <span id="userEmail"></span></p>
+    <div class="main">
+
+    <!-- ===== PÁGINA: DASHBOARD ===== -->
+    <div id="pageDashboard">
+    <h1 class="page-title">Dashboard</h1>
+
+    <div class="card" style="margin-bottom:16px;">
+      <button class="btn btn-accent btn-block" id="btnCarregarDash" onclick="carregarRegistrosInjecao()">Carregar registros</button>
+      <div id="dashLoading" class="loading-row" hidden><div class="spinner"></div> Carregando…</div>
+    </div>
+
+    <div id="dashConteudo" hidden>
+      <div class="dv3-filterbar">
+        <div class="dv3-filtergroup"><label>Máquina</label><select id="fMaquina"></select></div>
+        <div class="dv3-filtergroup"><label>Gramatura</label><select id="fGramatura"></select></div>
+        <div class="dv3-filtergroup"><label>Cor</label><select id="fCor"></select></div>
+        <div class="dv3-filtergroup"><label>Resina</label><select id="fResina"></select></div>
+        <div class="dv3-filtergroup"><label>Data inicial</label><input type="date" id="fData_de"></div>
+        <div class="dv3-filtergroup"><label>Data final</label><input type="date" id="fData_ate"></div>
+        <div class="dv3-filtergroup"><label>Horário inicial</label><input type="time" id="fHora_de" value="00:00"></div>
+        <div class="dv3-filtergroup"><label>Horário final</label><input type="time" id="fHora_ate" value="23:59"></div>
+        <button class="dv3-filtergroup dv3-btnfiltrar" onclick="aplicarFiltrosDashV3()">Aplicar filtro</button>
+      </div>
+
+      <div class="dv3-legend">
+        <span><i></i>Valor medido</span>
+        <span><i class="dv3-max"></i>Limite máximo</span>
+        <span><i class="dv3-min"></i>Limite mínimo</span>
+        <span><i class="dv3-dot"></i>Leitura fora do limite</span>
+      </div>
+
+      <div class="dv3-panel" id="dashPanel">
+        <div class="dv3-axishead">
+          <div class="dv3-axislabel"></div>
+          <div class="dv3-axisscroll" id="axisScroll"><svg id="axisSvg" height="46"></svg></div>
+          <div style="width:108px;flex-shrink:0;border-left:1px solid var(--border);"></div>
+        </div>
+        <div id="dashRows"></div>
+      </div>
+      <p class="note" id="dashVazio" hidden>Nenhum registro encontrado com esse filtro — tenta ajustar a máquina/gramatura/cor/resina ou o período.</p>
+      <p class="note">O eixo de horário/data fica fixo no topo e rola junto com os gráficos. Os pontos marcam horários com cadastro real na planilha.</p>
+    </div>
+    </div><!-- /#pageDashboard -->
+
+    <!-- ===== PÁGINA: DADOS CADASTRADOS ===== -->
+    <div id="pageDadosCadastrados" hidden>
+    <h1 class="page-title">Dados Cadastrados</h1>
+
+    <div class="card" style="margin-bottom:16px;">
+      <button class="btn btn-accent btn-block" id="btnCarregarTabela" onclick="carregarRegistrosInjecao()">Carregar registros</button>
+      <div id="tabelaLoading" class="loading-row" hidden><div class="spinner"></div> Carregando…</div>
+    </div>
+
+    <div id="tabelaConteudo" hidden>
+      <div class="dv3-filterbar">
+        <div class="dv3-filtergroup"><label>Máquina</label><select id="tMaquina"></select></div>
+        <div class="dv3-filtergroup"><label>Data inicial</label><input type="date" id="tData_de"></div>
+        <div class="dv3-filtergroup"><label>Data final</label><input type="date" id="tData_ate"></div>
+        <button class="dv3-filtergroup dv3-btnfiltrar" onclick="aplicarFiltroTabela()">Aplicar filtro</button>
+      </div>
+      <p class="note" id="tabelaContagem"></p>
+      <div class="widetablewrap">
+        <table class="widetable" id="widetable">
+          <thead><tr id="widetableHead"></tr></thead>
+          <tbody id="widetableBody"></tbody>
+        </table>
+      </div>
+      <p class="note" id="tabelaVazia" hidden>Nenhum registro encontrado com esse filtro.</p>
+    </div>
+    </div><!-- /#pageDadosCadastrados -->
+
+    <!-- ===== PÁGINA: CARREGAR DADOS ===== -->
+    <div id="pageCarregarDados" hidden>
+    <div class="wrap" style="padding:0;margin:0;max-width:640px;">
+  <p class="sub">Cadastro por Planilha — Injeção</p>
 
   <div class="steps">
     <div class="step" id="stepA">1. Planilha</div>
@@ -290,51 +419,13 @@
     </div>
   </div>
 
-  </div><!-- /#tabCadastro -->
+  </div><!-- /.wrap -->
+  </div><!-- /#pageCarregarDados -->
 
-  <!-- ===== ABA DASHBOARD (layout empilhado v3, aprovado no mockup) ===== -->
-  <div id="tabDashboard" hidden>
-    <div class="card" style="margin-bottom:16px;">
-      <button class="btn btn-accent btn-block" id="btnCarregarDash" onclick="carregarRegistrosInjecao()">Carregar registros</button>
-      <div id="dashLoading" class="loading-row" hidden><div class="spinner"></div> Carregando…</div>
-    </div>
-
-    <div id="dashConteudo" hidden>
-      <div class="dv3-filterbar">
-        <div class="dv3-filtergroup"><label>Máquina</label><select id="fMaquina"></select></div>
-        <div class="dv3-filtergroup"><label>Gramatura</label><select id="fGramatura"></select></div>
-        <div class="dv3-filtergroup"><label>Cor</label><select id="fCor"></select></div>
-        <div class="dv3-filtergroup"><label>Resina</label><select id="fResina"></select></div>
-        <div class="dv3-filtergroup"><label>Data inicial</label><input type="date" id="fData_de"></div>
-        <div class="dv3-filtergroup"><label>Data final</label><input type="date" id="fData_ate"></div>
-        <div class="dv3-filtergroup"><label>Horário inicial</label><input type="time" id="fHora_de" value="00:00"></div>
-        <div class="dv3-filtergroup"><label>Horário final</label><input type="time" id="fHora_ate" value="23:59"></div>
-        <button class="dv3-filtergroup dv3-btnfiltrar" onclick="aplicarFiltrosDashV3()">Aplicar filtro</button>
-      </div>
-
-      <div class="dv3-legend">
-        <span><i></i>Valor medido</span>
-        <span><i class="dv3-max"></i>Limite máximo</span>
-        <span><i class="dv3-min"></i>Limite mínimo</span>
-        <span><i class="dv3-dot"></i>Leitura fora do limite</span>
-      </div>
-
-      <div class="dv3-panel" id="dashPanel">
-        <div class="dv3-axishead">
-          <div class="dv3-axislabel"></div>
-          <div class="dv3-axisscroll" id="axisScroll"><svg id="axisSvg" height="46"></svg></div>
-          <div style="width:108px;flex-shrink:0;border-left:1px solid var(--border);"></div>
-        </div>
-        <div id="dashRows"></div>
-      </div>
-      <p class="note" id="dashVazio" hidden>Nenhum registro encontrado com esse filtro — tenta ajustar a máquina/gramatura/cor/resina ou o período.</p>
-      <p class="note">O eixo de horário/data fica fixo no topo e rola junto com os gráficos. Os pontos marcam horários com cadastro real na planilha.</p>
-    </div>
-  </div><!-- /#tabDashboard -->
+  </div><!-- /.main -->
 
   </div><!-- /#app -->
 
-</div>
 
 <div id="toast" class="toast" hidden></div>
 <div id="dv3tooltip"></div>
@@ -723,12 +814,26 @@ var registrosCarregados = null; // array de objetos {data,hora,maquina,responsav
 var dashPX_PER_HOUR = 26;
 var dashSTART = null, dashEND = null, dashAXIS_W = 0;
 
-function mudarAba(aba){
-  document.getElementById('tabCadastro').hidden = (aba !== 'cadastro');
-  document.getElementById('tabDashboard').hidden = (aba !== 'dashboard');
-  document.getElementById('tabbtnCadastro').classList.toggle('active', aba === 'cadastro');
-  document.getElementById('tabbtnDashboard').classList.toggle('active', aba === 'dashboard');
-  if (aba === 'dashboard' && registrosCarregados === null) carregarRegistrosInjecao();
+var PAGINAS_IDS = { dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', carregarDados:'pageCarregarDados' };
+
+function mudarPagina(pagina){
+  Object.keys(PAGINAS_IDS).forEach(function(key){
+    document.getElementById(PAGINAS_IDS[key]).hidden = (key !== pagina);
+  });
+  document.querySelectorAll('.nav-item').forEach(function(btn){
+    btn.classList.toggle('active', btn.getAttribute('data-page') === pagina);
+  });
+  if ((pagina === 'dashboard' || pagina === 'dadosCadastrados') && registrosCarregados === null) carregarRegistrosInjecao();
+  fecharMenuMobile();
+}
+
+function alternarMenuMobile(){
+  document.getElementById('sidebar').classList.toggle('aberta');
+  document.getElementById('sidebarOverlay').classList.toggle('ativa');
+}
+function fecharMenuMobile(){
+  document.getElementById('sidebar').classList.remove('aberta');
+  document.getElementById('sidebarOverlay').classList.remove('ativa');
 }
 
 // Corrige valores que o Excel converteu automaticamente em data/hora (serial),
@@ -756,9 +861,12 @@ function normalizarValorDataHora(campo, valor){
 async function carregarRegistrosInjecao(){
   if (!itemId){ mostrarToast('Ainda conectando com a planilha, aguarde um instante e tente de novo.', true); return; }
   var btn = document.getElementById('btnCarregarDash');
+  var btnT = document.getElementById('btnCarregarTabela');
   var loading = document.getElementById('dashLoading');
-  btn.disabled = true; loading.hidden = false;
+  var loadingT = document.getElementById('tabelaLoading');
+  btn.disabled = true; btnT.disabled = true; loading.hidden = false; loadingT.hidden = false;
   document.getElementById('dashConteudo').hidden = true;
+  document.getElementById('tabelaConteudo').hidden = true;
   try {
     var token = await getToken();
     var resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaRegistrosInjecao/rows', { headers: { Authorization: 'Bearer ' + token } });
@@ -774,14 +882,21 @@ async function carregarRegistrosInjecao(){
       return obj;
     });
     registrosCarregados.sort(function(a,b){ return (b.criado_em||'').localeCompare(a.criado_em||''); });
+
     document.getElementById('dashConteudo').hidden = false;
     popularFiltrosDashV3();
     aplicarFiltrosDashV3();
     btn.textContent = 'Atualizar registros';
+
+    document.getElementById('tabelaConteudo').hidden = false;
+    popularFiltroTabela();
+    aplicarFiltroTabela();
+    btnT.textContent = 'Atualizar registros';
   } catch (err) {
     mostrarToast('Falha de conexão ao carregar registros: ' + err.message, true);
   } finally {
     btn.disabled = false; loading.hidden = true;
+    btnT.disabled = false; loadingT.hidden = true;
   }
 }
 
@@ -1041,6 +1156,103 @@ function drawMiniV3(svg, serie, lmin, lmax, nome){
 }
 
 // =============================================================================
+// Página "Dados Cadastrados" — tabela larga (formato do rascunho do Cleber):
+// parâmetros na horizontal (colunas, uma por parâmetro, cabeçalho rotacionado),
+// dados na vertical (uma linha por horário/sessão de cadastro). Pivota os
+// registros de Registros_Injecao, que ficam salvos em formato longo (uma
+// linha por parâmetro), agrupando por id_sessao.
+// =============================================================================
+function agruparPorSessao(lista){
+  var porId = {}, ordem = [];
+  lista.forEach(function(r){
+    var id = r.id_sessao || (r.data + '|' + r.hora + '|' + r.maquina + '|' + r.criado_em);
+    if (!porId[id]){
+      porId[id] = {
+        id_sessao: id, data: r.data, hora: r.hora, maquina: r.maquina, responsavel: r.responsavel,
+        gramatura: r.gramatura, cor: r.cor, resina: r.resina, criado_em: r.criado_em, valores: {}
+      };
+      ordem.push(id);
+    }
+    porId[id].valores[r.parametro] = { valor: r.valor_medido, dentro: r.dentro_criterio };
+  });
+  var sessoes = ordem.map(function(id){ return porId[id]; });
+  sessoes.sort(function(a,b){ return (b.criado_em||'').localeCompare(a.criado_em||''); });
+  return sessoes;
+}
+
+function construirCabecalhoTabelaLarga(){
+  var head = document.getElementById('widetableHead');
+  var fixas = ['Data','Hora','Máquina','Responsável','Gramatura','Cor','Resina'];
+  var html = fixas.map(function(c){ return '<th class="wt-fixo">' + c + '</th>'; }).join('');
+  html += PARAMETROS_INJECAO.map(function(p){
+    return '<th class="wt-param"><div class="wt-paramtxt">' + p + '</div></th>';
+  }).join('');
+  head.innerHTML = html;
+}
+
+function popularFiltroTabela(){
+  var el = document.getElementById('tMaquina');
+  var opcoes = valoresUnicos('maquina');
+  el.innerHTML = '<option value="">Todas</option>' + opcoes.map(function(v){
+    return '<option value="'+v.replace(/"/g,'&quot;')+'">'+v+'</option>';
+  }).join('');
+  var datasIso = registrosCarregados.map(function(r){ return paraDataISO(r.data); }).filter(Boolean).sort();
+  document.getElementById('tData_de').value = datasIso[0] || '';
+  document.getElementById('tData_ate').value = datasIso[datasIso.length-1] || '';
+  construirCabecalhoTabelaLarga();
+}
+
+var LIMITE_LINHAS_TABELA_LARGA = 300;
+
+function aplicarFiltroTabela(){
+  var maquina = document.getElementById('tMaquina').value;
+  var de = document.getElementById('tData_de').value;
+  var ate = document.getElementById('tData_ate').value;
+
+  var filtrados = registrosCarregados.filter(function(r){
+    if (maquina && r.maquina !== maquina) return false;
+    var iso = paraDataISO(r.data);
+    if (de && iso && iso < de) return false;
+    if (ate && iso && iso > ate) return false;
+    return true;
+  });
+
+  var sessoes = agruparPorSessao(filtrados);
+  renderTabelaLarga(sessoes);
+}
+
+function renderTabelaLarga(sessoes){
+  var wrap = document.getElementById('widetable');
+  var body = document.getElementById('widetableBody');
+  var vazia = document.getElementById('tabelaVazia');
+  var contagem = document.getElementById('tabelaContagem');
+
+  if (sessoes.length === 0){
+    wrap.hidden = true; vazia.hidden = false;
+    body.innerHTML = '';
+    contagem.textContent = '';
+    return;
+  }
+  wrap.hidden = false; vazia.hidden = true;
+
+  var mostrar = sessoes.slice(0, LIMITE_LINHAS_TABELA_LARGA);
+  contagem.textContent = 'Mostrando ' + mostrar.length + ' de ' + sessoes.length + ' horário(s) cadastrado(s)' +
+    (sessoes.length > mostrar.length ? ' — refine o filtro para ver os demais.' : '.');
+
+  body.innerHTML = mostrar.map(function(s){
+    var fixas = [s.data, s.hora, s.maquina, s.responsavel, s.gramatura, s.cor, s.resina];
+    var tds = fixas.map(function(v){ return '<td class="wt-fixo">' + (v || '—') + '</td>'; }).join('');
+    tds += PARAMETROS_INJECAO.map(function(p){
+      var info = s.valores[p];
+      if (!info || info.valor === undefined || info.valor === '' || info.valor === null) return '<td class="wt-param">—</td>';
+      var cls = info.dentro === 'NÃO' ? 'bad' : (info.dentro === 'SIM' ? 'ok' : '');
+      return '<td class="wt-param ' + cls + '">' + info.valor + '</td>';
+    }).join('');
+    return '<tr>' + tds + '</tr>';
+  }).join('');
+}
+
+// =============================================================================
 // Login (MSAL) + conexão com a planilha (padrão idêntico ao App Inspeção Qualidade)
 // =============================================================================
 async function getToken(){
@@ -1087,7 +1299,8 @@ function aposLogin(){
   document.getElementById('viewLogin').hidden = true;
   document.getElementById('app').hidden = false;
   document.getElementById('userEmail').textContent = contaAtual.username;
-  conectarPlanilha();
+  // Dashboard é a página inicial — carrega os registros assim que a planilha conectar.
+  conectarPlanilha().then(function(ok){ if (ok) carregarRegistrosInjecao(); });
 }
 
 function letraColuna(indiceZeroBased){
