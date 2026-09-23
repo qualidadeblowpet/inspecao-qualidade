@@ -220,6 +220,28 @@
   .widetable td.wt-param.bad{background:rgba(229,72,77,.14);color:var(--danger);font-weight:700;}
   .widetable tbody tr:hover td{background:var(--surface-2);}
 
+  /* ---- Critérios (cadastro de tolerâncias por Máquina+Gramatura+Cor+Resina+Parâmetro) ---- */
+  .crit-actioncell{display:flex;gap:6px;white-space:nowrap;}
+  .crit-btn-mini{background:var(--surface-2);border:1px solid var(--border);color:var(--text);border-radius:6px;
+    padding:5px 10px;font-size:11px;cursor:pointer;font-family:var(--font-body);}
+  .crit-btn-mini:hover{border-color:var(--accent);}
+  .crit-btn-mini.excluir:hover{border-color:var(--danger);color:var(--danger);}
+  .crit-btn-mini.excluir.confirmando{border-color:var(--danger);color:var(--danger);background:rgba(229,72,77,.12);}
+  .crit-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;
+    justify-content:center;z-index:100;padding:20px;}
+  .crit-modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;
+    max-width:420px;width:100%;max-height:88vh;overflow-y:auto;}
+  .crit-modal h3{margin:0 0 16px;font-family:var(--font-display);font-size:18px;text-transform:uppercase;letter-spacing:.3px;}
+  .crit-field{margin-bottom:12px;display:flex;flex-direction:column;gap:5px;}
+  .crit-field label{font-size:10.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;}
+  .crit-field input,.crit-field select{background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+    padding:9px 11px;border-radius:7px;font-size:13px;font-family:var(--font-body);width:100%;}
+  .crit-field-row{display:flex;gap:12px;}
+  .crit-field-row .crit-field{flex:1;margin-bottom:12px;}
+  .crit-checkrow{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--text-dim);margin-bottom:18px;cursor:pointer;}
+  .crit-modal-actions{display:flex;justify-content:flex-end;gap:10px;}
+  .crit-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
+
   @media (max-width: 900px){
     .mobile-topbar{display:flex;align-items:center;gap:10px;background:var(--sidebar);border-bottom:1px solid var(--border);
       padding:12px 16px;position:sticky;top:0;z-index:30;}
@@ -264,6 +286,7 @@
       <div class="nav-section-label">Injeção</div>
       <button class="nav-item active" data-page="dashboard" onclick="mudarPagina('dashboard')"><span class="ic">▦</span> Dashboard</button>
       <button class="nav-item" data-page="dadosCadastrados" onclick="mudarPagina('dadosCadastrados')"><span class="ic">▤</span> Dados Cadastrados</button>
+      <button class="nav-item" data-page="criterios" onclick="mudarPagina('criterios')"><span class="ic">☑</span> Critérios</button>
       <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><span class="ic">⇧</span> Carregar Dados</button>
       <div class="sidebar-footer">
         <div class="sidebar-user"><span id="statusText">conectando…</span><br><span id="userEmail"></span></div>
@@ -342,6 +365,75 @@
       <p class="note" id="tabelaVazia" hidden>Nenhum registro encontrado com esse filtro.</p>
     </div>
     </div><!-- /#pageDadosCadastrados -->
+
+    <!-- ===== PÁGINA: CRITÉRIOS ===== -->
+    <div id="pageCriterios" hidden>
+    <h1 class="page-title">Critérios</h1>
+
+    <div class="card" style="margin-bottom:16px;">
+      <div class="crit-toolbar">
+        <p class="note" style="margin:0;max-width:520px;">Critérios de mínimo/máximo por Máquina + Gramatura + Cor + Resina + Parâmetro. O cadastro e o Dashboard usam esses valores automaticamente ao comparar as leituras.</p>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-outline" id="btnAtualizarCriterios" onclick="atualizarCriterios()">Atualizar critérios</button>
+          <button class="btn btn-accent" onclick="abrirFormCriterio(null)">+ Novo critério</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="criteriosConteudo">
+      <p class="note" id="criteriosContagem"></p>
+      <div class="widetablewrap">
+        <table class="widetable" id="criteriosTable" style="white-space:normal;width:100%;">
+          <thead><tr>
+            <th>Máquina</th><th>Gramatura</th><th>Cor</th><th>Resina</th><th>Parâmetro</th>
+            <th>Mínimo</th><th>Máximo</th><th>Status</th><th>Ações</th>
+          </tr></thead>
+          <tbody id="criteriosBody"></tbody>
+        </table>
+      </div>
+      <p class="note" id="criteriosVazio" hidden>Nenhum critério cadastrado ainda. Clique em "Novo critério" para começar.</p>
+    </div>
+
+    <div class="crit-modal-overlay" id="critModalOverlay" hidden onclick="if(event.target===this) fecharFormCriterio()">
+      <div class="crit-modal">
+        <h3 id="critModalTitulo">Novo critério</h3>
+        <div class="crit-field">
+          <label>Máquina</label>
+          <input type="text" id="critMaquina" list="critListaMaquinas" placeholder="ex.: Husky 01">
+        </div>
+        <div class="crit-field">
+          <label>Gramatura</label>
+          <input type="text" id="critGramatura" list="critListaGramaturas" placeholder="ex.: 20,5">
+        </div>
+        <div class="crit-field">
+          <label>Cor</label>
+          <input type="text" id="critCor" list="critListaCores" placeholder="ex.: Cristal">
+        </div>
+        <div class="crit-field">
+          <label>Resina</label>
+          <input type="text" id="critResina" list="critListaResinas" placeholder="ex.: J02">
+        </div>
+        <div class="crit-field">
+          <label>Parâmetro</label>
+          <select id="critParametro"></select>
+        </div>
+        <div class="crit-field-row">
+          <div class="crit-field"><label>Mínimo</label><input type="text" id="critMin" placeholder="sem limite"></div>
+          <div class="crit-field"><label>Máximo</label><input type="text" id="critMax" placeholder="sem limite"></div>
+        </div>
+        <label class="crit-checkrow"><input type="checkbox" id="critAtivo" checked style="width:auto;"> Ativo (desmarque para desativar sem excluir)</label>
+        <p class="note" id="critErro" style="color:var(--danger);display:none;"></p>
+        <div class="crit-modal-actions">
+          <button class="btn btn-outline" onclick="fecharFormCriterio()">Cancelar</button>
+          <button class="btn btn-accent" id="critBtnSalvar" onclick="salvarCriterio()">Salvar</button>
+        </div>
+      </div>
+    </div>
+    <datalist id="critListaMaquinas"></datalist>
+    <datalist id="critListaGramaturas"></datalist>
+    <datalist id="critListaCores"></datalist>
+    <datalist id="critListaResinas"></datalist>
+    </div><!-- /#pageCriterios -->
 
     <!-- ===== PÁGINA: CARREGAR DADOS ===== -->
     <div id="pageCarregarDados" hidden>
@@ -920,7 +1012,7 @@ var registrosCarregados = null; // array de objetos {data,hora,maquina,responsav
 var dashPX_PER_PONTO = 56; // espaçamento fixo entre horários consecutivos no eixo (não é proporcional ao tempo real decorrido)
 var dashSTART = null, dashEND = null, dashAXIS_W = 0, dashPONTO_INDEX = {};
 
-var PAGINAS_IDS = { dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', carregarDados:'pageCarregarDados' };
+var PAGINAS_IDS = { dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', criterios:'pageCriterios', carregarDados:'pageCarregarDados' };
 
 function mudarPagina(pagina){
   Object.keys(PAGINAS_IDS).forEach(function(key){
@@ -930,6 +1022,7 @@ function mudarPagina(pagina){
     btn.classList.toggle('active', btn.getAttribute('data-page') === pagina);
   });
   if ((pagina === 'dashboard' || pagina === 'dadosCadastrados') && registrosCarregados === null) carregarRegistrosInjecao();
+  if (pagina === 'criterios') renderCriterios();
   fecharMenuMobile();
 }
 
@@ -1621,13 +1714,235 @@ async function carregarTolerancias(token){
         processo: v[0], maquina: v[1], gramatura: v[2], cor: v[3], resina: v[4], parametro: v[5],
         valor_min: v[6] !== undefined && v[6] !== null ? String(v[6]) : '', valor_max: v[7] !== undefined && v[7] !== null ? String(v[7]) : '',
         ativoFalso: (ativo === false || ativo === 'FALSE' || ativo === 'Não' || ativo === 'NAO' || ativo === 0 || ativo === '0'),
-        _maquina: norm(v[1]), _gramatura: norm(v[2]), _cor: norm(v[3]), _resina: norm(v[4]), _parametro: norm(v[5])
+        _maquina: norm(v[1]), _gramatura: norm(v[2]), _cor: norm(v[3]), _resina: norm(v[4]), _parametro: norm(v[5]),
+        _index: row.index // posição da linha na tabela do Excel — necessário pra editar/excluir essa linha depois.
       };
     });
   } catch (e) {
     console.error('Falha ao carregar tolerâncias (segue sem elas, tudo aparece como "sem tolerância cadastrada"):', e);
     tolerancias = [];
   }
+  if (typeof renderCriterios === 'function') renderCriterios();
+}
+
+// =============================================================================
+// Página Critérios — cadastro/edição de tolerâncias por Máquina+Gramatura+Cor+Resina+Parâmetro
+// (lê/escreve na mesma TabelaTolerancias que carregarTolerancias/buscarTolerancia usam).
+// =============================================================================
+function escHtml(s){
+  return String(s === undefined || s === null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Sugestões de autocomplete pros campos livres (Máquina/Gramatura/Cor/Resina não têm lista fixa,
+// diferente de Parâmetro): junta valores já usados nos critérios e, se já carregados, nos registros salvos.
+function valoresParaAutocomplete(campo){
+  var vistos = {}, valores = [];
+  function add(v){
+    v = (v === undefined || v === null) ? '' : String(v).trim();
+    if (!v) return;
+    var k = norm(v);
+    if (vistos[k]) return;
+    vistos[k] = true; valores.push(v);
+  }
+  tolerancias.forEach(function(t){ add(t[campo]); });
+  if (registrosCarregados){ registrosCarregados.forEach(function(r){ add(r[campo]); }); }
+  valores.sort(function(a,b){ return a.localeCompare(b, 'pt-BR'); });
+  return valores;
+}
+
+function atualizarDatalistsCriterios(){
+  var mapa = { maquina:'critListaMaquinas', gramatura:'critListaGramaturas', cor:'critListaCores', resina:'critListaResinas' };
+  Object.keys(mapa).forEach(function(campo){
+    var dl = document.getElementById(mapa[campo]);
+    dl.innerHTML = valoresParaAutocomplete(campo).map(function(v){ return '<option value="'+escHtml(v)+'">'; }).join('');
+  });
+}
+
+function popularSelectParametroCriterio(selecionado){
+  var sel = document.getElementById('critParametro');
+  sel.innerHTML = PARAMETROS_INJECAO.map(function(p){ return '<option value="'+escHtml(p)+'">'+escHtml(p)+'</option>'; }).join('');
+  if (selecionado) sel.value = selecionado;
+}
+
+function renderCriterios(){
+  var corpo = document.getElementById('criteriosBody');
+  if (!corpo) return; // página ainda não existe no DOM
+  var vazio = document.getElementById('criteriosVazio');
+  var contagem = document.getElementById('criteriosContagem');
+  var tabela = document.getElementById('criteriosTable');
+
+  var lista = tolerancias.slice().sort(function(a,b){
+    return (a.maquina||'').localeCompare(b.maquina||'', 'pt-BR') ||
+           (a.gramatura||'').localeCompare(b.gramatura||'', 'pt-BR') ||
+           (a.cor||'').localeCompare(b.cor||'', 'pt-BR') ||
+           (a.resina||'').localeCompare(b.resina||'', 'pt-BR') ||
+           (a.parametro||'').localeCompare(b.parametro||'', 'pt-BR');
+  });
+
+  contagem.textContent = lista.length + ' critério(s) cadastrado(s).';
+  vazio.hidden = lista.length > 0;
+  tabela.style.display = lista.length > 0 ? '' : 'none';
+
+  corpo.innerHTML = lista.map(function(t){
+    var ativo = !t.ativoFalso;
+    return '<tr>' +
+      '<td>'+escHtml(t.maquina)+'</td>' +
+      '<td>'+escHtml(t.gramatura)+'</td>' +
+      '<td>'+escHtml(t.cor)+'</td>' +
+      '<td>'+escHtml(t.resina)+'</td>' +
+      '<td>'+escHtml(t.parametro)+'</td>' +
+      '<td>'+(t.valor_min !== '' ? escHtml(t.valor_min) : '—')+'</td>' +
+      '<td>'+(t.valor_max !== '' ? escHtml(t.valor_max) : '—')+'</td>' +
+      '<td><span class="critpill '+(ativo?'sim':'nao')+'">'+(ativo?'Ativo':'Inativo')+'</span></td>' +
+      '<td class="crit-actioncell">' +
+        '<button class="crit-btn-mini" onclick="abrirFormCriterio('+t._index+')">Editar</button>' +
+        '<button class="crit-btn-mini excluir" onclick="onCliqueExcluir(this,'+t._index+')">Excluir</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+var critEditandoIndex = null;
+
+function abrirFormCriterio(idx){
+  critEditandoIndex = (idx === null || idx === undefined) ? null : idx;
+  var t = critEditandoIndex !== null ? tolerancias.find(function(x){ return x._index === critEditandoIndex; }) : null;
+
+  document.getElementById('critModalTitulo').textContent = t ? 'Editar critério' : 'Novo critério';
+  document.getElementById('critErro').style.display = 'none';
+  atualizarDatalistsCriterios();
+  popularSelectParametroCriterio(t ? t.parametro : PARAMETROS_INJECAO[0]);
+
+  document.getElementById('critMaquina').value = t ? t.maquina : '';
+  document.getElementById('critGramatura').value = t ? t.gramatura : '';
+  document.getElementById('critCor').value = t ? t.cor : '';
+  document.getElementById('critResina').value = t ? t.resina : '';
+  document.getElementById('critMin').value = t ? t.valor_min : '';
+  document.getElementById('critMax').value = t ? t.valor_max : '';
+  document.getElementById('critAtivo').checked = t ? !t.ativoFalso : true;
+
+  document.getElementById('critModalOverlay').hidden = false;
+}
+
+function fecharFormCriterio(){
+  document.getElementById('critModalOverlay').hidden = true;
+  critEditandoIndex = null;
+  document.getElementById('critErro').style.display = 'none';
+}
+
+async function salvarCriterio(){
+  var maquina = document.getElementById('critMaquina').value.trim();
+  var gramatura = document.getElementById('critGramatura').value.trim();
+  var cor = document.getElementById('critCor').value.trim();
+  var resina = document.getElementById('critResina').value.trim();
+  var parametro = document.getElementById('critParametro').value;
+  var min = document.getElementById('critMin').value.trim();
+  var max = document.getElementById('critMax').value.trim();
+  var ativo = document.getElementById('critAtivo').checked;
+  var erroEl = document.getElementById('critErro');
+  function erro(msg){ erroEl.textContent = msg; erroEl.style.display = 'block'; }
+  erroEl.style.display = 'none';
+
+  if (!maquina || !gramatura || !cor || !resina || !parametro){
+    erro('Preencha Máquina, Gramatura, Cor, Resina e Parâmetro.'); return;
+  }
+  if (!min && !max){
+    erro('Informe ao menos um limite (Mínimo ou Máximo).'); return;
+  }
+  if (min && isNaN(paraNumero(min))){ erro('Mínimo precisa ser um número.'); return; }
+  if (max && isNaN(paraNumero(max))){ erro('Máximo precisa ser um número.'); return; }
+  if (min && max && !isNaN(paraNumero(min)) && !isNaN(paraNumero(max)) && paraNumero(min) > paraNumero(max)){
+    erro('O mínimo não pode ser maior que o máximo.'); return;
+  }
+
+  var chaveM = norm(maquina), chaveG = norm(gramatura), chaveC = norm(cor), chaveR = norm(resina), chaveP = norm(parametro);
+  var duplicado = tolerancias.some(function(t){
+    return t._index !== critEditandoIndex &&
+      t._maquina === chaveM && t._gramatura === chaveG && t._cor === chaveC && t._resina === chaveR && t._parametro === chaveP;
+  });
+  if (duplicado){ erro('Já existe um critério cadastrado para essa combinação de Máquina + Gramatura + Cor + Resina + Parâmetro.'); return; }
+
+  var btn = document.getElementById('critBtnSalvar');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+
+  var linha = ['Injeção', maquina, gramatura, cor, resina, parametro, min || null, max || null, ativo];
+
+  try {
+    var token = await getToken();
+    var resp;
+    if (critEditandoIndex === null){
+      var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias/rows/add';
+      resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: [linha] }) });
+    } else {
+      var urlP = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias/rows/itemAt(index=' + critEditandoIndex + ')';
+      resp = await fetch(urlP, { method:'PATCH', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: [linha] }) });
+    }
+    if (resp.ok){
+      await carregarTolerancias(token);
+      fecharFormCriterio();
+      mostrarToast('Critério salvo ✓');
+    } else {
+      var json = await resp.json().catch(function(){ return {}; });
+      erro('Erro ao salvar: ' + (json.error ? json.error.message : resp.status));
+      btn.disabled = false; btn.textContent = 'Salvar';
+      return;
+    }
+  } catch (err) {
+    erro('Falha de conexão: ' + err.message);
+  }
+  btn.disabled = false; btn.textContent = 'Salvar';
+}
+
+// Confirmação em dois cliques (sem usar window.confirm, que trava o app de teste headless):
+// primeiro clique vira "Confirmar?" por 3s: um segundo clique dentro desse tempo exclui de fato.
+function onCliqueExcluir(botao, idx){
+  if (botao.dataset.confirmando === '1'){
+    clearTimeout(botao._confirmT);
+    excluirCriterio(idx);
+    return;
+  }
+  botao.dataset.confirmando = '1';
+  botao.classList.add('confirmando');
+  var textoOriginal = botao.textContent;
+  botao.textContent = 'Confirmar?';
+  botao._confirmT = setTimeout(function(){
+    botao.dataset.confirmando = '0';
+    botao.classList.remove('confirmando');
+    botao.textContent = textoOriginal;
+  }, 3000);
+}
+
+async function excluirCriterio(idx){
+  var t = tolerancias.find(function(x){ return x._index === idx; });
+  if (!t) return;
+  try {
+    var token = await getToken();
+    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias/rows/itemAt(index=' + idx + ')/delete';
+    var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token } });
+    if (resp.ok){
+      await carregarTolerancias(token);
+      mostrarToast('Critério excluído.');
+    } else {
+      var json = await resp.json().catch(function(){ return {}; });
+      mostrarToast('Erro ao excluir: ' + (json.error ? json.error.message : resp.status), true);
+    }
+  } catch (err) {
+    mostrarToast('Falha de conexão: ' + err.message, true);
+  }
+}
+
+async function atualizarCriterios(){
+  var btn = document.getElementById('btnAtualizarCriterios');
+  btn.disabled = true; btn.textContent = 'Atualizando…';
+  try {
+    var token = await getToken();
+    await carregarTolerancias(token);
+    mostrarToast('Critérios atualizados ✓');
+  } catch (err) {
+    mostrarToast('Falha ao atualizar: ' + err.message, true);
+  }
+  btn.disabled = false; btn.textContent = 'Atualizar critérios';
 }
 
 async function conectarPlanilha(){
