@@ -44,31 +44,30 @@
   /* ---- Dashboard empilhado v3 (mockup-dashboard-empilhado-v3) ---- */
   .dv3-filterbar{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;background:var(--surface);border:1px solid var(--border);
     border-radius:12px;padding:14px;align-items:flex-end;}
-  .dv3-filtergroup{display:flex;flex-direction:column;gap:4px;}
-  .dv3-filtergroup label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;}
+  .dv3-filtergroup{display:flex;flex-direction:column;gap:4px;align-items:flex-start;}
+  .dv3-filtergroup > label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;}
   .dv3-filtergroup select,.dv3-filtergroup input{background:var(--surface-2);border:1px solid var(--border);color:var(--text);
     padding:8px 10px;border-radius:7px;font-size:12.5px;font-family:var(--font-body);min-width:110px;}
   .dv3-btnfiltrar{align-self:flex-end;background:var(--accent);color:#1a1200;border:none;border-radius:7px;
     padding:9px 16px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:var(--font-body);}
 
   /* ---- filtro de seleção múltipla (Máquina/Gramatura/Cor/Resina/Parâmetros) ---- */
-  .dv3-msel{position:relative;min-width:130px;}
-  .dv3-msel-btn{width:100%;text-align:left;background:var(--surface-2);border:1px solid var(--border);color:var(--text);
-    padding:8px 28px 8px 10px;border-radius:7px;font-size:12.5px;font-family:var(--font-body);cursor:pointer;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;}
+  .dv3-msel{position:relative;}
+  .dv3-msel-btn{text-align:left;background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+    padding:8px 26px 8px 10px;border-radius:7px;font-size:12.5px;font-family:var(--font-body);cursor:pointer;
+    white-space:nowrap;position:relative;}
   .dv3-msel-btn::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:10px;}
   .dv3-msel-btn:hover{border-color:var(--accent);}
   .dv3-msel.aberto .dv3-msel-btn{border-color:var(--accent);}
-  .dv3-msel-panel{position:absolute;top:calc(100% + 4px);left:0;min-width:100%;width:max-content;max-width:300px;
+  .dv3-msel-panel{position:absolute;top:calc(100% + 4px);left:0;min-width:100%;width:max-content;max-width:420px;
     background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px;z-index:60;
-    max-height:240px;overflow-y:auto;overflow-x:hidden;box-shadow:0 10px 28px rgba(0,0,0,.4);}
-  .dv3-msel-opt{display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border-radius:6px;font-size:12.5px;
-    color:var(--text);cursor:pointer;white-space:normal;line-height:1.35;}
-  .dv3-msel-opt input[type=checkbox]{margin-top:2px;}
+    max-height:240px;overflow-y:auto;box-shadow:0 10px 28px rgba(0,0,0,.4);}
+  .dv3-msel-opt{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;font-size:12.5px;
+    color:var(--text);cursor:pointer;white-space:nowrap;}
   .dv3-msel-opt:hover{background:var(--surface);}
   .dv3-msel-opt.dv3-msel-todos{font-weight:700;border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:8px;}
   .dv3-msel-opt input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;flex-shrink:0;}
-  .dv3-msel-vazio{padding:8px;font-size:11.5px;color:var(--text-dim);}
+  .dv3-msel-vazio{padding:8px;font-size:11.5px;color:var(--text-dim);white-space:nowrap;}
   .dv3-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--text-dim);margin:0 0 12px;}
   .dv3-legend span{display:inline-flex;align-items:center;gap:6px;}
   .dv3-legend i{width:16px;height:2px;display:inline-block;background:var(--purple);}
