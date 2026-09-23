@@ -1849,8 +1849,8 @@ async function adicionarItemLista(chave){
 async function removerItemLista(chave, idx){
   try {
     var token = await getToken();
-    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaListas/rows/itemAt(index=' + idx + ')/delete';
-    var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token } });
+    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaListas/rows/' + idx;
+    var resp = await fetch(url, { method:'DELETE', headers:{ Authorization:'Bearer '+token } });
     if (resp.ok){
       await carregarListas(token);
       mostrarToast('Removido.');
@@ -2053,7 +2053,7 @@ async function salvarCriterioLote(){
     var token = await getToken();
     var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias/rows';
     for (var p = 0; p < toPatch.length; p++){
-      await fetch(base + '/itemAt(index=' + toPatch[p].index + ')', { method:'PATCH', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values:[toPatch[p].linha] }) });
+      await fetch(base + '/' + toPatch[p].index, { method:'PATCH', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values:[toPatch[p].linha] }) });
     }
     for (var a = 0; a < toAdd.length; a++){
       await fetch(base + '/add', { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values:[toAdd[a]] }) });
@@ -2063,7 +2063,7 @@ async function salvarCriterioLote(){
     // que a exclusão anterior já invalidou.
     toDelete.sort(function(x,y){ return y - x; });
     for (var d = 0; d < toDelete.length; d++){
-      await fetch(base + '/itemAt(index=' + toDelete[d] + ')/delete', { method:'POST', headers:{ Authorization:'Bearer '+token } });
+      await fetch(base + '/' + toDelete[d], { method:'DELETE', headers:{ Authorization:'Bearer '+token } });
     }
     await carregarTolerancias(token);
     fecharFormCriterio();
@@ -2101,7 +2101,7 @@ async function excluirGrupo(i){
     var token = await getToken();
     var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias/rows';
     for (var k = 0; k < indices.length; k++){
-      await fetch(base + '/itemAt(index=' + indices[k] + ')/delete', { method:'POST', headers:{ Authorization:'Bearer '+token } });
+      await fetch(base + '/' + indices[k], { method:'DELETE', headers:{ Authorization:'Bearer '+token } });
     }
     await carregarTolerancias(token);
     mostrarToast('Critérios de ' + g.maquina + ' · ' + g.gramatura + ' · ' + g.cor + ' · ' + g.resina + ' removidos.');
