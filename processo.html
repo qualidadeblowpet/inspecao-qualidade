@@ -50,6 +50,25 @@
     padding:8px 10px;border-radius:7px;font-size:12.5px;font-family:var(--font-body);min-width:110px;}
   .dv3-btnfiltrar{align-self:flex-end;background:var(--accent);color:#1a1200;border:none;border-radius:7px;
     padding:9px 16px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:var(--font-body);}
+
+  /* ---- filtro de seleção múltipla (Máquina/Gramatura/Cor/Resina/Parâmetros) ---- */
+  .dv3-msel{position:relative;min-width:130px;}
+  .dv3-msel-btn{width:100%;text-align:left;background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+    padding:8px 28px 8px 10px;border-radius:7px;font-size:12.5px;font-family:var(--font-body);cursor:pointer;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;}
+  .dv3-msel-btn::after{content:'▾';position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:10px;}
+  .dv3-msel-btn:hover{border-color:var(--accent);}
+  .dv3-msel.aberto .dv3-msel-btn{border-color:var(--accent);}
+  .dv3-msel-panel{position:absolute;top:calc(100% + 4px);left:0;min-width:100%;width:max-content;max-width:300px;
+    background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px;z-index:60;
+    max-height:240px;overflow-y:auto;overflow-x:hidden;box-shadow:0 10px 28px rgba(0,0,0,.4);}
+  .dv3-msel-opt{display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border-radius:6px;font-size:12.5px;
+    color:var(--text);cursor:pointer;white-space:normal;line-height:1.35;}
+  .dv3-msel-opt input[type=checkbox]{margin-top:2px;}
+  .dv3-msel-opt:hover{background:var(--surface);}
+  .dv3-msel-opt.dv3-msel-todos{font-weight:700;border-bottom:1px solid var(--border);margin-bottom:4px;padding-bottom:8px;}
+  .dv3-msel-opt input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;flex-shrink:0;}
+  .dv3-msel-vazio{padding:8px;font-size:11.5px;color:var(--text-dim);}
   .dv3-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--text-dim);margin:0 0 12px;}
   .dv3-legend span{display:inline-flex;align-items:center;gap:6px;}
   .dv3-legend i{width:16px;height:2px;display:inline-block;background:var(--purple);}
@@ -266,10 +285,11 @@
 
     <div id="dashConteudo" hidden>
       <div class="dv3-filterbar">
-        <div class="dv3-filtergroup"><label>Máquina</label><select id="fMaquina"></select></div>
-        <div class="dv3-filtergroup"><label>Gramatura</label><select id="fGramatura"></select></div>
-        <div class="dv3-filtergroup"><label>Cor</label><select id="fCor"></select></div>
-        <div class="dv3-filtergroup"><label>Resina</label><select id="fResina"></select></div>
+        <div class="dv3-filtergroup"><label>Máquina</label><div class="dv3-msel" id="fMaquinaWrap"></div></div>
+        <div class="dv3-filtergroup"><label>Gramatura</label><div class="dv3-msel" id="fGramaturaWrap"></div></div>
+        <div class="dv3-filtergroup"><label>Cor</label><div class="dv3-msel" id="fCorWrap"></div></div>
+        <div class="dv3-filtergroup"><label>Resina</label><div class="dv3-msel" id="fResinaWrap"></div></div>
+        <div class="dv3-filtergroup"><label>Parâmetros</label><div class="dv3-msel" id="fParametrosWrap"></div></div>
         <div class="dv3-filtergroup"><label>Data inicial</label><input type="date" id="fData_de"></div>
         <div class="dv3-filtergroup"><label>Data final</label><input type="date" id="fData_ate"></div>
         <div class="dv3-filtergroup"><label>Horário inicial</label><input type="time" id="fHora_de" value="00:00"></div>
@@ -308,7 +328,7 @@
 
     <div id="tabelaConteudo" hidden>
       <div class="dv3-filterbar">
-        <div class="dv3-filtergroup"><label>Máquina</label><select id="tMaquina"></select></div>
+        <div class="dv3-filtergroup"><label>Máquina</label><div class="dv3-msel" id="tMaquinaWrap"></div></div>
         <div class="dv3-filtergroup"><label>Data inicial</label><input type="date" id="tData_de"></div>
         <div class="dv3-filtergroup"><label>Data final</label><input type="date" id="tData_ate"></div>
         <button class="dv3-filtergroup dv3-btnfiltrar" onclick="aplicarFiltroTabela()">Aplicar filtro</button>
@@ -1014,21 +1034,132 @@ function isoParaDataBR(iso){
   return m ? (m[3]+'/'+m[2]+'/'+m[1]) : '';
 }
 
-function popularFiltrosDashV3(){
-  var selects = [
-    { id:'fMaquina', campo:'maquina' },
-    { id:'fGramatura', campo:'gramatura' },
-    { id:'fCor', campo:'cor' },
-    { id:'fResina', campo:'resina' }
-  ];
-  // combinação "mais recente" (primeiro item, já que registrosCarregados está ordenado por criado_em desc)
-  var maisRecente = registrosCarregados[0] || {};
-  selects.forEach(function(s){
-    var el = document.getElementById(s.id);
-    var opcoes = valoresUnicos(s.campo);
-    el.innerHTML = opcoes.map(function(v){ return '<option value="'+v.replace(/"/g,'&quot;')+'">'+v+'</option>'; }).join('');
-    if (opcoes.indexOf(maisRecente[s.campo]) > -1) el.value = maisRecente[s.campo];
+// =============================================================================
+// Componente genérico de filtro em lista suspensa com seleção múltipla
+// (usado nos filtros do Dashboard e da tela Dados Cadastrados). Estado por
+// filtro: seleção vazia = "Todos" (sem restrição); com itens = restringe a eles.
+// =============================================================================
+var MSEL_REGISTRO = {}; // id -> { opcoes:[string], selecionados:[string], onChange:fn|null, rotuloTodos:string }
+var MSEL_ABERTO = null;
+
+function mselConfigurar(id, opcoes, selecionadosIniciais, onChange, rotuloTodos){
+  var wrap = document.getElementById(id + 'Wrap');
+  if (!wrap) return;
+  var selecionados = (selecionadosIniciais || []).filter(function(v){ return opcoes.indexOf(v) > -1; });
+  var st = { opcoes: opcoes.slice(), selecionados: selecionados, onChange: onChange || null, rotuloTodos: rotuloTodos || 'Todos' };
+  MSEL_REGISTRO[id] = st;
+
+  var opcoesHtml;
+  if (opcoes.length === 0){
+    opcoesHtml = '<div class="dv3-msel-vazio">Nenhuma opção disponível</div>';
+  } else {
+    opcoesHtml = '<label class="dv3-msel-opt dv3-msel-todos"><input type="checkbox" data-todos="1"> ' + st.rotuloTodos + '</label>' +
+      opcoes.map(function(v){
+        var vAttr = String(v).replace(/"/g,'&quot;');
+        return '<label class="dv3-msel-opt"><input type="checkbox" value="'+vAttr+'"> ' + v + '</label>';
+      }).join('');
+  }
+
+  wrap.innerHTML =
+    '<button type="button" class="dv3-msel-btn"></button>' +
+    '<div class="dv3-msel-panel" hidden></div>';
+  wrap.querySelector('.dv3-msel-panel').innerHTML = opcoesHtml;
+
+  wrap.querySelector('.dv3-msel-btn').addEventListener('click', function(e){
+    e.stopPropagation();
+    mselAlternarPainel(id);
   });
+  wrap.querySelector('.dv3-msel-panel').addEventListener('change', function(e){
+    mselMudou(id, e.target);
+  });
+  wrap.querySelector('.dv3-msel-panel').addEventListener('click', function(e){
+    e.stopPropagation(); // não fecha o painel ao marcar itens
+  });
+
+  mselSincronizarCheckboxes(id);
+  mselAtualizarBotao(id);
+}
+
+function mselSincronizarCheckboxes(id){
+  var st = MSEL_REGISTRO[id];
+  var wrap = document.getElementById(id + 'Wrap');
+  if (!st || !wrap) return;
+  var todosCb = wrap.querySelector('input[data-todos]');
+  if (todosCb) todosCb.checked = (st.selecionados.length === 0);
+  Array.prototype.forEach.call(wrap.querySelectorAll('.dv3-msel-panel input[value]'), function(cb){
+    cb.checked = st.selecionados.indexOf(cb.value) > -1;
+  });
+}
+
+function mselAtualizarBotao(id){
+  var st = MSEL_REGISTRO[id];
+  var wrap = document.getElementById(id + 'Wrap');
+  if (!st || !wrap) return;
+  var rotulo;
+  if (st.selecionados.length === 0) rotulo = st.rotuloTodos;
+  else if (st.selecionados.length === 1) rotulo = st.selecionados[0];
+  else rotulo = st.selecionados.length + ' selecionados';
+  wrap.querySelector('.dv3-msel-btn').textContent = rotulo;
+}
+
+function mselMudou(id, inputEl){
+  var st = MSEL_REGISTRO[id];
+  if (!st || inputEl.tagName !== 'INPUT') return;
+  if (inputEl.hasAttribute('data-todos')){
+    st.selecionados = [];
+  } else {
+    var v = inputEl.value;
+    var idx = st.selecionados.indexOf(v);
+    if (inputEl.checked && idx === -1) st.selecionados.push(v);
+    else if (!inputEl.checked && idx > -1) st.selecionados.splice(idx, 1);
+  }
+  mselSincronizarCheckboxes(id);
+  mselAtualizarBotao(id);
+  if (st.onChange) st.onChange();
+}
+
+function mselAlternarPainel(id){
+  var wrap = document.getElementById(id + 'Wrap');
+  if (!wrap) return;
+  var painel = wrap.querySelector('.dv3-msel-panel');
+  var vaiAbrir = painel.hidden;
+  mselFecharTodos();
+  if (vaiAbrir){
+    painel.style.left = '';
+    painel.style.right = '';
+    painel.hidden = false;
+    wrap.classList.add('aberto');
+    MSEL_ABERTO = id;
+    // evita o painel vazar pra fora da tela quando o filtro está perto da borda direita
+    var r = painel.getBoundingClientRect();
+    if (r.right > window.innerWidth - 8){
+      painel.style.left = 'auto';
+      painel.style.right = '0';
+    }
+  }
+}
+
+function mselFecharTodos(){
+  Array.prototype.forEach.call(document.querySelectorAll('.dv3-msel'), function(w){
+    w.classList.remove('aberto');
+    var p = w.querySelector('.dv3-msel-panel');
+    if (p) p.hidden = true;
+  });
+  MSEL_ABERTO = null;
+}
+document.addEventListener('click', function(){ if (MSEL_ABERTO) mselFecharTodos(); });
+
+function mselValores(id){
+  var st = MSEL_REGISTRO[id];
+  return st ? st.selecionados.slice() : [];
+}
+
+function popularFiltrosDashV3(){
+  mselConfigurar('fMaquina', valoresUnicos('maquina'), [], null, 'Todos');
+  mselConfigurar('fGramatura', valoresUnicos('gramatura'), [], null, 'Todos');
+  mselConfigurar('fCor', valoresUnicos('cor'), [], null, 'Todos');
+  mselConfigurar('fResina', valoresUnicos('resina'), [], null, 'Todos');
+  mselConfigurar('fParametros', PARAMETROS_INJECAO, [], null, 'Todos os parâmetros');
   // período: do dia mais antigo ao mais recente dentre os registros carregados
   var datasIso = registrosCarregados.map(function(r){ return paraDataISO(r.data); }).filter(Boolean).sort();
   document.getElementById('fData_de').value = datasIso[0] || '';
@@ -1038,20 +1169,21 @@ function popularFiltrosDashV3(){
 }
 
 function aplicarFiltrosDashV3(){
-  var maquina = document.getElementById('fMaquina').value;
-  var gramatura = document.getElementById('fGramatura').value;
-  var cor = document.getElementById('fCor').value;
-  var resina = document.getElementById('fResina').value;
+  var maquinas = mselValores('fMaquina');
+  var gramaturas = mselValores('fGramatura');
+  var cores = mselValores('fCor');
+  var resinas = mselValores('fResina');
+  var parametrosSel = mselValores('fParametros');
   var de = document.getElementById('fData_de').value;
   var ate = document.getElementById('fData_ate').value;
   var horaDe = document.getElementById('fHora_de').value || '00:00';
   var horaAte = document.getElementById('fHora_ate').value || '23:59';
 
   var filtrados = registrosCarregados.filter(function(r){
-    if (maquina && r.maquina !== maquina) return false;
-    if (gramatura && r.gramatura !== gramatura) return false;
-    if (cor && r.cor !== cor) return false;
-    if (resina && r.resina !== resina) return false;
+    if (maquinas.length && maquinas.indexOf(r.maquina) === -1) return false;
+    if (gramaturas.length && gramaturas.indexOf(r.gramatura) === -1) return false;
+    if (cores.length && cores.indexOf(r.cor) === -1) return false;
+    if (resinas.length && resinas.indexOf(r.resina) === -1) return false;
     var iso = paraDataISO(r.data);
     if (de && iso && iso < de) return false;
     if (ate && iso && iso > ate) return false;
@@ -1062,7 +1194,10 @@ function aplicarFiltrosDashV3(){
     return true;
   });
 
-  // agrupa por parâmetro: cada ponto é {t: Date, v: número, foraLimite: bool}
+  // agrupa por parâmetro: cada ponto é {t: Date, v: número, dentro, lmin, lmax}.
+  // A tolerância agora é buscada POR PONTO (não mais por um único combo do filtro),
+  // porque com seleção múltipla dá pra combinar várias máquinas/gramaturas/cores/
+  // resinas ao mesmo tempo — cada leitura pode ter um limite diferente aplicável.
   var seriesPorParametro = {};
   PARAMETROS_INJECAO.forEach(function(p){ seriesPorParametro[p] = []; });
   filtrados.forEach(function(r){
@@ -1071,13 +1206,19 @@ function aplicarFiltrosDashV3(){
     if (isNaN(n)) return; // não plota valores não-numéricos (texto, "—")
     var t = parseDataHoraBR(r.data, r.hora);
     if (!t) return;
-    seriesPorParametro[r.parametro].push({ t:t, v:n, dentro: r.dentro_criterio });
+    var tol = buscarTolerancia(r.maquina, r.gramatura, r.cor, r.resina, r.parametro);
+    var lmin = tol ? paraNumero(tol.valor_min) : NaN;
+    var lmax = tol ? paraNumero(tol.valor_max) : NaN;
+    lmin = isNaN(lmin) ? null : lmin;
+    lmax = isNaN(lmax) ? null : lmax;
+    seriesPorParametro[r.parametro].push({ t:t, v:n, dentro: r.dentro_criterio, lmin:lmin, lmax:lmax });
   });
   Object.keys(seriesPorParametro).forEach(function(p){
     seriesPorParametro[p].sort(function(a,b){ return a.t - b.t; });
   });
 
-  renderDashboardV3(seriesPorParametro, maquina, gramatura, cor, resina);
+  var parametrosParaMostrar = parametrosSel.length ? parametrosSel : PARAMETROS_INJECAO;
+  renderDashboardV3(seriesPorParametro, parametrosParaMostrar);
 }
 
 function xAtDashV3(d){
@@ -1086,7 +1227,7 @@ function xAtDashV3(d){
   return 10 + idx * dashPX_PER_PONTO;
 }
 
-function renderDashboardV3(seriesPorParametro, maquina, gramatura, cor, resina){
+function renderDashboardV3(seriesPorParametro, parametrosParaMostrar){
   var todosPontos = [];
   Object.keys(seriesPorParametro).forEach(function(p){
     seriesPorParametro[p].forEach(function(pt){ todosPontos.push(pt.t); });
@@ -1126,14 +1267,26 @@ function renderDashboardV3(seriesPorParametro, maquina, gramatura, cor, resina){
 
   rowsEl.innerHTML = '';
   var scrollGroup = [document.getElementById('axisScroll')];
-  PARAMETROS_INJECAO.forEach(function(nome){
-    var serie = seriesPorParametro[nome];
-    var tol = buscarTolerancia(maquina, gramatura, cor, resina, nome);
-    var lmin = tol ? paraNumero(tol.valor_min) : NaN;
-    var lmax = tol ? paraNumero(tol.valor_max) : NaN;
-    lmin = isNaN(lmin) ? null : lmin;
-    lmax = isNaN(lmax) ? null : lmax;
-    var lim = (lmin!=null?('mín '+lmin):'') + (lmin!=null&&lmax!=null?' · ':'') + (lmax!=null?('máx '+lmax):'') || 'sem limite';
+  parametrosParaMostrar.forEach(function(nome){
+    var serie = seriesPorParametro[nome] || [];
+
+    // tolerância: usa um único limite (pra desenhar a linha de referência e colorir as
+    // estatísticas) só quando TODOS os pontos visíveis têm a mesma tolerância — caso comum,
+    // uma combinação só selecionada. Se o filtro estiver misturando combinações com
+    // tolerâncias diferentes, cada ponto usa a própria (ver drawMiniV3) e aqui não desenha
+    // uma única linha de referência, pra não sugerir um limite que não vale pra tudo.
+    var uniforme = true, lmin = null, lmax = null;
+    if (serie.length){
+      lmin = serie[0].lmin; lmax = serie[0].lmax;
+      for (var i = 1; i < serie.length; i++){
+        if (serie[i].lmin !== lmin || serie[i].lmax !== lmax){ uniforme = false; break; }
+      }
+      if (!uniforme){ lmin = null; lmax = null; }
+    }
+    var lim;
+    if (serie.length === 0) lim = 'sem limite';
+    else if (!uniforme) lim = 'tolerância varia no filtro';
+    else lim = (lmin!=null?('mín '+lmin):'') + (lmin!=null&&lmax!=null?' · ':'') + (lmax!=null?('máx '+lmax):'') || 'sem limite';
 
     var row = document.createElement('div'); row.className = 'dv3-prow';
     if (serie.length === 0){
@@ -1178,6 +1331,10 @@ function renderDashboardV3(seriesPorParametro, maquina, gramatura, cor, resina){
   axisScrollEl.onscroll = function(){
     scrollGroup.forEach(function(w){ if (w!==axisScrollEl) w.scrollLeft = axisScrollEl.scrollLeft; });
   };
+
+  if (rowsEl.children.length === 0){
+    rowsEl.innerHTML = '<p class="dv3-semdados" style="padding:16px;">Nenhum parâmetro selecionado no filtro.</p>';
+  }
 }
 
 function drawAxisV3(pontos){
@@ -1221,6 +1378,12 @@ function drawMiniV3(svg, serie, lmin, lmax, nome){
   var allVals = vals.slice();
   if (lmin!=null) allVals.push(lmin);
   if (lmax!=null) allVals.push(lmax);
+  // inclui também os limites por ponto (podem variar quando o filtro combina mais
+  // de uma máquina/gramatura/cor/resina), pra nenhuma linha de limite ficar cortada.
+  serie.forEach(function(p){
+    if (p.lmin!=null) allVals.push(p.lmin);
+    if (p.lmax!=null) allVals.push(p.lmax);
+  });
   var yMin = Math.min.apply(null, allVals), yMax = Math.max.apply(null, allVals);
   var pad = (yMax-yMin)*0.15 || 1;
   yMin -= pad; yMax += pad;
@@ -1254,7 +1417,9 @@ function drawMiniV3(svg, serie, lmin, lmax, nome){
 
   var tooltip = document.getElementById('dv3tooltip');
   serie.forEach(function(p){
-    var fora = (lmin!=null && p.v<lmin) || (lmax!=null && p.v>lmax);
+    // usa o limite do PRÓPRIO ponto (não o compartilhado da linha), já que o filtro
+    // pode misturar combinações com tolerâncias diferentes.
+    var fora = (p.lmin!=null && p.v<p.lmin) || (p.lmax!=null && p.v>p.lmax);
     var corPonto = fora ? '#e5484d' : corLinha;
     // halo suave + anel, imitando o estilo de marcador pedido (referência enviada).
     svg.appendChild(el('circle',{cx:xAtDashV3(p.t),cy:y(p.v),r:fora?6:5,fill:corPonto,'fill-opacity':'0.18'}));
@@ -1262,7 +1427,9 @@ function drawMiniV3(svg, serie, lmin, lmax, nome){
     var hit = el('circle',{cx:xAtDashV3(p.t),cy:y(p.v),r:7,fill:'transparent'});
     hit.addEventListener('mouseenter', function(){
       var fmt = String(p.t.getHours()).padStart(2,'0')+'h '+String(p.t.getDate()).padStart(2,'0')+'/'+String(p.t.getMonth()+1).padStart(2,'0');
-      tooltip.innerHTML = '<b>'+nome+'</b><br>'+p.v+' &middot; '+fmt+'<br><span class="dv3-st '+(fora?'bad':'ok')+'">'+(fora?'Fora do limite':'Dentro do limite')+'</span>';
+      var limTxt = (p.lmin!=null || p.lmax!=null) ?
+        (' · lim ' + (p.lmin!=null?('mín '+p.lmin):'') + (p.lmin!=null&&p.lmax!=null?'/':'') + (p.lmax!=null?('máx '+p.lmax):'')) : '';
+      tooltip.innerHTML = '<b>'+nome+'</b><br>'+p.v+' &middot; '+fmt+limTxt+'<br><span class="dv3-st '+(fora?'bad':'ok')+'">'+(fora?'Fora do limite':'Dentro do limite')+'</span>';
       var r = svg.getBoundingClientRect();
       tooltip.style.left = (r.left + xAtDashV3(p.t) - 50)+'px';
       tooltip.style.top = (r.top - 54)+'px';
@@ -1309,11 +1476,7 @@ function construirCabecalhoTabelaLarga(){
 }
 
 function popularFiltroTabela(){
-  var el = document.getElementById('tMaquina');
-  var opcoes = valoresUnicos('maquina');
-  el.innerHTML = '<option value="">Todas</option>' + opcoes.map(function(v){
-    return '<option value="'+v.replace(/"/g,'&quot;')+'">'+v+'</option>';
-  }).join('');
+  mselConfigurar('tMaquina', valoresUnicos('maquina'), [], null, 'Todas');
   var datasIso = registrosCarregados.map(function(r){ return paraDataISO(r.data); }).filter(Boolean).sort();
   document.getElementById('tData_de').value = datasIso[0] || '';
   document.getElementById('tData_ate').value = datasIso[datasIso.length-1] || '';
@@ -1323,12 +1486,12 @@ function popularFiltroTabela(){
 var LIMITE_LINHAS_TABELA_LARGA = 300;
 
 function aplicarFiltroTabela(){
-  var maquina = document.getElementById('tMaquina').value;
+  var maquinas = mselValores('tMaquina');
   var de = document.getElementById('tData_de').value;
   var ate = document.getElementById('tData_ate').value;
 
   var filtrados = registrosCarregados.filter(function(r){
-    if (maquina && r.maquina !== maquina) return false;
+    if (maquinas.length && maquinas.indexOf(r.maquina) === -1) return false;
     var iso = paraDataISO(r.data);
     if (de && iso && iso < de) return false;
     if (ate && iso && iso > ate) return false;
