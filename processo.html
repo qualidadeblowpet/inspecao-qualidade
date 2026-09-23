@@ -86,8 +86,8 @@
   .dv3-prow:last-child{border-bottom:none;}
   .dv3-plabel{width:260px;flex-shrink:0;padding:10px 14px;display:flex;flex-direction:column;justify-content:center;gap:2px;
     background:var(--surface);position:sticky;left:0;z-index:2;border-right:1px solid var(--border);}
-  .dv3-plabel .dv3-pname{font-size:11.5px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-  .dv3-plabel .dv3-plim{font-size:10px;color:var(--text-dim);font-family:var(--font-body);}
+  .dv3-plabel .dv3-pname{font-size:13px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dv3-plabel .dv3-plim{font-size:11.5px;color:var(--text-dim);font-family:var(--font-body);}
   .dv3-pchartwrap{flex:1;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
   .dv3-pchartwrap::-webkit-scrollbar{height:6px;}
   .dv3-pchartwrap::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
@@ -1309,7 +1309,7 @@ function renderDashboardV3(seriesPorParametro, parametrosParaMostrar){
 
     row.innerHTML =
       '<div class="dv3-plabel"><div class="dv3-pname">'+nome+'</div><div class="dv3-plim">'+lim+'</div></div>' +
-      '<div class="dv3-pchartwrap"><svg width="'+dashAXIS_W+'" height="64"></svg></div>' +
+      '<div class="dv3-pchartwrap"><svg width="'+dashAXIS_W+'" height="128"></svg></div>' +
       '<div class="dv3-stats">' +
         '<div class="dv3-st"><span class="dv3-sl">Média</span><span class="dv3-sv '+statusClasse(media)+'">'+media+'</span></div>' +
         '<div class="dv3-st"><span class="dv3-sl">Máximo</span><span class="dv3-sv '+statusClasse(maximo)+'">'+maximo+'</span></div>' +
@@ -1372,7 +1372,7 @@ function drawAxisV3(pontos){
 var _dv3GradSeq = 0;
 
 function drawMiniV3(svg, serie, lmin, lmax, nome){
-  var W = dashAXIS_W, H = 64, padT = 8, padB = 8;
+  var W = dashAXIS_W, H = 128, padT = 26, padB = 26;
   var vals = serie.map(function(p){ return p.v; });
   var allVals = vals.slice();
   if (lmin!=null) allVals.push(lmin);
@@ -1420,10 +1420,13 @@ function drawMiniV3(svg, serie, lmin, lmax, nome){
     // pode misturar combinações com tolerâncias diferentes.
     var fora = (p.lmin!=null && p.v<p.lmin) || (p.lmax!=null && p.v>p.lmax);
     var corPonto = fora ? '#e5484d' : corLinha;
-    // halo suave + anel, imitando o estilo de marcador pedido (referência enviada).
-    svg.appendChild(el('circle',{cx:xAtDashV3(p.t),cy:y(p.v),r:fora?6:5,fill:corPonto,'fill-opacity':'0.18'}));
-    svg.appendChild(el('circle',{cx:xAtDashV3(p.t),cy:y(p.v),r:fora?3.6:3,fill:'#17181b',stroke:corPonto,'stroke-width':'1.6'}));
-    var hit = el('circle',{cx:xAtDashV3(p.t),cy:y(p.v),r:7,fill:'transparent'});
+    var cx = xAtDashV3(p.t), cy = y(p.v);
+    // bolinha com o valor escrito dentro (a pedido do Cleber, a partir de uma amostra aprovada).
+    svg.appendChild(el('circle',{cx:cx,cy:cy,r:16,fill:'#17181b',stroke:corPonto,'stroke-width':2}));
+    var valTxt = el('text',{x:cx,y:cy,fill:corPonto,'font-size':10,'font-weight':700,'text-anchor':'middle','dominant-baseline':'central','font-family':"'Inter',sans-serif"});
+    valTxt.textContent = String(p.v).replace('.',',');
+    svg.appendChild(valTxt);
+    var hit = el('circle',{cx:cx,cy:cy,r:16,fill:'transparent'});
     hit.addEventListener('mouseenter', function(){
       var fmt = String(p.t.getHours()).padStart(2,'0')+'h '+String(p.t.getDate()).padStart(2,'0')+'/'+String(p.t.getMonth()+1).padStart(2,'0');
       var limTxt = (p.lmin!=null || p.lmax!=null) ?
