@@ -4,14 +4,35 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Controle de Processo — BlowPet</title>
+<script>
+  // Aplica o tema salvo (claro/escuro) antes da página desenhar qualquer coisa, pra não piscar
+  // no tema errado por uma fração de segundo. Fica logo no início do <head>, de propósito.
+  (function(){
+    try {
+      var tema = localStorage.getItem('processoTema');
+      if (tema === 'claro') document.documentElement.setAttribute('data-theme', 'claro');
+    } catch (e) {}
+  })();
+</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
   :root{
+    /* Tema escuro (padrão) */
     --bg:#0c0d0f; --sidebar:#111214; --surface:#17181b; --surface-2:#1e2023; --border:#2a2d31;
     --text:#edeef0; --text-dim:#8b8f96; --accent:#f2a93b; --ok:#3fb68b; --danger:#e5484d; --warn:#f2a93b; --blue:#5b9bf2; --purple:#9c7bd9;
+    --ok-bg:rgba(63,182,139,.15); --danger-bg:rgba(229,72,77,.14); --warn-bg:rgba(242,169,59,.18);
+    --dim-bg:rgba(139,143,150,.15); --blue-bg:rgba(91,155,242,.18);
+    --shadow-dropdown:rgba(0,0,0,.4); --shadow-toast:rgba(0,0,0,.4); --shadow-drawer:rgba(0,0,0,.4); --shadow-overlay:rgba(0,0,0,.5);
     --font-display:'Barlow Condensed','Arial Narrow',sans-serif; --font-body:'Inter',system-ui,sans-serif; --font-mono:'JetBrains Mono',monospace;
+  }
+  /* Tema claro (opcional, escolhido em Configurações) — paleta baseada no mockup estilo ERP avaliado com o Cleber. */
+  :root[data-theme="claro"]{
+    --bg:#e9ebee; --sidebar:#f6f7f9; --surface:#ffffff; --surface-2:#eef1f4; --border:#c7cdd4;
+    --text:#1f2d3d; --text-dim:#5b6672; --accent:#e08a1e; --ok:#1f7a3d; --danger:#b3261e; --warn:#8a6100; --blue:#2e5f8a; --purple:#7c5cb8;
+    --ok-bg:#dcf1e2; --danger-bg:#fbe4e2; --warn-bg:#fbf0d6; --dim-bg:#eceef0; --blue-bg:#dce8f4;
+    --shadow-dropdown:rgba(31,45,61,.16); --shadow-toast:rgba(31,45,61,.22); --shadow-drawer:rgba(31,45,61,.18); --shadow-overlay:rgba(31,45,61,.35);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--font-body);-webkit-font-smoothing:antialiased;}
@@ -33,12 +54,12 @@
   .datatable{width:100%;border-collapse:collapse;font-size:12px;white-space:nowrap;}
   .datatable th{text-align:left;color:var(--text-dim);text-transform:uppercase;font-size:10px;letter-spacing:.4px;
     padding:8px 10px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--surface);}
-  .datatable td{padding:8px 10px;border-bottom:1px solid #1e2023;font-family:var(--font-mono);}
+  .datatable td{padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);}
   .datatable tbody tr:hover{background:var(--surface-2);}
   .critpill{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.3px;font-family:var(--font-body);}
-  .critpill.sim{background:rgba(63,182,139,.15);color:var(--ok);}
-  .critpill.nao{background:rgba(229,72,77,.15);color:var(--danger);}
-  .critpill.vazio{background:rgba(139,143,150,.15);color:var(--text-dim);}
+  .critpill.sim{background:var(--ok-bg);color:var(--ok);}
+  .critpill.nao{background:var(--danger-bg);color:var(--danger);}
+  .critpill.vazio{background:var(--dim-bg);color:var(--text-dim);}
   .emptystate{font-size:13px;color:var(--text-dim);text-align:center;padding:30px 10px;}
 
   /* ---- Dashboard empilhado v3 (mockup-dashboard-empilhado-v3) ---- */
@@ -61,7 +82,7 @@
   .dv3-msel.aberto .dv3-msel-btn{border-color:var(--accent);}
   .dv3-msel-panel{position:absolute;top:calc(100% + 4px);left:0;min-width:100%;width:max-content;max-width:420px;
     background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px;z-index:60;
-    max-height:240px;overflow-y:auto;box-shadow:0 10px 28px rgba(0,0,0,.4);}
+    max-height:240px;overflow-y:auto;box-shadow:0 10px 28px var(--shadow-dropdown);}
   .dv3-msel-opt{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;font-size:12.5px;
     color:var(--text);cursor:pointer;white-space:nowrap;}
   .dv3-msel-opt:hover{background:var(--surface);}
@@ -141,11 +162,11 @@
   .slot .op .opname{font-weight:600;}
   .slot .op .opsub{font-size:11px;color:var(--text-dim);}
   .flagpill{font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:.3px;}
-  .flagpill.ok{background:rgba(63,182,139,.15);color:var(--ok);}
-  .flagpill.warn{background:rgba(242,169,59,.18);color:var(--warn);}
-  .flagpill.bad{background:rgba(229,72,77,.15);color:var(--danger);}
-  .flagpill.none{background:rgba(139,143,150,.15);color:var(--text-dim);}
-  .flagpill.salvo{background:rgba(91,155,242,.18);color:var(--blue);}
+  .flagpill.ok{background:var(--ok-bg);color:var(--ok);}
+  .flagpill.warn{background:var(--warn-bg);color:var(--warn);}
+  .flagpill.bad{background:var(--danger-bg);color:var(--danger);}
+  .flagpill.none{background:var(--dim-bg);color:var(--text-dim);}
+  .flagpill.salvo{background:var(--blue-bg);color:var(--blue);}
   .chev{color:var(--text-dim);font-size:16px;}
   .backlink{display:flex;align-items:center;gap:6px;color:var(--text-dim);font-size:12.5px;cursor:pointer;margin-bottom:14px;}
   .backlink:hover{color:var(--text);}
@@ -153,7 +174,7 @@
   .legend span{display:inline-flex;align-items:center;gap:5px;}
   .legend i{width:9px;height:9px;border-radius:50%;display:inline-block;}
   .legend .ok i{background:var(--ok);} .legend .warn i{background:var(--warn);} .legend .bad i{background:var(--danger);} .legend .none i{background:var(--text-dim);}
-  .prow{display:grid;grid-template-columns:1fr 100px 74px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid #1e2023;}
+  .prow{display:grid;grid-template-columns:1fr 100px 74px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);}
   .prow:last-child{border-bottom:none;}
   .prow .pname{font-size:12.5px;}
   .prow .plimite{font-size:10.5px;color:var(--text-dim);margin-top:1px;}
@@ -174,11 +195,26 @@
     color:var(--accent);margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border);}
   .actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px;}
   .note{font-size:11.5px;color:var(--text-dim);line-height:1.6;margin-top:6px;}
+
+  /* ---- Configurações: seletor de tema claro/escuro ---- */
+  .tema-opcoes{display:flex;gap:14px;margin-top:4px;flex-wrap:wrap;}
+  .tema-opcao{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:8px;width:136px;
+    padding:12px;background:var(--surface-2);border:2px solid var(--border);border-radius:12px;cursor:pointer;
+    font-family:var(--font-body);color:var(--text);}
+  .tema-opcao:hover{border-color:var(--text-dim);}
+  .tema-opcao.ativo{border-color:var(--accent);}
+  .tema-opcao .tema-swatch{width:100%;height:52px;border-radius:8px;border:1px solid var(--border);}
+  .tema-swatch-escuro{background:linear-gradient(135deg,#111214 0 34%,#17181b 34% 100%);}
+  .tema-swatch-claro{background:linear-gradient(135deg,#f6f7f9 0 34%,#ffffff 34% 100%);border-color:#c7cdd4;}
+  .tema-opcao .tema-nome{font-size:12.5px;font-weight:600;}
+  .tema-opcao .tema-check{position:absolute;top:8px;right:8px;width:16px;height:16px;border-radius:50%;
+    background:var(--accent);color:#1a1200;font-size:10px;font-weight:700;line-height:16px;text-align:center;display:none;}
+  .tema-opcao.ativo .tema-check{display:block;}
   .errlist{font-size:12.5px;color:var(--danger);line-height:1.7;padding-left:18px;margin:0 0 16px;}
   .warnlist{font-size:12px;color:var(--text-dim);line-height:1.7;padding-left:18px;margin:0 0 16px;}
   .err{color:var(--danger);font-size:13px;}
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--surface-2);border:1px solid var(--border);
-    color:var(--text);padding:12px 18px;border-radius:10px;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.4);z-index:50;max-width:90vw;}
+    color:var(--text);padding:12px 18px;border-radius:10px;font-size:13px;box-shadow:0 6px 20px var(--shadow-toast);z-index:50;max-width:90vw;}
   .toast.err{border-color:var(--danger);color:var(--danger);}
   [hidden]{display:none!important;}
 
@@ -207,7 +243,7 @@
   /* ---- Tabela larga (Dados Cadastrados) ---- */
   .widetablewrap{overflow:auto;max-height:70vh;border:1px solid var(--border);border-radius:12px;}
   .widetable{border-collapse:collapse;font-size:11.5px;white-space:nowrap;}
-  .widetable th,.widetable td{padding:7px 9px;border-bottom:1px solid #1e2023;border-right:1px solid #1e2023;}
+  .widetable th,.widetable td{padding:7px 9px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);}
   .widetable thead th{position:sticky;top:0;background:var(--surface);color:var(--text-dim);text-transform:uppercase;
     font-size:9.5px;letter-spacing:.3px;z-index:2;text-align:left;}
   .widetable th.wt-fixo,.widetable td.wt-fixo{position:sticky;left:0;background:var(--surface);z-index:1;font-family:var(--font-body);}
@@ -217,7 +253,7 @@
     text-transform:none;letter-spacing:0;font-size:10.5px;color:var(--text-dim);}
   .widetable td.wt-param{text-align:center;font-family:var(--font-body);}
   .widetable td.wt-param.ok{color:var(--ok);}
-  .widetable td.wt-param.bad{background:rgba(229,72,77,.14);color:var(--danger);font-weight:700;}
+  .widetable td.wt-param.bad{background:var(--danger-bg);color:var(--danger);font-weight:700;}
   .widetable tbody tr:hover td{background:var(--surface-2);}
 
   /* ---- Critérios (cadastro de tolerâncias por Máquina+Gramatura+Cor+Resina+Parâmetro) ---- */
@@ -226,7 +262,7 @@
     padding:5px 10px;font-size:11px;cursor:pointer;font-family:var(--font-body);}
   .crit-btn-mini:hover{border-color:var(--accent);}
   .crit-btn-mini.excluir:hover{border-color:var(--danger);color:var(--danger);}
-  .crit-btn-mini.excluir.confirmando{border-color:var(--danger);color:var(--danger);background:rgba(229,72,77,.12);}
+  .crit-btn-mini.excluir.confirmando{border-color:var(--danger);color:var(--danger);background:var(--danger-bg);}
   .crit-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
 
   /* ---- Listas de apoio (Máquinas/Gramaturas/Cores/Resinas cadastradas) ---- */
@@ -244,7 +280,7 @@
     border-radius:999px;padding:4px 4px 4px 10px;font-size:11.5px;}
   .lista-chip button{background:transparent;border:none;color:var(--text-dim);cursor:pointer;font-size:14px;line-height:1;
     padding:3px 6px;border-radius:50%;}
-  .lista-chip button:hover{color:var(--danger);background:rgba(229,72,77,.12);}
+  .lista-chip button:hover{color:var(--danger);background:var(--danger-bg);}
 
   /* ---- Formulário de critério em lote (todos os 41 parâmetros de uma vez, por combinação) ---- */
   .crit-backlink{display:flex;align-items:center;gap:6px;color:var(--text-dim);font-size:12.5px;cursor:pointer;margin-bottom:14px;}
@@ -268,9 +304,9 @@
       padding:8px 12px;font-size:16px;cursor:pointer;}
     #app{display:block;}
     .sidebar{position:fixed;top:0;left:0;height:100vh;z-index:40;transform:translateX(-100%);
-      transition:transform .2s ease;box-shadow:8px 0 24px rgba(0,0,0,.4);}
+      transition:transform .2s ease;box-shadow:8px 0 24px var(--shadow-drawer);}
     .sidebar.aberta{transform:translateX(0);}
-    .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:35;}
+    .sidebar-overlay{position:fixed;inset:0;background:var(--shadow-overlay);z-index:35;}
     .sidebar-overlay.ativa{display:block;}
     .main{padding:16px;}
     .listas-grid{grid-template-columns:1fr;}
@@ -308,6 +344,7 @@
       <button class="nav-item" data-page="dadosCadastrados" onclick="mudarPagina('dadosCadastrados')"><span class="ic">▤</span> Dados Cadastrados</button>
       <button class="nav-item" data-page="criterios" onclick="mudarPagina('criterios')"><span class="ic">☑</span> Critérios</button>
       <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><span class="ic">⇧</span> Carregar Dados</button>
+      <button class="nav-item" data-page="configuracoes" onclick="mudarPagina('configuracoes')"><span class="ic">⚙</span> Configurações</button>
       <div class="sidebar-footer">
         <div class="sidebar-user"><span id="statusText">conectando…</span><br><span id="userEmail"></span></div>
         <button onclick="logout()">Sair</button>
@@ -572,6 +609,28 @@
 
   </div><!-- /.wrap -->
   </div><!-- /#pageCarregarDados -->
+
+  <!-- ===== PÁGINA: CONFIGURAÇÕES ===== -->
+  <div id="pageConfiguracoes" hidden>
+  <h1 class="page-title">Configurações</h1>
+
+  <div class="card" style="max-width:560px;">
+    <div class="sectiontitle">Aparência</div>
+    <p class="note" style="margin-top:0;">Escolha entre o tema escuro (padrão) ou o tema claro. A escolha fica salva neste navegador — continua a mesma depois de atualizar a página ou sair e entrar de novo.</p>
+    <div class="tema-opcoes">
+      <button type="button" class="tema-opcao" data-tema="escuro" onclick="definirTema('escuro')">
+        <span class="tema-check">✓</span>
+        <span class="tema-swatch tema-swatch-escuro"></span>
+        <span class="tema-nome">Escuro</span>
+      </button>
+      <button type="button" class="tema-opcao" data-tema="claro" onclick="definirTema('claro')">
+        <span class="tema-check">✓</span>
+        <span class="tema-swatch tema-swatch-claro"></span>
+        <span class="tema-nome">Claro</span>
+      </button>
+    </div>
+  </div>
+  </div><!-- /#pageConfiguracoes -->
 
   </div><!-- /.main -->
 
@@ -1059,7 +1118,32 @@ var registrosCarregados = null; // array de objetos {data,hora,maquina,responsav
 var dashPX_PER_PONTO = 56; // espaçamento fixo entre horários consecutivos no eixo (não é proporcional ao tempo real decorrido)
 var dashSTART = null, dashEND = null, dashAXIS_W = 0, dashPONTO_INDEX = {};
 
-var PAGINAS_IDS = { dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', criterios:'pageCriterios', carregarDados:'pageCarregarDados' };
+var PAGINAS_IDS = { dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', criterios:'pageCriterios', carregarDados:'pageCarregarDados', configuracoes:'pageConfiguracoes' };
+
+// =============================================================================
+// Tema (Configurações) — claro/escuro, salvo em localStorage pra continuar o mesmo
+// depois de atualizar a página ou sair e entrar de novo (funciona por navegador/aparelho,
+// não é algo salvo na planilha).
+// =============================================================================
+function definirTema(tema){
+  if (tema === 'claro') document.documentElement.setAttribute('data-theme', 'claro');
+  else document.documentElement.removeAttribute('data-theme');
+  try { localStorage.setItem('processoTema', tema); } catch (e) {}
+  atualizarBotoesTema();
+  // o gráfico do Dashboard é desenhado em JS (SVG) e não se redesenha sozinho quando o
+  // CSS muda, então força um redesenho com a cor nova se já tinha dados carregados
+  // (mesmo estando numa página diferente do Dashboard no momento).
+  if (typeof aplicarFiltrosDashV3 === 'function' && registrosCarregados !== null) aplicarFiltrosDashV3();
+}
+function temaSalvo(){
+  try { return localStorage.getItem('processoTema') === 'claro' ? 'claro' : 'escuro'; } catch (e) { return 'escuro'; }
+}
+function atualizarBotoesTema(){
+  var atual = document.documentElement.getAttribute('data-theme') === 'claro' ? 'claro' : 'escuro';
+  document.querySelectorAll('.tema-opcao').forEach(function(btn){
+    btn.classList.toggle('ativo', btn.getAttribute('data-tema') === atual);
+  });
+}
 
 function mudarPagina(pagina){
   Object.keys(PAGINAS_IDS).forEach(function(key){
@@ -1070,6 +1154,7 @@ function mudarPagina(pagina){
   });
   if ((pagina === 'dashboard' || pagina === 'dadosCadastrados') && registrosCarregados === null) carregarRegistrosInjecao();
   if (pagina === 'criterios') renderCriterios();
+  if (pagina === 'configuracoes') atualizarBotoesTema();
   fecharMenuMobile();
 }
 
@@ -1476,6 +1561,18 @@ function renderDashboardV3(seriesPorParametro, parametrosParaMostrar){
   }
 }
 
+// Cores do gráfico do Dashboard (SVG), por tema. São desenhadas em JS (não dá pra usar
+// var(--cor) direto num atributo "fill"/"stroke" de SVG gerado assim), então ficam aqui,
+// espelhando os mesmos tons do CSS pra cada tema — ver corTema() e o data-theme em <html>.
+var TEMA_CORES_GRAFICO = {
+  escuro: { linha: '#3fb68b', limite: '#e5484d', fundoPonto: '#17181b', eixoTexto: '#8b8f96' },
+  claro:  { linha: '#1f7a3d', limite: '#b3261e', fundoPonto: '#ffffff', eixoTexto: '#5b6672' }
+};
+function corTema(){
+  var t = document.documentElement.getAttribute('data-theme');
+  return TEMA_CORES_GRAFICO[t === 'claro' ? 'claro' : 'escuro'];
+}
+
 function drawAxisV3(pontos){
   var svg = document.getElementById('axisSvg');
   svg.innerHTML = '';
@@ -1483,7 +1580,7 @@ function drawAxisV3(pontos){
   var svgns = 'http://www.w3.org/2000/svg';
   function el(tag,attrs){ var e=document.createElementNS(svgns,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
 
-  var lineY = 24, col = '#8b8f96', prevX = null;
+  var lineY = 24, col = corTema().eixoTexto, prevX = null;
   pontos.forEach(function(pt){
     var cx = xAtDashV3(pt);
     if (prevX !== null) svg.appendChild(el('line',{x1:prevX,y1:lineY,x2:cx,y2:lineY,stroke:col,'stroke-width':1.2}));
@@ -1530,10 +1627,11 @@ function drawMiniV3(svg, serie, lmin, lmax, nome){
   var svgns = 'http://www.w3.org/2000/svg';
   function el(tag,attrs){ var e=document.createElementNS(svgns,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
 
-  var corLinha = '#3fb68b';
+  var cores = corTema();
+  var corLinha = cores.linha;
 
-  if (lmax!=null) svg.appendChild(el('line',{x1:0,y1:y(lmax),x2:W,y2:y(lmax),stroke:'#e5484d','stroke-width':1.3,'stroke-dasharray':'4,3'}));
-  if (lmin!=null) svg.appendChild(el('line',{x1:0,y1:y(lmin),x2:W,y2:y(lmin),stroke:'#e5484d','stroke-width':1.3,'stroke-dasharray':'4,3'}));
+  if (lmax!=null) svg.appendChild(el('line',{x1:0,y1:y(lmax),x2:W,y2:y(lmax),stroke:cores.limite,'stroke-width':1.3,'stroke-dasharray':'4,3'}));
+  if (lmin!=null) svg.appendChild(el('line',{x1:0,y1:y(lmin),x2:W,y2:y(lmin),stroke:cores.limite,'stroke-width':1.3,'stroke-dasharray':'4,3'}));
 
   var pontos = serie.map(function(p){ return { x: xAtDashV3(p.t), y: y(p.v) }; });
   var d = pontos.map(function(pt,i){ return (i===0?'M':'L')+pt.x+' '+pt.y; }).join(' ');
@@ -1559,10 +1657,10 @@ function drawMiniV3(svg, serie, lmin, lmax, nome){
     // usa o limite do PRÓPRIO ponto (não o compartilhado da linha), já que o filtro
     // pode misturar combinações com tolerâncias diferentes.
     var fora = (p.lmin!=null && p.v<p.lmin) || (p.lmax!=null && p.v>p.lmax);
-    var corPonto = fora ? '#e5484d' : corLinha;
+    var corPonto = fora ? cores.limite : corLinha;
     var cx = xAtDashV3(p.t), cy = y(p.v);
     // bolinha com o valor escrito dentro (a pedido do Cleber, a partir de uma amostra aprovada).
-    svg.appendChild(el('circle',{cx:cx,cy:cy,r:16,fill:'#17181b',stroke:corPonto,'stroke-width':2}));
+    svg.appendChild(el('circle',{cx:cx,cy:cy,r:16,fill:cores.fundoPonto,stroke:corPonto,'stroke-width':2}));
     var valTxt = el('text',{x:cx,y:cy,fill:corPonto,'font-size':10,'font-weight':700,'text-anchor':'middle','dominant-baseline':'central','font-family':"'Inter',sans-serif"});
     valTxt.textContent = String(p.v).replace('.',',');
     svg.appendChild(valTxt);
@@ -2200,6 +2298,7 @@ function iniciarUI(){
     btnLer.disabled = false;
   });
   show('viewUpload'); setSteps('active','','');
+  atualizarBotoesTema();
 }
 
 iniciarUI();
