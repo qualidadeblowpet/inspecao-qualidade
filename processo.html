@@ -1807,6 +1807,48 @@ function escHtml(s){
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+// Excluir/atualizar uma linha de tabela do Excel pelo índice (PATCH ou DELETE direto em
+// .../rows/{índice}) não funciona nesta planilha — a API do Graph responde "ApiNotFound"
+// ("pode estar disponível numa versão mais nova do Excel"), porque esse arquivo foi gerado
+// por script (openpyxl), não pelo Excel de verdade, e falta um metadado interno que esse
+// endpoint mais novo exige. Contorno: em vez da API de linha de tabela, usamos a API de
+// Intervalo (Range) — mais antiga e sempre suportada, a mesma família já usada em outro
+// ponto do app pra formatar colunas. 1) descobre o endereço da linha na planilha (GET
+// .../rows/itemAt(index=N)/range, que é só leitura e continua funcionando normalmente);
+// 2) aplica a mudança nesse endereço via Range: PATCH pra atualizar valores, POST
+// .../delete com shift:"Up" pra excluir e subir as linhas de baixo.
+async function enderecoLinhaTabela(tabela, idx, token){
+  var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + tabela + '/rows/itemAt(index=' + idx + ')/range';
+  var resp = await fetch(url, { headers: { Authorization: 'Bearer ' + token } });
+  if (!resp.ok){
+    var json = await resp.json().catch(function(){ return {}; });
+    throw new Error(json.error ? json.error.message : ('não achei a linha ' + idx + ' de ' + tabela + ' (status ' + resp.status + ')'));
+  }
+  var dados = await resp.json();
+  var endereco = dados.address || '';
+  return endereco.indexOf('!') >= 0 ? endereco.split('!')[1] : endereco;
+}
+
+async function excluirLinhaTabela(worksheet, tabela, idx, token){
+  var local = await enderecoLinhaTabela(tabela, idx, token);
+  var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + worksheet + "/range(address='" + local + "')/delete";
+  var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ shift: 'Up' }) });
+  if (!resp.ok){
+    var json = await resp.json().catch(function(){ return {}; });
+    throw new Error(json.error ? json.error.message : ('status ' + resp.status));
+  }
+}
+
+async function atualizarLinhaTabela(worksheet, tabela, idx, valores, token){
+  var local = await enderecoLinhaTabela(tabela, idx, token);
+  var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + worksheet + "/range(address='" + local + "')";
+  var resp = await fetch(url, { method:'PATCH', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: [valores] }) });
+  if (!resp.ok){
+    var json = await resp.json().catch(function(){ return {}; });
+    throw new Error(json.error ? json.error.message : ('status ' + resp.status));
+  }
+}
+
 // ---- Listas de apoio (Máquinas/Gramaturas/Cores/Resinas) ----
 function renderListas(){
   Object.keys(LISTA_CHAVE_PARA_TIPO).forEach(function(chave){
@@ -1849,17 +1891,11 @@ async function adicionarItemLista(chave){
 async function removerItemLista(chave, idx){
   try {
     var token = await getToken();
-    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaListas/rows/' + idx;
-    var resp = await fetch(url, { method:'DELETE', headers:{ Authorization:'Bearer '+token } });
-    if (resp.ok){
-      await carregarListas(token);
-      mostrarToast('Removido.');
-    } else {
-      var json = await resp.json().catch(function(){ return {}; });
-      mostrarToast('Erro ao remover: ' + (json.error ? json.error.message : resp.status), true);
-    }
+    await excluirLinhaTabela('Listas_App', 'TabelaListas', idx, token);
+    await carregarListas(token);
+    mostrarToast('Removido.');
   } catch (err) {
-    mostrarToast('Falha de conexão: ' + err.message, true);
+    mostrarToast('Erro ao remover: ' + err.message, true);
   }
 }
 
@@ -2053,7 +2089,7 @@ async function salvarCriterioLote(){
     var token = await getToken();
     var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias/rows';
     for (var p = 0; p < toPatch.length; p++){
-      await fetch(base + '/' + toPatch[p].index, { method:'PATCH', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values:[toPatch[p].linha] }) });
+      await atualizarLinhaTabela('Tolerancias_App', 'TabelaTolerancias', toPatch[p].index, toPatch[p].linha, token);
     }
     for (var a = 0; a < toAdd.length; a++){
       await fetch(base + '/add', { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values:[toAdd[a]] }) });
@@ -2063,7 +2099,7 @@ async function salvarCriterioLote(){
     // que a exclusão anterior já invalidou.
     toDelete.sort(function(x,y){ return y - x; });
     for (var d = 0; d < toDelete.length; d++){
-      await fetch(base + '/' + toDelete[d], { method:'DELETE', headers:{ Authorization:'Bearer '+token } });
+      await excluirLinhaTabela('Tolerancias_App', 'TabelaTolerancias', toDelete[d], token);
     }
     await carregarTolerancias(token);
     fecharFormCriterio();
@@ -2099,9 +2135,8 @@ async function excluirGrupo(i){
   var indices = g.itens.map(function(t){ return t._index; }).sort(function(a,b){ return b - a; });
   try {
     var token = await getToken();
-    var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias/rows';
     for (var k = 0; k < indices.length; k++){
-      await fetch(base + '/' + indices[k], { method:'DELETE', headers:{ Authorization:'Bearer '+token } });
+      await excluirLinhaTabela('Tolerancias_App', 'TabelaTolerancias', indices[k], token);
     }
     await carregarTolerancias(token);
     mostrarToast('Critérios de ' + g.maquina + ' · ' + g.gramatura + ' · ' + g.cor + ' · ' + g.resina + ' removidos.');
