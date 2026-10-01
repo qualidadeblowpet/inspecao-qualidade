@@ -1616,6 +1616,8 @@ async function carregarCavidadesDaPlanilha() {
   } catch (err) {
     console.error('Erro ao carregar cadastro de cavidades da planilha:', err);
     cavidadesCache = [];
+    renderCavidadesConfig();
+    mostrarToast('Não consegui carregar o cadastro de Cavidades por Gramatura (Configurações). Tente atualizar a página — se continuar faltando, avise o TI.', true);
   }
 }
 
