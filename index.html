@@ -634,7 +634,7 @@
       <div class="card card-ocorrencias">
         <h3>Últimas ocorrências — Injeção</h3>
         <div class="table-toolbar">
-          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 140px;"><label>Buscar</label><input type="text" id="tBuscaInjecao" placeholder="Defeito, máquina…" oninput="renderTabelaInjecao()" style="min-width:140px; width:100%;"></div>
+          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 140px;"><label>Buscar</label><input type="text" id="tBuscaInjecao" placeholder="Ex: GL, Verde" title="Separe vários termos por vírgula para combinar filtros (ex: GL, Verde)" oninput="renderTabelaInjecao()" style="min-width:140px; width:100%;"></div>
           <div class="toolbar-field"><label>Data inicial</label><input type="date" id="tDataDeInjecao" onchange="renderTabelaInjecao()"></div>
           <div class="toolbar-field"><label>Data final</label><input type="date" id="tDataAteInjecao" onchange="renderTabelaInjecao()"></div>
           <div class="toolbar-field toolbar-field-hora"><label>Horário inicial</label><input type="time" id="tHoraDeInjecao" onchange="renderTabelaInjecao()"></div>
@@ -709,7 +709,7 @@
       <div class="card card-ocorrencias">
         <h3>Últimas ocorrências — Sopro</h3>
         <div class="table-toolbar">
-          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 140px;"><label>Buscar</label><input type="text" id="tBuscaSopro" placeholder="Defeito, máquina…" oninput="renderTabelaSopro()" style="min-width:140px; width:100%;"></div>
+          <div class="toolbar-field toolbar-field-busca" style="flex:1 1 140px;"><label>Buscar</label><input type="text" id="tBuscaSopro" placeholder="Ex: GL, Verde" title="Separe vários termos por vírgula para combinar filtros (ex: GL, Verde)" oninput="renderTabelaSopro()" style="min-width:140px; width:100%;"></div>
           <div class="toolbar-field"><label>Data inicial</label><input type="date" id="tDataDeSopro" onchange="renderTabelaSopro()"></div>
           <div class="toolbar-field"><label>Data final</label><input type="date" id="tDataAteSopro" onchange="renderTabelaSopro()"></div>
           <div class="toolbar-field toolbar-field-hora"><label>Horário inicial</label><input type="time" id="tHoraDeSopro" onchange="renderTabelaSopro()"></div>
@@ -3245,10 +3245,16 @@ function formatarPesoAlturaTexto(l) {
 }
 
 function filtrarBuscaEData(linhas, buscaId, dataDeId, dataAteId, camposBusca, limite, horaDeId, horaAteId, cadastrosId) {
-  const busca = (document.getElementById(buscaId).value || '').toLowerCase().trim();
-  if (busca) {
+  // Busca com múltiplos termos separados por vírgula: cada termo precisa aparecer em algum campo
+  // (OR entre campos), mas TODOS os termos precisam bater, podendo ser em campos diferentes da
+  // mesma linha (AND entre termos) — ex.: "GL, Verde" filtra equipamento=GL E cor=Verde juntos.
+  const buscaRaw = (document.getElementById(buscaId).value || '').toLowerCase().trim();
+  const termosBusca = buscaRaw ? buscaRaw.split(',').map(function(t){ return t.trim(); }).filter(Boolean) : [];
+  if (termosBusca.length) {
     linhas = linhas.filter(function(l) {
-      return camposBusca.some(function(campo){ return (l[campo]||'').toString().toLowerCase().indexOf(busca) > -1; });
+      return termosBusca.every(function(termo) {
+        return camposBusca.some(function(campo){ return (l[campo]||'').toString().toLowerCase().indexOf(termo) > -1; });
+      });
     });
   }
   const dataDe = document.getElementById(dataDeId).value;
@@ -3290,7 +3296,7 @@ function renderTabelaSopro() {
     let linhas = linhasFiltradasPorProcesso('sopro');
     const limiteValorSopro = document.getElementById('tLimiteSopro').value;
     const limite = limiteValorSopro === 'todos' ? Infinity : parseInt(limiteValorSopro, 10);
-    linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], limite, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
+    linhas = filtrarBuscaEData(linhas, 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco','cor'], limite, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
 
     const corpo = document.getElementById('tabelaSoproBody');
     const vazio = document.getElementById('tabelaSoproVazia');
@@ -3325,7 +3331,7 @@ function renderTabelaInjecao() {
   let linhas = linhasFiltradasPorProcesso('injecao');
   const limiteValorInjecao = document.getElementById('tLimiteInjecao').value;
   const limite = limiteValorInjecao === 'todos' ? Infinity : parseInt(limiteValorInjecao, 10);
-  linhas = filtrarBuscaEData(linhas, 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], limite, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
+  linhas = filtrarBuscaEData(linhas, 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal','cor','resina'], limite, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
 
   const corpo = document.getElementById('tabelaInjecaoBody');
   const vazio = document.getElementById('tabelaInjecaoVazia');
@@ -3454,9 +3460,9 @@ function montarTextoWhatsApp(processo, linhas) {
 function gerarWhatsApp(processo) {
   let linhas;
   if (processo === 'sopro') {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco','cor'], 500, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
   } else {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal','cor','resina'], 500, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
   }
 
   if (linhas.length === 0) { mostrarToast('Nenhuma ocorrência para gerar o texto.', true); return; }
@@ -3500,14 +3506,14 @@ async function gerarPDF(processo) {
 
   let linhas, colunas, corpo;
   if (processo === 'sopro') {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco'], 500, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('sopro'), 'tBuscaSopro', 'tDataDeSopro', 'tDataAteSopro', ['defeito','equipamento','responsavel','observacao','tipo_frasco','cor'], 500, 'tHoraDeSopro', 'tHoraAteSopro', 'tCadastrosSopro');
     colunas = ['Data','Hora','Equipamento','Responsável','Operador','Frasco','Volume','Preforma','Caixa Vermelha','Lote Caixa','Nº Caixa','Defeito Encontrado','Criticidade','Peso/Altura'];
     corpo = linhas.map(function(l) {
       return [formatarDataBR(l.data), l.hora_fim||'—', l.equipamento||'—', l.responsavel||'—', l.operador||'—', l.tipo_frasco||'—',
         l.ml||'—', l.gramatura_preforma||'—', porExtenso(l.caixa_vermelha), l.lote_caixa||'—', l.numero_caixa||'—', l.defeito||'—', l.criticidade||'—', formatarPesoAlturaTexto(l)];
     });
   } else {
-    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal'], 500, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
+    linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal','cor','resina'], 500, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
     colunas = ['Data','Hora','Equipamento','Resp.','Operador','Cor','Gramatura','Resina','Temperatura Gate Mín.','Temperatura Gate Máx.','Temperatura Corpo Mín.','Temperatura Corpo Máx.','Organização Linha','Tonalidade','Alinhamento Etiqueta','Defeito','Cavidade','Criticidade','Operador Ciente'];
     corpo = linhas.map(function(l) {
       return [formatarDataBR(l.data), l.hora_fim||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
