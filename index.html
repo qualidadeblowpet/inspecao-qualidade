@@ -499,7 +499,23 @@
   .perfil-fill { height: 100%; background: var(--blue); border-radius: 3px; }
   .perfil-val { width: 86px; flex-shrink: 0; font-size: 10.5px; color: var(--text-dim); text-align: right; }
   .perfil-val b { color: var(--text); font-size: 11.5px; }
-  .axis-caption { font-size: 10px; color: var(--text-mute); margin-top: 8px; padding-left: 104px; }
+  .axis-caption { font-size: 10px; color: var(--text-dim); margin-top: 8px; padding-left: 104px; }
+
+  /* ---------- Grupo de período (data + horário, de/até) na barra de filtros ---------- */
+  .periodo-group { display: flex; align-items: flex-end; gap: 8px; padding-right: 14px; border-right: 1px solid var(--border); }
+  .periodo-sub { display: flex; flex-direction: column; gap: 4px; }
+  .periodo-sub label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
+  .periodo-inputs { display: flex; gap: 5px; }
+  .periodo-inputs input[type=date], .periodo-inputs input[type=time] {
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    padding: 7px 10px; border-radius: 7px; font-size: 12px; font-family: var(--font-body);
+    box-sizing: border-box; height: 33px;
+  }
+  .periodo-inputs input[type=date] { min-width: 122px; }
+  .periodo-inputs input[type=time] { min-width: 78px; }
+  @media (max-width: 900px) {
+    .periodo-group { border-right: none; padding-right: 0; flex-wrap: wrap; width: 100%; }
+  }
 
   /* ---------- Donut ---------- */
   .donut-wrap { display: flex; align-items: center; gap: 18px; justify-content: center; flex-wrap: wrap; }
@@ -882,6 +898,22 @@
       <div class="page-sub">Cruzamentos, tendências e mapa de cavidades — defeito × criticidade × cavidade × gramatura × cor × resina, a partir dos dados reais cadastrados.</div>
 
       <div class="filter-bar">
+        <div class="periodo-group">
+          <div class="periodo-sub">
+            <label>Período — de</label>
+            <div class="periodo-inputs">
+              <input type="date" id="aeDataInicio" onchange="aeAtualizar()">
+              <input type="time" id="aeHoraInicio" onchange="aeAtualizar()">
+            </div>
+          </div>
+          <div class="periodo-sub">
+            <label>até</label>
+            <div class="periodo-inputs">
+              <input type="date" id="aeDataFim" onchange="aeAtualizar()">
+              <input type="time" id="aeHoraFim" onchange="aeAtualizar()">
+            </div>
+          </div>
+        </div>
         <div class="filter-group">
           <label>Processo</label>
           <select id="aeProcesso" onchange="aeAtualizar()">
@@ -891,42 +923,12 @@
           </select>
         </div>
         <div class="filter-group">
-          <label>Período</label>
-          <select id="aePeriodo" onchange="aeOnPeriodoChange()">
-            <option value="personalizado">Personalizado</option>
-            <option value="0.25">Últimas 6 horas</option>
-            <option value="0.5">Últimas 12 horas</option>
-            <option value="1">Último 1 dia</option>
-            <option value="2">Últimos 2 dias</option>
-            <option value="7" selected>Últimos 7 dias</option>
-            <option value="30">Últimos 30 dias</option>
-            <option value="90">Últimos 90 dias</option>
-            <option value="0">Todo o período</option>
-          </select>
-        </div>
-        <div class="filter-group ae-filtro-personalizado hidden">
-          <label>Data início</label>
-          <input type="date" id="aePersonalizadoDataInicio" onchange="aeAtualizar()">
-        </div>
-        <div class="filter-group ae-filtro-personalizado hidden">
-          <label>Data fim</label>
-          <input type="date" id="aePersonalizadoDataFim" onchange="aeAtualizar()">
-        </div>
-        <div class="filter-group ae-filtro-personalizado hidden">
-          <label>Hora início</label>
-          <input type="time" id="aePersonalizadoHoraInicio" onchange="aeAtualizar()">
-        </div>
-        <div class="filter-group ae-filtro-personalizado hidden">
-          <label>Hora fim</label>
-          <input type="time" id="aePersonalizadoHoraFim" onchange="aeAtualizar()">
+          <label>Máquina</label>
+          <select id="aeEquipamento" onchange="aeAtualizar()"><option value="">Todas</option></select>
         </div>
         <div class="filter-group">
-          <label>Equipamento</label>
-          <select id="aeEquipamento" onchange="aeAtualizar()"><option value="">Todos</option></select>
-        </div>
-        <div class="filter-group">
-          <label>Responsável</label>
-          <select id="aeResponsavel" onchange="aeAtualizar()"><option value="">Todos</option></select>
+          <label>Defeito</label>
+          <select id="aeFiltroDefeito" onchange="aeAtualizar()"><option value="">Todos</option></select>
         </div>
         <div class="filter-group">
           <label>Criticidade</label>
@@ -936,6 +938,18 @@
             <option value="MÉDIO">Médio</option>
             <option value="GRAVE">Grave</option>
           </select>
+        </div>
+        <div class="filter-group">
+          <label>Gramatura</label>
+          <select id="aeGramatura" onchange="aeAtualizar()"><option value="">Todas</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Cor</label>
+          <select id="aeCor" onchange="aeAtualizar()"><option value="">Todas</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Resina</label>
+          <select id="aeResina" onchange="aeAtualizar()"><option value="">Todas</option></select>
         </div>
         <button class="filter-clear" onclick="aeLimparFiltros()">Limpar filtros</button>
         <button class="btn btn-outline" onclick="carregarDados(true)" style="align-self:flex-end;">↻ Atualizar</button>
@@ -4146,29 +4160,26 @@ function aeLinhasBase() {
 }
 function aeAplicarFiltrosComuns(linhas) {
   linhas = linhas.filter(function(l){ return l.defeito; });
-  const periodoVal = document.getElementById('aePeriodo').value;
-  if (periodoVal === 'personalizado') {
-    const dataIni = document.getElementById('aePersonalizadoDataInicio').value;
-    const dataFim = document.getElementById('aePersonalizadoDataFim').value;
-    const horaIni = document.getElementById('aePersonalizadoHoraInicio').value;
-    const horaFim = document.getElementById('aePersonalizadoHoraFim').value;
-    if (dataIni) linhas = linhas.filter(function(l){ return !l.data || l.data >= dataIni; });
-    if (dataFim) linhas = linhas.filter(function(l){ return !l.data || l.data <= dataFim; });
-    if (horaIni) linhas = linhas.filter(function(l){ return !l.hora_fim || l.hora_fim >= horaIni; });
-    if (horaFim) linhas = linhas.filter(function(l){ return !l.hora_fim || l.hora_fim <= horaFim; });
-  } else {
-    const horas = (parseFloat(periodoVal) || 0) * 24;
-    if (horas) {
-      const limite = new Date(); limite.setTime(limite.getTime() - horas * 60 * 60 * 1000);
-      linhas = linhas.filter(function(l){ return !l.data || new Date(l.data + 'T' + (l.hora_fim || '00:00')) >= limite; });
-    }
-  }
+  const dataIni = document.getElementById('aeDataInicio').value;
+  const dataFim = document.getElementById('aeDataFim').value;
+  const horaIni = document.getElementById('aeHoraInicio').value;
+  const horaFim = document.getElementById('aeHoraFim').value;
+  if (dataIni) linhas = linhas.filter(function(l){ return !l.data || l.data >= dataIni; });
+  if (dataFim) linhas = linhas.filter(function(l){ return !l.data || l.data <= dataFim; });
+  if (horaIni) linhas = linhas.filter(function(l){ return !l.hora_fim || l.hora_fim >= horaIni; });
+  if (horaFim) linhas = linhas.filter(function(l){ return !l.hora_fim || l.hora_fim <= horaFim; });
   const equip = document.getElementById('aeEquipamento').value;
   if (equip) linhas = linhas.filter(function(l){ return l.equipamento === equip; });
-  const resp = document.getElementById('aeResponsavel').value;
-  if (resp) linhas = linhas.filter(function(l){ return l.responsavel === resp; });
+  const defeito = document.getElementById('aeFiltroDefeito').value;
+  if (defeito) linhas = linhas.filter(function(l){ return l.defeito === defeito; });
   const crit = document.getElementById('aeCriticidade').value;
   if (crit) linhas = linhas.filter(function(l){ return (l.criticidade||'').toUpperCase() === crit; });
+  const gram = document.getElementById('aeGramatura').value;
+  if (gram) linhas = linhas.filter(function(l){ return (l.gramatura||'').toString().trim() === gram; });
+  const cor = document.getElementById('aeCor').value;
+  if (cor) linhas = linhas.filter(function(l){ return l.cor === cor; });
+  const resina = document.getElementById('aeResina').value;
+  if (resina) linhas = linhas.filter(function(l){ return l.resina === resina; });
   return linhas;
 }
 function aeLinhasFiltradas() { return aeAplicarFiltrosComuns(aeLinhasBase()); }
@@ -4176,20 +4187,13 @@ function aeLinhasInjecaoFiltradas() { return aeAplicarFiltrosComuns(dadosCache.i
 
 function aeISODate(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
 function aeIntervaloPeriodo(linhasBase) {
-  const periodoVal = document.getElementById('aePeriodo').value;
   const hoje = new Date();
-  if (periodoVal === 'personalizado') {
-    const dataIni = document.getElementById('aePersonalizadoDataInicio').value;
-    const dataFim = document.getElementById('aePersonalizadoDataFim').value;
-    if (dataIni && dataFim) return { ini: dataIni, fim: dataFim };
-  } else {
-    const horas = (parseFloat(periodoVal) || 0) * 24;
-    if (horas) {
-      const ini = new Date(hoje.getTime() - horas * 60 * 60 * 1000);
-      return { ini: aeISODate(ini), fim: aeISODate(hoje) };
-    }
-  }
+  const dataIni = document.getElementById('aeDataInicio').value;
+  const dataFim = document.getElementById('aeDataFim').value;
+  if (dataIni && dataFim) return { ini: dataIni, fim: dataFim };
   const datas = linhasBase.map(function(l){ return l.data; }).filter(Boolean).sort();
+  if (dataIni) return { ini: dataIni, fim: datas.length ? datas[datas.length - 1] : aeISODate(hoje) };
+  if (dataFim) return { ini: datas.length ? datas[0] : aeISODate(hoje), fim: dataFim };
   if (!datas.length) return { ini: aeISODate(hoje), fim: aeISODate(hoje) };
   return { ini: datas[0], fim: datas[datas.length - 1] };
 }
@@ -4680,26 +4684,30 @@ function aePopularFiltrosEquipResp() {
   if (selEquip.options.length > 1) return;
   const todos = dadosCache.injecao.concat(dadosCache.sopro);
   const equipamentos = Array.from(new Set(todos.map(function(l){ return l.equipamento; }).filter(Boolean))).sort();
-  const responsaveis = Array.from(new Set(todos.map(function(l){ return l.responsavel; }).filter(Boolean))).sort();
+  const defeitos = Array.from(new Set(todos.map(function(l){ return l.defeito; }).filter(Boolean))).sort();
+  const cores = Array.from(new Set(todos.map(function(l){ return l.cor; }).filter(Boolean))).sort();
+  const resinas = Array.from(new Set(todos.map(function(l){ return l.resina; }).filter(Boolean))).sort();
+  const gramaturas = Array.from(new Set(todos.map(function(l){ return (l.gramatura || '').toString().trim(); }).filter(Boolean)))
+    .sort(function(a, b){ return parseFloat(a.replace(',', '.')) - parseFloat(b.replace(',', '.')); });
   preencherSelect('aeEquipamento', equipamentos, true);
-  preencherSelect('aeResponsavel', responsaveis, true);
-}
-function aeOnPeriodoChange() {
-  const personalizado = document.getElementById('aePeriodo').value === 'personalizado';
-  document.querySelectorAll('.ae-filtro-personalizado').forEach(function(el){ el.classList.toggle('hidden', !personalizado); });
-  aeAtualizar();
+  preencherSelect('aeFiltroDefeito', defeitos, true);
+  preencherSelect('aeCor', cores, true);
+  preencherSelect('aeResina', resinas, true);
+  const selGram = document.getElementById('aeGramatura');
+  selGram.innerHTML = '<option value="">Todas</option>' + gramaturas.map(function(g){ return '<option value="' + g + '">' + formatarGramaturaWpp(g) + '</option>'; }).join('');
 }
 function aeLimparFiltros() {
   document.getElementById('aeProcesso').value = 'todos';
-  document.getElementById('aePeriodo').value = '7';
-  document.getElementById('aePersonalizadoDataInicio').value = '';
-  document.getElementById('aePersonalizadoDataFim').value = '';
-  document.getElementById('aePersonalizadoHoraInicio').value = '';
-  document.getElementById('aePersonalizadoHoraFim').value = '';
+  document.getElementById('aeDataInicio').value = '';
+  document.getElementById('aeDataFim').value = '';
+  document.getElementById('aeHoraInicio').value = '';
+  document.getElementById('aeHoraFim').value = '';
   document.getElementById('aeEquipamento').value = '';
-  document.getElementById('aeResponsavel').value = '';
+  document.getElementById('aeFiltroDefeito').value = '';
   document.getElementById('aeCriticidade').value = '';
-  document.querySelectorAll('.ae-filtro-personalizado').forEach(function(el){ el.classList.add('hidden'); });
+  document.getElementById('aeGramatura').value = '';
+  document.getElementById('aeCor').value = '';
+  document.getElementById('aeResina').value = '';
   aeAtualizar();
 }
 function aeAtualizar() {
