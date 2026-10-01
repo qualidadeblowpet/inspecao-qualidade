@@ -451,6 +451,118 @@
     }
     .table-toolbar button { flex: 1 1 100%; margin-left: 0 !important; }
   }
+
+  /* ======================================================================
+     Análise Estatística — classes novas desta página. Reaproveita .card,
+     .card h3, .kpi, .kpi-row, .filter-bar, .filter-group, .filter-clear e
+     .hidden já existentes no resto do app (não redefinidos aqui).
+     ====================================================================== */
+  .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+  .card .card-sub { font-size: 11.5px; color: var(--text-dim); margin: 4px 0 0; max-width: 620px; line-height: 1.4; }
+  .card-badge { font-size: 10.5px; color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; white-space: nowrap; }
+
+  .ae-row-2 { display: grid; grid-template-columns: 1.6fr 1fr; gap: 18px; align-items: start; }
+  .ae-row-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .kpi .num-row { display: flex; align-items: baseline; gap: 8px; }
+  .kpi .num.danger { color: var(--danger); }
+  .kpi .sub { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+  /* ---------- Eixos / grid comuns aos gráficos SVG da página ---------- */
+  .axis-line { stroke: var(--border); stroke-width: 1; }
+  .grid-line { stroke: var(--border); stroke-width: 1; opacity: 0.55; }
+  .axis-label { font-size: 9.5px; fill: var(--text-dim); }
+  .axis-label-x { font-size: 9.5px; fill: var(--text-dim); }
+
+  .legend-row { display: flex; gap: 16px; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-dim); }
+  .legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .legend-line { width: 14px; height: 0; border-top: 2px dashed var(--text-dim); flex-shrink: 0; }
+
+  /* ---------- Barra empilhada (comparativo por máquina) ---------- */
+  .bar-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; }
+  .bar-row .bar-label { width: 190px; flex-shrink: 0; font-size: 12.5px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-track { flex: 1; display: flex; height: 16px; border-radius: 4px; overflow: hidden; background: var(--surface-2); gap: 2px; }
+  .bar-seg { height: 100%; }
+  .bar-seg.leve { background: var(--ok); }
+  .bar-seg.medio { background: var(--warn); }
+  .bar-seg.grave { background: var(--danger); }
+  .bar-total { width: 86px; flex-shrink: 0; font-size: 11px; color: var(--text-dim); text-align: right; }
+  .bar-total b { color: var(--text); font-size: 12px; }
+
+  /* ---------- Perfil do produto ---------- */
+  .perfil-card h4 { font-size: 12.5px; font-weight: 700; margin: 0 0 2px; text-transform: uppercase; letter-spacing: 0.3px; color: var(--text); }
+  .perfil-card .perfil-sub { font-size: 11px; color: var(--text-dim); margin: 0 0 12px; line-height: 1.4; }
+  .perfil-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; }
+  .perfil-row .perfil-label { width: 96px; flex-shrink: 0; font-size: 11.5px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .perfil-track { flex: 1; height: 10px; border-radius: 3px; background: var(--surface-2); overflow: hidden; }
+  .perfil-fill { height: 100%; background: var(--blue); border-radius: 3px; }
+  .perfil-val { width: 86px; flex-shrink: 0; font-size: 10.5px; color: var(--text-dim); text-align: right; }
+  .perfil-val b { color: var(--text); font-size: 11.5px; }
+  .axis-caption { font-size: 10px; color: var(--text-mute); margin-top: 8px; padding-left: 104px; }
+
+  /* ---------- Donut ---------- */
+  .donut-wrap { display: flex; align-items: center; gap: 18px; justify-content: center; flex-wrap: wrap; }
+  .donut-legend { display: flex; flex-direction: column; gap: 10px; }
+  .donut-legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .donut-legend-item .sw { width: 11px; height: 11px; border-radius: 3px; flex-shrink: 0; }
+  .donut-legend-item b { font-size: 13px; color: var(--text); }
+  .donut-legend-item .pct { color: var(--text-dim); font-size: 11px; }
+  .donut-center-num { font-family: var(--font-display); font-size: 24px; font-weight: 700; fill: var(--text); }
+  .donut-center-label { font-size: 9px; fill: var(--text-dim); }
+
+  /* ---------- Hit areas (hover nativo via <title>) ---------- */
+  .hit { fill: transparent; }
+  .hit:hover { fill: rgba(255,255,255,0.045); }
+  .bar-hit:hover { filter: brightness(1.12); }
+
+  /* ---------- Mapa de cavidades ---------- */
+  .mold-controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .mold-controls select {
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    padding: 7px 10px; border-radius: 7px; font-size: 12px; font-family: var(--font-body);
+  }
+  .mold-body { display: grid; grid-template-columns: auto 1fr 210px; gap: 22px; margin-top: 10px; align-items: start; }
+  .mold-svg-wrap { position: relative; display: inline-flex; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.45)); }
+  .mold-svg-wrap canvas { display: block; border-radius: 10px; }
+  .mold-tooltip {
+    position: absolute; pointer-events: none; opacity: 0; transition: opacity 0.08s;
+    background: #0c0d0f; border: 1px solid var(--border); border-radius: 7px; padding: 6px 9px;
+    font-size: 11.5px; color: var(--text); white-space: nowrap; box-shadow: 0 4px 14px rgba(0,0,0,0.5); z-index: 5;
+  }
+  .mold-tooltip b { color: var(--accent); }
+  .mold-caption { font-size: 11px; color: var(--text-dim); margin-top: 10px; max-width: 320px; }
+  .mold-crit-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent); font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: 999px; }
+
+  .heat-legend-title { font-size: 10.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .heat-scale-bar { height: 12px; border-radius: 4px; margin-bottom: 4px; }
+  .heat-scale-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-dim); margin-bottom: 14px; }
+  .heat-iso-note { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--text-dim); margin-bottom: 16px; }
+  .heat-iso-note .heat-swatch { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+
+  .top-cav-list { display: flex; flex-direction: column; gap: 7px; margin-top: 6px; }
+  .top-cav-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; }
+  .top-cav-item.destaque { border-color: var(--danger); background: rgba(229,72,77,0.12); }
+  .top-cav-item .cav-nome { font-size: 12px; font-weight: 700; color: var(--text); }
+  .top-cav-item .cav-qtd { font-size: 12px; color: var(--text-dim); }
+  .top-cav-item.destaque .cav-qtd { color: var(--danger); font-weight: 700; }
+
+  .insight-box { display: flex; gap: 10px; align-items: flex-start; background: var(--accent-dim); border: 1px solid var(--accent); border-radius: 10px; padding: 12px 14px; margin-top: 16px; font-size: 12.5px; color: var(--text); line-height: 1.5; }
+  .insight-box .ic { font-size: 16px; flex-shrink: 0; }
+  .insight-box b { color: var(--accent); }
+
+  .ae-vazio { font-size: 12.5px; color: var(--text-dim); padding: 20px 4px; text-align: center; }
+
+  @media (max-width: 1150px) {
+    .ae-row-2 { grid-template-columns: 1fr; }
+    .ae-row-3 { grid-template-columns: 1fr; }
+    .mold-body { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 900px) {
+    .card-head { flex-direction: column; align-items: stretch; }
+    .mold-controls { width: 100%; }
+    .mold-controls select { flex: 1 1 auto; }
+  }
 </style>
 </head>
 <body>
@@ -501,6 +613,9 @@
     <div class="nav-section-label">Ocorrências</div>
     <button class="nav-item" data-page="ocorrenciaInjecao" onclick="setPage('ocorrenciaInjecao')"><span class="ic">▤</span> Ocorrência - Injeção</button>
     <button class="nav-item" data-page="ocorrenciaSopro" onclick="setPage('ocorrenciaSopro')"><span class="ic">▤</span> Ocorrência - Sopro</button>
+
+    <div class="nav-section-label">Análise</div>
+    <button class="nav-item" data-page="analiseEstatistica" onclick="setPage('analiseEstatistica')"><span class="ic">📈</span> Análise Estatística</button>
 
     <div class="nav-section-label">Sistema</div>
     <button class="nav-item" data-page="config" onclick="setPage('config')"><span class="ic">⚙</span> Configurações</button>
@@ -761,6 +876,178 @@
       </div>
     </div>
 
+    <!-- ===================== ANÁLISE ESTATÍSTICA ===================== -->
+    <div id="pageAnaliseEstatistica" class="hidden">
+      <div class="page-title">Análise Estatística</div>
+      <div class="page-sub">Cruzamentos, tendências e mapa de cavidades — defeito × criticidade × cavidade × gramatura × cor × resina, a partir dos dados reais cadastrados.</div>
+
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label>Processo</label>
+          <select id="aeProcesso" onchange="aeAtualizar()">
+            <option value="todos">Todos</option>
+            <option value="injecao">Injeção</option>
+            <option value="sopro">Sopro</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Período</label>
+          <select id="aePeriodo" onchange="aeOnPeriodoChange()">
+            <option value="personalizado">Personalizado</option>
+            <option value="0.25">Últimas 6 horas</option>
+            <option value="0.5">Últimas 12 horas</option>
+            <option value="1">Último 1 dia</option>
+            <option value="2">Últimos 2 dias</option>
+            <option value="7" selected>Últimos 7 dias</option>
+            <option value="30">Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="0">Todo o período</option>
+          </select>
+        </div>
+        <div class="filter-group ae-filtro-personalizado hidden">
+          <label>Data início</label>
+          <input type="date" id="aePersonalizadoDataInicio" onchange="aeAtualizar()">
+        </div>
+        <div class="filter-group ae-filtro-personalizado hidden">
+          <label>Data fim</label>
+          <input type="date" id="aePersonalizadoDataFim" onchange="aeAtualizar()">
+        </div>
+        <div class="filter-group ae-filtro-personalizado hidden">
+          <label>Hora início</label>
+          <input type="time" id="aePersonalizadoHoraInicio" onchange="aeAtualizar()">
+        </div>
+        <div class="filter-group ae-filtro-personalizado hidden">
+          <label>Hora fim</label>
+          <input type="time" id="aePersonalizadoHoraFim" onchange="aeAtualizar()">
+        </div>
+        <div class="filter-group">
+          <label>Equipamento</label>
+          <select id="aeEquipamento" onchange="aeAtualizar()"><option value="">Todos</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Responsável</label>
+          <select id="aeResponsavel" onchange="aeAtualizar()"><option value="">Todos</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Criticidade</label>
+          <select id="aeCriticidade" onchange="aeAtualizar()">
+            <option value="">Todas</option>
+            <option value="LEVE">Leve</option>
+            <option value="MÉDIO">Médio</option>
+            <option value="GRAVE">Grave</option>
+          </select>
+        </div>
+        <button class="filter-clear" onclick="aeLimparFiltros()">Limpar filtros</button>
+        <button class="btn btn-outline" onclick="carregarDados(true)" style="align-self:flex-end;">↻ Atualizar</button>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi"><div class="label">Desvios no período</div><div class="num" id="aeKpiTotal">–</div></div>
+        <div class="kpi"><div class="label">Desvios graves</div><div class="num danger" id="aeKpiGraves">–</div><div class="sub" id="aeKpiGravesSub"></div></div>
+        <div class="kpi"><div class="label">Defeito mais frequente</div><div class="num small" id="aeKpiDefeito">–</div><div class="sub" id="aeKpiDefeitoSub"></div></div>
+        <div class="kpi"><div class="label">Máquina mais crítica</div><div class="num small" id="aeKpiMaquina">–</div><div class="sub" id="aeKpiMaquinaSub"></div></div>
+      </div>
+
+      <!-- ================= Tendência ================= -->
+      <div class="card">
+        <div class="card-head">
+          <div><h3>Tendência de desvios no período</h3><p class="card-sub">Volume diário em colunas, empilhado por criticidade (verde = leve, laranja = médio, vermelho = grave) — o intervalo exibido acompanha o período selecionado no filtro acima.</p></div>
+          <span class="card-badge" id="aeTrendBadge"></span>
+        </div>
+        <div id="aeTrendChart"></div>
+        <div class="legend-row">
+          <div class="legend-item"><span class="legend-swatch" style="background:var(--ok);"></span>Leve</div>
+          <div class="legend-item"><span class="legend-swatch" style="background:var(--warn);"></span>Médio</div>
+          <div class="legend-item"><span class="legend-swatch" style="background:var(--danger);"></span>Grave</div>
+        </div>
+      </div>
+
+      <!-- ================= Pareto + Donut ================= -->
+      <div class="ae-row-2">
+        <div class="card">
+          <div class="card-head">
+            <div><h3>Diagrama de Pareto — defeitos</h3><p class="card-sub">Barras mostram o % que cada defeito representa do total; a linha mostra o % acumulado. A linha tracejada em 80% ajuda a ver quantos defeitos concentram a maior parte dos desvios.</p></div>
+          </div>
+          <div id="aeParetoChart"></div>
+          <div class="legend-row">
+            <div class="legend-item"><span class="legend-swatch" style="background:var(--blue);"></span>% do total (individual)</div>
+            <div class="legend-item"><span class="legend-line"></span>% acumulado</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div><h3>Desvios por criticidade</h3><p class="card-sub">Proporção geral no período filtrado</p></div></div>
+          <div id="aeDonutChart"></div>
+        </div>
+      </div>
+
+      <!-- ================= Máquinas ================= -->
+      <div class="card">
+        <div class="card-head">
+          <div><h3>Comparativo por máquina</h3><p class="card-sub">Mesmo cruzamento do Pareto, agora por equipamento — ajuda a decidir onde focar manutenção/ajuste de processo primeiro.</p></div>
+        </div>
+        <div id="aeMaquinaChart"></div>
+        <div class="legend-row">
+          <div class="legend-item"><span class="legend-swatch" style="background:var(--ok);"></span>Leve</div>
+          <div class="legend-item"><span class="legend-swatch" style="background:var(--warn);"></span>Médio</div>
+          <div class="legend-item"><span class="legend-swatch" style="background:var(--danger);"></span>Grave</div>
+        </div>
+      </div>
+
+      <!-- ================= Perfil do produto ================= -->
+      <div class="card">
+        <div class="card-head">
+          <div><h3>Desvios por característica do produto</h3><p class="card-sub">Cruza os desvios com o que estava sendo produzido — ajuda a enxergar se algum lote específico (gramatura, cor ou resina) concentra mais desvios que os demais. Resina considera só registros de Injeção.</p></div>
+        </div>
+        <div class="ae-row-3">
+          <div class="perfil-card">
+            <h4>Gramatura</h4>
+            <p class="perfil-sub">Desvios por gramatura cadastrada</p>
+            <div id="aePerfilGramatura"></div>
+          </div>
+          <div class="perfil-card">
+            <h4>Cor</h4>
+            <p class="perfil-sub">Desvios por cor de preforma</p>
+            <div id="aePerfilCor"></div>
+          </div>
+          <div class="perfil-card">
+            <h4>Resina</h4>
+            <p class="perfil-sub">Desvios por resina utilizada (Injeção)</p>
+            <div id="aePerfilResina"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= Mapa de cavidades ================= -->
+      <div class="card">
+        <div class="card-head">
+          <div><h3>Mapa de calor por cavidade</h3><p class="card-sub">Desenho real da distribuição do molde — escolha o molde e o defeito pra ver em quais cavidades ele mais se repete. Sempre a partir de registros de Injeção, independente do filtro de Processo acima.</p></div>
+          <div class="mold-controls">
+            <span id="aeMoldCritBadge" class="mold-crit-badge"></span>
+            <select id="aeSelMolde"></select>
+            <select id="aeSelDefeito"></select>
+          </div>
+        </div>
+
+        <div id="aeMoldVazio" class="ae-vazio hidden">Nenhum registro de cavidade encontrado para este molde/defeito no período filtrado.</div>
+        <div class="mold-body" id="aeMoldBody">
+          <div class="mold-svg-wrap"><div id="aeMoldSvgHost"></div><div class="mold-tooltip" id="aeMoldTooltip"></div></div>
+          <div>
+            <p class="mold-caption" id="aeMoldCaption"></p>
+            <div class="top-cav-list" id="aeTopCavList"></div>
+          </div>
+          <div>
+            <div class="heat-legend-title">Ocorrências no período</div>
+            <div class="heat-scale-bar" style="background: linear-gradient(90deg, #26282c 0%, rgba(200,214,96,0.75) 18%, rgba(236,210,60,0.85) 38%, rgba(242,164,55,0.9) 58%, rgba(233,116,50,0.95) 76%, rgba(224,58,63,1) 100%);"></div>
+            <div class="heat-scale-labels"><span>baixo</span><span id="aeHeatMaxLabel">alto</span></div>
+            <div class="heat-iso-note"><span class="heat-swatch" style="background:#2a2c31; border:1px solid #17181b; display:flex; align-items:center; justify-content:center; color:var(--danger); font-size:10px; font-weight:700;">✕</span>Cavidade isolada (fora de produção)</div>
+            <div class="heat-legend-title">Cavidades ativas / isoladas</div>
+            <div id="aeMoldStatsText" style="font-size:12px; color:var(--text-dim);"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ===================== CONFIGURAÇÕES ===================== -->
     <div id="pageConfig" class="hidden">
       <div class="page-title">Configurações</div>
@@ -968,12 +1255,13 @@ const statusCorrecao = ['CORRIGIDO', 'FICOU PENDENTE'];
 function setPage(p) {
   paginaAtual = p;
   document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.toggle('active', el.dataset.page === p); });
-  ['dashboard','cadastroInjecao','ocorrenciaInjecao','cadastroSopro','ocorrenciaSopro','config'].forEach(function(id) {
+  ['dashboard','cadastroInjecao','ocorrenciaInjecao','cadastroSopro','ocorrenciaSopro','analiseEstatistica','config'].forEach(function(id) {
     document.getElementById('page' + id.charAt(0).toUpperCase() + id.slice(1)).classList.toggle('hidden', id !== p);
   });
   if (p === 'dashboard') carregarDados();
   if (p === 'ocorrenciaInjecao') renderTabelaInjecao();
   if (p === 'ocorrenciaSopro') renderTabelaSopro();
+  if (p === 'analiseEstatistica') aeAtualizar();
   fecharMenuMobile();
   window.scrollTo(0, 0);
 }
@@ -3755,6 +4043,709 @@ document.addEventListener('touchend', function(e) {
   if (agora - ultimoToque <= 300) e.preventDefault();
   ultimoToque = agora;
 }, { passive: false });
+
+/* ======================================================================
+   ANÁLISE ESTATÍSTICA — construída a partir do mockup aprovado pelo Cleber.
+   Usa dadosCache (já carregado por carregarDados) e funções existentes do
+   app (contarPor, topN, preencherSelect, ordenarLista) sempre que possível.
+   ====================================================================== */
+
+/* ---------------- utilidades de gráfico (SVG/canvas) ---------------- */
+function niceMax(v) { const p = Math.pow(10, Math.floor(Math.log10(Math.max(v,1)))); const n = v / p; const step = n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10; return step * p; }
+function svgTopRoundedRect(x, y, w, h, r) {
+  if (h <= 0.1) return '';
+  r = Math.max(0, Math.min(r, w / 2, h));
+  return 'M ' + x + ',' + (y + r) +
+    ' Q ' + x + ',' + y + ' ' + (x + r) + ',' + y +
+    ' H ' + (x + w - r) +
+    ' Q ' + (x + w) + ',' + y + ' ' + (x + w) + ',' + (y + r) +
+    ' V ' + (y + h) +
+    ' H ' + x + ' Z';
+}
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+const HEAT_STOPS = [
+  [0.0,  [0, 0, 0, 0]],
+  [0.15, [200, 214, 96, 85]],
+  [0.35, [236, 210, 60, 150]],
+  [0.55, [242, 164, 55, 195]],
+  [0.75, [233, 116, 50, 222]],
+  [1.0,  [224, 58, 63, 240]],
+];
+function colorForDensity(d) {
+  d = Math.max(0, Math.min(1, d));
+  for (let i = 0; i < HEAT_STOPS.length - 1; i++) {
+    const d0 = HEAT_STOPS[i][0], c0 = HEAT_STOPS[i][1], d1 = HEAT_STOPS[i+1][0], c1 = HEAT_STOPS[i+1][1];
+    if (d >= d0 && d <= d1) {
+      const t = d1 > d0 ? (d - d0) / (d1 - d0) : 0;
+      return c0.map(function(v, idx) { return Math.round(v + (c1[idx] - v) * t); });
+    }
+  }
+  return HEAT_STOPS[HEAT_STOPS.length - 1][1];
+}
+function aeFormatarDataCurta(iso) {
+  if (!iso) return '—';
+  const p = iso.split('-');
+  return p.length === 3 ? p[2] + '/' + p[1] : iso;
+}
+
+/* ---------------- Moldes reais (layout e cavidades isoladas) ----------------
+   Husky LX1 e Hypet seguem exatamente os desenhos que o Cleber enviou, incluindo
+   as cavidades isoladas marcadas com "×". O Husky GL usa a mesma numeração
+   sequencial padrão de 4 quadrantes — o desenho original mostra algumas
+   cavidades com renumeração após reforma mecânica (ex.: posição original 47
+   operando hoje com outro número) que não foi possível confirmar com certeza
+   nesta rodada; vale conferir esse molde específico e me avisar se algum
+   número precisar de ajuste. */
+function buildQuadrante56(isolados) {
+  const cav = [];
+  function quad(colA, colB, colOffset, rowOffset) {
+    colA.forEach(function(n, i) { cav.push({ num: n, col: colOffset, row: rowOffset + i, isolada: isolados.has(n) }); });
+    colB.forEach(function(n, i) { cav.push({ num: n, col: colOffset + 1, row: rowOffset + i, isolada: isolados.has(n) }); });
+  }
+  quad([4, 8, 12, 16, 20, 24, 28], [3, 7, 11, 15, 19, 23, 27], 0, 0);
+  quad([2, 6, 10, 14, 18, 22, 26], [1, 5, 9, 13, 17, 21, 25], 2, 0);
+  quad([32, 36, 40, 44, 48, 52, 56], [31, 35, 39, 43, 47, 51, 55], 0, 8);
+  quad([30, 34, 38, 42, 46, 50, 54], [29, 33, 37, 41, 45, 49, 53], 2, 8);
+  return cav;
+}
+function buildHuskyLX1() {
+  const isolados = new Set([14, 28, 32, 35, 36, 39]);
+  return { id: 'huskyLX1', nome: 'Husky LX1 · Preforma 19,0g · 56 cavidades', gramatura: 19.0, total: 56, cols: 4, rows: 15, dividers: [7], cav: buildQuadrante56(isolados) };
+}
+function buildHuskyGL() {
+  const isolados = new Set();
+  return { id: 'huskyGL', nome: 'Husky GL · Preforma 15,6g · 56 cavidades', gramatura: 15.6, total: 56, cols: 4, rows: 15, dividers: [7], cav: buildQuadrante56(isolados) };
+}
+function buildHypet() {
+  const isolados = new Set([12]);
+  const cav = [];
+  function bloco(linhas, rowOffset) {
+    linhas.forEach(function(linha, ri) { linha.forEach(function(n, ci) { cav.push({ num: n, col: ci, row: rowOffset + ri, isolada: isolados.has(n) }); }); });
+  }
+  bloco([[1,13,25,37,49,61],[2,14,26,38,50,62],[3,15,27,39,51,63]], 0);
+  bloco([[4,16,28,40,52,64],[5,17,29,41,53,65],[6,18,30,42,54,66],[7,19,31,43,55,67],[8,20,32,44,56,68],[9,21,33,45,57,69]], 4);
+  bloco([[10,22,34,46,58,70],[11,23,35,47,59,71],[12,24,36,48,60,72]], 11);
+  return { id: 'hypet', nome: 'Hypet · Preforma 41,5g · 72 cavidades', gramatura: 41.5, total: 72, cols: 6, rows: 14, dividers: [3, 10], cav: cav };
+}
+const AE_MOLDES = { huskyLX1: buildHuskyLX1(), huskyGL: buildHuskyGL(), hypet: buildHypet() };
+
+/* ---------------- Filtros próprios da página (reaproveita dadosCache real) ---------------- */
+function aeLinhasBase() {
+  const proc = document.getElementById('aeProcesso').value;
+  if (proc === 'injecao') return dadosCache.injecao.slice();
+  if (proc === 'sopro') return dadosCache.sopro.slice();
+  return dadosCache.injecao.concat(dadosCache.sopro);
+}
+function aeAplicarFiltrosComuns(linhas) {
+  linhas = linhas.filter(function(l){ return l.defeito; });
+  const periodoVal = document.getElementById('aePeriodo').value;
+  if (periodoVal === 'personalizado') {
+    const dataIni = document.getElementById('aePersonalizadoDataInicio').value;
+    const dataFim = document.getElementById('aePersonalizadoDataFim').value;
+    const horaIni = document.getElementById('aePersonalizadoHoraInicio').value;
+    const horaFim = document.getElementById('aePersonalizadoHoraFim').value;
+    if (dataIni) linhas = linhas.filter(function(l){ return !l.data || l.data >= dataIni; });
+    if (dataFim) linhas = linhas.filter(function(l){ return !l.data || l.data <= dataFim; });
+    if (horaIni) linhas = linhas.filter(function(l){ return !l.hora_fim || l.hora_fim >= horaIni; });
+    if (horaFim) linhas = linhas.filter(function(l){ return !l.hora_fim || l.hora_fim <= horaFim; });
+  } else {
+    const horas = (parseFloat(periodoVal) || 0) * 24;
+    if (horas) {
+      const limite = new Date(); limite.setTime(limite.getTime() - horas * 60 * 60 * 1000);
+      linhas = linhas.filter(function(l){ return !l.data || new Date(l.data + 'T' + (l.hora_fim || '00:00')) >= limite; });
+    }
+  }
+  const equip = document.getElementById('aeEquipamento').value;
+  if (equip) linhas = linhas.filter(function(l){ return l.equipamento === equip; });
+  const resp = document.getElementById('aeResponsavel').value;
+  if (resp) linhas = linhas.filter(function(l){ return l.responsavel === resp; });
+  const crit = document.getElementById('aeCriticidade').value;
+  if (crit) linhas = linhas.filter(function(l){ return (l.criticidade||'').toUpperCase() === crit; });
+  return linhas;
+}
+function aeLinhasFiltradas() { return aeAplicarFiltrosComuns(aeLinhasBase()); }
+function aeLinhasInjecaoFiltradas() { return aeAplicarFiltrosComuns(dadosCache.injecao.slice()); }
+
+function aeISODate(d) { return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+function aeIntervaloPeriodo(linhasBase) {
+  const periodoVal = document.getElementById('aePeriodo').value;
+  const hoje = new Date();
+  if (periodoVal === 'personalizado') {
+    const dataIni = document.getElementById('aePersonalizadoDataInicio').value;
+    const dataFim = document.getElementById('aePersonalizadoDataFim').value;
+    if (dataIni && dataFim) return { ini: dataIni, fim: dataFim };
+  } else {
+    const horas = (parseFloat(periodoVal) || 0) * 24;
+    if (horas) {
+      const ini = new Date(hoje.getTime() - horas * 60 * 60 * 1000);
+      return { ini: aeISODate(ini), fim: aeISODate(hoje) };
+    }
+  }
+  const datas = linhasBase.map(function(l){ return l.data; }).filter(Boolean).sort();
+  if (!datas.length) return { ini: aeISODate(hoje), fim: aeISODate(hoje) };
+  return { ini: datas[0], fim: datas[datas.length - 1] };
+}
+
+/* ---------------- Agregações reais para os gráficos ---------------- */
+function aeSerieDiaria(linhas, intervalo) {
+  const porDia = {};
+  linhas.forEach(function(l) {
+    if (!l.data) return;
+    if (!porDia[l.data]) porDia[l.data] = { leve: 0, medio: 0, grave: 0 };
+    const c = (l.criticidade || '').toUpperCase();
+    if (c === 'GRAVE') porDia[l.data].grave++;
+    else if (c.indexOf('M') === 0) porDia[l.data].medio++;
+    else porDia[l.data].leve++;
+  });
+  const out = [];
+  let cursor = new Date(intervalo.ini + 'T00:00:00');
+  const fim = new Date(intervalo.fim + 'T00:00:00');
+  let guard = 0;
+  while (cursor <= fim && guard < 180) {
+    const iso = aeISODate(cursor);
+    const d = porDia[iso] || { leve: 0, medio: 0, grave: 0 };
+    out.push({ data: iso, leve: d.leve, medio: d.medio, grave: d.grave });
+    cursor.setDate(cursor.getDate() + 1);
+    guard++;
+  }
+  return out;
+}
+function aeParetoDados(linhas) {
+  const contagem = contarPor(linhas, 'defeito');
+  const entradas = Object.entries(contagem).sort(function(a,b){ return b[1]-a[1]; });
+  const top = entradas.slice(0, 8);
+  const outros = entradas.slice(8).reduce(function(s,e){ return s + e[1]; }, 0);
+  const dados = top.map(function(e){ return { nome: e[0], qtd: e[1] }; });
+  if (outros > 0) dados.push({ nome: 'Outros', qtd: outros });
+  return dados;
+}
+function aeCriticidadeTotal(linhas) {
+  const out = { leve: 0, medio: 0, grave: 0 };
+  linhas.forEach(function(l) {
+    const c = (l.criticidade || '').toUpperCase();
+    if (c === 'GRAVE') out.grave++;
+    else if (c.indexOf('M') === 0) out.medio++;
+    else out.leve++;
+  });
+  return out;
+}
+function aeMaquinas(linhas) {
+  const porMaquina = {};
+  linhas.forEach(function(l) {
+    const nome = l.equipamento || 'N/A';
+    if (!porMaquina[nome]) porMaquina[nome] = { nome: nome, leve: 0, medio: 0, grave: 0 };
+    const c = (l.criticidade || '').toUpperCase();
+    if (c === 'GRAVE') porMaquina[nome].grave++;
+    else if (c.indexOf('M') === 0) porMaquina[nome].medio++;
+    else porMaquina[nome].leve++;
+  });
+  return Object.values(porMaquina).sort(function(a,b){ return (b.leve+b.medio+b.grave) - (a.leve+a.medio+a.grave); });
+}
+function aePerfilGramatura(linhas) {
+  const contagem = {};
+  linhas.forEach(function(l) {
+    const v = l.gramatura || l.gramatura_preforma;
+    if (!v) return;
+    const chave = formatarGramaturaWpp(v);
+    contagem[chave] = (contagem[chave] || 0) + 1;
+  });
+  return topN(contagem, 6);
+}
+function aePerfilCampo(linhas, campo) {
+  const contagem = contarPor(linhas.filter(function(l){ return l[campo]; }), campo);
+  return topN(contagem, 6);
+}
+
+/* ---------------- Renderização dos gráficos (SVG) ---------------- */
+function aeRenderTrend(serie) {
+  const container = document.getElementById('aeTrendChart');
+  const n = serie.length;
+  if (!n || !serie.some(function(d){ return d.leve+d.medio+d.grave > 0; })) {
+    container.innerHTML = '<div class="ae-vazio">Sem desvios no período filtrado.</div>';
+    return;
+  }
+  const W = 980, H = 260, M = { top: 14, right: 16, bottom: 28, left: 38 };
+  const plotW = W - M.left - M.right, plotH = H - M.top - M.bottom;
+  const maxTotal = niceMax(Math.max.apply(null, serie.map(function(d){ return d.leve + d.medio + d.grave; }).concat([1])) * 1.12);
+  const bandW = plotW / n;
+  const barW = Math.max(2, Math.min(bandW * 0.64, 34));
+  const GAP = 2;
+  const RAIO = Math.min(4, barW / 2);
+  const x = function(i) { return M.left + bandW * i + bandW / 2; };
+  const y = function(v) { return M.top + plotH - (v / maxTotal) * plotH; };
+
+  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="max-width:' + W + 'px;">';
+  const steps = 4;
+  for (let s = 0; s <= steps; s++) {
+    const v = (maxTotal / steps) * s;
+    const gy = y(v);
+    svg += '<line class="grid-line" x1="' + M.left + '" y1="' + gy + '" x2="' + (W - M.right) + '" y2="' + gy + '"/>';
+    svg += '<text class="axis-label" x="' + (M.left - 8) + '" y="' + (gy + 3) + '" text-anchor="end">' + Math.round(v) + '</text>';
+  }
+  serie.forEach(function(d, i) {
+    const cx = x(i), bx = cx - barW / 2;
+    const segs = [
+      { v: d.leve, cor: 'var(--ok)' },
+      { v: d.medio, cor: 'var(--warn)' },
+      { v: d.grave, cor: 'var(--danger)' },
+    ].filter(function(s){ return s.v > 0; });
+    let acc = 0;
+    segs.forEach(function(s, si) {
+      const valTopo = acc + s.v;
+      let topY = y(valTopo), botY = y(acc);
+      if (si > 0) topY += GAP;
+      const h = Math.max(0, botY - topY);
+      const isTopo = si === segs.length - 1;
+      if (isTopo) svg += '<path d="' + svgTopRoundedRect(bx, topY, barW, h, RAIO) + '" fill="' + s.cor + '"/>';
+      else svg += '<rect x="' + bx + '" y="' + topY + '" width="' + barW + '" height="' + h + '" fill="' + s.cor + '"/>';
+      acc = valTopo;
+    });
+  });
+  svg += '<line class="axis-line" x1="' + M.left + '" y1="' + (M.top + plotH) + '" x2="' + (W - M.right) + '" y2="' + (M.top + plotH) + '"/>';
+  const skip = Math.max(1, Math.ceil(n / 9));
+  serie.forEach(function(d, i) {
+    if (i % skip !== 0 && i !== n - 1) return;
+    svg += '<text class="axis-label-x" x="' + x(i) + '" y="' + (M.top + plotH + 16) + '" text-anchor="middle">' + aeFormatarDataCurta(d.data) + '</text>';
+  });
+  serie.forEach(function(d, i) {
+    const total = d.leve + d.medio + d.grave;
+    svg += '<rect class="hit" x="' + (M.left + i * bandW) + '" y="' + M.top + '" width="' + bandW + '" height="' + plotH + '">' +
+      '<title>' + formatarDataBR(d.data) + ' — Total: ' + total + ' (Leve: ' + d.leve + ' · Médio: ' + d.medio + ' · Grave: ' + d.grave + ')</title></rect>';
+  });
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+function aeRenderPareto(dados) {
+  const container = document.getElementById('aeParetoChart');
+  if (!dados.length) { container.innerHTML = '<div class="ae-vazio">Sem defeitos no período filtrado.</div>'; return; }
+  const totalGeral = dados.reduce(function(s, d){ return s + d.qtd; }, 0);
+  let acumulado = 0;
+  const linhas = dados.map(function(d) {
+    const pct = (d.qtd / totalGeral) * 100;
+    acumulado += pct;
+    return { nome: d.nome, qtd: d.qtd, pct: pct, acumulado: acumulado };
+  });
+  const W = 560, H = 300, M = { top: 14, right: 12, bottom: 62, left: 46 };
+  const plotW = W - M.left - M.right, plotH = H - M.top - M.bottom;
+  const n = linhas.length;
+  const bandW = plotW / n;
+  const barW = bandW * 0.52;
+  const y = function(pct) { return M.top + plotH - (pct / 100) * plotH; };
+
+  let svg = '<svg viewBox="0 0 ' + W + ' ' + H + '" width="100%" style="max-width:' + W + 'px;">';
+  [0, 20, 40, 60, 80, 100].forEach(function(v) {
+    const gy = y(v);
+    svg += '<line class="grid-line" x1="' + M.left + '" y1="' + gy + '" x2="' + (W - M.right) + '" y2="' + gy + '"/>';
+    svg += '<text class="axis-label" x="' + (M.left - 8) + '" y="' + (gy + 3) + '" text-anchor="end">' + v + '%</text>';
+  });
+  const y80 = y(80);
+  svg += '<line x1="' + M.left + '" y1="' + y80 + '" x2="' + (W - M.right) + '" y2="' + y80 + '" stroke="var(--text-dim)" stroke-width="1" stroke-dasharray="4 3"/>';
+  svg += '<text class="axis-label" x="' + (W - M.right) + '" y="' + (y80 - 4) + '" text-anchor="end" fill="var(--text-dim)">80%</text>';
+  linhas.forEach(function(d, i) {
+    const cx = M.left + bandW * i + bandW / 2;
+    const bx = cx - barW / 2;
+    const by = y(d.pct);
+    const bh = (M.top + plotH) - by;
+    svg += '<rect class="bar-hit" x="' + bx + '" y="' + by + '" width="' + barW + '" height="' + bh + '" rx="3" fill="var(--blue)">' +
+      '<title>' + d.nome + ' — ' + d.qtd + ' ocorrências (' + d.pct.toFixed(1) + '% do total)</title></rect>';
+    svg += '<text class="axis-label-x" x="' + cx + '" y="' + (M.top + plotH + 14) + '" text-anchor="end" transform="rotate(-32 ' + cx + ' ' + (M.top + plotH + 14) + ')">' + d.nome + '</text>';
+  });
+  const pts = linhas.map(function(d, i) { return [M.left + bandW * i + bandW / 2, y(d.acumulado)]; });
+  svg += '<path d="M ' + pts.map(function(p){ return p.join(','); }).join(' L ') + '" stroke="var(--text)" stroke-width="2" fill="none"/>';
+  pts.forEach(function(p, i) {
+    svg += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="3.2" fill="var(--text)"><title>Acumulado até "' + linhas[i].nome + '": ' + linhas[i].acumulado.toFixed(1) + '%</title></circle>';
+  });
+  svg += '<line class="axis-line" x1="' + M.left + '" y1="' + (M.top + plotH) + '" x2="' + (W - M.right) + '" y2="' + (M.top + plotH) + '"/>';
+  svg += '</svg>';
+  container.innerHTML = svg;
+}
+
+function aeRenderDonut(crit) {
+  const container = document.getElementById('aeDonutChart');
+  const total = crit.leve + crit.medio + crit.grave;
+  if (!total) { container.innerHTML = '<div class="ae-vazio">Sem desvios no período filtrado.</div>'; return; }
+  const partes = [
+    { label: 'Leve', valor: crit.leve, cor: 'var(--ok)' },
+    { label: 'Médio', valor: crit.medio, cor: 'var(--warn)' },
+    { label: 'Grave', valor: crit.grave, cor: 'var(--danger)' },
+  ];
+  const cx = 90, cy = 90, r = 68, rInner = 42;
+  let anguloIni = -90, arcos = '';
+  partes.forEach(function(p) {
+    if (!p.valor) return;
+    const frac = p.valor / total;
+    const angFim = anguloIni + frac * 360;
+    const grandeArco = (angFim - anguloIni) > 180 ? 1 : 0;
+    const toXY = function(ang, raio) { return [cx + raio * Math.cos(ang * Math.PI / 180), cy + raio * Math.sin(ang * Math.PI / 180)]; };
+    const p1 = toXY(anguloIni, r), p2 = toXY(angFim, r);
+    const p1i = toXY(angFim, rInner), p2i = toXY(anguloIni, rInner);
+    arcos += '<path d="M ' + p1[0] + ',' + p1[1] + ' A ' + r + ',' + r + ' 0 ' + grandeArco + ' 1 ' + p2[0] + ',' + p2[1] +
+      ' L ' + p1i[0] + ',' + p1i[1] + ' A ' + rInner + ',' + rInner + ' 0 ' + grandeArco + ' 0 ' + p2i[0] + ',' + p2i[1] + ' Z" fill="' + p.cor + '">' +
+      '<title>' + p.label + ': ' + p.valor + ' (' + (frac * 100).toFixed(1) + '%)</title></path>';
+    anguloIni = angFim;
+  });
+  const svg = '<svg viewBox="0 0 180 180" width="180" height="180">' + arcos +
+    '<text class="donut-center-num" x="90" y="85" text-anchor="middle">' + total.toLocaleString('pt-BR') + '</text>' +
+    '<text class="donut-center-label" x="90" y="100" text-anchor="middle">desvios</text>' +
+  '</svg>';
+  const legend = partes.map(function(p) {
+    const pct = total ? (p.valor / total) * 100 : 0;
+    return '<div class="donut-legend-item"><span class="sw" style="background:' + p.cor + ';"></span><div><b>' + p.label + '</b><br><span class="pct">' + p.valor.toLocaleString('pt-BR') + ' · ' + pct.toFixed(1) + '%</span></div></div>';
+  }).join('');
+  container.innerHTML = '<div class="donut-wrap">' + svg + '<div class="donut-legend">' + legend + '</div></div>';
+}
+
+function aeRenderMaquinaChart(maquinas) {
+  const container = document.getElementById('aeMaquinaChart');
+  if (!maquinas.length) { container.innerHTML = '<div class="ae-vazio">Sem desvios no período filtrado.</div>'; return; }
+  const maxTotal = Math.max.apply(null, maquinas.map(function(m){ return m.leve + m.medio + m.grave; }).concat([1]));
+  container.innerHTML = maquinas.map(function(m) {
+    const total = m.leve + m.medio + m.grave;
+    const scale = 100 / maxTotal;
+    return '<div class="bar-row">' +
+      '<div class="bar-label">' + m.nome + '</div>' +
+      '<div class="bar-track">' +
+        (m.leve  ? '<div class="bar-seg leve"  style="width:' + (m.leve  * scale) + '%"></div>' : '') +
+        (m.medio ? '<div class="bar-seg medio" style="width:' + (m.medio * scale) + '%"></div>' : '') +
+        (m.grave ? '<div class="bar-seg grave" style="width:' + (m.grave * scale) + '%"></div>' : '') +
+      '</div>' +
+      '<div class="bar-total"><b>' + total + '</b> desvios</div>' +
+    '</div>';
+  }).join('');
+}
+
+function aeRenderPerfil(id, dados) {
+  const container = document.getElementById(id);
+  if (!dados.length) { container.innerHTML = '<div class="ae-vazio">Sem dados no período filtrado.</div>'; return; }
+  const max = Math.max.apply(null, dados.map(function(d){ return d[1]; }));
+  const total = dados.reduce(function(s, d){ return s + d[1]; }, 0);
+  container.innerHTML = dados.map(function(d) {
+    const pct = total ? (d[1] / total * 100).toFixed(0) : 0;
+    return '<div class="perfil-row"><div class="perfil-label">' + d[0] + '</div>' +
+      '<div class="perfil-track"><div class="perfil-fill" style="width:' + (d[1] / max * 100) + '%"></div></div>' +
+      '<div class="perfil-val"><b>' + d[1] + '</b> · ' + pct + '%</div></div>';
+  }).join('');
+}
+
+/* ---------------- Mapa de cavidades — agregação real + heatmap contínuo sobre a placa ----------------
+   Soma as ocorrências reais por cavidade (campo "cavidade", separado por ';', ignorando linhas com
+   "TODAS" marcado — mesma convenção de cavidadesRecorrentes), restrito ao molde selecionado via
+   correspondência de gramatura e ao defeito selecionado. A técnica do heatmap (grade de densidade
+   suave normalizada pelo pico, recolorida pela escala amarelo→laranja→vermelho) é a mesma do mockup
+   aprovado — só os dados por trás são reais agora. */
+const CELL = 25, R = 8.6, PAD = 30, EXTRA_W = 22;
+const DISPLAY_SCALE = 1.55, RENDER_SCALE = 2;
+let AE_MOLD_HOVER_INFO = [];
+
+function aeOcorrenciasPorCavidade(linhasInjecao, molde, defeitoNome) {
+  const mapa = {};
+  linhasInjecao.forEach(function(l) {
+    if (defeitoNome && l.defeito !== defeitoNome) return;
+    const g = parseFloat((l.gramatura || '').toString().replace(',', '.'));
+    if (isNaN(g) || Math.abs(g - molde.gramatura) > 0.3) return;
+    const bruto = (l.cavidade || '').toString().trim();
+    if (!bruto || bruto.toUpperCase() === 'TODAS') return;
+    bruto.split(';').map(function(c) { return c.trim(); }).filter(Boolean).forEach(function(cav) {
+      mapa[cav] = (mapa[cav] || 0) + 1;
+    });
+  });
+  return mapa;
+}
+function aeDefeitosDoMolde(linhasInjecao, molde) {
+  const linhasDoMolde = linhasInjecao.filter(function(l) {
+    const g = parseFloat((l.gramatura || '').toString().replace(',', '.'));
+    return !isNaN(g) && Math.abs(g - molde.gramatura) <= 0.3;
+  });
+  const contagem = contarPor(linhasDoMolde, 'defeito');
+  return Object.entries(contagem).sort(function(a,b){ return b[1]-a[1]; }).map(function(e){ return e[0]; });
+}
+
+function aeDesenharPlaca(ctx, w, h, molde) {
+  const bushR = 8.2;
+  const plateGrad = ctx.createLinearGradient(0, 0, w, h);
+  plateGrad.addColorStop(0, '#6b7078'); plateGrad.addColorStop(0.45, '#4a4e55');
+  plateGrad.addColorStop(0.55, '#3d4046'); plateGrad.addColorStop(1, '#2a2c31');
+  ctx.fillStyle = plateGrad;
+  roundRect(ctx, 0, 0, w, h, 10); ctx.fill();
+  ctx.strokeStyle = '#17181b'; ctx.lineWidth = 1.5;
+  roundRect(ctx, 0.75, 0.75, w - 1.5, h - 1.5, 9.3); ctx.stroke();
+
+  const edgeGrad = ctx.createLinearGradient(0, 0, 0, h);
+  edgeGrad.addColorStop(0, 'rgba(255,255,255,0.22)'); edgeGrad.addColorStop(0.12, 'rgba(255,255,255,0)'); edgeGrad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = edgeGrad;
+  roundRect(ctx, 1.5, 1.5, w - 3, h - 3, 8.5); ctx.fill();
+
+  [[PAD * 0.62, PAD * 0.62], [w - PAD * 0.62, PAD * 0.62], [PAD * 0.62, h - PAD * 0.62], [w - PAD * 0.62, h - PAD * 0.62]].forEach(function(p) {
+    const bushGrad = ctx.createRadialGradient(p[0] - bushR * 0.25, p[1] - bushR * 0.3, 0.5, p[0], p[1], bushR);
+    bushGrad.addColorStop(0, '#9aa0a8'); bushGrad.addColorStop(0.55, '#5c6167'); bushGrad.addColorStop(1, '#26282c');
+    ctx.fillStyle = bushGrad; ctx.beginPath(); ctx.arc(p[0], p[1], bushR, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#17181b'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#1a1b1e'; ctx.beginPath(); ctx.arc(p[0], p[1], bushR * 0.42, 0, Math.PI*2); ctx.fill();
+  });
+
+  molde.dividers.forEach(function(r) {
+    const y = PAD + r * CELL - CELL / 2 + 5;
+    ctx.strokeStyle = '#17181b'; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(PAD - 8, y); ctx.lineTo(w - PAD + 8, y); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(PAD - 8, y + 1.2); ctx.lineTo(w - PAD + 8, y + 1.2); ctx.stroke();
+  });
+
+  const railX = w + 6;
+  ctx.fillStyle = '#2a2c31'; ctx.strokeStyle = '#17181b'; ctx.lineWidth = 1;
+  roundRect(ctx, railX, PAD * 0.4, 9, h - PAD * 0.8, 3); ctx.fill(); ctx.stroke();
+  const nParaf = Math.max(3, Math.round(molde.rows / 3.2));
+  for (let i = 0; i < nParaf; i++) {
+    const py = PAD * 0.4 + ((h - PAD * 0.8) / (nParaf - 1 || 1)) * i;
+    ctx.fillStyle = '#5b9bf2';
+    ctx.beginPath(); ctx.arc(railX + 4.5, py, 3.4, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = '#17181b'; ctx.lineWidth = 0.8; ctx.stroke();
+    ctx.fillStyle = '#0c2f5c'; ctx.beginPath(); ctx.arc(railX + 4.5, py, 1.2, 0, Math.PI*2); ctx.fill();
+  }
+}
+
+function aeRenderMold(moldeId, defeitoNome) {
+  const molde = AE_MOLDES[moldeId];
+  const linhasInjecao = aeLinhasInjecaoFiltradas();
+  const mapa = aeOcorrenciasPorCavidade(linhasInjecao, molde, defeitoNome);
+
+  const ativas = molde.cav.filter(function(c){ return !c.isolada; });
+  const valores = ativas.map(function(c){ return mapa[String(c.num)] || 0; });
+  const max = Math.max.apply(null, valores.concat([0]));
+  const temDados = max > 0;
+
+  document.getElementById('aeMoldVazio').classList.toggle('hidden', temDados);
+  document.getElementById('aeMoldBody').classList.toggle('hidden', !temDados);
+  if (!temDados) return;
+
+  const w = molde.cols * CELL + PAD * 2, h = molde.rows * CELL + PAD * 2;
+  const totalW = w + EXTRA_W;
+  const pxW = Math.round(totalW * DISPLAY_SCALE * RENDER_SCALE), pxH = Math.round(h * DISPLAY_SCALE * RENDER_SCALE);
+  const scale = DISPLAY_SCALE * RENDER_SCALE;
+
+  let canvas = document.getElementById('aeMoldCanvas');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'aeMoldCanvas';
+    document.getElementById('aeMoldSvgHost').appendChild(canvas);
+  }
+  canvas.width = pxW; canvas.height = pxH;
+  canvas.style.width = Math.round(totalW * DISPLAY_SCALE) + 'px';
+  canvas.style.height = Math.round(h * DISPLAY_SCALE) + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  ctx.clearRect(0, 0, totalW, h);
+
+  aeDesenharPlaca(ctx, w, h, molde);
+
+  const gridScale = 3, raio = CELL * 1.85, expoenteQueda = 1.7;
+  const GW = Math.ceil(totalW / gridScale), GH = Math.ceil(h / gridScale);
+  const raioCel = Math.ceil(raio / gridScale);
+  const dens = new Float32Array(GW * GH);
+  ativas.forEach(function(c) {
+    const cx = PAD + c.col * CELL + CELL / 2, cy = PAD + c.row * CELL + CELL / 2;
+    const valor = mapa[String(c.num)] || 0;
+    const peso = valor / max;
+    if (peso <= 0) return;
+    const gcx = Math.round(cx / gridScale), gcy = Math.round(cy / gridScale);
+    for (let gy = Math.max(0, gcy - raioCel); gy <= Math.min(GH - 1, gcy + raioCel); gy++) {
+      for (let gx = Math.max(0, gcx - raioCel); gx <= Math.min(GW - 1, gcx + raioCel); gx++) {
+        const dx = (gx - gcx) * gridScale, dy = (gy - gcy) * gridScale;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist > raio) continue;
+        dens[gy * GW + gx] += peso * Math.pow(1 - dist / raio, expoenteQueda);
+      }
+    }
+  });
+  let pico = 0;
+  for (let i = 0; i < dens.length; i++) if (dens[i] > pico) pico = dens[i];
+  if (pico <= 0) pico = 1;
+  const smallCanvas = document.createElement('canvas');
+  smallCanvas.width = GW; smallCanvas.height = GH;
+  const sctx = smallCanvas.getContext('2d');
+  const imgData = sctx.createImageData(GW, GH);
+  for (let i = 0; i < dens.length; i++) {
+    const d = dens[i] / pico;
+    const cor = colorForDensity(d);
+    imgData.data[i * 4] = cor[0]; imgData.data[i * 4 + 1] = cor[1]; imgData.data[i * 4 + 2] = cor[2]; imgData.data[i * 4 + 3] = cor[3];
+  }
+  sctx.putImageData(imgData, 0, 0);
+  ctx.imageSmoothingEnabled = true;
+  if ('imageSmoothingQuality' in ctx) ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(smallCanvas, 0, 0, GW, GH, 0, 0, totalW, h);
+
+  AE_MOLD_HOVER_INFO = [];
+  let cavidadesAtivas = 0, cavidadesIsoladas = 0, top = null;
+  molde.cav.forEach(function(c) {
+    const cx = PAD + c.col * CELL + CELL / 2, cy = PAD + c.row * CELL + CELL / 2;
+    if (c.isolada) {
+      cavidadesIsoladas++;
+      ctx.fillStyle = '#1c1d20'; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = '#14151a'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.strokeStyle = '#e5484d'; ctx.lineWidth = 1.3;
+      ctx.beginPath(); ctx.moveTo(cx - 4, cy - 4); ctx.lineTo(cx + 4, cy + 4);
+      ctx.moveTo(cx - 4, cy + 4); ctx.lineTo(cx + 4, cy - 4); ctx.stroke();
+      AE_MOLD_HOVER_INFO.push({ cx: cx, cy: cy, num: c.num, valor: null, isolada: true });
+      return;
+    }
+    cavidadesAtivas++;
+    const valor = mapa[String(c.num)] || 0;
+    if (!top || valor > top.valor) top = { num: c.num, valor: valor };
+    AE_MOLD_HOVER_INFO.push({ cx: cx, cy: cy, num: c.num, valor: valor, isolada: false });
+    ctx.font = '700 7.4px ' + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineWidth = 2.2; ctx.strokeStyle = 'rgba(10,11,13,0.75)';
+    ctx.strokeText(c.num, cx, cy + 0.5);
+    ctx.fillStyle = '#fff';
+    ctx.fillText(c.num, cx, cy + 0.5);
+  });
+
+  document.getElementById('aeMoldCaption').textContent = molde.nome + ' — defeito selecionado: "' + defeitoNome + '". Passe o mouse sobre uma cavidade pra ver o número exato.';
+  document.getElementById('aeHeatMaxLabel').textContent = 'alto (' + max + '+)';
+  document.getElementById('aeMoldStatsText').textContent = cavidadesAtivas + ' ativas / ' + cavidadesIsoladas + ' isoladas (de ' + molde.total + ' no total)';
+  document.getElementById('aeMoldCritBadge').innerHTML = top ? ('🔥 Cav. ' + top.num + ' — ' + top.valor + 'x') : '';
+
+  const ranked = ativas.map(function(c){ return { num: c.num, valor: mapa[String(c.num)] || 0 }; })
+    .sort(function(a, b){ return b.valor - a.valor; }).slice(0, 5);
+  document.getElementById('aeTopCavList').innerHTML =
+    '<div class="heat-legend-title">Top 5 cavidades — ' + defeitoNome + '</div>' +
+    ranked.map(function(r, i) { return '<div class="top-cav-item' + (i === 0 ? ' destaque' : '') + '"><span class="cav-nome">Cav. ' + r.num + '</span><span class="cav-qtd">' + r.valor + 'x</span></div>'; }).join('');
+
+  aeConfigurarHoverMold(canvas);
+}
+
+function aeConfigurarHoverMold(canvas) {
+  const tip = document.getElementById('aeMoldTooltip');
+  canvas.onmousemove = function(e) {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) / DISPLAY_SCALE, my = (e.clientY - rect.top) / DISPLAY_SCALE;
+    let achou = null, melhorDist = R * 1.6;
+    AE_MOLD_HOVER_INFO.forEach(function(p) {
+      const dist = Math.hypot(p.cx - mx, p.cy - my);
+      if (dist < melhorDist) { melhorDist = dist; achou = p; }
+    });
+    if (!achou) { tip.style.opacity = 0; canvas.style.cursor = 'default'; return; }
+    canvas.style.cursor = 'pointer';
+    tip.innerHTML = achou.isolada
+      ? '<b>Cavidade ' + achou.num + '</b> — isolada (fora de produção)'
+      : '<b>Cavidade ' + achou.num + '</b> — ' + achou.valor + ' ocorrência' + (achou.valor === 1 ? '' : 's');
+    tip.style.left = (e.clientX - rect.left + 14) + 'px';
+    tip.style.top = (e.clientY - rect.top - 8) + 'px';
+    tip.style.opacity = 1;
+  };
+  canvas.onmouseleave = function() { tip.style.opacity = 0; };
+}
+
+function aePopularSeletorMolde() {
+  const sel = document.getElementById('aeSelMolde');
+  if (sel.options.length) return;
+  sel.innerHTML = Object.keys(AE_MOLDES).map(function(id){ return '<option value="' + id + '">' + AE_MOLDES[id].nome + '</option>'; }).join('');
+}
+function aePopularSeletorDefeito() {
+  const selMolde = document.getElementById('aeSelMolde');
+  const selDefeito = document.getElementById('aeSelDefeito');
+  const molde = AE_MOLDES[selMolde.value];
+  const linhasInjecao = aeLinhasInjecaoFiltradas();
+  const defeitos = aeDefeitosDoMolde(linhasInjecao, molde);
+  const valorAnterior = selDefeito.value;
+  selDefeito.innerHTML = defeitos.map(function(d){ return '<option value="' + d.replace(/"/g, '&quot;') + '">' + d + '</option>'; }).join('');
+  if (defeitos.indexOf(valorAnterior) !== -1) selDefeito.value = valorAnterior;
+}
+function aeAtualizarMolde() {
+  aePopularSeletorMolde();
+  aePopularSeletorDefeito();
+  const selMolde = document.getElementById('aeSelMolde');
+  const selDefeito = document.getElementById('aeSelDefeito');
+  if (!selDefeito.options.length) {
+    document.getElementById('aeMoldVazio').classList.remove('hidden');
+    document.getElementById('aeMoldBody').classList.add('hidden');
+    document.getElementById('aeMoldVazio').textContent = 'Nenhum defeito de Injeção encontrado para o molde "' + AE_MOLDES[selMolde.value].nome + '" no período filtrado.';
+    return;
+  }
+  aeRenderMold(selMolde.value, selDefeito.value);
+}
+
+/* ---------------- Filtros / orquestração geral da página ---------------- */
+function aePopularFiltrosEquipResp() {
+  const selEquip = document.getElementById('aeEquipamento');
+  if (selEquip.options.length > 1) return;
+  const todos = dadosCache.injecao.concat(dadosCache.sopro);
+  const equipamentos = Array.from(new Set(todos.map(function(l){ return l.equipamento; }).filter(Boolean))).sort();
+  const responsaveis = Array.from(new Set(todos.map(function(l){ return l.responsavel; }).filter(Boolean))).sort();
+  preencherSelect('aeEquipamento', equipamentos, true);
+  preencherSelect('aeResponsavel', responsaveis, true);
+}
+function aeOnPeriodoChange() {
+  const personalizado = document.getElementById('aePeriodo').value === 'personalizado';
+  document.querySelectorAll('.ae-filtro-personalizado').forEach(function(el){ el.classList.toggle('hidden', !personalizado); });
+  aeAtualizar();
+}
+function aeLimparFiltros() {
+  document.getElementById('aeProcesso').value = 'todos';
+  document.getElementById('aePeriodo').value = '7';
+  document.getElementById('aePersonalizadoDataInicio').value = '';
+  document.getElementById('aePersonalizadoDataFim').value = '';
+  document.getElementById('aePersonalizadoHoraInicio').value = '';
+  document.getElementById('aePersonalizadoHoraFim').value = '';
+  document.getElementById('aeEquipamento').value = '';
+  document.getElementById('aeResponsavel').value = '';
+  document.getElementById('aeCriticidade').value = '';
+  document.querySelectorAll('.ae-filtro-personalizado').forEach(function(el){ el.classList.add('hidden'); });
+  aeAtualizar();
+}
+function aeAtualizar() {
+  if (!dadosCache.injecao.length && !dadosCache.sopro.length) return;
+  aePopularFiltrosEquipResp();
+
+  const linhas = aeLinhasFiltradas();
+  const linhasInjecao = aeLinhasInjecaoFiltradas();
+  const intervalo = aeIntervaloPeriodo(aeLinhasBase());
+
+  const crit = aeCriticidadeTotal(linhas);
+  const totalDesvios = linhas.length;
+  document.getElementById('aeKpiTotal').textContent = totalDesvios.toLocaleString('pt-BR');
+  document.getElementById('aeKpiGraves').textContent = crit.grave.toLocaleString('pt-BR');
+  document.getElementById('aeKpiGravesSub').textContent = totalDesvios ? ((crit.grave / totalDesvios) * 100).toFixed(1).replace('.', ',') + '% do total' : '';
+
+  const contagemDefeitos = contarPor(linhas, 'defeito');
+  const topDefeito = topN(contagemDefeitos, 1)[0];
+  document.getElementById('aeKpiDefeito').textContent = topDefeito ? topDefeito[0] : '–';
+  document.getElementById('aeKpiDefeitoSub').textContent = topDefeito ? (topDefeito[1] + ' ocorrência' + (topDefeito[1] === 1 ? '' : 's')) : '';
+
+  const maquinas = aeMaquinas(linhas);
+  const topMaquina = maquinas[0];
+  document.getElementById('aeKpiMaquina').textContent = topMaquina ? topMaquina.nome : '–';
+  document.getElementById('aeKpiMaquinaSub').textContent = topMaquina ? ((topMaquina.leve + topMaquina.medio + topMaquina.grave) + ' desvios') : '';
+
+  const serie = aeSerieDiaria(linhas, intervalo);
+  document.getElementById('aeTrendBadge').textContent = aeFormatarDataCurta(intervalo.ini) + ' – ' + aeFormatarDataCurta(intervalo.fim);
+  aeRenderTrend(serie);
+
+  aeRenderPareto(aeParetoDados(linhas));
+  aeRenderDonut(crit);
+  aeRenderMaquinaChart(maquinas);
+
+  aeRenderPerfil('aePerfilGramatura', aePerfilGramatura(linhas));
+  aeRenderPerfil('aePerfilCor', aePerfilCampo(linhas, 'cor'));
+  aeRenderPerfil('aePerfilResina', aePerfilCampo(linhasInjecao, 'resina'));
+
+  aeAtualizarMolde();
+}
+(function aeInit() {
+  const selMolde = document.getElementById('aeSelMolde');
+  const selDefeito = document.getElementById('aeSelDefeito');
+  if (selMolde) selMolde.addEventListener('change', aeAtualizarMolde);
+  if (selDefeito) selDefeito.addEventListener('change', aeAtualizarMolde);
+})();
 </script>
 </body>
 </html>
