@@ -432,6 +432,9 @@
     .filter-bar { flex-direction: column; align-items: stretch; }
     .filter-group select { min-width: 0; width: 100%; }
     .filter-group input[type=date], .filter-group input[type=time] { width: 100%; }
+    .ms-filter { width: 100%; }
+    .ms-filter summary { min-width: 0; width: 100%; box-sizing: border-box; }
+    .ms-panel { left: 0; right: 0; min-width: 0; max-width: none; }
     .filter-clear { align-self: stretch; margin-left: 0; }
     .quick-actions { flex-direction: column; }
     .quick-actions .btn-outline { align-self: stretch; }
@@ -516,6 +519,43 @@
   @media (max-width: 900px) {
     .periodo-group { border-right: none; padding-right: 0; flex-wrap: wrap; width: 100%; }
   }
+
+  /* ---------- Filtros de múltipla escolha (Processo, Máquina, Defeito, Criticidade, Gramatura, Cor, Resina) ---------- */
+  .ms-filter { position: relative; }
+  .ms-filter summary {
+    background: var(--surface-2); border: 1px solid var(--border); color: var(--text);
+    padding: 7px 10px; border-radius: 7px; font-size: 12px; font-family: var(--font-body);
+    min-width: 130px; cursor: pointer; list-style: none;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px; white-space: nowrap;
+  }
+  .ms-filter summary span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ms-filter summary::-webkit-details-marker { display: none; }
+  .ms-filter summary::after { content: '▾'; color: var(--text-dim); font-size: 10px; flex-shrink: 0; }
+  .ms-filter[open] summary { border-color: var(--accent); color: var(--text); }
+  .ms-filter[open] summary::after { content: '▴'; color: var(--accent); }
+  .ms-panel {
+    position: absolute; top: calc(100% + 4px); left: 0; z-index: 40; min-width: 200px; max-width: 280px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 9px; padding: 5px;
+    box-shadow: 0 10px 28px rgba(0,0,0,0.45); max-height: 260px; overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  }
+  .ms-panel::-webkit-scrollbar { width: 7px; }
+  .ms-panel::-webkit-scrollbar-track { background: transparent; }
+  .ms-panel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .ms-panel-actions { display: flex; gap: 6px; padding: 2px 3px 7px; margin-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .ms-panel-actions button {
+    flex: 1; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim);
+    font-size: 10.5px; padding: 4px 6px; border-radius: 5px; cursor: pointer; font-family: var(--font-body);
+  }
+  .ms-panel-actions button:hover { color: var(--text); border-color: var(--text-dim); }
+  .ms-panel-vazio { font-size: 11.5px; color: var(--text-dim); padding: 8px 7px; }
+  .ms-opt { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--text); padding: 6px 7px; border-radius: 6px; cursor: pointer; }
+  .ms-opt:hover { background: var(--surface-2); }
+  .ms-opt input { margin: 0; flex-shrink: 0; width: auto; }
+  /* Especificidade reforçada (.ms-panel .ms-opt) pra vencer ".filter-group label" — os checkboxes do
+     multi-select ficam dentro de um .filter-group, e sem isso o rótulo de cada opção herda
+     text-transform:uppercase/letter-spacing, deixando "Rebarba" como "REBARBA". */
+  .ms-panel .ms-opt { text-transform: none; letter-spacing: normal; font-size: 12px; color: var(--text); }
 
   /* ---------- Donut ---------- */
   .donut-wrap { display: flex; align-items: center; gap: 18px; justify-content: center; flex-wrap: wrap; }
@@ -916,40 +956,52 @@
         </div>
         <div class="filter-group">
           <label>Processo</label>
-          <select id="aeProcesso" onchange="aeAtualizar()">
-            <option value="todos">Todos</option>
-            <option value="injecao">Injeção</option>
-            <option value="sopro">Sopro</option>
-          </select>
+          <details class="ms-filter" id="aeProcessoDetails">
+            <summary><span id="aeProcessoResumo" data-rotulo-todos="Todos">Todos</span></summary>
+            <div class="ms-panel" id="aeProcessoPanel"></div>
+          </details>
         </div>
         <div class="filter-group">
           <label>Máquina</label>
-          <select id="aeEquipamento" onchange="aeAtualizar()"><option value="">Todas</option></select>
+          <details class="ms-filter" id="aeEquipamentoDetails">
+            <summary><span id="aeEquipamentoResumo" data-rotulo-todos="Todas">Todas</span></summary>
+            <div class="ms-panel" id="aeEquipamentoPanel"></div>
+          </details>
         </div>
         <div class="filter-group">
           <label>Defeito</label>
-          <select id="aeFiltroDefeito" onchange="aeAtualizar()"><option value="">Todos</option></select>
+          <details class="ms-filter" id="aeFiltroDefeitoDetails">
+            <summary><span id="aeFiltroDefeitoResumo" data-rotulo-todos="Todos">Todos</span></summary>
+            <div class="ms-panel" id="aeFiltroDefeitoPanel"></div>
+          </details>
         </div>
         <div class="filter-group">
           <label>Criticidade</label>
-          <select id="aeCriticidade" onchange="aeAtualizar()">
-            <option value="">Todas</option>
-            <option value="LEVE">Leve</option>
-            <option value="MÉDIO">Médio</option>
-            <option value="GRAVE">Grave</option>
-          </select>
+          <details class="ms-filter" id="aeCriticidadeDetails">
+            <summary><span id="aeCriticidadeResumo" data-rotulo-todos="Todas">Todas</span></summary>
+            <div class="ms-panel" id="aeCriticidadePanel"></div>
+          </details>
         </div>
         <div class="filter-group">
           <label>Gramatura</label>
-          <select id="aeGramatura" onchange="aeAtualizar()"><option value="">Todas</option></select>
+          <details class="ms-filter" id="aeGramaturaDetails">
+            <summary><span id="aeGramaturaResumo" data-rotulo-todos="Todas">Todas</span></summary>
+            <div class="ms-panel" id="aeGramaturaPanel"></div>
+          </details>
         </div>
         <div class="filter-group">
           <label>Cor</label>
-          <select id="aeCor" onchange="aeAtualizar()"><option value="">Todas</option></select>
+          <details class="ms-filter" id="aeCorDetails">
+            <summary><span id="aeCorResumo" data-rotulo-todos="Todas">Todas</span></summary>
+            <div class="ms-panel" id="aeCorPanel"></div>
+          </details>
         </div>
         <div class="filter-group">
           <label>Resina</label>
-          <select id="aeResina" onchange="aeAtualizar()"><option value="">Todas</option></select>
+          <details class="ms-filter" id="aeResinaDetails">
+            <summary><span id="aeResinaResumo" data-rotulo-todos="Todas">Todas</span></summary>
+            <div class="ms-panel" id="aeResinaPanel"></div>
+          </details>
         </div>
         <button class="filter-clear" onclick="aeLimparFiltros()">Limpar filtros</button>
         <button class="btn btn-outline" onclick="carregarDados(true)" style="align-self:flex-end;">↻ Atualizar</button>
@@ -1035,15 +1087,11 @@
       <!-- ================= Mapa de cavidades ================= -->
       <div class="card">
         <div class="card-head">
-          <div><h3>Mapa de calor por cavidade</h3><p class="card-sub">Desenho real da distribuição do molde — escolha o molde e o defeito pra ver em quais cavidades ele mais se repete. Sempre a partir de registros de Injeção, independente do filtro de Processo acima.</p></div>
-          <div class="mold-controls">
-            <span id="aeMoldCritBadge" class="mold-crit-badge"></span>
-            <select id="aeSelMolde"></select>
-            <select id="aeSelDefeito"></select>
-          </div>
+          <div><h3>Mapa de calor por cavidade</h3><p class="card-sub">Desenho real da distribuição do molde — segue os mesmos filtros do topo (defeito, criticidade, cor, resina, etc). Selecione uma única Gramatura no filtro acima pra identificar o molde e ver o mapa. Sempre a partir de registros de Injeção, independente do filtro de Processo.</p></div>
+          <span id="aeMoldCritBadge" class="mold-crit-badge"></span>
         </div>
 
-        <div id="aeMoldVazio" class="ae-vazio hidden">Nenhum registro de cavidade encontrado para este molde/defeito no período filtrado.</div>
+        <div id="aeMoldVazio" class="ae-vazio hidden"></div>
         <div class="mold-body" id="aeMoldBody">
           <div class="mold-svg-wrap"><div id="aeMoldSvgHost"></div><div class="mold-tooltip" id="aeMoldTooltip"></div></div>
           <div>
@@ -4153,9 +4201,9 @@ const AE_MOLDES = { huskyLX1: buildHuskyLX1(), huskyGL: buildHuskyGL(), hypet: b
 
 /* ---------------- Filtros próprios da página (reaproveita dadosCache real) ---------------- */
 function aeLinhasBase() {
-  const proc = document.getElementById('aeProcesso').value;
-  if (proc === 'injecao') return dadosCache.injecao.slice();
-  if (proc === 'sopro') return dadosCache.sopro.slice();
+  const proc = msValores('aeProcesso');
+  if (proc.length === 1 && proc[0] === 'injecao') return dadosCache.injecao.slice();
+  if (proc.length === 1 && proc[0] === 'sopro') return dadosCache.sopro.slice();
   return dadosCache.injecao.concat(dadosCache.sopro);
 }
 function aeAplicarFiltrosComuns(linhas) {
@@ -4168,18 +4216,18 @@ function aeAplicarFiltrosComuns(linhas) {
   if (dataFim) linhas = linhas.filter(function(l){ return !l.data || l.data <= dataFim; });
   if (horaIni) linhas = linhas.filter(function(l){ return !l.hora_fim || l.hora_fim >= horaIni; });
   if (horaFim) linhas = linhas.filter(function(l){ return !l.hora_fim || l.hora_fim <= horaFim; });
-  const equip = document.getElementById('aeEquipamento').value;
-  if (equip) linhas = linhas.filter(function(l){ return l.equipamento === equip; });
-  const defeito = document.getElementById('aeFiltroDefeito').value;
-  if (defeito) linhas = linhas.filter(function(l){ return l.defeito === defeito; });
-  const crit = document.getElementById('aeCriticidade').value;
-  if (crit) linhas = linhas.filter(function(l){ return (l.criticidade||'').toUpperCase() === crit; });
-  const gram = document.getElementById('aeGramatura').value;
-  if (gram) linhas = linhas.filter(function(l){ return (l.gramatura||'').toString().trim() === gram; });
-  const cor = document.getElementById('aeCor').value;
-  if (cor) linhas = linhas.filter(function(l){ return l.cor === cor; });
-  const resina = document.getElementById('aeResina').value;
-  if (resina) linhas = linhas.filter(function(l){ return l.resina === resina; });
+  const equip = msValores('aeEquipamento');
+  if (equip.length) linhas = linhas.filter(function(l){ return equip.indexOf(l.equipamento) > -1; });
+  const defeito = msValores('aeFiltroDefeito');
+  if (defeito.length) linhas = linhas.filter(function(l){ return defeito.indexOf(l.defeito) > -1; });
+  const crit = msValores('aeCriticidade');
+  if (crit.length) linhas = linhas.filter(function(l){ return crit.indexOf((l.criticidade||'').toUpperCase()) > -1; });
+  const gram = msValores('aeGramatura');
+  if (gram.length) linhas = linhas.filter(function(l){ return gram.indexOf((l.gramatura||'').toString().trim()) > -1; });
+  const cor = msValores('aeCor');
+  if (cor.length) linhas = linhas.filter(function(l){ return cor.indexOf(l.cor) > -1; });
+  const resina = msValores('aeResina');
+  if (resina.length) linhas = linhas.filter(function(l){ return resina.indexOf(l.resina) > -1; });
   return linhas;
 }
 function aeLinhasFiltradas() { return aeAplicarFiltrosComuns(aeLinhasBase()); }
@@ -4450,10 +4498,9 @@ const CELL = 25, R = 8.6, PAD = 30, EXTRA_W = 22;
 const DISPLAY_SCALE = 1.55, RENDER_SCALE = 2;
 let AE_MOLD_HOVER_INFO = [];
 
-function aeOcorrenciasPorCavidade(linhasInjecao, molde, defeitoNome) {
+function aeOcorrenciasPorCavidade(linhasInjecao, molde) {
   const mapa = {};
   linhasInjecao.forEach(function(l) {
-    if (defeitoNome && l.defeito !== defeitoNome) return;
     const g = parseFloat((l.gramatura || '').toString().replace(',', '.'));
     if (isNaN(g) || Math.abs(g - molde.gramatura) > 0.3) return;
     const bruto = (l.cavidade || '').toString().trim();
@@ -4463,14 +4510,6 @@ function aeOcorrenciasPorCavidade(linhasInjecao, molde, defeitoNome) {
     });
   });
   return mapa;
-}
-function aeDefeitosDoMolde(linhasInjecao, molde) {
-  const linhasDoMolde = linhasInjecao.filter(function(l) {
-    const g = parseFloat((l.gramatura || '').toString().replace(',', '.'));
-    return !isNaN(g) && Math.abs(g - molde.gramatura) <= 0.3;
-  });
-  const contagem = contarPor(linhasDoMolde, 'defeito');
-  return Object.entries(contagem).sort(function(a,b){ return b[1]-a[1]; }).map(function(e){ return e[0]; });
 }
 
 function aeDesenharPlaca(ctx, w, h, molde) {
@@ -4517,19 +4556,25 @@ function aeDesenharPlaca(ctx, w, h, molde) {
   }
 }
 
-function aeRenderMold(moldeId, defeitoNome) {
+function aeRenderMold(moldeId) {
   const molde = AE_MOLDES[moldeId];
   const linhasInjecao = aeLinhasInjecaoFiltradas();
-  const mapa = aeOcorrenciasPorCavidade(linhasInjecao, molde, defeitoNome);
+  const mapa = aeOcorrenciasPorCavidade(linhasInjecao, molde);
 
   const ativas = molde.cav.filter(function(c){ return !c.isolada; });
   const valores = ativas.map(function(c){ return mapa[String(c.num)] || 0; });
   const max = Math.max.apply(null, valores.concat([0]));
   const temDados = max > 0;
 
-  document.getElementById('aeMoldVazio').classList.toggle('hidden', temDados);
-  document.getElementById('aeMoldBody').classList.toggle('hidden', !temDados);
-  if (!temDados) return;
+  if (!temDados) {
+    document.getElementById('aeMoldVazio').textContent = 'Nenhum registro de cavidade encontrado para o ' + molde.nome + ' com os filtros selecionados.';
+    document.getElementById('aeMoldVazio').classList.remove('hidden');
+    document.getElementById('aeMoldBody').classList.add('hidden');
+    document.getElementById('aeMoldCritBadge').innerHTML = '';
+    return;
+  }
+  document.getElementById('aeMoldVazio').classList.add('hidden');
+  document.getElementById('aeMoldBody').classList.remove('hidden');
 
   const w = molde.cols * CELL + PAD * 2, h = molde.rows * CELL + PAD * 2;
   const totalW = w + EXTRA_W;
@@ -4613,7 +4658,9 @@ function aeRenderMold(moldeId, defeitoNome) {
     ctx.fillText(c.num, cx, cy + 0.5);
   });
 
-  document.getElementById('aeMoldCaption').textContent = molde.nome + ' — defeito selecionado: "' + defeitoNome + '". Passe o mouse sobre uma cavidade pra ver o número exato.';
+  const defeitosSel = msValores('aeFiltroDefeito');
+  const descDefeito = defeitosSel.length ? defeitosSel.join(', ') : 'todos os defeitos (conforme filtro acima)';
+  document.getElementById('aeMoldCaption').textContent = molde.nome + ' — ' + descDefeito + '. Passe o mouse sobre uma cavidade pra ver o número exato.';
   document.getElementById('aeHeatMaxLabel').textContent = 'alto (' + max + '+)';
   document.getElementById('aeMoldStatsText').textContent = cavidadesAtivas + ' ativas / ' + cavidadesIsoladas + ' isoladas (de ' + molde.total + ' no total)';
   document.getElementById('aeMoldCritBadge').innerHTML = top ? ('🔥 Cav. ' + top.num + ' — ' + top.valor + 'x') : '';
@@ -4621,7 +4668,7 @@ function aeRenderMold(moldeId, defeitoNome) {
   const ranked = ativas.map(function(c){ return { num: c.num, valor: mapa[String(c.num)] || 0 }; })
     .sort(function(a, b){ return b.valor - a.valor; }).slice(0, 5);
   document.getElementById('aeTopCavList').innerHTML =
-    '<div class="heat-legend-title">Top 5 cavidades — ' + defeitoNome + '</div>' +
+    '<div class="heat-legend-title">Top 5 cavidades — ' + descDefeito + '</div>' +
     ranked.map(function(r, i) { return '<div class="top-cav-item' + (i === 0 ? ' destaque' : '') + '"><span class="cav-nome">Cav. ' + r.num + '</span><span class="cav-qtd">' + r.valor + 'x</span></div>'; }).join('');
 
   aeConfigurarHoverMold(canvas);
@@ -4649,39 +4696,86 @@ function aeConfigurarHoverMold(canvas) {
   canvas.onmouseleave = function() { tip.style.opacity = 0; };
 }
 
-function aePopularSeletorMolde() {
-  const sel = document.getElementById('aeSelMolde');
-  if (sel.options.length) return;
-  sel.innerHTML = Object.keys(AE_MOLDES).map(function(id){ return '<option value="' + id + '">' + AE_MOLDES[id].nome + '</option>'; }).join('');
-}
-function aePopularSeletorDefeito() {
-  const selMolde = document.getElementById('aeSelMolde');
-  const selDefeito = document.getElementById('aeSelDefeito');
-  const molde = AE_MOLDES[selMolde.value];
-  const linhasInjecao = aeLinhasInjecaoFiltradas();
-  const defeitos = aeDefeitosDoMolde(linhasInjecao, molde);
-  const valorAnterior = selDefeito.value;
-  selDefeito.innerHTML = defeitos.map(function(d){ return '<option value="' + d.replace(/"/g, '&quot;') + '">' + d + '</option>'; }).join('');
-  if (defeitos.indexOf(valorAnterior) !== -1) selDefeito.value = valorAnterior;
-}
 function aeAtualizarMolde() {
-  aePopularSeletorMolde();
-  aePopularSeletorDefeito();
-  const selMolde = document.getElementById('aeSelMolde');
-  const selDefeito = document.getElementById('aeSelDefeito');
-  if (!selDefeito.options.length) {
+  const gramSel = msValores('aeGramatura');
+  if (gramSel.length !== 1) {
+    document.getElementById('aeMoldVazio').textContent = 'Selecione uma única Gramatura no filtro acima pra identificar o molde e ver o mapa de cavidades — cada molde tem sua própria configuração de cavidades e isolamento, então isso garante que o desenho exibido é o correto.';
     document.getElementById('aeMoldVazio').classList.remove('hidden');
     document.getElementById('aeMoldBody').classList.add('hidden');
-    document.getElementById('aeMoldVazio').textContent = 'Nenhum defeito de Injeção encontrado para o molde "' + AE_MOLDES[selMolde.value].nome + '" no período filtrado.';
+    document.getElementById('aeMoldCritBadge').innerHTML = '';
     return;
   }
-  aeRenderMold(selMolde.value, selDefeito.value);
+  const gramVal = parseFloat(gramSel[0].replace(',', '.'));
+  const moldeId = Object.keys(AE_MOLDES).find(function(id) { return Math.abs(AE_MOLDES[id].gramatura - gramVal) <= 0.3; });
+  if (!moldeId) {
+    document.getElementById('aeMoldVazio').textContent = 'Não há um molde cadastrado no mapa de calor para a gramatura "' + formatarGramaturaWpp(gramSel[0]) + '".';
+    document.getElementById('aeMoldVazio').classList.remove('hidden');
+    document.getElementById('aeMoldBody').classList.add('hidden');
+    document.getElementById('aeMoldCritBadge').innerHTML = '';
+    return;
+  }
+  aeRenderMold(moldeId);
 }
 
 /* ---------------- Filtros / orquestração geral da página ---------------- */
+/* ---------------- Multi-select genérico (Processo, Máquina, Defeito, Criticidade, Gramatura, Cor, Resina) ----------------
+   Cada filtro é um <details class="ms-filter"> com um painel de checkboxes. Nenhuma opção marcada = sem filtro
+   (equivale a "Todos"/"Todas"); uma ou mais marcadas = só essas entram no cruzamento dos gráficos. */
+function msValores(id) {
+  const panel = document.getElementById(id + 'Panel');
+  if (!panel) return [];
+  return Array.from(panel.querySelectorAll('input:checked')).map(function(i){ return i.value; });
+}
+function msPopular(id, opcoes) {
+  const panel = document.getElementById(id + 'Panel');
+  if (!panel) return;
+  const marcadosAntes = new Set(msValores(id));
+  if (!opcoes.length) { panel.innerHTML = '<div class="ms-panel-vazio">Nenhuma opção disponível.</div>'; msAtualizarResumo(id); return; }
+  panel.innerHTML =
+    '<div class="ms-panel-actions">' +
+      '<button type="button" onclick="msMarcarTodos(\'' + id + '\')">Marcar todos</button>' +
+      '<button type="button" onclick="msLimpar(\'' + id + '\')">Limpar</button>' +
+    '</div>' +
+    opcoes.map(function(o) {
+      const checked = marcadosAntes.has(o.valor) ? ' checked' : '';
+      const valorAttr = o.valor.replace(/"/g, '&quot;');
+      return '<label class="ms-opt"><input type="checkbox" value="' + valorAttr + '"' + checked + ' onchange="msOnChange(\'' + id + '\')"> ' + o.rotulo + '</label>';
+    }).join('');
+  msAtualizarResumo(id);
+}
+function msAtualizarResumo(id) {
+  const resumo = document.getElementById(id + 'Resumo');
+  if (!resumo) return;
+  const vals = msValores(id);
+  const rotuloTodos = resumo.getAttribute('data-rotulo-todos') || 'Todos';
+  if (!vals.length) { resumo.textContent = rotuloTodos; return; }
+  if (vals.length === 1) {
+    const opt = document.querySelector('#' + id + 'Panel .ms-opt input:checked');
+    resumo.textContent = opt ? opt.parentElement.textContent.trim() : (vals.length + ' selecionados');
+    return;
+  }
+  resumo.textContent = vals.length + ' selecionados';
+}
+function msMarcarTodos(id) {
+  document.querySelectorAll('#' + id + 'Panel input').forEach(function(i){ i.checked = true; });
+  msOnChange(id);
+}
+function msLimpar(id) {
+  document.querySelectorAll('#' + id + 'Panel input').forEach(function(i){ i.checked = false; });
+  msOnChange(id);
+}
+function msOnChange(id) {
+  msAtualizarResumo(id);
+  aeAtualizar();
+}
+
 function aePopularFiltrosEquipResp() {
-  const selEquip = document.getElementById('aeEquipamento');
-  if (selEquip.options.length > 1) return;
+  const panelDefeito = document.getElementById('aeFiltroDefeitoPanel');
+  if (panelDefeito.querySelector('.ms-opt')) return;
+
+  msPopular('aeProcesso', [ { valor: 'injecao', rotulo: 'Injeção' }, { valor: 'sopro', rotulo: 'Sopro' } ]);
+  msPopular('aeCriticidade', [ { valor: 'LEVE', rotulo: 'Leve' }, { valor: 'MÉDIO', rotulo: 'Médio' }, { valor: 'GRAVE', rotulo: 'Grave' } ]);
+
   const todos = dadosCache.injecao.concat(dadosCache.sopro);
   const equipamentos = Array.from(new Set(todos.map(function(l){ return l.equipamento; }).filter(Boolean))).sort();
   const defeitos = Array.from(new Set(todos.map(function(l){ return l.defeito; }).filter(Boolean))).sort();
@@ -4689,25 +4783,22 @@ function aePopularFiltrosEquipResp() {
   const resinas = Array.from(new Set(todos.map(function(l){ return l.resina; }).filter(Boolean))).sort();
   const gramaturas = Array.from(new Set(todos.map(function(l){ return (l.gramatura || '').toString().trim(); }).filter(Boolean)))
     .sort(function(a, b){ return parseFloat(a.replace(',', '.')) - parseFloat(b.replace(',', '.')); });
-  preencherSelect('aeEquipamento', equipamentos, true);
-  preencherSelect('aeFiltroDefeito', defeitos, true);
-  preencherSelect('aeCor', cores, true);
-  preencherSelect('aeResina', resinas, true);
-  const selGram = document.getElementById('aeGramatura');
-  selGram.innerHTML = '<option value="">Todas</option>' + gramaturas.map(function(g){ return '<option value="' + g + '">' + formatarGramaturaWpp(g) + '</option>'; }).join('');
+
+  msPopular('aeEquipamento', equipamentos.map(function(v){ return { valor: v, rotulo: v }; }));
+  msPopular('aeFiltroDefeito', defeitos.map(function(v){ return { valor: v, rotulo: v }; }));
+  msPopular('aeCor', cores.map(function(v){ return { valor: v, rotulo: v }; }));
+  msPopular('aeResina', resinas.map(function(v){ return { valor: v, rotulo: v }; }));
+  msPopular('aeGramatura', gramaturas.map(function(g){ return { valor: g, rotulo: formatarGramaturaWpp(g) }; }));
 }
 function aeLimparFiltros() {
-  document.getElementById('aeProcesso').value = 'todos';
   document.getElementById('aeDataInicio').value = '';
   document.getElementById('aeDataFim').value = '';
   document.getElementById('aeHoraInicio').value = '';
   document.getElementById('aeHoraFim').value = '';
-  document.getElementById('aeEquipamento').value = '';
-  document.getElementById('aeFiltroDefeito').value = '';
-  document.getElementById('aeCriticidade').value = '';
-  document.getElementById('aeGramatura').value = '';
-  document.getElementById('aeCor').value = '';
-  document.getElementById('aeResina').value = '';
+  ['aeProcesso', 'aeEquipamento', 'aeFiltroDefeito', 'aeCriticidade', 'aeGramatura', 'aeCor', 'aeResina'].forEach(function(id) {
+    document.querySelectorAll('#' + id + 'Panel input').forEach(function(i){ i.checked = false; });
+    msAtualizarResumo(id);
+  });
   aeAtualizar();
 }
 function aeAtualizar() {
@@ -4749,10 +4840,18 @@ function aeAtualizar() {
   aeAtualizarMolde();
 }
 (function aeInit() {
-  const selMolde = document.getElementById('aeSelMolde');
-  const selDefeito = document.getElementById('aeSelDefeito');
-  if (selMolde) selMolde.addEventListener('change', aeAtualizarMolde);
-  if (selDefeito) selDefeito.addEventListener('change', aeAtualizarMolde);
+  const filtrosMultiplos = document.querySelectorAll('#pageAnaliseEstatistica .ms-filter');
+  filtrosMultiplos.forEach(function(det) {
+    det.addEventListener('toggle', function() {
+      if (!det.open) return;
+      filtrosMultiplos.forEach(function(outro) { if (outro !== det) outro.removeAttribute('open'); });
+    });
+  });
+  document.addEventListener('click', function(e) {
+    filtrosMultiplos.forEach(function(det) {
+      if (det.open && !det.contains(e.target)) det.removeAttribute('open');
+    });
+  });
 })();
 </script>
 </body>
