@@ -397,6 +397,13 @@
   .cav-cadastro-sub { font-size: 13px; color: var(--text-dim); margin: 0 0 20px; line-height: 1.55; }
   .cav-cadastro-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }
   .cav-cadastro-acoes .btn { padding: 13px; font-size: 14.5px; }
+  .mm-cadastro-card { max-width: 760px; }
+  .mm-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 16px; }
+  .mm-form-grid .field-full { grid-column: 1 / -1; }
+  .mm-preview-wrap { margin-top: 16px; padding: 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; display: flex; justify-content: center; align-items: center; min-height: 150px; overflow-x: auto; }
+  .mm-preview-hint { font-size: 11.5px; color: var(--text-dim); margin: 8px 0 0; line-height: 1.5; }
+  .mm-preview-hint a { color: var(--accent); }
+  @media (max-width: 640px) { .mm-form-grid { grid-template-columns: 1fr; } }
   .cav-isoladas-nota { font-size: 11.5px; color: var(--text-dim); margin-top: 8px; }
   .cav-isoladas-tag { display: inline-block; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; margin: 2px 2px 0 0; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
 
@@ -654,6 +661,10 @@
 
   <div class="cav-cadastro-overlay hidden" id="cavCadastroOverlay">
     <div class="cav-cadastro-card" id="cavCadastroCardBody"></div>
+  </div>
+
+  <div class="cav-cadastro-overlay hidden" id="mmCadastroOverlay">
+    <div class="cav-cadastro-card mm-cadastro-card" id="mmCadastroCardBody"></div>
   </div>
 
   <div class="sidebar" id="sidebar">
@@ -1180,7 +1191,9 @@
           Define quantas cavidades tem o molde de cada gramatura e quais estão isoladas (fora de uso)
           no momento. É isso que restringe as opções do campo "Cavidade(s)" no Cadastro de Injeção.
           Fica guardado numa aba própria da planilha (<code>Cavidades_App</code>), com histórico de
-          cada atualização — o cadastro mais recente de cada gramatura é sempre o que vale.
+          cada atualização — o cadastro mais recente de cada gramatura é sempre o que vale. Opcionalmente
+          você pode vincular a gramatura a um "Modelo de molde" (seção abaixo) pra deixar o desenho do
+          mapa de calor da Análise Estatística parecido com o molde físico real.
         </p>
         <div class="grid-2" style="align-items:end;">
           <div class="field"><label>Gramatura</label><select id="cavConfigGramatura"></select></div>
@@ -1188,10 +1201,32 @@
         </div>
         <div class="table-scroll" style="margin-top:16px;">
           <table class="occ-table" id="tabelaCavidadesConfig">
-            <thead><tr><th>Gramatura</th><th>Total de cavidades</th><th>Isoladas atualmente</th><th>Cadastrado em</th><th></th></tr></thead>
+            <thead><tr><th>Gramatura</th><th>Total de cavidades</th><th>Isoladas atualmente</th><th>Modelo de molde</th><th>Cadastrado em</th><th></th></tr></thead>
             <tbody id="tabelaCavidadesConfigBody"></tbody>
           </table>
           <div id="tabelaCavidadesConfigVazia" class="table-empty hidden">Nenhuma gramatura cadastrada ainda.</div>
+        </div>
+      </div>
+
+      <div class="card" id="modelosMoldeSecao">
+        <h3>Modelos de molde (desenho do mapa de calor)</h3>
+        <p class="config-note" style="margin-bottom:12px;">
+          Um modelo de molde define o FORMATO/desenho usado no mapa de calor por cavidade da Análise
+          Estatística — quantas colunas tem a grade, o sentido de numeração e, se quiser, linhas de
+          divisão visual. Ele <b>não</b> define quais cavidades estão isoladas — isso continua sendo
+          cadastrado por gramatura, no card acima. Várias gramaturas que usam o mesmo molde físico podem
+          apontar pro mesmo modelo aqui, sem precisar recadastrar o desenho pra cada uma. Fica guardado
+          numa aba própria da planilha (<code>ModelosMolde_App</code>).
+        </p>
+        <div style="display:flex; justify-content:flex-end;">
+          <button class="btn btn-outline" onclick="abrirNovoModeloMolde()">+ Novo modelo de molde</button>
+        </div>
+        <div class="table-scroll" style="margin-top:16px;">
+          <table class="occ-table" id="tabelaModelosMoldeConfig">
+            <thead><tr><th>Nome do modelo</th><th>Total de cavidades</th><th>Colunas</th><th>Linhas de divisão</th><th></th></tr></thead>
+            <tbody id="tabelaModelosMoldeBody"></tbody>
+          </table>
+          <div id="tabelaModelosMoldeVazia" class="table-empty hidden">Nenhum modelo de molde cadastrado ainda.</div>
         </div>
       </div>
     </div>
@@ -1277,7 +1312,18 @@ const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipament
 /* ---------------- Cadastro de cavidades por gramatura (aba própria, histórico append-only) ---------------- */
 const NOME_ABA_CAVIDADES = 'Cavidades_App';
 const NOME_TABELA_CAVIDADES = 'TabelaCavidades';
-const CABECALHO_CAVIDADES = ['gramatura','total_cavidades','cavidades_isoladas','data_cadastro','hora_cadastro','responsavel'];
+// 'modelo_molde' foi adicionado no fim da lista (nunca no meio) pra não desalinhar a leitura de linhas
+// já cadastradas em planilhas antigas, que não tinham essa coluna.
+const CABECALHO_CAVIDADES = ['gramatura','total_cavidades','cavidades_isoladas','data_cadastro','hora_cadastro','responsavel','modelo_molde'];
+
+/* ---------------- Modelos de molde: cadastro do DESENHO/grade usado no mapa de calor por cavidade
+   (aba própria ModelosMolde_App, histórico append-only — mesma convenção da aba Cavidades_App: a
+   chave é o "nome" do modelo, e o cadastro mais recente de cada nome é sempre o que vale). Uma
+   gramatura vincula-se a um modelo pelo campo cavidades.modelo_molde (guarda o nome); o próprio
+   isolamento de cavidades continua sendo só por gramatura, nunca pelo modelo. ---------------- */
+const NOME_ABA_MODELOS_MOLDE = 'ModelosMolde_App';
+const NOME_TABELA_MODELOS_MOLDE = 'TabelaModelosMolde';
+const CABECALHO_MODELOS_MOLDE = ['nome','total_cavidades','colunas','divisorias','numeracao','data_cadastro','hora_cadastro','responsavel'];
 
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
 let paginaAtual = 'dashboard';
@@ -1287,6 +1333,7 @@ let desviosInjecao = [], contadorInjecao = 0;
 let desviosSopro = [], contadorSopro = 0;
 
 let cavidadesCache = [];           // registros carregados da aba Cavidades_App (histórico completo)
+let modelosMoldeCache = [];        // registros carregados da aba ModelosMolde_App (histórico completo, chave = nome do modelo)
 let cavidadesAtivasAtual = null;   // cavidades ativas (array) pra gramatura selecionada no Cadastro Injeção; null = sem restrição (legado)
 let isoladasAtuaisAtual = [];      // cavidades isoladas do cadastro aplicado no momento
 let gramaturaCavResolvida = null;  // gramatura já resolvida (perguntada/aplicada) nesta passagem pelo formulário
@@ -1424,6 +1471,7 @@ async function conectarPlanilha() {
       await garantirColunasInjecao(token);
       await prepararColunasComoTexto(token);
       await carregarCavidadesDaPlanilha();
+      await carregarModelosMoldeDaPlanilha();
       // Recupera rascunho do Cadastro (se houver) só depois que listas/cavidades já carregaram —
       // garante que os dropdowns e a lógica de cavidade por gramatura estejam prontos pra restaurar corretamente.
       restaurarRascunho('injecao');
@@ -1596,6 +1644,19 @@ async function garantirTabelaCavidades(token) {
     });
     return false; // tabela recém-criada, ainda vazia
   }
+  // Tabela já existia — garante que a coluna modelo_molde exista (planilhas de antes dessa funcionalidade
+  // não tinham esse campo). Sempre adicionada no FIM da tabela, sem reordenar/apagar nada já cadastrado.
+  try {
+    const respCols = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/columns', { headers: { Authorization: 'Bearer ' + token } });
+    const jsonCols = await respCols.json();
+    const nomesCols = (jsonCols.value || []).map(function(c){ return c.name; });
+    if (nomesCols.indexOf('modelo_molde') === -1) {
+      await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/columns/add', {
+        method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: 'modelo_molde' })
+      });
+    }
+  } catch (e) { /* segue mesmo se falhar — cadastro de cavidades continua funcionando sem vínculo de modelo */ }
   return true;
 }
 
@@ -1667,12 +1728,32 @@ function abrirCadastroCavidades() {
         '<div class="cav-grid" id="cavIsoladasGrid">' + montarGridIsoladas(totalPre, isoladasPre) + '</div>' +
       '</details>' +
     '</div>' +
+    '<div class="field" style="margin-top:14px;"><label>Modelo de molde (desenho usado no mapa de calor da Análise Estatística) — opcional</label>' +
+      '<select id="cavModeloMoldeSelect"></select>' +
+      '<p class="mm-preview-hint">Várias gramaturas que usam o mesmo molde físico podem apontar pro mesmo modelo. ' +
+        '<a href="#" onclick="irParaCadastroNovoModeloMolde();return false;">+ Cadastrar um novo modelo de molde</a></p>' +
+    '</div>' +
     '<div class="cav-cadastro-acoes">' +
       '<button class="btn btn-outline" onclick="cancelarCadastroCavidades()">Cancelar</button>' +
       '<button class="btn btn-accent" onclick="salvarCadastroCavidades()">Salvar cadastro</button>' +
     '</div>';
   overlay.classList.remove('hidden');
   body.querySelectorAll('.cavIsoladaChk').forEach(function(cb){ cb.addEventListener('change', atualizarResumoIsoladasCadastro); });
+  atualizarSeletorModeloMolde();
+  const selModelo = document.getElementById('cavModeloMoldeSelect');
+  if (selModelo && base && base.modelo_molde) selModelo.value = base.modelo_molde;
+}
+
+// Leva o usuário pra Configurações pra cadastrar um novo modelo de molde a partir do cadastro de
+// cavidades (fecha este modal; ao voltar, reabra o cadastro de cavidades pra vincular o modelo criado).
+function irParaCadastroNovoModeloMolde() {
+  fecharCadastroCavidades();
+  setPage('config');
+  setTimeout(function() {
+    abrirNovoModeloMolde();
+    const sec = document.getElementById('modelosMoldeSecao');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 60);
 }
 
 function atualizarGridIsoladasCadastro() {
@@ -1745,13 +1826,15 @@ async function salvarCadastroCavidades() {
     const token = await getToken();
     await garantirTabelaCavidades(token);
     const respEl = document.getElementById('inj_responsavel');
+    const selModelo = document.getElementById('cavModeloMoldeSelect');
     const novoRegistro = {
       gramatura: gramatura,
       total_cavidades: String(total),
       cavidades_isoladas: isoladas.join(','),
       data_cadastro: hojeISO(),
       hora_cadastro: agoraHHMM(),
-      responsavel: respEl ? respEl.value : ''
+      responsavel: respEl ? respEl.value : '',
+      modelo_molde: selModelo ? selModelo.value : ''
     };
     const valores = CABECALHO_CAVIDADES.map(function(campo) { return novoRegistro[campo]; });
     await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows/add', {
@@ -1807,7 +1890,7 @@ function renderCavidadesConfig() {
     const r = mapa[g];
     const isoladas = r.cavidades_isoladas ? String(r.cavidades_isoladas).split(',').filter(Boolean) : [];
     const gEsc = g.replace(/'/g, "\\'");
-    return '<tr><td>'+g+'</td><td>'+r.total_cavidades+'</td><td>'+(isoladas.length ? isoladas.join(', ') : 'Nenhuma')+'</td><td>'+dataISOparaBR(r.data_cadastro)+(r.hora_cadastro?(' '+r.hora_cadastro):'')+'</td>' +
+    return '<tr><td>'+g+'</td><td>'+r.total_cavidades+'</td><td>'+(isoladas.length ? isoladas.join(', ') : 'Nenhuma')+'</td><td>'+(r.modelo_molde || '—')+'</td><td>'+dataISOparaBR(r.data_cadastro)+(r.hora_cadastro?(' '+r.hora_cadastro):'')+'</td>' +
       '<td><button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="editarCavidadesConfig(\''+gEsc+'\')">Editar</button></td></tr>';
   }).join('');
 }
@@ -1823,6 +1906,239 @@ function abrirCadastroCavidadesConfig() {
   const gramatura = document.getElementById('cavConfigGramatura').value;
   if (!gramatura) { mostrarToast('Selecione uma gramatura.', true); return; }
   editarCavidadesConfig(gramatura);
+}
+
+/* ---------------- Modelos de molde: cadastro do desenho/grade (aba ModelosMolde_App) ----------------
+   Define só o FORMATO usado no mapa de calor (colunas, sentido de numeração, linhas de divisão visual).
+   Isolamento de cavidades continua sempre por gramatura (aba Cavidades_App) — nunca aqui. */
+
+async function garantirTabelaModelosMolde(token) {
+  const respWs = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets', { headers: { Authorization: 'Bearer ' + token } });
+  const jsonWs = await respWs.json();
+  const existeWs = (jsonWs.value || []).some(function(w){ return w.name === NOME_ABA_MODELOS_MOLDE; });
+
+  if (!existeWs) {
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: NOME_ABA_MODELOS_MOLDE })
+    });
+  }
+
+  const respTb = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables', { headers: { Authorization: 'Bearer ' + token } });
+  const jsonTb = await respTb.json();
+  const existeTb = (jsonTb.value || []).some(function(t){ return t.name === NOME_TABELA_MODELOS_MOLDE; });
+
+  if (!existeTb) {
+    const faixa = 'A1:' + letraColuna(CABECALHO_MODELOS_MOLDE.length - 1) + '1';
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/range(address=\'' + faixa + '\')', {
+      method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [CABECALHO_MODELOS_MOLDE] })
+    });
+    const respAdd = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: NOME_ABA_MODELOS_MOLDE + '!' + faixa, hasHeaders: true })
+    });
+    const jsonAdd = await respAdd.json();
+    if (jsonAdd.id) {
+      await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + jsonAdd.id, {
+        method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: NOME_TABELA_MODELOS_MOLDE })
+      });
+    }
+    ['data_cadastro', 'hora_cadastro'].forEach(async function(campo) {
+      const idx = CABECALHO_MODELOS_MOLDE.indexOf(campo);
+      const col = letraColuna(idx);
+      try {
+        await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/range(address=\'' + col + ':' + col + '\')', {
+          method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ numberFormat: [['@']] })
+        });
+      } catch (e) { /* segue mesmo se falhar */ }
+    });
+    return false; // tabela recém-criada, ainda vazia
+  }
+  return true;
+}
+
+async function carregarModelosMoldeDaPlanilha() {
+  try {
+    const token = await getToken();
+    const jaExistia = await garantirTabelaModelosMolde(token);
+    if (!jaExistia) { modelosMoldeCache = []; renderModelosMoldeConfig(); return; }
+    const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows', { headers: { Authorization: 'Bearer ' + token } });
+    const json = await resp.json();
+    modelosMoldeCache = (json.value || []).map(function(row) {
+      const v = row.values[0];
+      const obj = {};
+      CABECALHO_MODELOS_MOLDE.forEach(function(campo, i) { obj[campo] = v[i]; });
+      return obj;
+    });
+    renderModelosMoldeConfig();
+  } catch (err) {
+    console.error('Erro ao carregar modelos de molde da planilha:', err);
+    modelosMoldeCache = [];
+    renderModelosMoldeConfig();
+    mostrarToast('Não consegui carregar os Modelos de Molde (Configurações). Tente atualizar a página — se continuar faltando, avise o TI.', true);
+  }
+}
+
+function ultimoRegistroModeloPorNome() {
+  const mapa = {};
+  modelosMoldeCache.forEach(function(r){ mapa[r.nome] = r; }); // última ocorrência sobrescreve, igual ao cadastro de cavidades
+  return mapa;
+}
+
+function renderModelosMoldeConfig() {
+  const corpo = document.getElementById('tabelaModelosMoldeBody');
+  if (!corpo) return; // Configurações ainda não foi montada
+  const vazio = document.getElementById('tabelaModelosMoldeVazia');
+  const mapa = ultimoRegistroModeloPorNome();
+  const nomes = Object.keys(mapa).sort(function(a,b){ return a.localeCompare(b, 'pt-BR'); });
+  vazio.classList.toggle('hidden', nomes.length > 0);
+  corpo.innerHTML = nomes.map(function(nome) {
+    const r = mapa[nome];
+    const divisoriasTxt = r.divisorias ? String(r.divisorias) : '—';
+    const nomeEsc = nome.replace(/'/g, "\\'");
+    return '<tr><td>' + nome + '</td><td>' + r.total_cavidades + '</td><td>' + r.colunas + '</td><td>' + divisoriasTxt + '</td>' +
+      '<td><button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="editarModeloMolde(\'' + nomeEsc + '\')">Editar</button></td></tr>';
+  }).join('');
+  atualizarSeletorModeloMolde();
+}
+
+// Repopula o <select> "Modelo de molde" dentro do cadastro de Cavidades por Gramatura, se estiver aberto.
+function atualizarSeletorModeloMolde() {
+  const sel = document.getElementById('cavModeloMoldeSelect');
+  if (!sel) return;
+  const atual = sel.value;
+  const nomes = Object.keys(ultimoRegistroModeloPorNome()).sort(function(a,b){ return a.localeCompare(b, 'pt-BR'); });
+  sel.innerHTML = '<option value="">Nenhum (grade automática aproximada)</option>' +
+    nomes.map(function(n){ return '<option value="' + n.replace(/"/g,'&quot;') + '">' + n + '</option>'; }).join('');
+  if (nomes.indexOf(atual) > -1) sel.value = atual;
+}
+
+function abrirNovoModeloMolde() {
+  mmAbrirForm(null);
+}
+
+function editarModeloMolde(nome) {
+  const registro = ultimoRegistroModeloPorNome()[nome];
+  mmAbrirForm(registro || null);
+}
+
+function fecharModeloMoldeForm() {
+  document.getElementById('mmCadastroOverlay').classList.add('hidden');
+  document.getElementById('mmCadastroCardBody').innerHTML = '';
+}
+
+function mmAbrirForm(registro) {
+  const overlay = document.getElementById('mmCadastroOverlay');
+  const body = document.getElementById('mmCadastroCardBody');
+  const divisoriasPre = registro && registro.divisorias ? String(registro.divisorias) : '';
+  body.innerHTML =
+    '<div class="cav-cadastro-icon">🧰</div>' +
+    '<h2 class="cav-cadastro-titulo">' + (registro ? 'Editar modelo de molde' : 'Novo modelo de molde') + '</h2>' +
+    '<p class="cav-cadastro-sub">Descreva a grade do molde (colunas e, se quiser, linhas de divisão visual) e compare a prévia ao lado com a foto/desenho real — ajuste até ficar parecido. Depois vincule esse modelo às gramaturas que usam esse molde no cadastro de "Cavidades por gramatura", acima.</p>' +
+    '<input type="hidden" id="mmNomeOriginalInput" value="' + (registro ? registro.nome.replace(/"/g,'&quot;') : '') + '">' +
+    '<div class="mm-form-grid">' +
+      '<div class="field field-full"><label>Nome do modelo' + (registro ? ' (pra renomear, cadastre um novo modelo e depois reatribua as gramaturas)' : '') + '</label><input type="text" id="mmNomeInput" ' + (registro ? 'disabled' : '') + ' placeholder="Ex: Husky 56 cavidades" value="' + (registro ? registro.nome.replace(/"/g,'&quot;') : '') + '" oninput="mmAtualizarPreview()"></div>' +
+      '<div class="field"><label>Total de cavidades</label><input type="number" id="mmTotalInput" min="1" value="' + (registro ? registro.total_cavidades : '') + '" placeholder="Ex: 56" oninput="mmAtualizarPreview()"></div>' +
+      '<div class="field"><label>Número de colunas</label><input type="number" id="mmColunasInput" min="1" value="' + (registro ? registro.colunas : '') + '" placeholder="Ex: 4" oninput="mmAtualizarPreview()"></div>' +
+      '<div class="field field-full"><label>Sentido de numeração</label><select id="mmNumeracaoSelect" onchange="mmAtualizarPreview()">' +
+        '<option value="sequencial"' + (registro && registro.numeracao === 'zigzag' ? '' : ' selected') + '>Sequencial por coluna (1, 2, 3… de cima a baixo em cada coluna)</option>' +
+        '<option value="zigzag"' + (registro && registro.numeracao === 'zigzag' ? ' selected' : '') + '>Zig-zag por coluna (desce numa coluna, sobe na próxima)</option>' +
+      '</select></div>' +
+      '<div class="field field-full"><label>Linhas de divisão (opcional, só visual)</label><input type="text" id="mmDivisoriasInput" placeholder="Ex: 7 ou 3,10" value="' + divisoriasPre.replace(/"/g,'&quot;') + '" oninput="mmAtualizarPreview()"></div>' +
+    '</div>' +
+    '<div class="mm-preview-wrap" id="mmPreviewHost"></div>' +
+    '<p class="mm-preview-hint">A prévia mostra só a posição dos números do molde. As cavidades isoladas continuam sendo definidas por gramatura, no cadastro acima, mesmo quando várias gramaturas compartilham este modelo.</p>' +
+    '<div class="cav-cadastro-acoes">' +
+      '<button class="btn btn-outline" onclick="fecharModeloMoldeForm()">Cancelar</button>' +
+      '<button class="btn btn-accent" id="mmBtnSalvar" onclick="salvarModeloMolde()">Salvar modelo</button>' +
+    '</div>';
+  overlay.classList.remove('hidden');
+  mmAtualizarPreview();
+}
+
+function mmAtualizarPreview() {
+  const host = document.getElementById('mmPreviewHost');
+  if (!host) return;
+  const total = parseInt(document.getElementById('mmTotalInput').value, 10) || 0;
+  const colunas = parseInt(document.getElementById('mmColunasInput').value, 10) || 0;
+  const zigzag = document.getElementById('mmNumeracaoSelect').value === 'zigzag';
+  const divisoriasRaw = document.getElementById('mmDivisoriasInput').value.trim();
+  if (!total || !colunas) {
+    host.innerHTML = '<div class="ae-vazio">Informe o total de cavidades e o número de colunas pra ver a prévia do desenho.</div>';
+    return;
+  }
+  const divisorias = divisoriasRaw ? divisoriasRaw.split(',').map(function(s){ return parseInt(s.trim(), 10); }).filter(function(n){ return !isNaN(n) && n > 0; }) : [];
+  const layout = aeLayoutPorColunas(total, colunas, divisorias, zigzag);
+  const w = layout.cols * CELL + PAD * 2, h = layout.rows * CELL + PAD * 2;
+  let canvas = document.getElementById('mmPreviewCanvas');
+  if (!canvas) { canvas = document.createElement('canvas'); canvas.id = 'mmPreviewCanvas'; host.innerHTML = ''; host.appendChild(canvas); }
+  const escala = DISPLAY_SCALE;
+  canvas.width = Math.round(w * escala * RENDER_SCALE);
+  canvas.height = Math.round(h * escala * RENDER_SCALE);
+  canvas.style.width = Math.round(w * escala) + 'px';
+  canvas.style.height = Math.round(h * escala) + 'px';
+  canvas.style.display = 'block';
+  canvas.style.borderRadius = '10px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(escala * RENDER_SCALE, 0, 0, escala * RENDER_SCALE, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  aeDesenharPlaca(ctx, w, h, { rows: layout.rows, dividers: layout.dividers });
+  layout.cav.forEach(function(c) {
+    const cx = PAD + c.col * CELL + CELL / 2, cy = PAD + c.row * CELL + CELL / 2;
+    ctx.fillStyle = '#3a3d44'; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#17181b'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.font = '700 7.4px ' + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#d6d8db';
+    ctx.fillText(c.num, cx, cy + 0.5);
+  });
+}
+
+async function salvarModeloMolde() {
+  const nomeOriginal = document.getElementById('mmNomeOriginalInput').value;
+  const nome = document.getElementById('mmNomeInput').value.trim();
+  const total = parseInt(document.getElementById('mmTotalInput').value, 10);
+  const colunas = parseInt(document.getElementById('mmColunasInput').value, 10);
+  const numeracao = document.getElementById('mmNumeracaoSelect').value;
+  const divisoriasRaw = document.getElementById('mmDivisoriasInput').value.trim();
+  if (!nome) { mostrarToast('Informe um nome pro modelo de molde.', true); return; }
+  if (!total || total < 1) { mostrarToast('Informe o total de cavidades do modelo.', true); return; }
+  if (!colunas || colunas < 1) { mostrarToast('Informe o número de colunas da grade.', true); return; }
+  if (!nomeOriginal && ultimoRegistroModeloPorNome()[nome]) { mostrarToast('Já existe um modelo com esse nome — abra ele em "Editar" pra atualizar, ou escolha outro nome.', true); return; }
+  const divisorias = divisoriasRaw ? divisoriasRaw.split(',').map(function(s){ return parseInt(s.trim(), 10); }).filter(function(n){ return !isNaN(n) && n > 0; }) : [];
+  const btn = document.getElementById('mmBtnSalvar');
+  if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
+  try {
+    const token = await getToken();
+    await garantirTabelaModelosMolde(token);
+    const respEl = document.getElementById('inj_responsavel');
+    const registro = {
+      nome: nome,
+      total_cavidades: String(total),
+      colunas: String(colunas),
+      divisorias: divisorias.join(','),
+      numeracao: numeracao,
+      data_cadastro: hojeISO(),
+      hora_cadastro: agoraHHMM(),
+      responsavel: respEl ? respEl.value : ''
+    };
+    const valores = CABECALHO_MODELOS_MOLDE.map(function(campo) { return registro[campo]; });
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [valores] })
+    });
+    modelosMoldeCache.push(registro);
+    renderModelosMoldeConfig();
+    fecharModeloMoldeForm();
+    mostrarToast('Modelo de molde salvo com sucesso.');
+  } catch (err) {
+    mostrarToast('Erro ao salvar o modelo de molde. Tente novamente.', true);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Salvar modelo'; }
+  }
 }
 
 async function garantirTabelaListas(token) {
@@ -4163,12 +4479,16 @@ function aeFormatarDataCurta(iso) {
 /* ---------------- Molde por gramatura: total de cavidades e isoladas vêm sempre do cadastro real
    (Configurações → "Cavidades por Gramatura — Injeção" / aba Cavidades_App), nunca de um valor fixo
    aqui no código — é a mesma fonte usada pelo Cadastro de Injeção, então o mapa de calor fica sempre
-   compatível com o que está cadastrado lá. Só o DESENHO (em quais colunas/linhas cada número cai) é
-   fixo: pra 19,0g e 15,6g (molde Husky, 56 cavidades) e 41,5g (Hypet, 72 cavidades) usamos o layout
-   conferido com as fotos reais dos moldes; qualquer outra gramatura cadastrada usa uma grade genérica
-   (numeração em colunas, sem desenho físico de referência) — o que importa pro cálculo (quantidade por
-   cavidade e quais estão isoladas) continua sempre correto, só a disposição visual é aproximada nesses
-   casos. */
+   compatível com o que está cadastrado lá.
+   O DESENHO (em quais colunas/linhas cada número cai) vem, por ordem de prioridade:
+   1) do "Modelo de molde" vinculado à gramatura em Configurações (aba ModelosMolde_App) — cadastrado
+      visualmente pelo usuário, com prévia, em "Configurações → Modelos de molde";
+   2) se não houver modelo vinculado: o layout conferido com fotos reais, só pra 19,0g/15,6g (Husky, 56
+      cavidades) e 41,5g (Hypet, 72 cavidades), mantido aqui como legado pra não regredir esses 3 moldes
+      já existentes antes dos modelos ficarem auto-cadastráveis;
+   3) senão, uma grade genérica automática (numeração sequencial em colunas, sem desenho de referência).
+   Em todos os casos, o que importa pro cálculo (quantidade por cavidade e quais estão isoladas) vem
+   sempre do cadastro real — só a disposição visual pode ser aproximada quando não há modelo cadastrado. */
 function aeLayoutQuadrante56() {
   const cav = [];
   function quad(colA, colB, colOffset, rowOffset) {
@@ -4191,17 +4511,43 @@ function aeLayoutHypet72() {
   bloco([[10,22,34,46,58,70],[11,23,35,47,59,71],[12,24,36,48,60,72]], 11);
   return { cols: 6, rows: 14, dividers: [3, 10], cav: cav };
 }
-function aeLayoutGenerico(total) {
-  const cols = total >= 32 ? 4 : total >= 10 ? 2 : 1;
-  const rows = Math.max(1, Math.ceil(total / cols));
+// Motor genérico parametrizado: usado tanto pelo fallback automático (sem modelo cadastrado) quanto
+// por QUALQUER modelo de molde cadastrado em Configurações (e pela prévia ao vivo do cadastro de modelo).
+// Numeração sequencial por coluna (1,2,3… de cima a baixo) ou zig-zag (desce numa coluna, sobe na
+// próxima) — "divisorias" são só linhas de separação visual, não afetam a numeração nem o cálculo.
+function aeLayoutPorColunas(total, colunas, divisorias, zigzag) {
+  const t = Math.max(1, parseInt(total, 10) || 1);
+  const c = Math.max(1, parseInt(colunas, 10) || 1);
+  const rows = Math.max(1, Math.ceil(t / c));
   const cav = [];
   let num = 1;
-  for (let c = 0; c < cols && num <= total; c++) {
-    for (let r = 0; r < rows && num <= total; r++) { cav.push({ num: num, col: c, row: r }); num++; }
+  for (let col = 0; col < c && num <= t; col++) {
+    const inverte = !!zigzag && (col % 2 === 1);
+    for (let r = 0; r < rows && num <= t; r++) {
+      const row = inverte ? (rows - 1 - r) : r;
+      cav.push({ num: num, col: col, row: row });
+      num++;
+    }
   }
-  return { cols: cols, rows: rows, dividers: [], cav: cav };
+  const dividers = (divisorias || []).filter(function(n){ return n > 0 && n < rows; });
+  return { cols: c, rows: rows, dividers: dividers, cav: cav };
 }
-function aeLayoutParaGramatura(gramaturaStr, total) {
+function aeLayoutGenerico(total) {
+  const t = parseInt(total, 10) || 0;
+  const cols = t >= 32 ? 4 : t >= 10 ? 2 : 1;
+  return aeLayoutPorColunas(t, cols, [], false);
+}
+function aeLayoutParaGramatura(gramaturaStr, total, registro) {
+  const modeloNome = registro && registro.modelo_molde ? String(registro.modelo_molde).trim() : '';
+  if (modeloNome) {
+    const modelo = ultimoRegistroModeloPorNome()[modeloNome];
+    if (modelo) {
+      const divs = modelo.divisorias
+        ? String(modelo.divisorias).split(',').map(function(s){ return parseInt(s.trim(), 10); }).filter(function(n){ return !isNaN(n); })
+        : [];
+      return aeLayoutPorColunas(total, modelo.colunas, divs, modelo.numeracao === 'zigzag');
+    }
+  }
   if (gramaturaStr === '19,0' && total === 56) return aeLayoutQuadrante56();
   if (gramaturaStr === '15,6' && total === 56) return aeLayoutQuadrante56();
   if (gramaturaStr === '41,5' && total === 72) return aeLayoutHypet72();
@@ -4216,11 +4562,12 @@ function aeObterMoldePorGramatura(gramaturaStr) {
     (registro.cavidades_isoladas ? String(registro.cavidades_isoladas).split(',') : [])
       .map(function(s){ return parseInt(s.trim(), 10); }).filter(function(n){ return !isNaN(n); })
   );
-  const layout = aeLayoutParaGramatura(gramaturaStr, total);
+  const layout = aeLayoutParaGramatura(gramaturaStr, total, registro);
   const cav = layout.cav.map(function(c) { return { num: c.num, col: c.col, row: c.row, isolada: isoladasSet.has(c.num) }; });
+  const modeloNome = registro.modelo_molde ? String(registro.modelo_molde).trim() : '';
   return {
     gramatura: gramaturaStr,
-    nome: 'Molde ' + formatarGramaturaWpp(gramaturaStr) + ' · ' + total + ' cavidades',
+    nome: 'Molde ' + formatarGramaturaWpp(gramaturaStr) + (modeloNome ? ' (' + modeloNome + ')' : '') + ' · ' + total + ' cavidades',
     total: total, cols: layout.cols, rows: layout.rows, dividers: layout.dividers, cav: cav
   };
 }
