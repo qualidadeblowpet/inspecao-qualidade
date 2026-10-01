@@ -609,6 +609,19 @@
   .top-cav-item .cav-nome { font-size: 12px; font-weight: 700; color: var(--text); }
   .top-cav-item .cav-qtd { font-size: 12px; color: var(--text-dim); }
   .top-cav-item.destaque .cav-qtd { color: var(--danger); font-weight: 700; }
+  .cav-bar-legend { display: flex; gap: 14px; margin: 2px 0 8px; }
+  .cav-bar-legend span { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-dim); }
+  .cav-bar-legend i { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+  .cav-bar-legend i.leve { background: var(--ok); }
+  .cav-bar-legend i.medio { background: var(--warn); }
+  .cav-bar-legend i.grave { background: var(--danger); }
+  .cav-bar-list { column-width: 215px; column-gap: 22px; }
+  .cav-bar-row { break-inside: avoid-column; padding: 2.5px 0; gap: 6px; }
+  .cav-bar-row .bar-label { width: 46px; font-size: 10.5px; }
+  .cav-bar-row .bar-track { height: 9px; border-radius: 3px; gap: 1px; }
+  .cav-bar-row .bar-total { width: 24px; font-size: 10.5px; }
+  .cav-bar-row.isolada-row { opacity: 0.4; }
+  .cav-bar-row.isolada-row .bar-total { font-size: 9px; white-space: nowrap; width: auto; }
 
   .insight-box { display: flex; gap: 10px; align-items: flex-start; background: var(--accent-dim); border: 1px solid var(--accent); border-radius: 10px; padding: 12px 14px; margin-top: 16px; font-size: 12.5px; color: var(--text); line-height: 1.5; }
   .insight-box .ic { font-size: 16px; flex-shrink: 0; }
@@ -4885,6 +4898,23 @@ function aeOcorrenciasPorCavidade(linhasInjecao) {
   return mapa;
 }
 
+// Igual a aeOcorrenciasPorCavidade, mas quebrado por criticidade (leve/médio/grave) — usado no gráfico
+// de barras empilhadas por cavidade, no mesmo estilo e cores do "Comparativo por máquina".
+function aeOcorrenciasPorCavidadeCriticidade(linhasInjecao) {
+  const mapa = {};
+  linhasInjecao.forEach(function(l) {
+    const bruto = (l.cavidade || '').toString().trim();
+    if (!bruto || bruto.toUpperCase() === 'TODAS') return;
+    const c = (l.criticidade || '').toUpperCase();
+    const chave = c === 'GRAVE' ? 'grave' : (c.indexOf('M') === 0 ? 'medio' : 'leve');
+    bruto.split(';').map(function(cv) { return cv.trim(); }).filter(Boolean).forEach(function(cav) {
+      if (!mapa[cav]) mapa[cav] = { leve: 0, medio: 0, grave: 0 };
+      mapa[cav][chave]++;
+    });
+  });
+  return mapa;
+}
+
 function aeDesenharPlaca(ctx, w, h, molde) {
   const bushR = 8.2;
   const plateGrad = ctx.createLinearGradient(0, 0, w, h);
@@ -5037,11 +5067,32 @@ function aeRenderMold(molde) {
   document.getElementById('aeMoldStatsText').textContent = cavidadesAtivas + ' ativas / ' + cavidadesIsoladas + ' isoladas (de ' + molde.total + ' no total)';
   document.getElementById('aeMoldCritBadge').innerHTML = top ? ('🔥 Cav. ' + top.num + ' — ' + top.valor + 'x') : '';
 
-  const ranked = ativas.map(function(c){ return { num: c.num, valor: mapa[String(c.num)] || 0 }; })
-    .sort(function(a, b){ return b.valor - a.valor; }).slice(0, 5);
+  const mapaCrit = aeOcorrenciasPorCavidadeCriticidade(linhasInjecao);
+  const porCavidade = molde.cav.slice().sort(function(a, b){ return a.num - b.num; })
+    .map(function(c) {
+      const cc = mapaCrit[String(c.num)] || { leve: 0, medio: 0, grave: 0 };
+      return { num: c.num, leve: cc.leve, medio: cc.medio, grave: cc.grave, total: cc.leve + cc.medio + cc.grave, isolada: c.isolada };
+    });
+  const maxCavTotal = Math.max.apply(null, porCavidade.filter(function(r){ return !r.isolada; }).map(function(r){ return r.total; }).concat([1]));
   document.getElementById('aeTopCavList').innerHTML =
-    '<div class="heat-legend-title">Top 5 cavidades — ' + descDefeito + '</div>' +
-    ranked.map(function(r, i) { return '<div class="top-cav-item' + (i === 0 ? ' destaque' : '') + '"><span class="cav-nome">Cav. ' + r.num + '</span><span class="cav-qtd">' + r.valor + 'x</span></div>'; }).join('');
+    '<div class="heat-legend-title">Ocorrências por cavidade (1 a ' + molde.total + ') — ' + descDefeito + '</div>' +
+    '<div class="cav-bar-legend"><span><i class="leve"></i>Leve</span><span><i class="medio"></i>Médio</span><span><i class="grave"></i>Grave</span></div>' +
+    '<div class="cav-bar-list">' +
+    porCavidade.map(function(r) {
+      if (r.isolada) {
+        return '<div class="bar-row cav-bar-row isolada-row"><div class="bar-label">Cav. ' + r.num + '</div>' +
+          '<div class="bar-track"></div><div class="bar-total">isolada</div></div>';
+      }
+      const scale = 100 / maxCavTotal;
+      return '<div class="bar-row cav-bar-row"><div class="bar-label">Cav. ' + r.num + '</div>' +
+        '<div class="bar-track">' +
+          (r.leve  ? '<div class="bar-seg leve"  style="width:' + (r.leve  * scale) + '%"></div>' : '') +
+          (r.medio ? '<div class="bar-seg medio" style="width:' + (r.medio * scale) + '%"></div>' : '') +
+          (r.grave ? '<div class="bar-seg grave" style="width:' + (r.grave * scale) + '%"></div>' : '') +
+        '</div>' +
+        '<div class="bar-total"><b>' + r.total + '</b></div></div>';
+    }).join('') +
+    '</div>';
 
   aeConfigurarHoverMold(canvas);
 }
