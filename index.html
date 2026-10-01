@@ -4160,46 +4160,70 @@ function aeFormatarDataCurta(iso) {
   return p.length === 3 ? p[2] + '/' + p[1] : iso;
 }
 
-/* ---------------- Moldes reais (layout e cavidades isoladas) ----------------
-   Husky LX1 e Hypet seguem exatamente os desenhos que o Cleber enviou, incluindo
-   as cavidades isoladas marcadas com "×". O Husky GL usa a mesma numeração
-   sequencial padrão de 4 quadrantes — o desenho original mostra algumas
-   cavidades com renumeração após reforma mecânica (ex.: posição original 47
-   operando hoje com outro número) que não foi possível confirmar com certeza
-   nesta rodada; vale conferir esse molde específico e me avisar se algum
-   número precisar de ajuste. */
-function buildQuadrante56(isolados) {
+/* ---------------- Molde por gramatura: total de cavidades e isoladas vêm sempre do cadastro real
+   (Configurações → "Cavidades por Gramatura — Injeção" / aba Cavidades_App), nunca de um valor fixo
+   aqui no código — é a mesma fonte usada pelo Cadastro de Injeção, então o mapa de calor fica sempre
+   compatível com o que está cadastrado lá. Só o DESENHO (em quais colunas/linhas cada número cai) é
+   fixo: pra 19,0g e 15,6g (molde Husky, 56 cavidades) e 41,5g (Hypet, 72 cavidades) usamos o layout
+   conferido com as fotos reais dos moldes; qualquer outra gramatura cadastrada usa uma grade genérica
+   (numeração em colunas, sem desenho físico de referência) — o que importa pro cálculo (quantidade por
+   cavidade e quais estão isoladas) continua sempre correto, só a disposição visual é aproximada nesses
+   casos. */
+function aeLayoutQuadrante56() {
   const cav = [];
   function quad(colA, colB, colOffset, rowOffset) {
-    colA.forEach(function(n, i) { cav.push({ num: n, col: colOffset, row: rowOffset + i, isolada: isolados.has(n) }); });
-    colB.forEach(function(n, i) { cav.push({ num: n, col: colOffset + 1, row: rowOffset + i, isolada: isolados.has(n) }); });
+    colA.forEach(function(n, i) { cav.push({ num: n, col: colOffset, row: rowOffset + i }); });
+    colB.forEach(function(n, i) { cav.push({ num: n, col: colOffset + 1, row: rowOffset + i }); });
   }
   quad([4, 8, 12, 16, 20, 24, 28], [3, 7, 11, 15, 19, 23, 27], 0, 0);
   quad([2, 6, 10, 14, 18, 22, 26], [1, 5, 9, 13, 17, 21, 25], 2, 0);
   quad([32, 36, 40, 44, 48, 52, 56], [31, 35, 39, 43, 47, 51, 55], 0, 8);
   quad([30, 34, 38, 42, 46, 50, 54], [29, 33, 37, 41, 45, 49, 53], 2, 8);
-  return cav;
+  return { cols: 4, rows: 15, dividers: [7], cav: cav };
 }
-function buildHuskyLX1() {
-  const isolados = new Set([14, 28, 32, 35, 36, 39]);
-  return { id: 'huskyLX1', nome: 'Husky LX1 · Preforma 19,0g · 56 cavidades', gramatura: 19.0, total: 56, cols: 4, rows: 15, dividers: [7], cav: buildQuadrante56(isolados) };
-}
-function buildHuskyGL() {
-  const isolados = new Set();
-  return { id: 'huskyGL', nome: 'Husky GL · Preforma 15,6g · 56 cavidades', gramatura: 15.6, total: 56, cols: 4, rows: 15, dividers: [7], cav: buildQuadrante56(isolados) };
-}
-function buildHypet() {
-  const isolados = new Set([12]);
+function aeLayoutHypet72() {
   const cav = [];
   function bloco(linhas, rowOffset) {
-    linhas.forEach(function(linha, ri) { linha.forEach(function(n, ci) { cav.push({ num: n, col: ci, row: rowOffset + ri, isolada: isolados.has(n) }); }); });
+    linhas.forEach(function(linha, ri) { linha.forEach(function(n, ci) { cav.push({ num: n, col: ci, row: rowOffset + ri }); }); });
   }
   bloco([[1,13,25,37,49,61],[2,14,26,38,50,62],[3,15,27,39,51,63]], 0);
   bloco([[4,16,28,40,52,64],[5,17,29,41,53,65],[6,18,30,42,54,66],[7,19,31,43,55,67],[8,20,32,44,56,68],[9,21,33,45,57,69]], 4);
   bloco([[10,22,34,46,58,70],[11,23,35,47,59,71],[12,24,36,48,60,72]], 11);
-  return { id: 'hypet', nome: 'Hypet · Preforma 41,5g · 72 cavidades', gramatura: 41.5, total: 72, cols: 6, rows: 14, dividers: [3, 10], cav: cav };
+  return { cols: 6, rows: 14, dividers: [3, 10], cav: cav };
 }
-const AE_MOLDES = { huskyLX1: buildHuskyLX1(), huskyGL: buildHuskyGL(), hypet: buildHypet() };
+function aeLayoutGenerico(total) {
+  const cols = total >= 32 ? 4 : total >= 10 ? 2 : 1;
+  const rows = Math.max(1, Math.ceil(total / cols));
+  const cav = [];
+  let num = 1;
+  for (let c = 0; c < cols && num <= total; c++) {
+    for (let r = 0; r < rows && num <= total; r++) { cav.push({ num: num, col: c, row: r }); num++; }
+  }
+  return { cols: cols, rows: rows, dividers: [], cav: cav };
+}
+function aeLayoutParaGramatura(gramaturaStr, total) {
+  if (gramaturaStr === '19,0' && total === 56) return aeLayoutQuadrante56();
+  if (gramaturaStr === '15,6' && total === 56) return aeLayoutQuadrante56();
+  if (gramaturaStr === '41,5' && total === 72) return aeLayoutHypet72();
+  return aeLayoutGenerico(total);
+}
+function aeObterMoldePorGramatura(gramaturaStr) {
+  const registro = (typeof ultimoRegistroCavidadePorGramatura === 'function') ? ultimoRegistroCavidadePorGramatura()[gramaturaStr] : null;
+  if (!registro) return null;
+  const total = parseInt(registro.total_cavidades, 10) || 0;
+  if (!total) return null;
+  const isoladasSet = new Set(
+    (registro.cavidades_isoladas ? String(registro.cavidades_isoladas).split(',') : [])
+      .map(function(s){ return parseInt(s.trim(), 10); }).filter(function(n){ return !isNaN(n); })
+  );
+  const layout = aeLayoutParaGramatura(gramaturaStr, total);
+  const cav = layout.cav.map(function(c) { return { num: c.num, col: c.col, row: c.row, isolada: isoladasSet.has(c.num) }; });
+  return {
+    gramatura: gramaturaStr,
+    nome: 'Molde ' + formatarGramaturaWpp(gramaturaStr) + ' · ' + total + ' cavidades',
+    total: total, cols: layout.cols, rows: layout.rows, dividers: layout.dividers, cav: cav
+  };
+}
 
 /* ---------------- Filtros próprios da página (reaproveita dadosCache real) ---------------- */
 function aeLinhasBase() {
@@ -4500,11 +4524,11 @@ const CELL = 25, R = 8.6, PAD = 30, EXTRA_W = 22;
 const DISPLAY_SCALE = 1.55, RENDER_SCALE = 2;
 let AE_MOLD_HOVER_INFO = [];
 
-function aeOcorrenciasPorCavidade(linhasInjecao, molde) {
+function aeOcorrenciasPorCavidade(linhasInjecao) {
+  // linhasInjecao já vem filtrada pela Gramatura selecionada no topo (aeAplicarFiltrosComuns), então
+  // aqui é só agregar por número de cavidade — sem precisar comparar gramatura de novo.
   const mapa = {};
   linhasInjecao.forEach(function(l) {
-    const g = parseFloat((l.gramatura || '').toString().replace(',', '.'));
-    if (isNaN(g) || Math.abs(g - molde.gramatura) > 0.3) return;
     const bruto = (l.cavidade || '').toString().trim();
     if (!bruto || bruto.toUpperCase() === 'TODAS') return;
     bruto.split(';').map(function(c) { return c.trim(); }).filter(Boolean).forEach(function(cav) {
@@ -4558,10 +4582,9 @@ function aeDesenharPlaca(ctx, w, h, molde) {
   }
 }
 
-function aeRenderMold(moldeId) {
-  const molde = AE_MOLDES[moldeId];
+function aeRenderMold(molde) {
   const linhasInjecao = aeLinhasInjecaoFiltradas();
-  const mapa = aeOcorrenciasPorCavidade(linhasInjecao, molde);
+  const mapa = aeOcorrenciasPorCavidade(linhasInjecao);
 
   const ativas = molde.cav.filter(function(c){ return !c.isolada; });
   const valores = ativas.map(function(c){ return mapa[String(c.num)] || 0; });
@@ -4707,16 +4730,15 @@ function aeAtualizarMolde() {
     document.getElementById('aeMoldCritBadge').innerHTML = '';
     return;
   }
-  const gramVal = parseFloat(gramSel[0].replace(',', '.'));
-  const moldeId = Object.keys(AE_MOLDES).find(function(id) { return Math.abs(AE_MOLDES[id].gramatura - gramVal) <= 0.3; });
-  if (!moldeId) {
-    document.getElementById('aeMoldVazio').textContent = 'Não há um molde cadastrado no mapa de calor para a gramatura "' + formatarGramaturaWpp(gramSel[0]) + '".';
+  const molde = aeObterMoldePorGramatura(gramSel[0]);
+  if (!molde) {
+    document.getElementById('aeMoldVazio').textContent = 'A gramatura "' + formatarGramaturaWpp(gramSel[0]) + '" ainda não tem cadastro de cavidades em Configurações → "Cavidades por Gramatura — Injeção". Cadastre lá pra liberar o mapa de calor aqui — é a mesma informação que garante os números certos de cavidade no Cadastro de Injeção.';
     document.getElementById('aeMoldVazio').classList.remove('hidden');
     document.getElementById('aeMoldBody').classList.add('hidden');
     document.getElementById('aeMoldCritBadge').innerHTML = '';
     return;
   }
-  aeRenderMold(moldeId);
+  aeRenderMold(molde);
 }
 
 /* ---------------- Filtros / orquestração geral da página ---------------- */
