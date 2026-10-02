@@ -2452,7 +2452,17 @@ async function gravarLinhaModeloMolde(token, nome, valores) {
       body: JSON.stringify({ values: [valores] })
     });
   }
-  return fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/itemAt(index=' + melhorIdx + ')', {
+  // PATCH direto em rows/{index} ou rows/itemAt(index=N) pra ATUALIZAR uma linha é um canto da API do
+  // Excel com comportamento inconsistente entre contas/versões (a Microsoft já confirmou isso como uma
+  // limitação conhecida). Pra não depender disso, busca primeiro o ENDEREÇO de verdade dessa linha
+  // (ex: "A15:L15") — uma chamada de leitura simples, sem essa instabilidade — e sobrescreve via
+  // range(address=...), o mesmo mecanismo já usado em outros pontos do app pra gravar na planilha.
+  const respRange = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/itemAt(index=' + melhorIdx + ')/range', { headers: { Authorization: 'Bearer ' + token } });
+  if (!respRange.ok) return respRange;
+  const jsonRange = await respRange.json();
+  const endereco = jsonRange.address ? String(jsonRange.address).split('!').pop() : '';
+  if (!endereco) return new Response(null, { status: 500 });
+  return fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/range(address=\'' + endereco + '\')', {
     method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ values: [valores] })
   });
