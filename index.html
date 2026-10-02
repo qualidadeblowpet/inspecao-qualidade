@@ -801,7 +801,7 @@
           </select>
         </div>
         <button class="filter-clear" onclick="limparFiltros()">Limpar filtros</button>
-        <button class="btn btn-outline" onclick="carregarDados(true)" style="align-self:flex-end;">↻ Atualizar</button>
+        <button class="btn btn-outline btn-atualizar-dados" onclick="carregarDados(true)" style="align-self:flex-end;">↻ Atualizar</button>
       </div>
 
       <div class="kpi-row">
@@ -845,7 +845,7 @@
 
       <div class="quick-actions">
         <button class="filter-clear" onclick="limparFiltrosOcorrenciaInjecao()">Limpar filtros</button>
-        <button class="btn btn-outline" onclick="carregarDados(true)">↻ Atualizar</button>
+        <button class="btn btn-outline btn-atualizar-dados" onclick="carregarDados(true)">↻ Atualizar</button>
       </div>
 
       <div class="card card-ocorrencias">
@@ -920,7 +920,7 @@
 
       <div class="quick-actions">
         <button class="filter-clear" onclick="limparFiltrosOcorrenciaSopro()">Limpar filtros</button>
-        <button class="btn btn-outline" onclick="carregarDados(true)">↻ Atualizar</button>
+        <button class="btn btn-outline btn-atualizar-dados" onclick="carregarDados(true)">↻ Atualizar</button>
       </div>
 
       <div class="card card-ocorrencias">
@@ -1050,7 +1050,7 @@
           </details>
         </div>
         <button class="filter-clear" onclick="aeLimparFiltros()">Limpar filtros</button>
-        <button class="btn btn-outline" onclick="carregarDados(true)" style="align-self:flex-end;">↻ Atualizar</button>
+        <button class="btn btn-outline btn-atualizar-dados" onclick="carregarDados(true)" style="align-self:flex-end;">↻ Atualizar</button>
       </div>
 
       <div class="kpi-row">
@@ -1375,6 +1375,16 @@ let gramaturaCavResolvida = null;  // gramatura já resolvida (perguntada/aplica
 let gramaturaCavPendente = '';     // gramatura sendo tratada no modal de cadastro/alerta agora
 let registroCavPendente = null;    // último registro encontrado pra essa gramatura (ou null = cadastro novo)
 
+// ---- Carregamento em 2 etapas (dados cadastrais primeiro, dashboard/análise só depois) ----
+// Etapa 1 (rápida, prioritária): Listas_App + Cavidades_App + ModelosMolde_App — o que o Cadastro
+// precisa pra funcionar direito. Etapa 2 (sob demanda): Injecao_App + Sopro_App (histórico completo,
+// cresce sem parar) — só carrega ao abrir Dashboard/Ocorrências/Análise Estatística por essa aba a
+// primeira vez na sessão, ou ao clicar em "Atualizar". Ver conectarPlanilha() e carregarDados().
+let configCarregada = false;          // true quando a etapa 1 (dados cadastrais) já terminou
+let configCarregadaPromise = null;    // promise da etapa 1 — quem precisa de cavidadesCache/modelosMoldeCache/listas prontos pode esperar nela
+let colunasInjecaoProntasPromise = null; // promise da preparação de colunas da Injeção/Sopro — salvarSessão espera nela antes de gravar
+let dadosHistoricoCarregados = false; // true depois da 1ª carga de Injeção/Sopro (histórico) nesta sessão
+
 let listas = {
   responsaveis: ['Juliana', 'Kenedy', 'Pablo', 'Tiago', 'Lucas', 'Kenneth', 'Arthur'],
   equipInjecao: ['HUSK 1', 'HUSK 2', 'KM2', 'KM3'],
@@ -1402,7 +1412,15 @@ function setPage(p) {
   ['dashboard','cadastroInjecao','ocorrenciaInjecao','cadastroSopro','ocorrenciaSopro','analiseEstatistica','config'].forEach(function(id) {
     document.getElementById('page' + id.charAt(0).toUpperCase() + id.slice(1)).classList.toggle('hidden', id !== p);
   });
-  if (p === 'dashboard') carregarDados();
+  // Dashboard/Ocorrências/Análise Estatística dependem do histórico de Injeção/Sopro, que não carrega
+  // mais no login (ver conectarPlanilha) — carrega aqui, mas só na 1ª vez que alguma dessas telas é
+  // aberta nesta sessão; depois disso, só o botão "Atualizar" (ou o ciclo automático de 30 min) busca
+  // de novo. Enquanto não carregou, cada tela já sabe mostrar o que tiver no cache (vazio = "sem dados
+  // no período", igual ao que já mostrava antes de qualquer cadastro existir).
+  if (['dashboard', 'ocorrenciaInjecao', 'ocorrenciaSopro', 'analiseEstatistica'].indexOf(p) > -1 && !dadosHistoricoCarregados) {
+    carregarDados();
+  }
+  if (p === 'dashboard') atualizarDashboard();
   if (p === 'ocorrenciaInjecao') renderTabelaInjecao();
   if (p === 'ocorrenciaSopro') renderTabelaSopro();
   if (p === 'analiseEstatistica') aeAtualizar();
@@ -1501,7 +1519,7 @@ async function conectarPlanilha() {
     const json = await resp.json();
     if (json.id) {
       itemId = json.id; driveId = json.parentReference.driveId;
-      dot.className = 'status-dot online'; dotSide.style.background = 'var(--ok)'; label.textContent = 'conectado';
+      dot.className = 'status-dot online'; dotSide.style.background = 'var(--ok)'; label.textContent = 'carregando dados cadastrais…';
       // Dispara a busca da lista de abas (worksheets) uma única vez, em paralelo com tudo o resto —
       // Listas/Cavidades/ModelosMolde abaixo precisavam cada uma da sua própria cópia dessa mesma
       // lista; agora todas aproveitam essa, reduzindo de 3 requisições idênticas simultâneas pra 1
@@ -1515,23 +1533,37 @@ async function conectarPlanilha() {
           return jsonWs.value || [];
         } catch (e) { return null; }
       })();
-      // As 4 etapas abaixo mexem em abas/tabelas diferentes e nenhuma depende do resultado das
-      // outras (só a formatação de texto depende das colunas da Injeção terem sido garantidas antes
-      // dela, por isso essas duas ficam encadeadas entre si) — rodar em paralelo em vez de uma atrás
-      // da outra é o que mais reduz o tempo de carregamento inicial do app, sem mudar nada do que é
-      // carregado ou na ordem em que os dados ficam disponíveis pro resto da tela. Cada uma também
-      // reaproveita o token já obtido acima, em vez de pedir um novo pro MSAL.
-      await Promise.all([
+      // Preparo de colunas da Injeção/Sopro (garantir que op/numero_caixa/cavidade_todas existam e que
+      // as colunas de data/hora estejam travadas como Texto): dispara em segundo plano, SEM bloquear a
+      // tela nem o carregamento dos dados cadastrais — nada no Cadastro depende disso pra abrir ou pra
+      // o usuário escolher gramatura/equipamento. A única coisa que realmente precisa que as colunas já
+      // existam é a gravação da sessão em si, então confirmarSalvarSessao() espera essa mesma promise
+      // antes de gravar (ver colunasInjecaoProntasPromise), garantindo que a ordem das colunas nunca
+      // fique arriscada mesmo com esse trecho correndo em paralelo com o resto.
+      colunasInjecaoProntasPromise = (async function() { await garantirColunasInjecao(token); await prepararColunasComoTexto(token); })();
+      colunasInjecaoProntasPromise.catch(function(){ /* confirmarSalvarSessao trata a falha ao gravar normalmente */ });
+      // Etapa 1 — dados cadastrais (Listas, Cavidades por Gramatura, Modelos de Molde): é só isso que
+      // o Cadastro precisa pra funcionar sem pedir cadastro de cavidade por engano ou mostrar listas
+      // desatualizadas. Prioridade máxima no carregamento inicial — nada de Dashboard/Análise aqui.
+      configCarregadaPromise = Promise.all([
         carregarListasDaPlanilha(token, worksheetsPromise),
-        (async function() { await garantirColunasInjecao(token); await prepararColunasComoTexto(token); })(),
         carregarCavidadesDaPlanilha(token, worksheetsPromise),
         carregarModelosMoldeDaPlanilha(token, worksheetsPromise)
-      ]);
+      ]).then(function() {
+        configCarregada = true;
+        label.textContent = 'conectado';
+      });
+      await configCarregadaPromise;
       // Recupera rascunho do Cadastro (se houver) só depois que listas/cavidades já carregaram —
       // garante que os dropdowns e a lógica de cavidade por gramatura estejam prontos pra restaurar corretamente.
       restaurarRascunho('injecao');
       restaurarRascunho('sopro');
-      carregarDados();
+      // Etapa 2 — histórico de Injeção/Sopro (dashboard, ocorrências, análise estatística): essa tabela
+      // só cresce e é a maior responsável pela demora no carregamento inicial, mas nada no Cadastro
+      // depende dela. Agora só carrega quando o usuário abre uma dessas telas pela 1ª vez na sessão, ou
+      // aperta "Atualizar" — ver setPage() e carregarDados(). Isso é o que resolve tanto a lentidão ao
+      // reabrir o app quanto o "cavidade não cadastrada" por engano (que era a etapa 1 demorando mais
+      // do que devia por estar competindo com essa carga pesada).
       return true;
     } else {
       dot.className = 'status-dot offline'; label.textContent = 'erro na planilha'; return false;
@@ -1775,10 +1807,20 @@ async function carregarCavidadesDaPlanilha(tokenPreCarregado, worksheetsPreCarre
 
 // Ao trocar a gramatura no Cadastro de Injeção: se não houver cadastro de cavidades pra ela, abre a
 // tela de cadastro novo; se já houver, mostra o último cadastro e pergunta se mantém ou atualiza.
-function verificarCavidadesGramatura() {
+async function verificarCavidadesGramatura() {
   const gramatura = document.getElementById('inj_gramatura').value;
   if (!gramatura) { cavidadesAtivasAtual = null; isoladasAtuaisAtual = []; gramaturaCavResolvida = null; renderDesvios('injecao'); return; }
   if (gramaturaCavResolvida === gramatura) return; // já resolvido nesta passagem pelo formulário
+  // Dados cadastrais (cavidades/modelos) ainda estão chegando da planilha — espera terminar antes de
+  // decidir se já existe cadastro ou não. Sem isso, cavidadesCache ainda vazio fazia o app concluir
+  // "nunca foi cadastrado" por engano e pedir cadastro novo de uma gramatura que já tinha cadastro.
+  if (!configCarregada && configCarregadaPromise) {
+    mostrarToast('Carregando dados cadastrais…');
+    try { await configCarregadaPromise; } catch (e) { /* segue mesmo assim com o que tiver no cache */ }
+    const gramaturaAgora = document.getElementById('inj_gramatura').value;
+    if (gramaturaAgora !== gramatura) return; // usuário trocou de novo enquanto esperava
+    if (gramaturaCavResolvida === gramatura) return; // já pode ter sido resolvido nesse meio tempo
+  }
   gramaturaCavPendente = gramatura;
   registroCavPendente = ultimoRegistroCavidadePorGramatura()[gramatura] || null; // null tanto se nunca houve cadastro quanto se o último foi uma exclusão
   if (!registroCavPendente) {
@@ -2596,7 +2638,7 @@ function renderFormInjecao() {
     '<div class="card"><h3>Dados da sessão</h3>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Data</label><input type="date" id="inj_data"></div>' +
-        '<div class="field"><label>Equipamento</label>'+'<select id="inj_equipamento" onchange="atualizarAlertaMaquina(\'injecao\'); carregarDados();"></select>'+'</div>' +
+        '<div class="field"><label>Equipamento</label>'+'<select id="inj_equipamento" onchange="atualizarAlertaMaquina(\'injecao\');"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-2 hidden">' +
         '<div class="field"><label>Hora início</label><input type="time" id="inj_hora_inicio"></div>' +
@@ -2653,7 +2695,7 @@ function renderFormSopro() {
     '<div class="card"><h3>Dados da sessão</h3>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Data</label><input type="date" id="sop_data"></div>' +
-        '<div class="field"><label>Equipamento</label>'+'<select id="sop_equipamento" onchange="atualizarAlertaMaquina(\'sopro\'); carregarDados();"></select>'+'</div>' +
+        '<div class="field"><label>Equipamento</label>'+'<select id="sop_equipamento" onchange="atualizarAlertaMaquina(\'sopro\');"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-2 hidden">' +
         '<div class="field"><label>Hora início</label><input type="time" id="sop_hora_inicio"></div>' +
@@ -3289,6 +3331,12 @@ async function confirmarSalvarSessao(processo) {
   try {
     const token = await getToken();
 
+    // Garante que as colunas da Injeção/Sopro (op/numero_caixa/cavidade_todas, formatação de texto)
+    // já foram criadas antes de gravar — esse preparo roda em segundo plano desde o login (ver
+    // colunasInjecaoProntasPromise em conectarPlanilha), então normalmente essa espera já está
+    // resolvida; isso só importa de verdade se alguém salvar nos primeiros instantes após logar.
+    if (colunasInjecaoProntasPromise) { try { await colunasInjecaoProntasPromise; } catch (e) { /* segue mesmo assim — colunas podem já existir */ } }
+
     // Envia as fotos primeiro (quando houver) e guarda a URL de cada uma
     for (let i = 0; i < desvios.length; i++) {
       if (desvios[i].fotoFile) {
@@ -3428,8 +3476,13 @@ function linhasArrayParaObjeto(linhasArray, cabecalho, processo) {
   });
 }
 
+// Carrega o histórico de Injeção/Sopro (dashboard, ocorrências, análise estatística). Só é chamada
+// quando o usuário realmente precisa dela: a 1ª vez que abre uma dessas telas na sessão (ver setPage),
+// ao clicar em "Atualizar", ou pelo ciclo automático a cada 30 min — nunca mais no login, pra não
+// disputar tempo de carregamento com os dados cadastrais (ver conectarPlanilha).
 async function carregarDados(tentativaRetry) {
   if (!itemId) return;
+  definirCarregandoDados(true);
   try {
     const token = await getToken();
     const [respInj, respSop] = await Promise.all([
@@ -3442,8 +3495,15 @@ async function carregarDados(tentativaRetry) {
       injecao: jsonInj.value ? linhasArrayParaObjeto(jsonInj.value, CABECALHO_INJECAO, 'injecao') : [],
       sopro: jsonSop.value ? linhasArrayParaObjeto(jsonSop.value, CABECALHO_SOPRO, 'sopro') : []
     };
+    dadosHistoricoCarregados = true;
     popularFiltrosEquipResp();
     atualizarDashboard();
+    // Reflete os dados recém-carregados nas telas que dependem deles, mesmo que não seja a que está
+    // aberta agora — idêntico ao que essas mesmas telas já fazem ao serem abertas (ver setPage), só
+    // que agora precisa ser repetido aqui porque essa carga pode terminar bem depois da navegação.
+    renderTabelaInjecao();
+    renderTabelaSopro();
+    if (paginaAtual === 'analiseEstatistica') aeAtualizar();
     // Recarrega o alerta de histórico recente do Cadastro, caso um equipamento já esteja
     // selecionado ali (ex.: usuário abriu o Cadastro antes dos dados terminarem de carregar)
     atualizarAlertaMaquina('injecao');
@@ -3455,7 +3515,29 @@ async function carregarDados(tentativaRetry) {
     } else {
       mostrarToast('Falha de conexão ao carregar dashboard.', true);
     }
+  } finally {
+    definirCarregandoDados(false);
   }
+}
+
+// Alterna o indicador visual de carregamento nos botões "Atualizar" (dashboard, ocorrências e análise
+// estatística) e no spinner que já existia nas tabelas de Ocorrência — aparece quando carregarDados()
+// começa e desaparece quando termina (com sucesso ou erro), pra nunca ficar sem feedback na tela.
+function definirCarregandoDados(ativo) {
+  document.querySelectorAll('.btn-atualizar-dados').forEach(function(btn) {
+    if (ativo) {
+      if (!btn.dataset.textoOriginal) btn.dataset.textoOriginal = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = '↻ Atualizando…';
+    } else {
+      btn.disabled = false;
+      if (btn.dataset.textoOriginal) btn.textContent = btn.dataset.textoOriginal;
+    }
+  });
+  const loadingInjecao = document.getElementById('loadingInjecao');
+  const loadingSopro = document.getElementById('loadingSopro');
+  if (loadingInjecao) loadingInjecao.classList.toggle('hidden', !ativo);
+  if (loadingSopro) loadingSopro.classList.toggle('hidden', !ativo);
 }
 
 function popularFiltrosEquipResp() {
