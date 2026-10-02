@@ -251,6 +251,20 @@
   }
   @keyframes girar { to { transform: rotate(360deg); } }
 
+  /* ---------- Tela de carregamento (Dashboard/Ocorrências/Análise Estatística) ---------- */
+  .btn-atualizar-dados { margin-bottom: 16px; }
+  .tela-carregando-dados { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 60px 20px; color: var(--text-dim); font-size: 14px; }
+  .tela-carregando-dados .spinner { width: 28px; height: 28px; }
+
+  /* ---------- Tela cheia de carregamento inicial (dados cadastrais, login) ---------- */
+  .carregamento-inicial-overlay {
+    position: fixed; inset: 0; z-index: 500; background: rgba(10,11,13,0.94);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    color: var(--text); font-size: 15px; font-weight: 600; text-align: center; padding: 20px;
+  }
+  body.tema-claro .carregamento-inicial-overlay { background: rgba(244,245,246,0.96); }
+  .carregamento-inicial-overlay .spinner { width: 34px; height: 34px; border-width: 4px; }
+
   /* ---------- Forms (cadastro) ---------- */
   .field { margin-bottom: 12px; min-width: 0; }
   .field label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
@@ -664,6 +678,11 @@
 <!-- ===================== APP ===================== -->
 <div id="app" class="hidden">
 
+  <div class="carregamento-inicial-overlay hidden" id="carregamentoInicialOverlay">
+    <div class="spinner"></div>
+    <p>Aguarde, sistema carregando o banco de dados</p>
+  </div>
+
   <div class="mobile-topbar">
     <button class="btn-menu" onclick="alternarMenuMobile()">☰</button>
     <span class="mark">INSPEÇÃO</span>
@@ -739,6 +758,9 @@
       <div class="page-title">Dashboard</div>
       <div class="page-sub">Cruzamento de dados das inspeções de Injeção e Sopro</div>
 
+      <button class="btn btn-accent btn-block btn-atualizar-dados" onclick="carregarDados(true)">Carregar Dados</button>
+
+      <div class="conteudo-carregavel" id="dashboardConteudo">
       <div class="quick-actions">
         <button class="btn btn-accent" onclick="setPage('cadastroInjecao')">+ Cadastro Injeção</button>
         <button class="btn btn-accent" onclick="setPage('cadastroSopro')">+ Cadastro Sopro</button>
@@ -801,7 +823,6 @@
           </select>
         </div>
         <button class="filter-clear" onclick="limparFiltros()">Limpar filtros</button>
-        <button class="btn btn-outline btn-atualizar-dados" onclick="carregarDados(true)" style="align-self:flex-end;">↻ Atualizar</button>
       </div>
 
       <div class="kpi-row">
@@ -826,6 +847,8 @@
         <div class="card"><h3>Injeção vs. Sopro</h3><div class="chart-wrap"><canvas id="chartProcesso"></canvas></div></div>
         <div class="card"><h3>Desvios por responsável</h3><div class="chart-wrap"><canvas id="chartResponsavel"></canvas></div></div>
       </div>
+      </div>
+      <div class="tela-carregando-dados hidden" id="dashboardCarregando"><div class="spinner"></div><p>Carregando…</p></div>
     </div>
 
     <!-- ===================== CADASTRO INJEÇÃO ===================== -->
@@ -843,9 +866,11 @@
       <div class="page-title">Ocorrência — Injeção</div>
       <div class="page-sub">Últimas ocorrências registradas no processo de injeção</div>
 
+      <button class="btn btn-accent btn-block btn-atualizar-dados" onclick="carregarDados(true)">Carregar Dados</button>
+
+      <div class="conteudo-carregavel" id="ocorrenciaInjecaoConteudo">
       <div class="quick-actions">
         <button class="filter-clear" onclick="limparFiltrosOcorrenciaInjecao()">Limpar filtros</button>
-        <button class="btn btn-outline btn-atualizar-dados" onclick="carregarDados(true)">↻ Atualizar</button>
       </div>
 
       <div class="card card-ocorrencias">
@@ -901,6 +926,8 @@
           <div id="tabelaInjecaoVazia" class="table-empty hidden">Nenhuma ocorrência encontrada com esses filtros.</div>
         </div>
       </div>
+      </div>
+      <div class="tela-carregando-dados hidden" id="ocorrenciaInjecaoCarregando"><div class="spinner"></div><p>Carregando…</p></div>
     </div>
 
     <!-- ===================== CADASTRO SOPRO ===================== -->
@@ -918,9 +945,11 @@
       <div class="page-title">Ocorrência — Sopro</div>
       <div class="page-sub">Últimas ocorrências registradas no processo de sopro</div>
 
+      <button class="btn btn-accent btn-block btn-atualizar-dados" onclick="carregarDados(true)">Carregar Dados</button>
+
+      <div class="conteudo-carregavel" id="ocorrenciaSoproConteudo">
       <div class="quick-actions">
         <button class="filter-clear" onclick="limparFiltrosOcorrenciaSopro()">Limpar filtros</button>
-        <button class="btn btn-outline btn-atualizar-dados" onclick="carregarDados(true)">↻ Atualizar</button>
       </div>
 
       <div class="card card-ocorrencias">
@@ -976,6 +1005,8 @@
           <div id="tabelaSoproVazia" class="table-empty hidden">Nenhuma ocorrência encontrada com esses filtros.</div>
         </div>
       </div>
+      </div>
+      <div class="tela-carregando-dados hidden" id="ocorrenciaSoproCarregando"><div class="spinner"></div><p>Carregando…</p></div>
     </div>
 
     <!-- ===================== ANÁLISE ESTATÍSTICA ===================== -->
@@ -983,6 +1014,9 @@
       <div class="page-title">Análise Estatística</div>
       <div class="page-sub">Cruzamentos, tendências e mapa de cavidades — defeito × criticidade × cavidade × gramatura × cor × resina, a partir dos dados reais cadastrados.</div>
 
+      <button class="btn btn-accent btn-block btn-atualizar-dados" onclick="carregarDados(true)">Carregar Dados</button>
+
+      <div class="conteudo-carregavel" id="analiseEstatisticaConteudo">
       <div class="filter-bar">
         <div class="periodo-group">
           <div class="periodo-sub">
@@ -1050,7 +1084,6 @@
           </details>
         </div>
         <button class="filter-clear" onclick="aeLimparFiltros()">Limpar filtros</button>
-        <button class="btn btn-outline btn-atualizar-dados" onclick="carregarDados(true)" style="align-self:flex-end;">↻ Atualizar</button>
       </div>
 
       <div class="kpi-row">
@@ -1154,6 +1187,8 @@
           </div>
         </div>
       </div>
+      </div>
+      <div class="tela-carregando-dados hidden" id="analiseEstatisticaCarregando"><div class="spinner"></div><p>Carregando…</p></div>
     </div>
 
     <!-- ===================== CONFIGURAÇÕES ===================== -->
@@ -1385,22 +1420,27 @@ let configCarregadaPromise = null;    // promise da etapa 1 — quem precisa de 
 let colunasInjecaoProntasPromise = null; // promise da preparação de colunas da Injeção/Sopro — salvarSessão espera nela antes de gravar
 let dadosHistoricoCarregados = false; // true depois da 1ª carga de Injeção/Sopro (histórico) nesta sessão
 
+// Listas vazias por padrão — ficam assim até carregarListasDaPlanilha() trazer os valores reais
+// cadastrados na aba Listas_App. Antes aqui havia dados de exemplo do início do projeto (ex.: "HUSK 1,
+// HUSK 2, KM2, KM3" em equipInjecao), que apareciam rapidamente nos campos de Configurações e nos
+// formulários de Cadastro enquanto a planilha ainda carregava — removidos a pedido do Cleber, pra não
+// mostrar cadastro nenhum (nem de exemplo) até o dado de verdade chegar.
 let listas = {
-  responsaveis: ['Juliana', 'Kenedy', 'Pablo', 'Tiago', 'Lucas', 'Kenneth', 'Arthur'],
-  equipInjecao: ['HUSK 1', 'HUSK 2', 'KM2', 'KM3'],
-  equipSopro: ['UNIPET 1', 'MULTIPET 1', 'SBO1', 'SBO2A', 'SBO2B'],
-  defeitosInjecao: ['REBARBA NA ROSCA', 'RISCO NO CORPO', 'PONTO DE INJEÇÃO ESCORRIDO', 'PELE DE LARANJA', 'MARCAS NO CORPO', 'GATE ALTO', 'FUNDO BRANCO', 'BOLHA'],
-  defeitosSopro: ['ANEL TORTO', 'ALTURA DO FRASCO FORA DO ESPECIFICADO', 'COSTURA LATERAL QUADRADA', 'DEGRAU NA COSTURA DO FUNDO'],
-  operadores: ['Pablo', 'Marcos', 'André', 'Wesley'],
-  coresInjecao: ['Cristal', 'Azul', 'Verde', 'Âmbar'],
-  gramaturas: ['28', '32', '42', '48'],
-  resinas: ['Indorama Max', 'Alpek', 'M&G'],
-  coresSopro: ['Cristal', 'Azul', 'Verde'],
-  mlSopro: ['300 mL', '500 mL', '510 mL', '1500 mL', '2000 mL'],
-  tipoFrasco: ['Água Himalaia', 'Água Indaiá', 'Refrigerante Linha X'],
-  fornecedoresPreforma: ['Indorama', 'Alpek', 'M&G'],
-  gramaturasPreforma: ['20', '22', '24', '26'],
-  operadoresSopro: ['Ana', 'Bruno', 'Carla']
+  responsaveis: [],
+  equipInjecao: [],
+  equipSopro: [],
+  defeitosInjecao: [],
+  defeitosSopro: [],
+  operadores: [],
+  coresInjecao: [],
+  gramaturas: [],
+  resinas: [],
+  coresSopro: [],
+  mlSopro: [],
+  tipoFrasco: [],
+  fornecedoresPreforma: [],
+  gramaturasPreforma: [],
+  operadoresSopro: []
 };
 const criticidades = ['LEVE', 'MÉDIO', 'GRAVE'];
 const statusCorrecao = ['CORRIGIDO', 'FICOU PENDENTE'];
@@ -1506,11 +1546,21 @@ function aposLogin() {
 }
 
 /* ---------------- Conexão com a planilha ---------------- */
+// Mostra/esconde a tela cheia de "Aguarde, sistema carregando o banco de dados", que bloqueia
+// qualquer ação enquanto os dados cadastrais (Listas, Cavidades, Modelos de Molde) ainda não
+// chegaram da planilha — ver conectarPlanilha(), que mostra no início e esconde no final (sucesso
+// ou erro, pra nunca deixar o usuário travado sem conseguir usar o app).
+function mostrarCarregamentoInicial(ativo) {
+  const overlay = document.getElementById('carregamentoInicialOverlay');
+  if (overlay) overlay.classList.toggle('hidden', !ativo);
+}
+
 async function conectarPlanilha() {
   const dot = document.getElementById('statusDot');
   const dotSide = document.getElementById('statusDotSide');
   const label = document.getElementById('statusText');
   label.textContent = 'conectando…';
+  mostrarCarregamentoInicial(true);
   try {
     const token = await getToken();
     const base64 = btoa(LINK_PLANILHA_PADRAO).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
@@ -1570,6 +1620,10 @@ async function conectarPlanilha() {
     }
   } catch (err) {
     dot.className = 'status-dot offline'; label.textContent = 'offline'; return false;
+  } finally {
+    // Libera a tela independente do resultado — mesmo se der erro, o usuário não pode ficar travado
+    // sem conseguir fazer nada (ele ainda vai ver o status "offline"/"erro na planilha" na barra lateral).
+    mostrarCarregamentoInicial(false);
   }
 }
 
@@ -3524,20 +3578,16 @@ async function carregarDados(tentativaRetry) {
 // estatística) e no spinner que já existia nas tabelas de Ocorrência — aparece quando carregarDados()
 // começa e desaparece quando termina (com sucesso ou erro), pra nunca ficar sem feedback na tela.
 function definirCarregandoDados(ativo) {
-  document.querySelectorAll('.btn-atualizar-dados').forEach(function(btn) {
-    if (ativo) {
-      if (!btn.dataset.textoOriginal) btn.dataset.textoOriginal = btn.textContent;
-      btn.disabled = true;
-      btn.textContent = '↻ Atualizando…';
-    } else {
-      btn.disabled = false;
-      if (btn.dataset.textoOriginal) btn.textContent = btn.dataset.textoOriginal;
-    }
+  document.querySelectorAll('.btn-atualizar-dados').forEach(function(btn) { btn.disabled = ativo; });
+  // Esconde todo o conteúdo de cada tela (filtros, KPIs, tabelas, gráficos) e mostra só "Carregando…"
+  // com uma bolinha girando no lugar, até os dados chegarem — assim fica óbvio que está processando,
+  // e some automaticamente quando termina (com sucesso ou erro).
+  ['dashboard', 'ocorrenciaInjecao', 'ocorrenciaSopro', 'analiseEstatistica'].forEach(function(pagina) {
+    const conteudo = document.getElementById(pagina + 'Conteudo');
+    const carregando = document.getElementById(pagina + 'Carregando');
+    if (conteudo) conteudo.classList.toggle('hidden', ativo);
+    if (carregando) carregando.classList.toggle('hidden', !ativo);
   });
-  const loadingInjecao = document.getElementById('loadingInjecao');
-  const loadingSopro = document.getElementById('loadingSopro');
-  if (loadingInjecao) loadingInjecao.classList.toggle('hidden', !ativo);
-  if (loadingSopro) loadingSopro.classList.toggle('hidden', !ativo);
 }
 
 function popularFiltrosEquipResp() {
