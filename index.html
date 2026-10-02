@@ -1418,6 +1418,19 @@ function lerRegistroPorOrdemReal(ordemReal, camposConhecidos, valores) {
   });
   return obj;
 }
+// A resposta de .../tables/{id}/columns vem como uma coleção — NÃO dá pra supor que o array já vem
+// na ordem física (esquerda->direita) das colunas na planilha; cada coluna tem seu próprio campo
+// 'index' (posição real, 0-based) pra isso, e é ele que manda. Ordenar por esse índice (em vez de
+// confiar na ordem do array) é o que garante que ordemColunasCavidadesReal/ordemColunasModelosMoldeReal
+// reflitam a posição verdadeira — sem isso, duas colunas na planilha podiam ficar "trocadas" no app
+// mesmo com os nomes certos, bagunçando leitura e gravação de campo (foi exatamente isso que causou o
+// "inverter horizontalmente"/"inverter verticalmente" se confundindo um com o outro).
+function nomesColunasPorIndiceReal(colunas) {
+  return (colunas || [])
+    .slice()
+    .sort(function(a, b) { return (typeof a.index === 'number' ? a.index : 0) - (typeof b.index === 'number' ? b.index : 0); })
+    .map(function(c) { return c.name; });
+}
 
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
 let paginaAtual = 'dashboard';
@@ -1848,7 +1861,7 @@ async function garantirTabelaCavidades(token, worksheetsPreCarregada) {
   try {
     const respCols = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/columns', { headers: { Authorization: 'Bearer ' + token } });
     const jsonCols = await respCols.json();
-    const nomesCols = (jsonCols.value || []).map(function(c){ return c.name; });
+    const nomesCols = nomesColunasPorIndiceReal(jsonCols.value);
     const faltando = ['modelo_molde', 'excluido'].filter(function(nome){ return nomesCols.indexOf(nome) === -1; });
     for (const nome of faltando) {
       try {
@@ -2237,7 +2250,7 @@ async function garantirTabelaModelosMolde(token, worksheetsPreCarregada) {
   try {
     const respCols = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/columns', { headers: { Authorization: 'Bearer ' + token } });
     const jsonCols = await respCols.json();
-    const nomesCols = (jsonCols.value || []).map(function(c){ return c.name; });
+    const nomesCols = nomesColunasPorIndiceReal(jsonCols.value);
     const faltando = ['orientacao', 'espelho_h', 'espelho_v', 'excluido'].filter(function(nome){ return nomesCols.indexOf(nome) === -1; });
     for (const nome of faltando) {
       try {
@@ -2423,11 +2436,15 @@ async function gravarLinhaModeloMolde(token, nome, valores) {
   const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows', { headers: { Authorization: 'Bearer ' + token } });
   const json = await resp.json();
   const linhas = json.value || [];
+  // Mesmo cuidado de nomesColunasPorIndiceReal: não confia na posição da linha dentro do array da
+  // resposta como se fosse o índice real dela na tabela — usa o campo 'index' de cada linha (quando
+  // vier), que é a posição verdadeira que itemAt(index=N) espera.
   let melhorIdx = -1, melhorRegistro = null;
   linhas.forEach(function(linha, i) {
     const registro = lerRegistroPorOrdemReal(ordemColunasModelosMoldeReal, CABECALHO_MODELOS_MOLDE, linha.values[0]);
     if (registro.nome !== nome) return;
-    if (!melhorRegistro || registroMaisRecente(melhorRegistro, registro) === registro) { melhorRegistro = registro; melhorIdx = i; }
+    const idxReal = typeof linha.index === 'number' ? linha.index : i;
+    if (!melhorRegistro || registroMaisRecente(melhorRegistro, registro) === registro) { melhorRegistro = registro; melhorIdx = idxReal; }
   });
   if (melhorIdx === -1) {
     return fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
