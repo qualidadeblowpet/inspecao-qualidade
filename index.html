@@ -2123,9 +2123,22 @@ function aplicarRegistroCavidades(registro) {
 
 /* ---------------- Configurações: listagem/edição de cavidades por gramatura ---------------- */
 
+// Decide qual dos dois registros (mesma chave — gramatura ou nome de modelo) é o mais recente,
+// comparando data_cadastro+hora_cadastro de cada um — NUNCA a ordem em que vieram da planilha. A
+// planilha é visível e editável por qualquer um no Excel; se alguém ordenar ou filtrar a tabela ali
+// (bem comum numa aba que várias pessoas consultam), o Excel reordena as linhas de verdade, e
+// qualquer lógica de "a última linha da lista vale" passaria a escolher um cadastro antigo em vez do
+// mais novo — inclusive fazendo uma exclusão salva "sumir" na próxima vez que o app carrega os dados.
+// Com empate exato de minuto, mantém o comportamento anterior (quem veio depois na lista).
+function registroMaisRecente(a, b) {
+  const chaveA = (a.data_cadastro || '') + ' ' + (a.hora_cadastro || '');
+  const chaveB = (b.data_cadastro || '') + ' ' + (b.hora_cadastro || '');
+  return chaveA > chaveB ? a : b;
+}
+
 function ultimoRegistroCavidadePorGramatura() {
   const mapa = {};
-  cavidadesCache.forEach(function(r){ mapa[r.gramatura] = r; }); // última ocorrência sobrescreve (ordem = ordem de inserção na planilha)
+  cavidadesCache.forEach(function(r){ mapa[r.gramatura] = mapa[r.gramatura] ? registroMaisRecente(mapa[r.gramatura], r) : r; });
   // Se o registro mais recente de uma gramatura for uma exclusão, ela some do mapa — mas o histórico
   // continua intacto na planilha (nunca apagamos linhas, só marcamos). Ver excluirCadastroCavidades().
   Object.keys(mapa).forEach(function(g){ if (mapa[g].excluido === '1') delete mapa[g]; });
@@ -2261,7 +2274,7 @@ async function carregarModelosMoldeDaPlanilha(tokenPreCarregado, worksheetsPreCa
 
 function ultimoRegistroModeloPorNome() {
   const mapa = {};
-  modelosMoldeCache.forEach(function(r){ mapa[r.nome] = r; }); // última ocorrência sobrescreve, igual ao cadastro de cavidades
+  modelosMoldeCache.forEach(function(r){ mapa[r.nome] = mapa[r.nome] ? registroMaisRecente(mapa[r.nome], r) : r; }); // mais recente por data/hora, não por ordem na planilha — ver registroMaisRecente()
   // Mesma lógica de exclusão do cadastro de cavidades: some do mapa, mas o histórico continua na
   // planilha. Ver excluirModeloMolde().
   Object.keys(mapa).forEach(function(n){ if (mapa[n].excluido === '1') delete mapa[n]; });
@@ -2398,6 +2411,36 @@ function mmAtualizarPreview() {
   });
 }
 
+// ModelosMolde_App guarda só UM registro por nome (diferente de Cavidades_App, que mantém histórico
+// completo) — Cleber pediu pra não acumular 2, 3 ou mais linhas do mesmo molde, pra não pesar o
+// sistema nem precisar ficar resolvendo qual linha é a mais recente. Então salvar/excluir aqui sempre
+// SOBRESCREVE a linha existente desse nome na planilha (em vez de acrescentar uma nova no fim); só
+// acrescenta uma linha quando esse nome ainda não existe. Busca a linha certa numa leitura fresca da
+// planilha (não confia em cache local, que pode estar desatualizado) e, se houver mais de uma linha
+// com esse nome por causa de cadastros antigos de antes dessa mudança, sobrescreve a mais recente
+// delas (mesmo critério de data/hora de registroMaisRecente) e deixa as outras, antigas, como estão.
+async function gravarLinhaModeloMolde(token, nome, valores) {
+  const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows', { headers: { Authorization: 'Bearer ' + token } });
+  const json = await resp.json();
+  const linhas = json.value || [];
+  let melhorIdx = -1, melhorRegistro = null;
+  linhas.forEach(function(linha, i) {
+    const registro = lerRegistroPorOrdemReal(ordemColunasModelosMoldeReal, CABECALHO_MODELOS_MOLDE, linha.values[0]);
+    if (registro.nome !== nome) return;
+    if (!melhorRegistro || registroMaisRecente(melhorRegistro, registro) === registro) { melhorRegistro = registro; melhorIdx = i; }
+  });
+  if (melhorIdx === -1) {
+    return fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [valores] })
+    });
+  }
+  return fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/itemAt(index=' + melhorIdx + ')', {
+    method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [valores] })
+  });
+}
+
 async function salvarModeloMolde() {
   const nomeOriginal = document.getElementById('mmNomeOriginalInput').value;
   const nome = document.getElementById('mmNomeInput').value.trim();
@@ -2434,12 +2477,10 @@ async function salvarModeloMolde() {
       excluido: ''
     };
     const valores = construirValoresPorOrdemReal(ordemColunasModelosMoldeReal, registro);
-    const respGravar = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
-      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ values: [valores] })
-    });
+    const respGravar = await gravarLinhaModeloMolde(token, nome, valores);
     if (!respGravar.ok) throw new Error('Falha ao gravar modelo na planilha (HTTP ' + respGravar.status + ')');
-    modelosMoldeCache.push(registro);
+    const idxCache = modelosMoldeCache.findIndex(function(r){ return r.nome === nome; });
+    if (idxCache !== -1) modelosMoldeCache[idxCache] = registro; else modelosMoldeCache.push(registro);
     renderModelosMoldeConfig();
     fecharModeloMoldeForm();
     mostrarToast('Modelo de molde salvo com sucesso.');
@@ -2450,10 +2491,11 @@ async function salvarModeloMolde() {
   }
 }
 
-// Exclui (marca como excluído) um modelo de molde. Mesmo padrão de histórico do resto do app: nunca
-// apaga linha da planilha, só grava um novo registro no fim com excluido='1'. Gramaturas que ainda
-// apontarem pro nome desse modelo não quebram — aeLayoutParaGramatura() simplesmente não encontra mais
-// o modelo no mapa e cai no desenho automático aproximado, até alguém vincular outro modelo a elas.
+// Exclui (marca como excluído) um modelo de molde. Diferente de Cavidades_App, ModelosMolde_App não
+// mantém histórico (ver gravarLinhaModeloMolde) — a exclusão sobrescreve a própria linha do molde com
+// excluido='1', sem criar uma linha nova. Gramaturas que ainda apontarem pro nome desse modelo não
+// quebram — aeLayoutParaGramatura() simplesmente não encontra mais o modelo no mapa e cai no desenho
+// automático aproximado, até alguém vincular outro modelo a elas.
 async function excluirModeloMolde(nome) {
   const base = ultimoRegistroModeloPorNome()[nome];
   try {
@@ -2475,14 +2517,12 @@ async function excluirModeloMolde(nome) {
       excluido: '1'
     };
     const valores = construirValoresPorOrdemReal(ordemColunasModelosMoldeReal, registro);
-    const respGravar = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
-      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ values: [valores] })
-    });
+    const respGravar = await gravarLinhaModeloMolde(token, nome, valores);
     // Confere se a gravação realmente aconteceu na planilha antes de dar por excluído aqui — senão
     // o item sumiria da tela mas voltaria ao atualizar a página (exclusão só "de mentirinha").
     if (!respGravar.ok) throw new Error('Falha ao gravar exclusão na planilha (HTTP ' + respGravar.status + ')');
-    modelosMoldeCache.push(registro);
+    const idxCache = modelosMoldeCache.findIndex(function(r){ return r.nome === nome; });
+    if (idxCache !== -1) modelosMoldeCache[idxCache] = registro; else modelosMoldeCache.push(registro);
     renderModelosMoldeConfig();
     mostrarToast('Modelo de molde excluído.');
   } catch (err) {
