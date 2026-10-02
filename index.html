@@ -373,10 +373,16 @@
     background: rgba(63,182,139,0.15); color: var(--ok);
     display: flex; align-items: center; justify-content: center; font-size: 28px;
   }
+  .wa-confirma-icon.perigo { background: rgba(229,72,77,0.15); color: var(--danger); }
   .wa-confirma-titulo { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text); margin: 0 0 8px; text-transform: none; }
   .wa-confirma-sub { font-size: 13.5px; color: var(--text-dim); margin: 0 0 26px; line-height: 1.5; }
   .wa-confirma-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .wa-confirma-acoes .btn { padding: 13px; font-size: 14.5px; }
+  .btn-perigo { background: var(--danger); color: #fff; border: 1px solid var(--danger); }
+  .btn-perigo:hover { filter: brightness(1.08); }
+  .btn-perigo:disabled { opacity: 0.6; }
+  .btn-outline-perigo { background: transparent; border: 1px solid var(--danger); color: var(--danger); }
+  .btn-outline-perigo:hover { background: rgba(229,72,77,0.1); }
 
   /* ---------- Cadastro/alerta de cavidades por gramatura ---------- */
   .cav-cadastro-overlay {
@@ -682,6 +688,18 @@
 
   <div class="cav-cadastro-overlay hidden" id="mmCadastroOverlay">
     <div class="cav-cadastro-card mm-cadastro-card" id="mmCadastroCardBody"></div>
+  </div>
+
+  <div class="wa-confirma-overlay hidden" id="confirmExclusaoOverlay">
+    <div class="wa-confirma-card">
+      <div class="wa-confirma-icon perigo">🗑️</div>
+      <h2 class="wa-confirma-titulo" id="confirmExclusaoTitulo">Excluir cadastro?</h2>
+      <p class="wa-confirma-sub" id="confirmExclusaoSub"></p>
+      <div class="wa-confirma-acoes">
+        <button class="btn btn-outline btn-block" onclick="fecharConfirmExclusao()">Cancelar</button>
+        <button class="btn btn-block btn-perigo" id="confirmExclusaoBtnOk" onclick="confirmarExclusaoPendente()">Excluir</button>
+      </div>
+    </div>
   </div>
 
   <div class="sidebar" id="sidebar">
@@ -1331,7 +1349,7 @@ const NOME_ABA_CAVIDADES = 'Cavidades_App';
 const NOME_TABELA_CAVIDADES = 'TabelaCavidades';
 // 'modelo_molde' foi adicionado no fim da lista (nunca no meio) pra não desalinhar a leitura de linhas
 // já cadastradas em planilhas antigas, que não tinham essa coluna.
-const CABECALHO_CAVIDADES = ['gramatura','total_cavidades','cavidades_isoladas','data_cadastro','hora_cadastro','responsavel','modelo_molde'];
+const CABECALHO_CAVIDADES = ['gramatura','total_cavidades','cavidades_isoladas','data_cadastro','hora_cadastro','responsavel','modelo_molde','excluido'];
 
 /* ---------------- Modelos de molde: cadastro do DESENHO/grade usado no mapa de calor por cavidade
    (aba própria ModelosMolde_App, histórico append-only — mesma convenção da aba Cavidades_App: a
@@ -1340,7 +1358,7 @@ const CABECALHO_CAVIDADES = ['gramatura','total_cavidades','cavidades_isoladas',
    isolamento de cavidades continua sendo só por gramatura, nunca pelo modelo. ---------------- */
 const NOME_ABA_MODELOS_MOLDE = 'ModelosMolde_App';
 const NOME_TABELA_MODELOS_MOLDE = 'TabelaModelosMolde';
-const CABECALHO_MODELOS_MOLDE = ['nome','total_cavidades','colunas','divisorias','numeracao','data_cadastro','hora_cadastro','responsavel','orientacao','espelho_h','espelho_v'];
+const CABECALHO_MODELOS_MOLDE = ['nome','total_cavidades','colunas','divisorias','numeracao','data_cadastro','hora_cadastro','responsavel','orientacao','espelho_h','espelho_v','excluido'];
 
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
 let paginaAtual = 'dashboard';
@@ -1675,19 +1693,22 @@ async function garantirTabelaCavidades(token) {
     });
     return false; // tabela recém-criada, ainda vazia
   }
-  // Tabela já existia — garante que a coluna modelo_molde exista (planilhas de antes dessa funcionalidade
-  // não tinham esse campo). Sempre adicionada no FIM da tabela, sem reordenar/apagar nada já cadastrado.
+  // Tabela já existia — garante que as colunas modelo_molde/excluido existam (planilhas de antes dessas
+  // funcionalidades não tinham esses campos). Sempre adicionadas no FIM da tabela, sem reordenar/apagar
+  // nada já cadastrado. "excluido" marca um registro como excluído (histórico preservado, só deixa de
+  // valer) — ver excluirCadastroCavidades().
   try {
     const respCols = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/columns', { headers: { Authorization: 'Bearer ' + token } });
     const jsonCols = await respCols.json();
     const nomesCols = (jsonCols.value || []).map(function(c){ return c.name; });
-    if (nomesCols.indexOf('modelo_molde') === -1) {
-      await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/columns/add', {
+    const faltando = ['modelo_molde', 'excluido'].filter(function(nome){ return nomesCols.indexOf(nome) === -1; });
+    await Promise.all(faltando.map(function(nome) {
+      return fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/columns/add', {
         method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'modelo_molde' })
-      });
-    }
-  } catch (e) { /* segue mesmo se falhar — cadastro de cavidades continua funcionando sem vínculo de modelo */ }
+        body: JSON.stringify({ name: nome })
+      }).catch(function(e) { /* segue mesmo se uma coluna falhar */ });
+    }));
+  } catch (e) { /* segue mesmo se falhar — cadastro de cavidades continua funcionando sem vínculo de modelo/exclusão */ }
   return true;
 }
 
@@ -1720,8 +1741,7 @@ function verificarCavidadesGramatura() {
   if (!gramatura) { cavidadesAtivasAtual = null; isoladasAtuaisAtual = []; gramaturaCavResolvida = null; renderDesvios('injecao'); return; }
   if (gramaturaCavResolvida === gramatura) return; // já resolvido nesta passagem pelo formulário
   gramaturaCavPendente = gramatura;
-  const registros = cavidadesCache.filter(function(r){ return r.gramatura === gramatura; });
-  registroCavPendente = registros.length ? registros[registros.length - 1] : null; // último cadastro = mais recente (sempre gravado no fim da tabela)
+  registroCavPendente = ultimoRegistroCavidadePorGramatura()[gramatura] || null; // null tanto se nunca houve cadastro quanto se o último foi uma exclusão
   if (!registroCavPendente) {
     abrirCadastroCavidades();
   } else {
@@ -1865,7 +1885,8 @@ async function salvarCadastroCavidades() {
       data_cadastro: hojeISO(),
       hora_cadastro: agoraHHMM(),
       responsavel: respEl ? respEl.value : '',
-      modelo_molde: selModelo ? selModelo.value : ''
+      modelo_molde: selModelo ? selModelo.value : '',
+      excluido: ''
     };
     const valores = CABECALHO_CAVIDADES.map(function(campo) { return novoRegistro[campo]; });
     await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows/add', {
@@ -1880,6 +1901,41 @@ async function salvarCadastroCavidades() {
     mostrarToast('Erro ao salvar o cadastro de cavidades. Tente novamente.', true);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Salvar cadastro'; }
+  }
+}
+
+// Exclui (marca como excluído) o cadastro de cavidades de uma gramatura. Segue o mesmo padrão de
+// histórico do resto do app: NUNCA apaga linha nenhuma da planilha — grava um novo registro no fim,
+// igual aos outros, só que com excluido='1'. Como ultimoRegistroCavidadePorGramatura() ignora
+// registros excluídos, a gramatura passa a se comportar como se nunca tivesse sido cadastrada (some
+// da lista de Configurações, some do seletor de "Modelo de molde" vinculado, e se for selecionada de
+// novo no Cadastro de Injeção, pede pra cadastrar as cavidades do zero).
+async function excluirCadastroCavidades(gramatura) {
+  const base = ultimoRegistroCavidadePorGramatura()[gramatura];
+  try {
+    const token = await getToken();
+    await garantirTabelaCavidades(token);
+    const respEl = document.getElementById('inj_responsavel');
+    const registro = {
+      gramatura: gramatura,
+      total_cavidades: base ? base.total_cavidades : '',
+      cavidades_isoladas: base ? base.cavidades_isoladas : '',
+      data_cadastro: hojeISO(),
+      hora_cadastro: agoraHHMM(),
+      responsavel: respEl ? respEl.value : '',
+      modelo_molde: base ? base.modelo_molde : '',
+      excluido: '1'
+    };
+    const valores = CABECALHO_CAVIDADES.map(function(campo) { return registro[campo]; });
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [valores] })
+    });
+    cavidadesCache.push(registro);
+    renderCavidadesConfig();
+    mostrarToast('Cadastro de cavidades excluído.');
+  } catch (err) {
+    mostrarToast('Erro ao excluir o cadastro de cavidades. Tente novamente.', true);
   }
 }
 
@@ -1905,6 +1961,9 @@ function aplicarRegistroCavidades(registro) {
 function ultimoRegistroCavidadePorGramatura() {
   const mapa = {};
   cavidadesCache.forEach(function(r){ mapa[r.gramatura] = r; }); // última ocorrência sobrescreve (ordem = ordem de inserção na planilha)
+  // Se o registro mais recente de uma gramatura for uma exclusão, ela some do mapa — mas o histórico
+  // continua intacto na planilha (nunca apagamos linhas, só marcamos). Ver excluirCadastroCavidades().
+  Object.keys(mapa).forEach(function(g){ if (mapa[g].excluido === '1') delete mapa[g]; });
   return mapa;
 }
 
@@ -1922,14 +1981,14 @@ function renderCavidadesConfig() {
     const isoladas = r.cavidades_isoladas ? String(r.cavidades_isoladas).split(',').filter(Boolean) : [];
     const gEsc = g.replace(/'/g, "\\'");
     return '<tr><td>'+g+'</td><td>'+r.total_cavidades+'</td><td>'+(isoladas.length ? isoladas.join(', ') : 'Nenhuma')+'</td><td>'+(r.modelo_molde || '—')+'</td><td>'+dataISOparaBR(r.data_cadastro)+(r.hora_cadastro?(' '+r.hora_cadastro):'')+'</td>' +
-      '<td><button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="editarCavidadesConfig(\''+gEsc+'\')">Editar</button></td></tr>';
+      '<td><div style="display:flex;gap:6px;"><button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="editarCavidadesConfig(\''+gEsc+'\')">Editar</button>' +
+      '<button class="btn btn-outline-perigo" style="padding:5px 10px;font-size:12px;" onclick="pedirExclusaoCavidade(\''+gEsc+'\')">Excluir</button></div></td></tr>';
   }).join('');
 }
 
 function editarCavidadesConfig(gramatura) {
   gramaturaCavPendente = gramatura;
-  const registros = cavidadesCache.filter(function(r){ return r.gramatura === gramatura; });
-  registroCavPendente = registros.length ? registros[registros.length - 1] : null;
+  registroCavPendente = ultimoRegistroCavidadePorGramatura()[gramatura] || null;
   abrirCadastroCavidades();
 }
 
@@ -1988,16 +2047,17 @@ async function garantirTabelaModelosMolde(token) {
     });
     return false; // tabela recém-criada, ainda vazia
   }
-  // Tabela já existia — garante que as colunas orientacao/espelho_h/espelho_v existam (modelos
-  // cadastrados antes dessa funcionalidade não tinham esses campos). Sempre adicionadas no FIM da
+  // Tabela já existia — garante que as colunas orientacao/espelho_h/espelho_v/excluido existam (modelos
+  // cadastrados antes dessas funcionalidades não tinham esses campos). Sempre adicionadas no FIM da
   // tabela, sem reordenar/apagar nada já cadastrado. Modelos antigos sem "orientacao" continuam
   // funcionando normalmente: o motor de desenho trata ausência desses campos como "coluna", sem
-  // espelhamento, que é exatamente o comportamento que eles já tinham.
+  // espelhamento, que é exatamente o comportamento que eles já tinham. "excluido" marca um modelo como
+  // excluído (histórico preservado, só deixa de valer) — ver excluirModeloMolde().
   try {
     const respCols = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/columns', { headers: { Authorization: 'Bearer ' + token } });
     const jsonCols = await respCols.json();
     const nomesCols = (jsonCols.value || []).map(function(c){ return c.name; });
-    const faltando = ['orientacao', 'espelho_h', 'espelho_v'].filter(function(nome){ return nomesCols.indexOf(nome) === -1; });
+    const faltando = ['orientacao', 'espelho_h', 'espelho_v', 'excluido'].filter(function(nome){ return nomesCols.indexOf(nome) === -1; });
     await Promise.all(faltando.map(function(nome) {
       return fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/columns/add', {
         method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
@@ -2033,6 +2093,9 @@ async function carregarModelosMoldeDaPlanilha() {
 function ultimoRegistroModeloPorNome() {
   const mapa = {};
   modelosMoldeCache.forEach(function(r){ mapa[r.nome] = r; }); // última ocorrência sobrescreve, igual ao cadastro de cavidades
+  // Mesma lógica de exclusão do cadastro de cavidades: some do mapa, mas o histórico continua na
+  // planilha. Ver excluirModeloMolde().
+  Object.keys(mapa).forEach(function(n){ if (mapa[n].excluido === '1') delete mapa[n]; });
   return mapa;
 }
 
@@ -2048,7 +2111,8 @@ function renderModelosMoldeConfig() {
     const divisoriasTxt = r.divisorias ? String(r.divisorias) : '—';
     const nomeEsc = nome.replace(/'/g, "\\'");
     return '<tr><td>' + nome + '</td><td>' + r.total_cavidades + '</td><td>' + r.colunas + '</td><td>' + divisoriasTxt + '</td>' +
-      '<td><button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="editarModeloMolde(\'' + nomeEsc + '\')">Editar</button></td></tr>';
+      '<td><div style="display:flex;gap:6px;"><button class="btn btn-outline" style="padding:5px 10px;font-size:12px;" onclick="editarModeloMolde(\'' + nomeEsc + '\')">Editar</button>' +
+      '<button class="btn btn-outline-perigo" style="padding:5px 10px;font-size:12px;" onclick="pedirExclusaoModelo(\'' + nomeEsc + '\')">Excluir</button></div></td></tr>';
   }).join('');
   atualizarSeletorModeloMolde();
 }
@@ -2197,7 +2261,8 @@ async function salvarModeloMolde() {
       responsavel: respEl ? respEl.value : '',
       orientacao: orientacao,
       espelho_h: espelhoH ? '1' : '',
-      espelho_v: espelhoV ? '1' : ''
+      espelho_v: espelhoV ? '1' : '',
+      excluido: ''
     };
     const valores = CABECALHO_MODELOS_MOLDE.map(function(campo) { return registro[campo]; });
     await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
@@ -2212,6 +2277,92 @@ async function salvarModeloMolde() {
     mostrarToast('Erro ao salvar o modelo de molde. Tente novamente.', true);
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = 'Salvar modelo'; }
+  }
+}
+
+// Exclui (marca como excluído) um modelo de molde. Mesmo padrão de histórico do resto do app: nunca
+// apaga linha da planilha, só grava um novo registro no fim com excluido='1'. Gramaturas que ainda
+// apontarem pro nome desse modelo não quebram — aeLayoutParaGramatura() simplesmente não encontra mais
+// o modelo no mapa e cai no desenho automático aproximado, até alguém vincular outro modelo a elas.
+async function excluirModeloMolde(nome) {
+  const base = ultimoRegistroModeloPorNome()[nome];
+  try {
+    const token = await getToken();
+    await garantirTabelaModelosMolde(token);
+    const respEl = document.getElementById('inj_responsavel');
+    const registro = {
+      nome: nome,
+      total_cavidades: base ? base.total_cavidades : '',
+      colunas: base ? base.colunas : '',
+      divisorias: base ? base.divisorias : '',
+      numeracao: base ? base.numeracao : '',
+      data_cadastro: hojeISO(),
+      hora_cadastro: agoraHHMM(),
+      responsavel: respEl ? respEl.value : '',
+      orientacao: base ? base.orientacao : '',
+      espelho_h: base ? base.espelho_h : '',
+      espelho_v: base ? base.espelho_v : '',
+      excluido: '1'
+    };
+    const valores = CABECALHO_MODELOS_MOLDE.map(function(campo) { return registro[campo]; });
+    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [valores] })
+    });
+    modelosMoldeCache.push(registro);
+    renderModelosMoldeConfig();
+    mostrarToast('Modelo de molde excluído.');
+  } catch (err) {
+    mostrarToast('Erro ao excluir o modelo de molde. Tente novamente.', true);
+  }
+}
+
+/* ---------------- Confirmação de exclusão (cadastro de cavidades e modelos de molde) ----------------
+   Overlay genérico de "tem certeza?" reaproveitado pelos dois cadastros acima. Guarda o que está
+   pendente de exclusão em exclusaoPendente e só executa de fato ao confirmar. */
+let exclusaoPendente = null; // { tipo: 'cavidade'|'modelo', chave: string }
+
+function pedirExclusaoCavidade(gramatura) {
+  exclusaoPendente = { tipo: 'cavidade', chave: gramatura };
+  document.getElementById('confirmExclusaoTitulo').textContent = 'Excluir cadastro de cavidades?';
+  document.getElementById('confirmExclusaoSub').textContent =
+    'A gramatura ' + formatarGramaturaWpp(gramatura) + ' deixa de ter cadastro de cavidades. Se ela for usada de novo no Cadastro de Injeção, vai pedir pra cadastrar tudo outra vez. O histórico continua guardado na planilha, só deixa de valer.';
+  document.getElementById('confirmExclusaoOverlay').classList.remove('hidden');
+}
+
+function pedirExclusaoModelo(nome) {
+  exclusaoPendente = { tipo: 'modelo', chave: nome };
+  const emUso = Object.values(ultimoRegistroCavidadePorGramatura())
+    .filter(function(r){ return r.modelo_molde === nome; })
+    .map(function(r){ return formatarGramaturaWpp(r.gramatura); });
+  let msg = 'O modelo "' + nome + '" deixa de aparecer na lista de vínculo. O histórico continua guardado na planilha, só deixa de valer.';
+  if (emUso.length) {
+    msg += ' Atenção: ' + emUso.join(', ') + ' ainda ' + (emUso.length > 1 ? 'usam' : 'usa') + ' esse modelo — o mapa de calor ' + (emUso.length > 1 ? 'delas passa' : 'dela passa') + ' a usar um desenho aproximado automático até você vincular outro modelo.';
+  }
+  document.getElementById('confirmExclusaoTitulo').textContent = 'Excluir modelo de molde?';
+  document.getElementById('confirmExclusaoSub').textContent = msg;
+  document.getElementById('confirmExclusaoOverlay').classList.remove('hidden');
+}
+
+function fecharConfirmExclusao() {
+  document.getElementById('confirmExclusaoOverlay').classList.add('hidden');
+  exclusaoPendente = null;
+}
+
+async function confirmarExclusaoPendente() {
+  if (!exclusaoPendente) return;
+  const pendente = exclusaoPendente;
+  const btn = document.getElementById('confirmExclusaoBtnOk');
+  if (btn) { btn.disabled = true; btn.textContent = 'Excluindo…'; }
+  try {
+    if (pendente.tipo === 'cavidade') {
+      await excluirCadastroCavidades(pendente.chave);
+    } else if (pendente.tipo === 'modelo') {
+      await excluirModeloMolde(pendente.chave);
+    }
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Excluir'; }
+    fecharConfirmExclusao();
   }
 }
 
