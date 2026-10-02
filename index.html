@@ -1502,16 +1502,30 @@ async function conectarPlanilha() {
     if (json.id) {
       itemId = json.id; driveId = json.parentReference.driveId;
       dot.className = 'status-dot online'; dotSide.style.background = 'var(--ok)'; label.textContent = 'conectado';
+      // Dispara a busca da lista de abas (worksheets) uma única vez, em paralelo com tudo o resto —
+      // Listas/Cavidades/ModelosMolde abaixo precisavam cada uma da sua própria cópia dessa mesma
+      // lista; agora todas aproveitam essa, reduzindo de 3 requisições idênticas simultâneas pra 1
+      // (menos chance de a Microsoft Graph limitar/atrasar por excesso de requisições ao mesmo tempo).
+      // Se essa busca falhar por qualquer motivo, cada função cai de volta a buscar sozinha — igual
+      // sempre fez — então o resultado final nunca muda, só o número de requisições repetidas.
+      const worksheetsPromise = (async function() {
+        try {
+          const respWs = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets', { headers: { Authorization: 'Bearer ' + token } });
+          const jsonWs = await respWs.json();
+          return jsonWs.value || [];
+        } catch (e) { return null; }
+      })();
       // As 4 etapas abaixo mexem em abas/tabelas diferentes e nenhuma depende do resultado das
       // outras (só a formatação de texto depende das colunas da Injeção terem sido garantidas antes
       // dela, por isso essas duas ficam encadeadas entre si) — rodar em paralelo em vez de uma atrás
       // da outra é o que mais reduz o tempo de carregamento inicial do app, sem mudar nada do que é
-      // carregado ou na ordem em que os dados ficam disponíveis pro resto da tela.
+      // carregado ou na ordem em que os dados ficam disponíveis pro resto da tela. Cada uma também
+      // reaproveita o token já obtido acima, em vez de pedir um novo pro MSAL.
       await Promise.all([
-        carregarListasDaPlanilha(),
+        carregarListasDaPlanilha(token, worksheetsPromise),
         (async function() { await garantirColunasInjecao(token); await prepararColunasComoTexto(token); })(),
-        carregarCavidadesDaPlanilha(),
-        carregarModelosMoldeDaPlanilha()
+        carregarCavidadesDaPlanilha(token, worksheetsPromise),
+        carregarModelosMoldeDaPlanilha(token, worksheetsPromise)
       ]);
       // Recupera rascunho do Cadastro (se houver) só depois que listas/cavidades já carregaram —
       // garante que os dropdowns e a lógica de cavidade por gramatura estejam prontos pra restaurar corretamente.
@@ -1645,11 +1659,24 @@ function dataISOparaBR(iso) {
   return partes.length === 3 ? (partes[2] + '/' + partes[1] + '/' + partes[0]) : iso;
 }
 
-async function garantirTabelaCavidades(token) {
+// Busca a lista de abas (worksheets) da planilha. Se já tivermos uma lista pré-carregada (ou uma
+// Promise dela ainda em andamento — ver conectarPlanilha), reaproveita em vez de pedir de novo pro
+// Graph; se não tiver nada aproveitável (não foi passada, ainda não resolveu ou falhou), busca sozinha
+// — exatamente como cada chamador fazia antes. Resultado sempre idêntico, só evita requisições repetidas.
+async function obterListaWorksheets(token, preCarregada) {
+  if (preCarregada) {
+    const lista = await preCarregada;
+    if (lista) return lista;
+  }
+  const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets', { headers: { Authorization: 'Bearer ' + token } });
+  const json = await resp.json();
+  return json.value || [];
+}
+
+async function garantirTabelaCavidades(token, worksheetsPreCarregada) {
   // Verifica se a planilha (worksheet) "Cavidades_App" existe
-  const respWs = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets', { headers: { Authorization: 'Bearer ' + token } });
-  const jsonWs = await respWs.json();
-  const existeWs = (jsonWs.value || []).some(function(w){ return w.name === NOME_ABA_CAVIDADES; });
+  const listaWs = await obterListaWorksheets(token, worksheetsPreCarregada);
+  const existeWs = listaWs.some(function(w){ return w.name === NOME_ABA_CAVIDADES; });
 
   if (!existeWs) {
     await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/add', {
@@ -1712,10 +1739,10 @@ async function garantirTabelaCavidades(token) {
   return true;
 }
 
-async function carregarCavidadesDaPlanilha() {
+async function carregarCavidadesDaPlanilha(tokenPreCarregado, worksheetsPreCarregada) {
   try {
-    const token = await getToken();
-    const jaExistia = await garantirTabelaCavidades(token);
+    const token = tokenPreCarregado || await getToken();
+    const jaExistia = await garantirTabelaCavidades(token, worksheetsPreCarregada);
     if (!jaExistia) { cavidadesCache = []; renderCavidadesConfig(); return; }
     const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows', { headers: { Authorization: 'Bearer ' + token } });
     const json = await resp.json();
@@ -2002,10 +2029,9 @@ function abrirCadastroCavidadesConfig() {
    Define só o FORMATO usado no mapa de calor (colunas, sentido de numeração, linhas de divisão visual).
    Isolamento de cavidades continua sempre por gramatura (aba Cavidades_App) — nunca aqui. */
 
-async function garantirTabelaModelosMolde(token) {
-  const respWs = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets', { headers: { Authorization: 'Bearer ' + token } });
-  const jsonWs = await respWs.json();
-  const existeWs = (jsonWs.value || []).some(function(w){ return w.name === NOME_ABA_MODELOS_MOLDE; });
+async function garantirTabelaModelosMolde(token, worksheetsPreCarregada) {
+  const listaWs = await obterListaWorksheets(token, worksheetsPreCarregada);
+  const existeWs = listaWs.some(function(w){ return w.name === NOME_ABA_MODELOS_MOLDE; });
 
   if (!existeWs) {
     await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/add', {
@@ -2068,10 +2094,10 @@ async function garantirTabelaModelosMolde(token) {
   return true;
 }
 
-async function carregarModelosMoldeDaPlanilha() {
+async function carregarModelosMoldeDaPlanilha(tokenPreCarregado, worksheetsPreCarregada) {
   try {
-    const token = await getToken();
-    const jaExistia = await garantirTabelaModelosMolde(token);
+    const token = tokenPreCarregado || await getToken();
+    const jaExistia = await garantirTabelaModelosMolde(token, worksheetsPreCarregada);
     if (!jaExistia) { modelosMoldeCache = []; renderModelosMoldeConfig(); return; }
     const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows', { headers: { Authorization: 'Bearer ' + token } });
     const json = await resp.json();
@@ -2366,11 +2392,10 @@ async function confirmarExclusaoPendente() {
   }
 }
 
-async function garantirTabelaListas(token) {
+async function garantirTabelaListas(token, worksheetsPreCarregada) {
   // Verifica se a planilha (worksheet) "Listas_App" existe
-  const respWs = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets', { headers: { Authorization: 'Bearer ' + token } });
-  const jsonWs = await respWs.json();
-  let existeWs = (jsonWs.value || []).some(function(w){ return w.name === 'Listas_App'; });
+  const listaWs = await obterListaWorksheets(token, worksheetsPreCarregada);
+  let existeWs = listaWs.some(function(w){ return w.name === 'Listas_App'; });
 
   if (!existeWs) {
     await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/add', {
@@ -2405,10 +2430,10 @@ async function garantirTabelaListas(token) {
   return true;
 }
 
-async function carregarListasDaPlanilha() {
+async function carregarListasDaPlanilha(tokenPreCarregado, worksheetsPreCarregada) {
   try {
-    const token = await getToken();
-    const jaExistia = await garantirTabelaListas(token);
+    const token = tokenPreCarregado || await getToken();
+    const jaExistia = await garantirTabelaListas(token, worksheetsPreCarregada);
 
     if (!jaExistia) {
       // Tabela acabou de ser criada: grava os valores padrão que já estavam no app
@@ -5214,8 +5239,10 @@ function aeDesenharPlaca(ctx, w, h, molde) {
   }
 }
 
-function aeRenderMold(molde) {
-  const linhasInjecao = aeLinhasInjecaoFiltradas();
+function aeRenderMold(molde, linhasInjecaoPreCalculadas) {
+  // Reaproveita o filtro já calculado por quem chamou (aeAtualizar), em vez de refazer a mesma
+  // varredura de novo — mesmo resultado, um pouco menos trabalho a cada atualização do filtro.
+  const linhasInjecao = linhasInjecaoPreCalculadas || aeLinhasInjecaoFiltradas();
   const mapa = aeOcorrenciasPorCavidade(linhasInjecao);
 
   const ativas = molde.cav.filter(function(c){ return !c.isolada; });
@@ -5374,7 +5401,7 @@ function aeConfigurarHoverMold(canvas) {
   canvas.onmouseleave = function() { tip.style.opacity = 0; };
 }
 
-function aeAtualizarMolde() {
+function aeAtualizarMolde(linhasInjecaoPreCalculadas) {
   const gramSel = msValores('aeGramatura');
   if (gramSel.length !== 1) {
     document.getElementById('aeMoldVazio').textContent = 'Selecione uma única Gramatura no filtro acima pra identificar o molde e ver o mapa de cavidades — cada molde tem sua própria configuração de cavidades e isolamento, então isso garante que o desenho exibido é o correto.';
@@ -5391,7 +5418,7 @@ function aeAtualizarMolde() {
     document.getElementById('aeMoldCritBadge').innerHTML = '';
     return;
   }
-  aeRenderMold(molde);
+  aeRenderMold(molde, linhasInjecaoPreCalculadas);
 }
 
 /* ---------------- Filtros / orquestração geral da página ---------------- */
@@ -5514,7 +5541,7 @@ function aeAtualizar() {
   aeRenderPerfil('aePerfilCor', aePerfilCampo(linhas, 'cor'));
   aeRenderPerfil('aePerfilResina', aePerfilCampo(linhasInjecao, 'resina'));
 
-  aeAtualizarMolde();
+  aeAtualizarMolde(linhasInjecao);
 }
 (function aeInit() {
   const filtrosMultiplos = document.querySelectorAll('#pageAnaliseEstatistica .ms-filter');
