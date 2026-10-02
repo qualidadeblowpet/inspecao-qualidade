@@ -1608,14 +1608,20 @@ async function garantirColunasInjecao(token) {
     const json = await resp.json();
     const colunasExistentes = (json.value || []).map(function(c) { return c.name; });
     const colunasNovas = ['op', 'numero_caixa', 'cavidade_todas'].filter(function(nome) { return colunasExistentes.indexOf(nome) === -1; });
-    // Dispara as criações de coluna em paralelo (em vez de uma por vez) — mais rápido pra carregar
-    // o app, sem mudar o resultado final (cada coluna nova continua sendo criada do mesmo jeito).
-    await Promise.all(colunasNovas.map(function(nome) {
-      return fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaInjecao/columns/add', {
-        method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: nome })
-      }).catch(function(e) { /* segue mesmo se uma coluna falhar — as outras continuam */ });
-    }));
+    // Uma coluna de cada vez, NUNCA em paralelo. O Excel sempre adiciona uma coluna nova no fim da
+    // tabela, mas duas requisições de criação de coluna chegando ao mesmo tempo podem ser aplicadas
+    // fora de ordem — e como o app lê TabelaInjecao por POSIÇÃO (CABECALHO_INJECAO[i]), uma coluna
+    // fora de ordem faz o app ler um valor de produção no campo errado, silenciosamente. Criar uma
+    // de cada vez é um pouco mais lento aqui (no máximo 3 requisições a mais em sequência, só na
+    // primeira vez que uma coluna nova precisa ser criada), mas é o que garante a ordem certa.
+    for (const nome of colunasNovas) {
+      try {
+        await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaInjecao/columns/add', {
+          method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: nome })
+        });
+      } catch (e) { /* segue mesmo se uma coluna falhar — as outras continuam */ }
+    }
   } catch (e) { /* segue mesmo se falhar — as colunas podem já existir ou a tabela ainda não estar pronta */ }
   colunasInjecaoPreparadas = true;
 }
@@ -1724,17 +1730,23 @@ async function garantirTabelaCavidades(token, worksheetsPreCarregada) {
   // funcionalidades não tinham esses campos). Sempre adicionadas no FIM da tabela, sem reordenar/apagar
   // nada já cadastrado. "excluido" marca um registro como excluído (histórico preservado, só deixa de
   // valer) — ver excluirCadastroCavidades().
+  // IMPORTANTE: essas colunas são criadas uma de cada vez, NUNCA em paralelo (Promise.all). O Excel
+  // sempre adiciona uma coluna nova no fim da tabela, mas se duas chegam ao mesmo tempo a ordem final
+  // não é garantida — e todo o resto do código lê os valores por POSIÇÃO (CABECALHO_CAVIDADES[i]), então
+  // uma coluna fora de ordem faz o app ler o valor errado pro campo errado, silenciosamente.
   try {
     const respCols = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/columns', { headers: { Authorization: 'Bearer ' + token } });
     const jsonCols = await respCols.json();
     const nomesCols = (jsonCols.value || []).map(function(c){ return c.name; });
     const faltando = ['modelo_molde', 'excluido'].filter(function(nome){ return nomesCols.indexOf(nome) === -1; });
-    await Promise.all(faltando.map(function(nome) {
-      return fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/columns/add', {
-        method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: nome })
-      }).catch(function(e) { /* segue mesmo se uma coluna falhar */ });
-    }));
+    for (const nome of faltando) {
+      try {
+        await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/columns/add', {
+          method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: nome })
+        });
+      } catch (e) { /* segue mesmo se uma coluna falhar */ }
+    }
   } catch (e) { /* segue mesmo se falhar — cadastro de cavidades continua funcionando sem vínculo de modelo/exclusão */ }
   return true;
 }
@@ -1916,10 +1928,11 @@ async function salvarCadastroCavidades() {
       excluido: ''
     };
     const valores = CABECALHO_CAVIDADES.map(function(campo) { return novoRegistro[campo]; });
-    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows/add', {
+    const respGravar = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows/add', {
       method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ values: [valores] })
     });
+    if (!respGravar.ok) throw new Error('Falha ao gravar cadastro na planilha (HTTP ' + respGravar.status + ')');
     cavidadesCache.push(novoRegistro);
     aplicarRegistroCavidades(novoRegistro);
     fecharCadastroCavidades();
@@ -1954,10 +1967,13 @@ async function excluirCadastroCavidades(gramatura) {
       excluido: '1'
     };
     const valores = CABECALHO_CAVIDADES.map(function(campo) { return registro[campo]; });
-    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows/add', {
+    const respGravar = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows/add', {
       method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ values: [valores] })
     });
+    // Confere se a gravação realmente aconteceu na planilha antes de dar por excluído aqui — senão
+    // o item sumiria da tela mas voltaria ao atualizar a página (exclusão só "de mentirinha").
+    if (!respGravar.ok) throw new Error('Falha ao gravar exclusão na planilha (HTTP ' + respGravar.status + ')');
     cavidadesCache.push(registro);
     renderCavidadesConfig();
     mostrarToast('Cadastro de cavidades excluído.');
@@ -2079,17 +2095,22 @@ async function garantirTabelaModelosMolde(token, worksheetsPreCarregada) {
   // funcionando normalmente: o motor de desenho trata ausência desses campos como "coluna", sem
   // espelhamento, que é exatamente o comportamento que eles já tinham. "excluido" marca um modelo como
   // excluído (histórico preservado, só deixa de valer) — ver excluirModeloMolde().
+  // IMPORTANTE: uma coluna de cada vez, NUNCA em paralelo (Promise.all) — ver comentário equivalente
+  // em garantirTabelaCavidades logo acima. Com 4 colunas possivelmente faltando aqui, o risco de
+  // embaralhar a ordem (e com isso ler o campo errado em cada posição) era ainda maior.
   try {
     const respCols = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/columns', { headers: { Authorization: 'Bearer ' + token } });
     const jsonCols = await respCols.json();
     const nomesCols = (jsonCols.value || []).map(function(c){ return c.name; });
     const faltando = ['orientacao', 'espelho_h', 'espelho_v', 'excluido'].filter(function(nome){ return nomesCols.indexOf(nome) === -1; });
-    await Promise.all(faltando.map(function(nome) {
-      return fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/columns/add', {
-        method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: nome })
-      }).catch(function(e) { /* segue mesmo se uma coluna falhar */ });
-    }));
+    for (const nome of faltando) {
+      try {
+        await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/columns/add', {
+          method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: nome })
+        });
+      } catch (e) { /* segue mesmo se uma coluna falhar */ }
+    }
   } catch (e) { /* segue mesmo se falhar — modelo continua funcionando com o layout padrão (coluna, sem espelhar) */ }
   return true;
 }
@@ -2291,10 +2312,11 @@ async function salvarModeloMolde() {
       excluido: ''
     };
     const valores = CABECALHO_MODELOS_MOLDE.map(function(campo) { return registro[campo]; });
-    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
+    const respGravar = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
       method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ values: [valores] })
     });
+    if (!respGravar.ok) throw new Error('Falha ao gravar modelo na planilha (HTTP ' + respGravar.status + ')');
     modelosMoldeCache.push(registro);
     renderModelosMoldeConfig();
     fecharModeloMoldeForm();
@@ -2331,10 +2353,13 @@ async function excluirModeloMolde(nome) {
       excluido: '1'
     };
     const valores = CABECALHO_MODELOS_MOLDE.map(function(campo) { return registro[campo]; });
-    await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
+    const respGravar = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
       method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ values: [valores] })
     });
+    // Confere se a gravação realmente aconteceu na planilha antes de dar por excluído aqui — senão
+    // o item sumiria da tela mas voltaria ao atualizar a página (exclusão só "de mentirinha").
+    if (!respGravar.ok) throw new Error('Falha ao gravar exclusão na planilha (HTTP ' + respGravar.status + ')');
     modelosMoldeCache.push(registro);
     renderModelosMoldeConfig();
     mostrarToast('Modelo de molde excluído.');
