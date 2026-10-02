@@ -1385,6 +1385,13 @@ const NOME_TABELA_CAVIDADES = 'TabelaCavidades';
 // 'modelo_molde' foi adicionado no fim da lista (nunca no meio) pra não desalinhar a leitura de linhas
 // já cadastradas em planilhas antigas, que não tinham essa coluna.
 const CABECALHO_CAVIDADES = ['gramatura','total_cavidades','cavidades_isoladas','data_cadastro','hora_cadastro','responsavel','modelo_molde','excluido'];
+// Ordem REAL das colunas na planilha (pode divergir da ordem acima se 'modelo_molde'/'excluido' foram
+// adicionados numa tabela já existente — o Excel sempre acrescenta no fim, mas não necessariamente na
+// mesma ordem em que o app pediu, principalmente se já rodou alguma vez de um jeito que não garantia
+// isso). garantirTabelaCavidades() mantém esta lista atualizada com a ordem de verdade; leitura e
+// gravação SEMPRE usam ela (nunca o array fixo acima) pra nunca ler/gravar um campo na coluna errada —
+// isso inclui o campo 'excluido', que é exatamente o que faz uma exclusão "não pegar" na planilha.
+let ordemColunasCavidadesReal = CABECALHO_CAVIDADES.slice();
 
 /* ---------------- Modelos de molde: cadastro do DESENHO/grade usado no mapa de calor por cavidade
    (aba própria ModelosMolde_App, histórico append-only — mesma convenção da aba Cavidades_App: a
@@ -1394,6 +1401,23 @@ const CABECALHO_CAVIDADES = ['gramatura','total_cavidades','cavidades_isoladas',
 const NOME_ABA_MODELOS_MOLDE = 'ModelosMolde_App';
 const NOME_TABELA_MODELOS_MOLDE = 'TabelaModelosMolde';
 const CABECALHO_MODELOS_MOLDE = ['nome','total_cavidades','colunas','divisorias','numeracao','data_cadastro','hora_cadastro','responsavel','orientacao','espelho_h','espelho_v','excluido'];
+// Mesma lógica de ordemColunasCavidadesReal acima, pro mesmo risco nesta tabela (ver comentário lá).
+let ordemColunasModelosMoldeReal = CABECALHO_MODELOS_MOLDE.slice();
+
+// Monta o array de valores de uma linha respeitando a ordem REAL das colunas na planilha (não a ordem
+// fixa do cabeçalho no código) — usado tanto pra Cavidades quanto ModelosMolde.
+function construirValoresPorOrdemReal(ordemReal, registro) {
+  return ordemReal.map(function(nome) { return (nome in registro) ? registro[nome] : ''; });
+}
+// Lê uma linha (array de valores por posição) de volta pra objeto, também respeitando a ordem REAL.
+function lerRegistroPorOrdemReal(ordemReal, camposConhecidos, valores) {
+  const obj = {};
+  camposConhecidos.forEach(function(campo) {
+    const idx = ordemReal.indexOf(campo);
+    obj[campo] = idx === -1 ? '' : valores[idx];
+  });
+  return obj;
+}
 
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
 let paginaAtual = 'dashboard';
@@ -1810,6 +1834,7 @@ async function garantirTabelaCavidades(token, worksheetsPreCarregada) {
         });
       } catch (e) { /* segue mesmo se falhar */ }
     });
+    ordemColunasCavidadesReal = CABECALHO_CAVIDADES.slice(); // acabamos de criar nessa ordem — é a real
     return false; // tabela recém-criada, ainda vazia
   }
   // Tabela já existia — garante que as colunas modelo_molde/excluido existam (planilhas de antes dessas
@@ -1833,7 +1858,11 @@ async function garantirTabelaCavidades(token, worksheetsPreCarregada) {
         });
       } catch (e) { /* segue mesmo se uma coluna falhar */ }
     }
-  } catch (e) { /* segue mesmo se falhar — cadastro de cavidades continua funcionando sem vínculo de modelo/exclusão */ }
+    // Atualiza a ordem real: colunas que já existiam (na ordem de verdade) + as que acabamos de
+    // adicionar agora, nessa ordem (acrescentadas sequencialmente, sempre no fim). É essa lista — e
+    // nunca CABECALHO_CAVIDADES — que leitura e gravação usam dali pra frente.
+    ordemColunasCavidadesReal = nomesCols.concat(faltando);
+  } catch (e) { /* segue mesmo se falhar — cadastro de cavidades continua funcionando sem vínculo de modelo/exclusão, mas mantém a última ordem real conhecida */ }
   return true;
 }
 
@@ -1845,10 +1874,7 @@ async function carregarCavidadesDaPlanilha(tokenPreCarregado, worksheetsPreCarre
     const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows', { headers: { Authorization: 'Bearer ' + token } });
     const json = await resp.json();
     cavidadesCache = (json.value || []).map(function(row) {
-      const v = row.values[0];
-      const obj = {};
-      CABECALHO_CAVIDADES.forEach(function(campo, i) { obj[campo] = v[i]; });
-      return obj;
+      return lerRegistroPorOrdemReal(ordemColunasCavidadesReal, CABECALHO_CAVIDADES, row.values[0]);
     });
     renderCavidadesConfig();
   } catch (err) {
@@ -2023,7 +2049,7 @@ async function salvarCadastroCavidades() {
       modelo_molde: selModelo ? selModelo.value : '',
       excluido: ''
     };
-    const valores = CABECALHO_CAVIDADES.map(function(campo) { return novoRegistro[campo]; });
+    const valores = construirValoresPorOrdemReal(ordemColunasCavidadesReal, novoRegistro);
     const respGravar = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows/add', {
       method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ values: [valores] })
@@ -2062,7 +2088,7 @@ async function excluirCadastroCavidades(gramatura) {
       modelo_molde: base ? base.modelo_molde : '',
       excluido: '1'
     };
-    const valores = CABECALHO_CAVIDADES.map(function(campo) { return registro[campo]; });
+    const valores = construirValoresPorOrdemReal(ordemColunasCavidadesReal, registro);
     const respGravar = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_CAVIDADES + '/tables/' + NOME_TABELA_CAVIDADES + '/rows/add', {
       method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ values: [valores] })
@@ -2183,6 +2209,7 @@ async function garantirTabelaModelosMolde(token, worksheetsPreCarregada) {
         });
       } catch (e) { /* segue mesmo se falhar */ }
     });
+    ordemColunasModelosMoldeReal = CABECALHO_MODELOS_MOLDE.slice(); // acabamos de criar nessa ordem — é a real
     return false; // tabela recém-criada, ainda vazia
   }
   // Tabela já existia — garante que as colunas orientacao/espelho_h/espelho_v/excluido existam (modelos
@@ -2207,7 +2234,9 @@ async function garantirTabelaModelosMolde(token, worksheetsPreCarregada) {
         });
       } catch (e) { /* segue mesmo se uma coluna falhar */ }
     }
-  } catch (e) { /* segue mesmo se falhar — modelo continua funcionando com o layout padrão (coluna, sem espelhar) */ }
+    // Mesma lógica de ordemColunasCavidadesReal — ver comentário equivalente em garantirTabelaCavidades.
+    ordemColunasModelosMoldeReal = nomesCols.concat(faltando);
+  } catch (e) { /* segue mesmo se falhar — modelo continua funcionando com o layout padrão (coluna, sem espelhar), mas mantém a última ordem real conhecida */ }
   return true;
 }
 
@@ -2219,10 +2248,7 @@ async function carregarModelosMoldeDaPlanilha(tokenPreCarregado, worksheetsPreCa
     const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows', { headers: { Authorization: 'Bearer ' + token } });
     const json = await resp.json();
     modelosMoldeCache = (json.value || []).map(function(row) {
-      const v = row.values[0];
-      const obj = {};
-      CABECALHO_MODELOS_MOLDE.forEach(function(campo, i) { obj[campo] = v[i]; });
-      return obj;
+      return lerRegistroPorOrdemReal(ordemColunasModelosMoldeReal, CABECALHO_MODELOS_MOLDE, row.values[0]);
     });
     renderModelosMoldeConfig();
   } catch (err) {
@@ -2407,7 +2433,7 @@ async function salvarModeloMolde() {
       espelho_v: espelhoV ? '1' : '',
       excluido: ''
     };
-    const valores = CABECALHO_MODELOS_MOLDE.map(function(campo) { return registro[campo]; });
+    const valores = construirValoresPorOrdemReal(ordemColunasModelosMoldeReal, registro);
     const respGravar = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
       method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ values: [valores] })
@@ -2448,7 +2474,7 @@ async function excluirModeloMolde(nome) {
       espelho_v: base ? base.espelho_v : '',
       excluido: '1'
     };
-    const valores = CABECALHO_MODELOS_MOLDE.map(function(campo) { return registro[campo]; });
+    const valores = construirValoresPorOrdemReal(ordemColunasModelosMoldeReal, registro);
     const respGravar = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
       method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
       body: JSON.stringify({ values: [valores] })
