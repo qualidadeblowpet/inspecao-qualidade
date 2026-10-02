@@ -403,6 +403,10 @@
   .mm-preview-wrap { margin-top: 16px; padding: 16px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; display: flex; justify-content: center; align-items: center; min-height: 150px; overflow-x: auto; }
   .mm-preview-hint { font-size: 11.5px; color: var(--text-dim); margin: 8px 0 0; line-height: 1.5; }
   .mm-preview-hint a { color: var(--accent); }
+  .mm-form-help { font-size: 11.5px; color: var(--text-dim); margin: -2px 0 2px; line-height: 1.5; }
+  .mm-check-row { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 2px 0; }
+  .mm-check-row label.mm-check { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text); cursor: pointer; font-weight: 400; text-transform: none; letter-spacing: normal; margin-bottom: 0; }
+  .mm-check input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--accent); cursor: pointer; }
   @media (max-width: 640px) { .mm-form-grid { grid-template-columns: 1fr; } }
   .cav-isoladas-nota { font-size: 11.5px; color: var(--text-dim); margin-top: 8px; }
   .cav-isoladas-tag { display: inline-block; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 2px 7px; margin: 2px 2px 0 0; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
@@ -1336,7 +1340,7 @@ const CABECALHO_CAVIDADES = ['gramatura','total_cavidades','cavidades_isoladas',
    isolamento de cavidades continua sendo só por gramatura, nunca pelo modelo. ---------------- */
 const NOME_ABA_MODELOS_MOLDE = 'ModelosMolde_App';
 const NOME_TABELA_MODELOS_MOLDE = 'TabelaModelosMolde';
-const CABECALHO_MODELOS_MOLDE = ['nome','total_cavidades','colunas','divisorias','numeracao','data_cadastro','hora_cadastro','responsavel'];
+const CABECALHO_MODELOS_MOLDE = ['nome','total_cavidades','colunas','divisorias','numeracao','data_cadastro','hora_cadastro','responsavel','orientacao','espelho_h','espelho_v'];
 
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
 let paginaAtual = 'dashboard';
@@ -1984,6 +1988,23 @@ async function garantirTabelaModelosMolde(token) {
     });
     return false; // tabela recém-criada, ainda vazia
   }
+  // Tabela já existia — garante que as colunas orientacao/espelho_h/espelho_v existam (modelos
+  // cadastrados antes dessa funcionalidade não tinham esses campos). Sempre adicionadas no FIM da
+  // tabela, sem reordenar/apagar nada já cadastrado. Modelos antigos sem "orientacao" continuam
+  // funcionando normalmente: o motor de desenho trata ausência desses campos como "coluna", sem
+  // espelhamento, que é exatamente o comportamento que eles já tinham.
+  try {
+    const respCols = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/columns', { headers: { Authorization: 'Bearer ' + token } });
+    const jsonCols = await respCols.json();
+    const nomesCols = (jsonCols.value || []).map(function(c){ return c.name; });
+    const faltando = ['orientacao', 'espelho_h', 'espelho_v'].filter(function(nome){ return nomesCols.indexOf(nome) === -1; });
+    await Promise.all(faltando.map(function(nome) {
+      return fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/columns/add', {
+        method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: nome })
+      }).catch(function(e) { /* segue mesmo se uma coluna falhar */ });
+    }));
+  } catch (e) { /* segue mesmo se falhar — modelo continua funcionando com o layout padrão (coluna, sem espelhar) */ }
   return true;
 }
 
@@ -2070,10 +2091,19 @@ function mmAbrirForm(registro) {
       '<div class="field field-full"><label>Nome do modelo' + (registro ? ' (pra renomear, cadastre um novo modelo e depois reatribua as gramaturas)' : '') + '</label><input type="text" id="mmNomeInput" ' + (registro ? 'disabled' : '') + ' placeholder="Ex: Husky 56 cavidades" value="' + (registro ? registro.nome.replace(/"/g,'&quot;') : '') + '" oninput="mmAtualizarPreview()"></div>' +
       '<div class="field"><label>Total de cavidades</label><input type="number" id="mmTotalInput" min="1" value="' + (registro ? registro.total_cavidades : '') + '" placeholder="Ex: 56" oninput="mmAtualizarPreview()"></div>' +
       '<div class="field"><label>Número de colunas</label><input type="number" id="mmColunasInput" min="1" value="' + (registro ? registro.colunas : '') + '" placeholder="Ex: 4" oninput="mmAtualizarPreview()"></div>' +
-      '<div class="field field-full"><label>Sentido de numeração</label><select id="mmNumeracaoSelect" onchange="mmAtualizarPreview()">' +
-        '<option value="sequencial"' + (registro && registro.numeracao === 'zigzag' ? '' : ' selected') + '>Sequencial por coluna (1, 2, 3… de cima a baixo em cada coluna)</option>' +
-        '<option value="zigzag"' + (registro && registro.numeracao === 'zigzag' ? ' selected' : '') + '>Zig-zag por coluna (desce numa coluna, sobe na próxima)</option>' +
+      '<div class="field"><label>Orientação da numeração</label><select id="mmOrientacaoSelect" onchange="mmAtualizarPreview()">' +
+        '<option value="coluna"' + (registro && registro.orientacao === 'linha' ? '' : ' selected') + '>Por coluna (anda pelas colunas)</option>' +
+        '<option value="linha"' + (registro && registro.orientacao === 'linha' ? ' selected' : '') + '>Por linha (anda pelas linhas)</option>' +
       '</select></div>' +
+      '<div class="field"><label>Padrão de preenchimento</label><select id="mmPadraoSelect" onchange="mmAtualizarPreview()">' +
+        '<option value="sequencial"' + (registro && registro.numeracao === 'zigzag' ? '' : ' selected') + '>Sequencial (sempre no mesmo sentido)</option>' +
+        '<option value="zigzag"' + (registro && registro.numeracao === 'zigzag' ? ' selected' : '') + '>Zig-zag (vai e volta, tipo serpente)</option>' +
+      '</select></div>' +
+      '<p class="mm-form-help field-full" id="mmOrientacaoAjuda"></p>' +
+      '<div class="field field-full mm-check-row">' +
+        '<label class="mm-check"><input type="checkbox" id="mmEspelhoHChk"' + (registro && (registro.espelho_h === '1' || registro.espelho_h === 'sim') ? ' checked' : '') + ' onchange="mmAtualizarPreview()"> Inverter horizontalmente (começa pela direita, não pela esquerda)</label>' +
+        '<label class="mm-check"><input type="checkbox" id="mmEspelhoVChk"' + (registro && (registro.espelho_v === '1' || registro.espelho_v === 'sim') ? ' checked' : '') + ' onchange="mmAtualizarPreview()"> Inverter verticalmente (começa por baixo, não por cima)</label>' +
+      '</div>' +
       '<div class="field field-full"><label>Linhas de divisão (opcional, só visual)</label><input type="text" id="mmDivisoriasInput" placeholder="Ex: 7 ou 3,10" value="' + divisoriasPre.replace(/"/g,'&quot;') + '" oninput="mmAtualizarPreview()"></div>' +
     '</div>' +
     '<div class="mm-preview-wrap" id="mmPreviewHost"></div>' +
@@ -2091,14 +2121,25 @@ function mmAtualizarPreview() {
   if (!host) return;
   const total = parseInt(document.getElementById('mmTotalInput').value, 10) || 0;
   const colunas = parseInt(document.getElementById('mmColunasInput').value, 10) || 0;
-  const zigzag = document.getElementById('mmNumeracaoSelect').value === 'zigzag';
+  const orientacao = document.getElementById('mmOrientacaoSelect').value;
+  const zigzag = document.getElementById('mmPadraoSelect').value === 'zigzag';
+  const espelhoH = document.getElementById('mmEspelhoHChk').checked;
+  const espelhoV = document.getElementById('mmEspelhoVChk').checked;
   const divisoriasRaw = document.getElementById('mmDivisoriasInput').value.trim();
+  const ajudaEl = document.getElementById('mmOrientacaoAjuda');
+  if (ajudaEl) {
+    const eixo = orientacao === 'linha' ? 'linhas' : 'colunas';
+    const vaiVolta = zigzag ? ', alternando ida e volta a cada ' + (orientacao === 'linha' ? 'linha' : 'coluna') : '';
+    const cantoV = espelhoV ? 'inferior' : 'superior';
+    const cantoH = espelhoH ? 'direito' : 'esquerdo';
+    ajudaEl.textContent = 'A cavidade 1 fica no canto ' + cantoV + ' ' + cantoH + ' — ajuste se não bater com a foto. Numeração anda pelas ' + eixo + vaiVolta + '.';
+  }
   if (!total || !colunas) {
     host.innerHTML = '<div class="ae-vazio">Informe o total de cavidades e o número de colunas pra ver a prévia do desenho.</div>';
     return;
   }
   const divisorias = divisoriasRaw ? divisoriasRaw.split(',').map(function(s){ return parseInt(s.trim(), 10); }).filter(function(n){ return !isNaN(n) && n > 0; }) : [];
-  const layout = aeLayoutPorColunas(total, colunas, divisorias, zigzag);
+  const layout = aeLayoutGrade(total, colunas, divisorias, orientacao, zigzag ? 'zigzag' : 'sequencial', espelhoH, espelhoV);
   const w = layout.cols * CELL + PAD * 2, h = layout.rows * CELL + PAD * 2;
   let canvas = document.getElementById('mmPreviewCanvas');
   if (!canvas) { canvas = document.createElement('canvas'); canvas.id = 'mmPreviewCanvas'; host.innerHTML = ''; host.appendChild(canvas); }
@@ -2129,7 +2170,10 @@ async function salvarModeloMolde() {
   const nome = document.getElementById('mmNomeInput').value.trim();
   const total = parseInt(document.getElementById('mmTotalInput').value, 10);
   const colunas = parseInt(document.getElementById('mmColunasInput').value, 10);
-  const numeracao = document.getElementById('mmNumeracaoSelect').value;
+  const orientacao = document.getElementById('mmOrientacaoSelect').value;
+  const numeracao = document.getElementById('mmPadraoSelect').value;
+  const espelhoH = document.getElementById('mmEspelhoHChk').checked;
+  const espelhoV = document.getElementById('mmEspelhoVChk').checked;
   const divisoriasRaw = document.getElementById('mmDivisoriasInput').value.trim();
   if (!nome) { mostrarToast('Informe um nome pro modelo de molde.', true); return; }
   if (!total || total < 1) { mostrarToast('Informe o total de cavidades do modelo.', true); return; }
@@ -2150,7 +2194,10 @@ async function salvarModeloMolde() {
       numeracao: numeracao,
       data_cadastro: hojeISO(),
       hora_cadastro: agoraHHMM(),
-      responsavel: respEl ? respEl.value : ''
+      responsavel: respEl ? respEl.value : '',
+      orientacao: orientacao,
+      espelho_h: espelhoH ? '1' : '',
+      espelho_v: espelhoV ? '1' : ''
     };
     const valores = CABECALHO_MODELOS_MOLDE.map(function(campo) { return registro[campo]; });
     await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + NOME_ABA_MODELOS_MOLDE + '/tables/' + NOME_TABELA_MODELOS_MOLDE + '/rows/add', {
@@ -4559,6 +4606,45 @@ function aeLayoutPorColunas(total, colunas, divisorias, zigzag) {
   const dividers = (divisorias || []).filter(function(n){ return n > 0 && n < rows; });
   return { cols: c, rows: rows, dividers: dividers, cav: cav };
 }
+// Mesma ideia de aeLayoutPorColunas, mas andando primeiro pelas LINHAS: preenche a linha 1 inteira
+// (ou em zig-zag, intercalando o sentido a cada linha), depois a linha 2, etc. Necessário pra moldes
+// como o Husky 29,0g/48cav., cuja numeração começa na primeira linha, da esquerda pra direita —
+// diferente do Hypet 41,5g/72cav., que anda pelas colunas (ver aeLayoutPorColunas).
+function aeLayoutPorLinhas(total, colunas, divisorias, zigzag) {
+  const t = Math.max(1, parseInt(total, 10) || 1);
+  const c = Math.max(1, parseInt(colunas, 10) || 1);
+  const rows = Math.max(1, Math.ceil(t / c));
+  const cav = [];
+  let num = 1;
+  for (let row = 0; row < rows && num <= t; row++) {
+    const inverte = !!zigzag && (row % 2 === 1);
+    for (let col = 0; col < c && num <= t; col++) {
+      const colReal = inverte ? (c - 1 - col) : col;
+      cav.push({ num: num, col: colReal, row: row });
+      num++;
+    }
+  }
+  const dividers = (divisorias || []).filter(function(n){ return n > 0 && n < rows; });
+  return { cols: c, rows: rows, dividers: dividers, cav: cav };
+}
+// Combina orientação (coluna/linha) + padrão (sequencial/zig-zag) + espelhamento opcional
+// (horizontal e/ou vertical, pra moldes cuja cavidade 1 começa num canto diferente do
+// superior-esquerdo). É o ponto único usado tanto pela prévia ao vivo do cadastro de modelo
+// quanto pelo desenho real do mapa de calor — qualquer ajuste aqui vale pros dois.
+function aeLayoutGrade(total, colunas, divisorias, orientacao, padrao, espelhoH, espelhoV) {
+  const zigzag = padrao === 'zigzag';
+  const layout = (orientacao === 'linha')
+    ? aeLayoutPorLinhas(total, colunas, divisorias, zigzag)
+    : aeLayoutPorColunas(total, colunas, divisorias, zigzag);
+  if (espelhoH) {
+    layout.cav.forEach(function(c) { c.col = (layout.cols - 1) - c.col; });
+  }
+  if (espelhoV) {
+    layout.cav.forEach(function(c) { c.row = (layout.rows - 1) - c.row; });
+    layout.dividers = layout.dividers.map(function(d) { return layout.rows - d; });
+  }
+  return layout;
+}
 function aeLayoutGenerico(total) {
   const t = parseInt(total, 10) || 0;
   const cols = t >= 32 ? 4 : t >= 10 ? 2 : 1;
@@ -4572,7 +4658,11 @@ function aeLayoutParaGramatura(gramaturaStr, total, registro) {
       const divs = modelo.divisorias
         ? String(modelo.divisorias).split(',').map(function(s){ return parseInt(s.trim(), 10); }).filter(function(n){ return !isNaN(n); })
         : [];
-      return aeLayoutPorColunas(total, modelo.colunas, divs, modelo.numeracao === 'zigzag');
+      const orientacao = modelo.orientacao === 'linha' ? 'linha' : 'coluna';
+      const padrao = modelo.numeracao === 'zigzag' ? 'zigzag' : 'sequencial';
+      const espelhoH = modelo.espelho_h === '1' || modelo.espelho_h === 'sim';
+      const espelhoV = modelo.espelho_v === '1' || modelo.espelho_v === 'sim';
+      return aeLayoutGrade(total, modelo.colunas, divs, orientacao, padrao, espelhoH, espelhoV);
     }
   }
   if (gramaturaStr === '19,0' && total === 56) return aeLayoutQuadrante56();
