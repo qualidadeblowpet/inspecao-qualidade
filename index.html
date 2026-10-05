@@ -1410,11 +1410,21 @@ function construirValoresPorOrdemReal(ordemReal, registro) {
   return ordemReal.map(function(nome) { return (nome in registro) ? registro[nome] : ''; });
 }
 // Lê uma linha (array de valores por posição) de volta pra objeto, também respeitando a ordem REAL.
+// IMPORTANTE: o Excel converte sozinho um texto como "1" em NÚMERO 1 quando a coluna não está formatada
+// como Texto — e a Graph API devolve esse número (não a string) na leitura. Como o resto do app compara
+// com strings ('1', 'sim'), cada valor lido é normalizado pra texto aqui, na única porta de entrada de
+// leitura. Sem isso, o valor gravado "1" voltava como 1 depois do F5 e flags (inverter, excluído) sumiam.
+function normalizarValorLido(v) {
+  if (v === null || v === undefined) return '';
+  if (v === true) return '1';
+  if (v === false) return '';
+  return typeof v === 'string' ? v : String(v);
+}
 function lerRegistroPorOrdemReal(ordemReal, camposConhecidos, valores) {
   const obj = {};
   camposConhecidos.forEach(function(campo) {
     const idx = ordemReal.indexOf(campo);
-    obj[campo] = idx === -1 ? '' : valores[idx];
+    obj[campo] = idx === -1 ? '' : normalizarValorLido(valores[idx]);
   });
   return obj;
 }
