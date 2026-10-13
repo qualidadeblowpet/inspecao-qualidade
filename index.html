@@ -4077,8 +4077,8 @@ function cavidadesRecorrentes(desviosMaquina) {
   });
   return Object.keys(porCavidade).map(function(cav) {
     const info = porCavidade[cav];
-    const defeitoPrincipal = Object.entries(info.defeitos).sort(function(a, b) { return b[1] - a[1]; })[0][0];
-    return { cavidade: cav, qtd: info.qtd, defeito: defeitoPrincipal };
+    const principal = Object.entries(info.defeitos).sort(function(a, b) { return b[1] - a[1]; })[0];
+    return { cavidade: cav, qtd: info.qtd, defeito: principal[0], qtdDefeito: principal[1] };
   }).sort(function(a, b) { return b.qtd - a.qtd; }).slice(0, 4);
 }
 
@@ -4146,7 +4146,7 @@ function atualizarAlertaMaquina(processo) {
     const cavidades = cavidadesRecorrentes(desvios);
     if (cavidades.length) {
       cavidadesHtml = '<div class="analise-bloco"><div class="analise-bloco-titulo">Cavidades que mais repetiram defeitos</div><div class="analise-tags">' + cavidades.map(function(c, i) {
-        return '<span class="analise-tag' + (i === 0 ? ' cav-destaque' : '') + '">Cav. ' + c.cavidade + ' — ' + c.qtd + ' ocorrência' + (c.qtd === 1 ? '' : 's') + ' (' + c.defeito + ')</span>';
+        return '<span class="analise-tag' + (i === 0 ? ' cav-destaque' : '') + '">Cav. ' + c.cavidade + ' — ' + c.qtd + ' ocorrência' + (c.qtd === 1 ? '' : 's') + ' (' + c.qtdDefeito + ' por ' + c.defeito + ')</span>';
       }).join('') + '</div></div>';
     }
   }
@@ -4231,7 +4231,7 @@ function renderCardMaquina(equip, todasLinhasFiltro, dias) {
     const cavidades = cavidadesRecorrentes(desviosMaquina);
     cavidadesHtml = '<div class="analise-bloco"><div class="analise-bloco-titulo">Cavidades que mais repetiram defeitos</div>' +
       (cavidades.length ? '<div class="analise-tags">' + cavidades.map(function(c, i) {
-        return '<span class="analise-tag' + (i === 0 ? ' cav-destaque' : '') + '">Cav. ' + c.cavidade + ' — ' + c.qtd + ' ocorrência' + (c.qtd === 1 ? '' : 's') + ' (' + c.defeito + ')</span>';
+        return '<span class="analise-tag' + (i === 0 ? ' cav-destaque' : '') + '">Cav. ' + c.cavidade + ' — ' + c.qtd + ' ocorrência' + (c.qtd === 1 ? '' : 's') + ' (' + c.qtdDefeito + ' por ' + c.defeito + ')</span>';
       }).join('') + '</div>' : '<div class="analise-vazio" style="padding:8px 0;">Sem cavidades recorrentes no período.</div>') +
     '</div>';
   }
