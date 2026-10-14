@@ -837,9 +837,9 @@
         <div class="card wide">
           <div class="analise-topo">
             <h3 style="margin:0;">Análise do período por máquina</h3>
-            <button class="btn btn-outline" onclick="gerarAnaliseIA()">🔎 Analisar período</button>
+            <button class="btn btn-outline" onclick="gerarAnaliseIA()">🔄 Atualizar análise</button>
           </div>
-          <div id="analiseResultado"><div class="analise-vazio">Clique em "Analisar período" para gerar um resumo dos dados filtrados acima, separado por máquina.</div></div>
+          <div id="analiseResultado"><div class="analise-vazio">A análise por máquina aparece aqui assim que os dados forem carregados.</div></div>
         </div>
         <div class="card"><h3>Defeitos mais frequentes</h3><div class="chart-wrap"><canvas id="chartDefeitos"></canvas></div></div>
         <div class="card"><h3>Desvios por equipamento</h3><div class="chart-wrap"><canvas id="chartEquipamento"></canvas></div></div>
@@ -3968,6 +3968,10 @@ async function atualizarDashboard() {
   document.getElementById('kpiGraves').textContent = graves;
   document.getElementById('kpiTaxa').textContent = total ? Math.round(((total - pendentes) / total) * 100) + '%' : '–';
 
+  // "Análise do período por máquina": gerada automaticamente junto com o resto do Dashboard (é só
+  // cálculo local sobre os dados já carregados, não depende do Chart.js). O botão ficou como "Atualizar".
+  try { gerarAnaliseIA(); } catch (e) { console.error('Erro ao gerar análise do período:', e); }
+
   // Chart.js só é carregado aqui, na primeira vez que o Dashboard precisa desenhar um gráfico
   // (ver garantirChartJs). Os KPIs/tabelas acima e abaixo não dependem dela, então continuam
   // funcionando normalmente mesmo se o carregamento falhar (ex.: sem internet no momento).
@@ -3997,7 +4001,6 @@ async function atualizarDashboard() {
 
   renderTabelaSopro();
   renderTabelaInjecao();
-  resetAnaliseIA();
 }
 
 /* ---------------- Análise do período por máquina (Opção A: local, sem IA externa) ---------------- */
