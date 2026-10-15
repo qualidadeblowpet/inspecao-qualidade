@@ -1231,14 +1231,60 @@ async function carregarRegistrosInjecao(){
   }
 }
 
+// Monta as opções de um filtro (Máquina/Gramatura/Cor/Resina) a partir dos valores já
+// GRAVADOS nos registros — não da lista cadastrada em Critérios. Como o campo aceita texto
+// livre ao carregar uma planilha (o aviso de "nome não cadastrado" não bloqueia salvar),
+// pequenas variações de digitação (ex.: "Husky 1" / "HUSKY 1" / "Husky 02") podem ter sido
+// salvas como strings diferentes — sem isso, cada uma viraria uma opção repetida no filtro.
+// Aqui elas são agrupadas numa opção só; o rótulo mostrado prioriza o valor cadastrado nas
+// Listas de apoio (se existir um que bate com o grupo) e, senão, a variante de escrita mais
+// usada nos dados.
+var CAMPO_PARA_LISTA_APOIO = { maquina:'maquinas', gramatura:'gramaturas', cor:'cores', resina:'resinas' };
+
+// Normalização extra só pra Máquina: além de ignorar maiúscula/espaço (norm()), também trata
+// zero à esquerda em número como a mesma máquina — "Husky 02" e "Husky 2" são a mesma máquina
+// (confirmado pelo Cleber). Não aplicamos isso a Gramatura/Cor/Resina porque lá um número pode
+// ser parte de um código de verdade (ex.: resina "J02"), onde o zero não é só preenchimento.
+function normMaquina(v){
+  return norm(v).replace(/\d+/g, function(d){ return String(parseInt(d, 10)); });
+}
+function chaveAgrupamento(campo, v){
+  return campo === 'maquina' ? normMaquina(v) : norm(v);
+}
+
 function valoresUnicos(campo){
-  var vistos = {}, lista = [];
+  var chaveLista = CAMPO_PARA_LISTA_APOIO[campo];
+  var canonicoCadastrado = {}; // chave de agrupamento -> valor exato cadastrado em Listas_App
+  if (chaveLista && listas[chaveLista]){
+    listas[chaveLista].forEach(function(item){ canonicoCadastrado[chaveAgrupamento(campo, item.valor)] = item.valor; });
+  }
+
+  var grupos = {}, ordem = [];
   registrosCarregados.forEach(function(r){
     var v = r[campo];
-    if (v && !vistos[v]){ vistos[v] = true; lista.push(v); }
+    if (!v) return;
+    var chave = chaveAgrupamento(campo, v);
+    if (!grupos[chave]){ grupos[chave] = {}; ordem.push(chave); }
+    grupos[chave][v] = (grupos[chave][v] || 0) + 1;
+  });
+
+  var lista = ordem.map(function(chave){
+    if (canonicoCadastrado[chave]) return canonicoCadastrado[chave];
+    var brutos = grupos[chave], melhor = null, melhorN = -1;
+    Object.keys(brutos).forEach(function(v){ if (brutos[v] > melhorN){ melhor = v; melhorN = brutos[v]; } });
+    return melhor;
   });
   lista.sort();
   return lista;
+}
+
+// Compara um valor de registro contra a lista de selecionados de um filtro, usando a mesma
+// chave de agrupamento de valoresUnicos (por campo) — assim marcar a opção mesclada "Husky 2"
+// também cobre as linhas salvas como "HUSKY 2" ou "Husky 02", por exemplo.
+function valorBateFiltro(selecionados, valor, campo){
+  if (!selecionados.length) return true;
+  var chave = chaveAgrupamento(campo, valor);
+  return selecionados.some(function(s){ return chaveAgrupamento(campo, s) === chave; });
 }
 
 function parseDataHoraBR(dataStr, horaStr){
@@ -1404,10 +1450,10 @@ function aplicarFiltrosDashV3(){
   var horaAte = document.getElementById('fHora_ate').value || '23:59';
 
   var filtrados = registrosCarregados.filter(function(r){
-    if (maquinas.length && maquinas.indexOf(r.maquina) === -1) return false;
-    if (gramaturas.length && gramaturas.indexOf(r.gramatura) === -1) return false;
-    if (cores.length && cores.indexOf(r.cor) === -1) return false;
-    if (resinas.length && resinas.indexOf(r.resina) === -1) return false;
+    if (!valorBateFiltro(maquinas, r.maquina, 'maquina')) return false;
+    if (!valorBateFiltro(gramaturas, r.gramatura, 'gramatura')) return false;
+    if (!valorBateFiltro(cores, r.cor, 'cor')) return false;
+    if (!valorBateFiltro(resinas, r.resina, 'resina')) return false;
     var iso = paraDataISO(r.data);
     if (de && iso && iso < de) return false;
     if (ate && iso && iso > ate) return false;
@@ -1731,7 +1777,7 @@ function aplicarFiltroTabela(){
   var ate = document.getElementById('tData_ate').value;
 
   var filtrados = registrosCarregados.filter(function(r){
-    if (maquinas.length && maquinas.indexOf(r.maquina) === -1) return false;
+    if (!valorBateFiltro(maquinas, r.maquina, 'maquina')) return false;
     var iso = paraDataISO(r.data);
     if (de && iso && iso < de) return false;
     if (ate && iso && iso > ate) return false;
