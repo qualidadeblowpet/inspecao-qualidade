@@ -367,6 +367,10 @@
       <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><span class="ic">⇧</span> Carregar Dados</button>
       <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('injecao')"><span class="ic">✏</span> Lançar Manual</button>
       <div class="nav-section-label">Sopro</div>
+      <button class="nav-item" data-page="dashboardSopro" onclick="mudarPagina('dashboardSopro')"><span class="ic">▦</span> Dashboard</button>
+      <button class="nav-item" data-page="dadosCadastradosSopro" onclick="mudarPagina('dadosCadastradosSopro')"><span class="ic">▤</span> Dados Cadastrados</button>
+      <button class="nav-item" data-page="criteriosSopro" onclick="mudarPagina('criteriosSopro')"><span class="ic">☑</span> Critérios</button>
+      <button class="nav-item" data-page="carregarDadosSopro" onclick="mudarPagina('carregarDadosSopro')"><span class="ic">⇧</span> Carregar Dados</button>
       <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('sopro')"><span class="ic">✏</span> Lançar Manual</button>
       <button class="nav-item" data-page="configuracoes" onclick="mudarPagina('configuracoes')"><span class="ic">⚙</span> Configurações</button>
       <div class="sidebar-footer">
@@ -644,6 +648,39 @@
 
   </div><!-- /.wrap -->
   </div><!-- /#pageCarregarDados -->
+
+  <!-- ===== PÁGINAS: SOPRO (Dashboard/Dados Cadastrados/Critérios/Carregar Dados) =====
+       Ainda não construídas — por enquanto só o Lançar Manual do Sopro está em funcionamento.
+       Essas 4 ficam como placeholder, mas já no menu (igual à amostra aprovada com o Cleber),
+       pra não dar a impressão de menu quebrado/faltando item enquanto elas não ficam prontas. -->
+  <div id="pageDashboardSopro" hidden>
+    <h1 class="page-title">Dashboard — Sopro</h1>
+    <div class="card" style="max-width:560px;">
+      <h3>Ainda em construção</h3>
+      <p class="desc" style="margin-bottom:0;">O Dashboard do Sopro (gráficos por parâmetro, igual ao da Injeção) ainda não foi construído. Por enquanto, use o <strong>Lançar Manual</strong> do Sopro, no menu ao lado, pra cadastrar os dados.</p>
+    </div>
+  </div>
+  <div id="pageDadosCadastradosSopro" hidden>
+    <h1 class="page-title">Dados Cadastrados — Sopro</h1>
+    <div class="card" style="max-width:560px;">
+      <h3>Ainda em construção</h3>
+      <p class="desc" style="margin-bottom:0;">A tabela de registros do Sopro (igual à de Injeção) ainda não foi construída. Por enquanto, use o <strong>Lançar Manual</strong> do Sopro, no menu ao lado, pra cadastrar os dados.</p>
+    </div>
+  </div>
+  <div id="pageCriteriosSopro" hidden>
+    <h1 class="page-title">Critérios — Sopro</h1>
+    <div class="card" style="max-width:560px;">
+      <h3>Ainda em construção</h3>
+      <p class="desc" style="margin-bottom:0;">O cadastro de critérios (mín/máx por parâmetro) do Sopro ainda não foi construído — os parâmetros mudam por máquina, então o formulário precisa ser um pouco diferente do de Injeção. Até lá, os lançamentos do Sopro aparecem como "sem tolerância cadastrada".</p>
+    </div>
+  </div>
+  <div id="pageCarregarDadosSopro" hidden>
+    <h1 class="page-title">Carregar Dados — Sopro</h1>
+    <div class="card" style="max-width:560px;">
+      <h3>Ainda em construção</h3>
+      <p class="desc" style="margin-bottom:0;">O envio de planilha do Sopro (igual ao de Injeção) ainda depende de definir o formato .xlsx do checklist transcrito. Por enquanto, use o <strong>Lançar Manual</strong> do Sopro, no menu ao lado, pra cadastrar os dados direto pelo sistema.</p>
+    </div>
+  </div>
 
   <!-- ===== PÁGINA: CONFIGURAÇÕES ===== -->
   <div id="pageConfiguracoes" hidden>
@@ -1300,7 +1337,11 @@ var registrosCarregados = null; // array de objetos {data,hora,maquina,responsav
 var dashPX_PER_PONTO = 56; // espaçamento fixo entre horários consecutivos no eixo (não é proporcional ao tempo real decorrido)
 var dashSTART = null, dashEND = null, dashAXIS_W = 0, dashPONTO_INDEX = {};
 
-var PAGINAS_IDS = { dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', criterios:'pageCriterios', carregarDados:'pageCarregarDados', configuracoes:'pageConfiguracoes' };
+var PAGINAS_IDS = {
+  dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', criterios:'pageCriterios', carregarDados:'pageCarregarDados',
+  dashboardSopro:'pageDashboardSopro', dadosCadastradosSopro:'pageDadosCadastradosSopro', criteriosSopro:'pageCriteriosSopro', carregarDadosSopro:'pageCarregarDadosSopro',
+  configuracoes:'pageConfiguracoes'
+};
 
 // =============================================================================
 // Tema (Configurações) — claro/escuro, salvo em localStorage pra continuar o mesmo
