@@ -185,6 +185,7 @@
   .prow input.warn{border-color:var(--warn);box-shadow:0 0 0 1px var(--warn) inset;}
   .prow-texto{grid-template-columns:1fr 1fr;}
   .prow-texto input{font-family:var(--font-body);text-align:left;}
+  .prow-texto select{font-family:var(--font-body);text-align:left;}
   .statuswrap{display:flex;justify-content:center;}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   .field{margin-bottom:0;}
@@ -214,7 +215,7 @@
   .warnlist{font-size:12px;color:var(--text-dim);line-height:1.7;padding-left:18px;margin:0 0 16px;}
   .err{color:var(--danger);font-size:13px;}
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--surface-2);border:1px solid var(--border);
-    color:var(--text);padding:12px 18px;border-radius:10px;font-size:13px;box-shadow:0 6px 20px var(--shadow-toast);z-index:50;max-width:90vw;}
+    color:var(--text);padding:12px 18px;border-radius:10px;font-size:13px;box-shadow:0 6px 20px var(--shadow-toast);z-index:220;max-width:90vw;}
   .toast.err{border-color:var(--danger);color:var(--danger);}
   [hidden]{display:none!important;}
 
@@ -232,6 +233,8 @@
   .nav-item .ic{width:18px;text-align:center;font-size:15px;}
   .nav-item:hover{background:var(--surface);color:var(--text);}
   .nav-item.active{background:var(--accent);color:#1a1200;font-weight:700;}
+  .nav-item.novo::after{content:'novo';font-size:8.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
+    background:var(--purple);color:#fff;padding:2px 5px;border-radius:5px;margin-left:auto;}
   .sidebar-footer{margin-top:auto;border-top:1px solid var(--border);padding-top:12px;}
   .sidebar-user{font-size:11px;color:var(--text-dim);padding:0 10px 8px;word-break:break-all;}
   .sidebar-footer button{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text-dim);
@@ -266,7 +269,7 @@
   .crit-toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
 
   /* ---- Listas de apoio (Máquinas/Gramaturas/Cores/Resinas cadastradas) ---- */
-  .listas-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  .listas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
   .lista-col h4{font-family:var(--font-display);font-size:12.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;
     color:var(--text-dim);margin:0 0 8px;}
   .lista-add{display:flex;gap:6px;margin-bottom:10px;}
@@ -295,6 +298,24 @@
 
   /* ---- Aviso de valor não cadastrado nas listas de apoio (Cadastro Injeção) ---- */
   .campo-aviso{font-size:10.5px;color:var(--warn);margin-top:5px;line-height:1.4;}
+
+  /* ---- Lançar Manual: modal de confirmação + tela cheia do formulário ---- */
+  .modal-overlay{position:fixed;inset:0;background:var(--shadow-overlay);display:flex;align-items:center;justify-content:center;z-index:200;}
+  .modal-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:360px;
+    width:90%;text-align:center;box-shadow:0 20px 60px var(--shadow-drawer);}
+  .modal-card .micon{font-size:30px;margin-bottom:10px;}
+  .modal-card h4{font-family:var(--font-display);font-size:18px;margin:0 0 8px;text-transform:uppercase;letter-spacing:.3px;}
+  .modal-card p{font-size:13px;color:var(--text-dim);margin:0 0 20px;line-height:1.5;}
+  .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .fullscreen-overlay{position:fixed;inset:0;background:var(--bg);z-index:150;overflow-y:auto;}
+  .fullscreen-topbar{position:sticky;top:0;background:var(--sidebar);border-bottom:1px solid var(--border);
+    padding:16px 28px;display:flex;align-items:center;justify-content:space-between;z-index:5;}
+  .fullscreen-topbar .fstitle{font-family:var(--font-display);font-weight:700;font-size:18px;letter-spacing:.3px;
+    text-transform:uppercase;color:var(--accent);}
+  .fullscreen-topbar .fsclose{background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+    padding:9px 14px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font-body);}
+  .fullscreen-body{max-width:760px;margin:0 auto;padding:24px 28px 80px;}
+  .field input[readonly]{color:var(--text-dim);}
 
   @media (max-width: 900px){
     .mobile-topbar{display:flex;align-items:center;gap:10px;background:var(--sidebar);border-bottom:1px solid var(--border);
@@ -344,6 +365,9 @@
       <button class="nav-item" data-page="dadosCadastrados" onclick="mudarPagina('dadosCadastrados')"><span class="ic">▤</span> Dados Cadastrados</button>
       <button class="nav-item" data-page="criterios" onclick="mudarPagina('criterios')"><span class="ic">☑</span> Critérios</button>
       <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><span class="ic">⇧</span> Carregar Dados</button>
+      <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('injecao')"><span class="ic">✏</span> Lançar Manual</button>
+      <div class="nav-section-label">Sopro</div>
+      <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('sopro')"><span class="ic">✏</span> Lançar Manual</button>
       <button class="nav-item" data-page="configuracoes" onclick="mudarPagina('configuracoes')"><span class="ic">⚙</span> Configurações</button>
       <div class="sidebar-footer">
         <div class="sidebar-user"><span id="statusText">conectando…</span><br><span id="userEmail"></span></div>
@@ -453,7 +477,18 @@
             <div class="lista-add"><input type="text" id="listaInput_resinas" placeholder="ex.: J02" onkeydown="if(event.key==='Enter') adicionarItemLista('resinas')"><button type="button" id="listaBtnAdd_resinas" onclick="adicionarItemLista('resinas')">+</button></div>
             <div class="lista-chips" id="listaChips_resinas"></div>
           </div>
+          <div class="lista-col">
+            <h4>Operadores</h4>
+            <div class="lista-add"><input type="text" id="listaInput_operadores" placeholder="ex.: Vagner" onkeydown="if(event.key==='Enter') adicionarItemLista('operadores')"><button type="button" id="listaBtnAdd_operadores" onclick="adicionarItemLista('operadores')">+</button></div>
+            <div class="lista-chips" id="listaChips_operadores"></div>
+          </div>
+          <div class="lista-col">
+            <h4>Frascos (Sopro)</h4>
+            <div class="lista-add"><input type="text" id="listaInput_frascos" placeholder="ex.: Água 510ml" onkeydown="if(event.key==='Enter') adicionarItemLista('frascos')"><button type="button" id="listaBtnAdd_frascos" onclick="adicionarItemLista('frascos')">+</button></div>
+            <div class="lista-chips" id="listaChips_frascos"></div>
+          </div>
         </div>
+        <p class="note" style="margin:10px 0 0;">Operadores e Frascos alimentam as listas suspensas do <strong>Lançar Manual</strong> (Injeção e Sopro). Máquinas, Gramaturas, Cores e Resinas continuam servindo também pro cadastro de Critérios, como antes.</p>
       </div>
 
       <div class="card" style="margin-bottom:16px;">
@@ -636,6 +671,92 @@
 
   </div><!-- /#app -->
 
+  <!-- ===== MODAL: confirmação do Lançar Manual ===== -->
+  <div class="modal-overlay" id="lmConfirmModal" hidden>
+    <div class="modal-card">
+      <div class="micon">✏️</div>
+      <h4>Novo lançamento</h4>
+      <p>Deseja cadastrar um novo lançamento manual de <strong id="lmConfirmProcessoNome">Sopro</strong>?</p>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="fecharConfirmLancamento()">Cancelar</button>
+        <button class="btn btn-accent" onclick="confirmarLancamentoSim()">Sim, cadastrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TELA INTEIRA: formulário do Lançar Manual ===== -->
+  <div class="fullscreen-overlay" id="lmFullscreen" hidden>
+    <div class="fullscreen-topbar">
+      <div class="fstitle" id="lmFsTitle">Novo lançamento manual</div>
+      <button class="fsclose" onclick="fecharLancamentoManual()">✕ Fechar</button>
+    </div>
+    <div class="fullscreen-body">
+
+      <!-- INJEÇÃO -->
+      <div id="lmFormInjecao" hidden>
+        <div class="card">
+          <p class="desc" style="margin-bottom:14px;">Preencha os campos abaixo direto pelo sistema, sem precisar montar uma planilha à parte. Os valores são comparados com a tolerância cadastrada (Máquina + Gramatura + Cor + Resina) assim que você digita.</p>
+
+          <div class="sectiontitle" style="margin-top:0;">Identificação</div>
+          <div class="grid-2" style="margin-bottom:14px;">
+            <div class="field"><label>Máquina</label><select id="lmMaquinaI" onchange="lmRenderInjecao()"></select></div>
+            <div class="field"><label>Responsável</label><select id="lmResponsavelI"></select></div>
+            <div class="field"><label>Gramatura</label><select id="lmGramaturaI" onchange="lmRenderInjecao()"></select></div>
+            <div class="field"><label>Lançado em</label><input id="lmAgoraI" readonly></div>
+          </div>
+          <p class="note" style="margin:-6px 0 14px;">Máquina, Responsável e Gramatura vêm das listas cadastradas em Critérios → Listas de apoio. Data e hora são preenchidas automaticamente no momento do cadastro.</p>
+
+          <div class="legend">
+            <span class="ok"><i></i>Dentro do limite</span>
+            <span class="bad"><i></i>Fora do limite</span>
+            <span class="none"><i></i>Sem tolerância cadastrada / vazio</span>
+          </div>
+
+          <div class="sectiontitle" style="margin-top:0;">Parâmetros</div>
+          <div id="lmParamsInjecao"></div>
+
+          <p class="note" id="lmErroInjecao" style="color:var(--danger);display:none;margin-top:12px;"></p>
+          <div class="actions">
+            <button class="btn btn-outline" onclick="fecharLancamentoManual()">Cancelar</button>
+            <button class="btn btn-accent" id="lmBtnSalvarInjecao" onclick="lmSalvarInjecao()">Confirmar e salvar ✓</button>
+          </div>
+          <p class="note">Grava uma sessão nova (um <code>id_sessao</code>) na mesma tabela Registros_Injecao, igual a um horário lido da planilha — o valor medido e o limite mín/máx aplicado no momento são salvos juntos.</p>
+        </div>
+      </div>
+
+      <!-- SOPRO -->
+      <div id="lmFormSopro" hidden>
+        <div class="card">
+          <p class="desc" style="margin-bottom:14px;">Mesma ideia, pro lado do Sopro: lançar os parâmetros direto pelo sistema, sem Excel. Os parâmetros mudam conforme a máquina escolhida (Sopradora / Rotuladora / Ensacadeira).</p>
+
+          <div class="sectiontitle" style="margin-top:0;">Identificação</div>
+          <div class="grid-2" style="margin-bottom:14px;">
+            <div class="field"><label>Máquina</label><select id="lmMaquinaS" onchange="lmTrocarMaquinaSopro()"></select></div>
+            <div class="field"><label>Responsável</label><select id="lmResponsavelS"></select></div>
+            <div class="field"><label>Frasco</label><select id="lmFrascoS" onchange="lmRenderSopro()"></select></div>
+            <div class="field"><label>Lançado em</label><input id="lmAgoraS" readonly></div>
+          </div>
+          <p class="note" style="margin:-6px 0 14px;">Responsável e Frasco vêm das listas cadastradas em Critérios → Listas de apoio. Data e hora são preenchidas automaticamente no momento do cadastro.</p>
+
+          <div class="legend">
+            <span class="ok"><i></i>Dentro do limite</span>
+            <span class="bad"><i></i>Fora do limite</span>
+            <span class="none"><i></i>Sem tolerância cadastrada / vazio</span>
+          </div>
+
+          <div id="lmParamsSopro"></div>
+
+          <p class="note" id="lmErroSopro" style="color:var(--danger);display:none;margin-top:12px;"></p>
+          <div class="actions">
+            <button class="btn btn-outline" onclick="fecharLancamentoManual()">Cancelar</button>
+            <button class="btn btn-accent" id="lmBtnSalvarSopro" onclick="lmSalvarSopro()">Confirmar e salvar ✓</button>
+          </div>
+          <p class="note">Grava uma sessão nova (um <code>id_sessao</code>) na tabela Registros_Sopro, igual a um horário lido da planilha — o valor medido e o limite mín/máx aplicado no momento são salvos juntos.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
 <div id="toast" class="toast" hidden></div>
 <div id="dv3tooltip"></div>
@@ -661,9 +782,9 @@ let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, i
 let tolerancias = []; // { maquina, gramatura, cor, resina, parametro, valor_min, valor_max, ativo } (chaves normalizadas)
 // Listas de apoio (Máquinas/Gramaturas/Cores/Resinas cadastradas) — viram <select> no cadastro de Critérios
 // e servem de referência pra destacar nome divergente no Carregar Dados. Guardadas na TabelaListas (tipo/valor).
-let listas = { maquinas: [], gramaturas: [], cores: [], resinas: [] }; // cada item: { valor, _index }
-const LISTA_TIPO_PARA_CHAVE = { maquinasInjecao:'maquinas', gramaturas:'gramaturas', cores:'cores', resinas:'resinas' };
-const LISTA_CHAVE_PARA_TIPO = { maquinas:'maquinasInjecao', gramaturas:'gramaturas', cores:'cores', resinas:'resinas' };
+let listas = { maquinas: [], gramaturas: [], cores: [], resinas: [], operadores: [], frascos: [] }; // cada item: { valor, _index }
+const LISTA_TIPO_PARA_CHAVE = { maquinasInjecao:'maquinas', gramaturas:'gramaturas', cores:'cores', resinas:'resinas', operadores:'operadores', frascosSopro:'frascos' };
+const LISTA_CHAVE_PARA_TIPO = { maquinas:'maquinasInjecao', gramaturas:'gramaturas', cores:'cores', resinas:'resinas', operadores:'operadores', frascos:'frascosSopro' };
 let colunasTextoPreparadas = false;
 
 // =============================================================================
@@ -686,6 +807,47 @@ const PARAMETROS_INJECAO = [
   'Tempo de ciclo (total)', 'Número de batidas (set)', 'Cavidades ativas',
   'Velocidade do pigmentador (RPM)', 'Tempo do pigmentador (seg.)'
 ];
+
+// Parâmetros do Sopro — diferentes por máquina (ao contrário da Injeção, que usa a mesma
+// lista pras 4 máquinas). Multipet 1 e 2 compartilham a mesma lista (confirmado pelo Cleber).
+// Agrupados em Sopradora/Rotuladora/Ensacadeira pra bater com os checklists físicos (FO500
+// de Sopro) — SB01 não tem bloco de Rotuladora. Usado hoje só pelo Lançar Manual; o Carregar
+// Dados (planilha) do Sopro ainda não foi construído.
+const PARAMETROS_SOPRO = {
+  'Multipet 1': {
+    'Sopradora': ['Zona 01','Zona 02','Zona 03','Zona 04','Zona 05','Zona 06','Zona 07','Zona 08','Zona 09','Zona 10',
+      'Tempo de estiramento','Início pré-sopro 1','Início pré-sopro 2','Pré-sopro','Sopro','Residência de sopro',
+      'Regeneração','Descarga','Perfil','Set point forno','Temperatura de forno','Velocidade ventilador',
+      'Temperatura da preforma','Pressão pré-sopro','Refrigeração set point'],
+    'Rotuladora': ['Velocidade da esteira','Medida (dimensão do rótulo)','Offset total','Janela foto',
+      'Coleiro - pistola 1','Ângulo início cola','Ângulo fim cola','Coleiro - mangueira 1','Coleiro - tanque','Temperatura da faca'],
+    'Ensacadeira': ['Retardo parada do motor (PR)','Tempo segurador','Tempo de gargalo','Tempo separador 1','Tempo separador 2'],
+  },
+  'SB01': {
+    'Sopradora': ['Zona 01','Zona 02','Zona 03','Zona 04','Zona 05','Zona 06','Zona 07','Zona 08','Zona 09','Zona 10',
+      'Tempo pré-sopro','Tempo degazagem','Descida tubeira','Descida elongação','Subida elongação','Set cadência',
+      'P (%) partida','Tº de abastecimento','P (%) saída','P (%) reduzida','P (%) manual','Tº preforma fria',
+      'Coeficiênte correção','Frequência correção','Pressão pré-sopro','Temperatura da água ºC',
+      'Refrigeração chiller','Refrigeração banho maria'],
+    'Ensacadeira': ['G - Tempo gargalo','E – Tempo segurador','I – Parada esteira'],
+  },
+  'Unipet 1': {
+    'Sopradora': ['Zona 01','Zona 02','Zona 03','Zona 04','Zona 05','Zona 06','Zona 07','Zona 08','Zona 09','Zona 10',
+      'Retardo pré-sopro','Tempo pré-sopro','Pressão pré sopro','Tempo sopro','Tempo descompressão',
+      'Velocidade esteira','Ventiladores','Atraso pinça','Refrigeração molde','Refrigeração régua'],
+    'Rotuladora': ['Ângulo início aplicação de cola','Ângulo fim aplicação de cola','Temperatura contador (faca)',
+      'Temperatura mangueira 1','Temperatura tanque cola','Temperatura pistola','Comprimento rótulo [mm]',
+      'Bloqueio leitura máquina','Distância após marca [offset]'],
+    'Ensacadeira': ['Tempo segurador','Tempo separador 1','Tempo separador 2','Tempo gargalo','Tempo alarme'],
+  },
+};
+PARAMETROS_SOPRO['Multipet 2'] = PARAMETROS_SOPRO['Multipet 1'];
+
+// Registros_Sopro ainda não tem coluna de Frasco na planilha de verdade — 'frasco' foi
+// colocado como ÚLTIMA coluna de propósito: basta o Cleber adicionar um cabeçalho "frasco"
+// na célula logo depois da última coluna da tabela TabelaRegistrosSopro (a tabela do Excel se
+// estende sozinha) pra ficar igual a essa lista, sem precisar reordenar nada que já existe.
+const COLS_SOPRO = ['id_sessao','data','hora','maquina','responsavel','parametro','valor_medido','tolerancia_min_aplicada','tolerancia_max_aplicada','dentro_criterio','criado_em','frasco'];
 
 function norm(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,' '); }
 function colLetterFromIndex(i){ return String.fromCharCode(65+i); }
@@ -797,7 +959,27 @@ function buscarTolerancia(maquina, gramatura, cor, resina, parametro){
   for (var i = 0; i < tolerancias.length; i++){
     var t = tolerancias[i];
     if (t.ativoFalso) continue;
+    if (t.processo && t.processo !== 'Injeção') continue; // ignora linhas de outro processo (ex.: Sopro)
     if (t._maquina === chaveM && t._gramatura === chaveG && t._cor === chaveC && t._resina === chaveR && t._parametro === chaveP){
+      return t;
+    }
+  }
+  return null;
+}
+
+// Tolerância do Sopro — mesma TabelaTolerancias, mas a identificação é só Máquina + Frasco
+// (sem Cor/Resina). Reaproveita a coluna "gramatura" da planilha pra guardar o Frasco nas
+// linhas de Sopro, assim não precisa mexer na estrutura da Tolerancias_App — só o critério
+// em si (Critérios → Sopro) ainda não tem tela própria pra cadastrar; até lá, essa busca
+// só vai achar algo se o Cleber cadastrar a linha direto na planilha (processo="Sopro",
+// maquina, gramatura=<frasco>, parametro, valor_min, valor_max, ativo).
+function buscarToleranciaSopro(maquina, frasco, parametro){
+  var chaveM = norm(maquina), chaveF = norm(frasco), chaveP = norm(parametro);
+  for (var i = 0; i < tolerancias.length; i++){
+    var t = tolerancias[i];
+    if (t.ativoFalso) continue;
+    if (t.processo !== 'Sopro') continue;
+    if (t._maquina === chaveM && t._gramatura === chaveF && t._parametro === chaveP){
       return t;
     }
   }
@@ -1893,6 +2075,308 @@ async function prepararColunasTextoRegistrosInjecao(token){
   colunasTextoPreparadas = true;
 }
 
+var colunasTextoPreparadasSopro = false;
+async function prepararColunasTextoRegistrosSopro(token){
+  if (colunasTextoPreparadasSopro) return;
+  var camposTexto = ['data', 'hora', 'criado_em'];
+  for (var i = 0; i < camposTexto.length; i++){
+    var idx = COLS_SOPRO.indexOf(camposTexto[i]);
+    if (idx === -1) continue;
+    var col = letraColuna(idx);
+    try {
+      await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Registros_Sopro/range(address=\'' + col + ':' + col + '\')', {
+        method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ numberFormat: [['@']] })
+      });
+    } catch (e) { /* segue mesmo se falhar numa coluna */ }
+  }
+  colunasTextoPreparadasSopro = true;
+}
+
+// =============================================================================
+// Lançar Manual — cadastro direto pelo sistema (Injeção e Sopro), sem planilha.
+// Mesma tolerância/salvamento usados pelo Carregar Dados; só a origem dos valores
+// muda (digitados aqui, em vez de lidos de um .xlsx). Abre em tela cheia, por cima
+// de qualquer página em que o usuário estava.
+// =============================================================================
+var LM_PROCESSO_PENDENTE = null;
+var LM = { valoresInjecao: [], valoresSopro: [], maquinaSopro: '' };
+
+function lmPad2(n){ return String(n).padStart(2,'0'); }
+function lmAgora(){
+  var d = new Date();
+  return {
+    dataStr: lmPad2(d.getDate())+'/'+lmPad2(d.getMonth()+1)+'/'+d.getFullYear(),
+    horaStr: lmPad2(d.getHours())+':'+lmPad2(d.getMinutes()),
+    isoStr: d.toISOString(),
+    exibicao: lmPad2(d.getDate())+'/'+lmPad2(d.getMonth()+1)+'/'+d.getFullYear()+' '+lmPad2(d.getHours())+':'+lmPad2(d.getMinutes())
+  };
+}
+// mesma lógica de comparação de statusDoValor, sem o estado "baixa confiança" (não existe
+// aqui — não há leitura de planilha/OCR, o valor foi digitado agora mesmo).
+function lmStatus(valorStr, tol){
+  if (!tol) return 'none';
+  var n = paraNumero(valorStr);
+  if (isNaN(n)) return 'none';
+  var min = paraNumero(tol.valor_min), max = paraNumero(tol.valor_max);
+  var dentro = true;
+  if (!isNaN(min) && n < min) dentro = false;
+  if (!isNaN(max) && n > max) dentro = false;
+  return dentro ? 'ok' : 'bad';
+}
+function lmOpcoesLista(chave){
+  return (listas[chave] || []).map(function(i){ return i.valor; }).sort(function(a,b){ return a.localeCompare(b, 'pt-BR'); });
+}
+function lmPopularSelect(id, opcoes, placeholder, manterSelecionado){
+  var sel = document.getElementById(id);
+  var atual = manterSelecionado ? sel.value : '';
+  sel.innerHTML = '<option value="" '+(atual?'':'selected')+' disabled>'+placeholder+'</option>' +
+    opcoes.map(function(v){ return '<option value="'+escHtml(v)+'"'+(v===atual?' selected':'')+'>'+escHtml(v)+'</option>'; }).join('');
+}
+
+function pedirConfirmacaoLancamento(processo){
+  LM_PROCESSO_PENDENTE = processo;
+  document.getElementById('lmConfirmProcessoNome').textContent = processo === 'sopro' ? 'Sopro' : 'Injeção';
+  document.getElementById('lmConfirmModal').hidden = false;
+  fecharMenuMobile();
+}
+function fecharConfirmLancamento(){
+  document.getElementById('lmConfirmModal').hidden = true;
+  LM_PROCESSO_PENDENTE = null;
+}
+function confirmarLancamentoSim(){
+  document.getElementById('lmConfirmModal').hidden = true;
+  abrirLancamentoManual(LM_PROCESSO_PENDENTE);
+}
+
+function abrirLancamentoManual(processo){
+  document.getElementById('lmFullscreen').hidden = false;
+  document.body.style.overflow = 'hidden';
+  var ehInjecao = processo === 'injecao';
+  document.getElementById('lmFormInjecao').hidden = !ehInjecao;
+  document.getElementById('lmFormSopro').hidden = ehInjecao;
+  document.getElementById('lmFsTitle').textContent = 'Novo lançamento manual — ' + (ehInjecao ? 'Injeção' : 'Sopro');
+
+  if (ehInjecao){
+    document.getElementById('lmErroInjecao').style.display = 'none';
+    var btnI = document.getElementById('lmBtnSalvarInjecao');
+    btnI.disabled = false; btnI.textContent = 'Confirmar e salvar ✓';
+    lmPopularSelect('lmMaquinaI', lmOpcoesLista('maquinas'), 'Selecione a máquina');
+    lmPopularSelect('lmResponsavelI', lmOpcoesLista('operadores'), 'Selecione o operador');
+    lmPopularSelect('lmGramaturaI', lmOpcoesLista('gramaturas'), 'Selecione a gramatura');
+    document.getElementById('lmAgoraI').value = lmAgora().exibicao;
+    LM.valoresInjecao = PARAMETROS_INJECAO.map(function(p){ return { parametro:p, valor:'' }; });
+    LM.corInjecao = ''; LM.resinaInjecao = '';
+    lmRenderInjecao();
+  } else {
+    document.getElementById('lmErroSopro').style.display = 'none';
+    var btnS = document.getElementById('lmBtnSalvarSopro');
+    btnS.disabled = false; btnS.textContent = 'Confirmar e salvar ✓';
+    var maquinasSopro = ['Multipet 1','Multipet 2','SB01','Unipet 1']; // ordem física, não alfabética das chaves do objeto
+    lmPopularSelect('lmMaquinaS', maquinasSopro, 'Selecione a máquina');
+    document.getElementById('lmMaquinaS').value = 'Multipet 1';
+    lmPopularSelect('lmResponsavelS', lmOpcoesLista('operadores'), 'Selecione o operador');
+    lmPopularSelect('lmFrascoS', lmOpcoesLista('frascos'), 'Selecione o frasco');
+    document.getElementById('lmAgoraS').value = lmAgora().exibicao;
+    lmTrocarMaquinaSopro();
+  }
+}
+function fecharLancamentoManual(){
+  document.getElementById('lmFullscreen').hidden = true;
+  document.body.style.overflow = '';
+}
+
+function lmLinhaParam(nome, valor, status, idx, funcaoOnInput){
+  var label = status==='ok'?'OK':status==='bad'?'Fora':'—';
+  return '<div class="prow prow-param">' +
+    '<div><div class="pname">'+escHtml(nome)+'</div></div>' +
+    '<input class="'+(status==='none'?'':status)+'" value="'+escHtml(valor)+'" placeholder="—" oninput="'+funcaoOnInput+'('+idx+',this.value)">' +
+    '<div class="statuswrap"><span class="flagpill '+status+'">'+label+'</span></div>' +
+  '</div>';
+}
+
+// ---- Injeção ----
+function lmRenderInjecao(){
+  var maquina = document.getElementById('lmMaquinaI').value;
+  var gramatura = document.getElementById('lmGramaturaI').value;
+
+  var corResinaHtml =
+    '<div class="prow prow-texto">' +
+      '<div><div class="pname">Cor</div></div>' +
+      '<select id="lmCorI" onchange="LM.corInjecao=this.value;lmRenderInjecao();">' +
+        '<option value="" '+(LM.corInjecao?'':'selected')+' disabled>Selecione a cor</option>' +
+        lmOpcoesLista('cores').map(function(v){ return '<option value="'+escHtml(v)+'"'+(v===LM.corInjecao?' selected':'')+'>'+escHtml(v)+'</option>'; }).join('') +
+      '</select>' +
+    '</div>' +
+    '<div class="prow prow-texto">' +
+      '<div><div class="pname">Resina</div></div>' +
+      '<select id="lmResinaI" onchange="LM.resinaInjecao=this.value;lmRenderInjecao();">' +
+        '<option value="" '+(LM.resinaInjecao?'':'selected')+' disabled>Selecione a resina</option>' +
+        lmOpcoesLista('resinas').map(function(v){ return '<option value="'+escHtml(v)+'"'+(v===LM.resinaInjecao?' selected':'')+'>'+escHtml(v)+'</option>'; }).join('') +
+      '</select>' +
+    '</div>';
+
+  var paramsHtml = LM.valoresInjecao.map(function(item, idx){
+    var tol = buscarTolerancia(maquina, gramatura, LM.corInjecao, LM.resinaInjecao, item.parametro);
+    var status = lmStatus(item.valor, tol);
+    return lmLinhaParam(item.parametro, item.valor, status, idx, 'lmAtualizarValorInjecao');
+  }).join('');
+
+  document.getElementById('lmParamsInjecao').innerHTML = corResinaHtml + paramsHtml;
+}
+function lmAtualizarValorInjecao(idx, novoValor){
+  LM.valoresInjecao[idx].valor = novoValor;
+  var maquina = document.getElementById('lmMaquinaI').value;
+  var gramatura = document.getElementById('lmGramaturaI').value;
+  var tol = buscarTolerancia(maquina, gramatura, LM.corInjecao, LM.resinaInjecao, LM.valoresInjecao[idx].parametro);
+  var status = lmStatus(novoValor, tol);
+  var row = document.querySelectorAll('#lmParamsInjecao .prow-param')[idx];
+  if (!row) return;
+  var inputEl = row.querySelector('input');
+  inputEl.className = (status==='none'?'':status);
+  var pill = row.querySelector('.flagpill');
+  if (pill){ pill.className = 'flagpill ' + status; pill.textContent = status==='ok'?'OK':status==='bad'?'Fora':'—'; }
+}
+
+async function lmSalvarInjecao(){
+  var maquina = document.getElementById('lmMaquinaI').value;
+  var responsavel = document.getElementById('lmResponsavelI').value;
+  var gramatura = document.getElementById('lmGramaturaI').value;
+  var erroEl = document.getElementById('lmErroInjecao');
+  function erro(msg){ erroEl.textContent = msg; erroEl.style.display = 'block'; }
+  erroEl.style.display = 'none';
+  if (!maquina || !responsavel || !gramatura || !LM.corInjecao || !LM.resinaInjecao){
+    erro('Selecione Máquina, Responsável, Gramatura, Cor e Resina antes de salvar.'); return;
+  }
+  if (!itemId){ mostrarToast('Ainda conectando com a planilha, aguarde um instante e tente de novo.', true); return; }
+
+  var btn = document.getElementById('lmBtnSalvarInjecao');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  try {
+    var agora = lmAgora();
+    var idSessao = gerarIdSessao();
+    var cabecalho = { maquina: maquina, gramatura: gramatura };
+    var linhas = LM.valoresInjecao.map(function(item){
+      var valor = (item.valor || '').trim() || '—';
+      var tol = buscarTolerancia(maquina, gramatura, LM.corInjecao, LM.resinaInjecao, item.parametro);
+      var status = lmStatus(valor, tol);
+      var dentro = status === 'ok' ? 'SIM' : status === 'bad' ? 'NÃO' : '';
+      var obj = {
+        id_sessao: idSessao, data: agora.dataStr, hora: agora.horaStr, maquina: maquina, responsavel: responsavel,
+        gramatura: gramatura, cor: LM.corInjecao, resina: LM.resinaInjecao, parametro: item.parametro, valor_medido: valor,
+        tolerancia_min_aplicada: tol ? tol.valor_min : '', tolerancia_max_aplicada: tol ? tol.valor_max : '',
+        dentro_criterio: dentro, criado_em: agora.isoStr
+      };
+      return COLS_INJ.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; });
+    });
+    var token = await getToken();
+    await prepararColunasTextoRegistrosInjecao(token);
+    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaRegistrosInjecao/rows/add';
+    var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: linhas }) });
+    if (resp.ok){
+      mostrarToast(linhas.length + ' parâmetro(s) salvos — lançamento manual de Injeção ✓');
+      registrosCarregados = null; // próxima visita ao Dashboard/Dados Cadastrados recarrega já com esse lançamento
+      fecharLancamentoManual();
+    } else {
+      var json = await resp.json().catch(function(){ return {}; });
+      erro('Erro ao salvar: ' + (json.error ? json.error.message : resp.status));
+    }
+  } catch (err) {
+    erro('Falha de conexão: ' + err.message);
+  }
+  btn.disabled = false; btn.textContent = 'Confirmar e salvar ✓';
+}
+
+// ---- Sopro ----
+function lmTrocarMaquinaSopro(){
+  var maquina = document.getElementById('lmMaquinaS').value;
+  LM.maquinaSopro = maquina;
+  var grupos = PARAMETROS_SOPRO[maquina] || {};
+  var lista = [];
+  Object.keys(grupos).forEach(function(grupo){ grupos[grupo].forEach(function(p){ lista.push(p); }); });
+  LM.valoresSopro = lista.map(function(p){ return { parametro:p, valor:'' }; });
+  lmRenderSopro();
+}
+function lmRenderSopro(){
+  var maquina = document.getElementById('lmMaquinaS').value;
+  var frasco = document.getElementById('lmFrascoS').value;
+  var grupos = PARAMETROS_SOPRO[maquina] || {};
+  var i = 0;
+  var html = Object.keys(grupos).map(function(grupo){
+    var linhas = grupos[grupo].map(function(nome){
+      var item = LM.valoresSopro[i];
+      var tol = buscarToleranciaSopro(maquina, frasco, nome);
+      var status = lmStatus(item ? item.valor : '', tol);
+      var linha = lmLinhaParam(nome, item ? item.valor : '', status, i, 'lmAtualizarValorSopro');
+      i++;
+      return linha;
+    }).join('');
+    return '<div class="sectiontitle"'+(grupo===Object.keys(grupos)[0]?' style="margin-top:0;"':'')+'>'+escHtml(grupo)+
+      ' <span style="color:var(--text-dim);font-weight:500;text-transform:none;letter-spacing:0;">— '+grupos[grupo].length+' parâmetros</span></div>' + linhas;
+  }).join('');
+  document.getElementById('lmParamsSopro').innerHTML = html;
+}
+function lmAtualizarValorSopro(idx, novoValor){
+  LM.valoresSopro[idx].valor = novoValor;
+  var maquina = document.getElementById('lmMaquinaS').value;
+  var frasco = document.getElementById('lmFrascoS').value;
+  var tol = buscarToleranciaSopro(maquina, frasco, LM.valoresSopro[idx].parametro);
+  var status = lmStatus(novoValor, tol);
+  var row = document.querySelectorAll('#lmParamsSopro .prow-param')[idx];
+  if (!row) return;
+  var inputEl = row.querySelector('input');
+  inputEl.className = (status==='none'?'':status);
+  var pill = row.querySelector('.flagpill');
+  if (pill){ pill.className = 'flagpill ' + status; pill.textContent = status==='ok'?'OK':status==='bad'?'Fora':'—'; }
+}
+
+async function lmSalvarSopro(){
+  var maquina = document.getElementById('lmMaquinaS').value;
+  var responsavel = document.getElementById('lmResponsavelS').value;
+  var frasco = document.getElementById('lmFrascoS').value;
+  var erroEl = document.getElementById('lmErroSopro');
+  function erro(msg){ erroEl.textContent = msg; erroEl.style.display = 'block'; }
+  erroEl.style.display = 'none';
+  if (!maquina || !responsavel || !frasco){
+    erro('Selecione Máquina, Responsável e Frasco antes de salvar.'); return;
+  }
+  if (!itemId){ mostrarToast('Ainda conectando com a planilha, aguarde um instante e tente de novo.', true); return; }
+
+  var btn = document.getElementById('lmBtnSalvarSopro');
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  try {
+    var agora = lmAgora();
+    var idSessao = gerarIdSessao();
+    var linhas = LM.valoresSopro.map(function(item){
+      var valor = (item.valor || '').trim() || '—';
+      var tol = buscarToleranciaSopro(maquina, frasco, item.parametro);
+      var status = lmStatus(valor, tol);
+      var dentro = status === 'ok' ? 'SIM' : status === 'bad' ? 'NÃO' : '';
+      var obj = {
+        id_sessao: idSessao, data: agora.dataStr, hora: agora.horaStr, maquina: maquina, responsavel: responsavel,
+        parametro: item.parametro, valor_medido: valor,
+        tolerancia_min_aplicada: tol ? tol.valor_min : '', tolerancia_max_aplicada: tol ? tol.valor_max : '',
+        dentro_criterio: dentro, criado_em: agora.isoStr, frasco: frasco
+      };
+      return COLS_SOPRO.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; });
+    });
+    var token = await getToken();
+    await prepararColunasTextoRegistrosSopro(token);
+    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaRegistrosSopro/rows/add';
+    var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: linhas }) });
+    if (resp.ok){
+      mostrarToast(linhas.length + ' parâmetro(s) salvos — lançamento manual de Sopro ✓');
+      fecharLancamentoManual();
+    } else {
+      var json = await resp.json().catch(function(){ return {}; });
+      erro('Erro ao salvar: ' + (json.error ? json.error.message : resp.status) + ' — confira se a coluna "frasco" já existe no final da tabela Registros_Sopro.');
+    }
+  } catch (err) {
+    erro('Falha de conexão: ' + err.message);
+  }
+  btn.disabled = false; btn.textContent = 'Confirmar e salvar ✓';
+}
+
 async function carregarTolerancias(token){
   try {
     var resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Tolerancias_App/tables/TabelaTolerancias/rows', { headers: { Authorization: 'Bearer ' + token } });
@@ -1922,9 +2406,9 @@ async function carregarTolerancias(token){
 async function carregarListas(token){
   try {
     var resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/tables/TabelaListas/rows', { headers: { Authorization: 'Bearer ' + token } });
-    if (!resp.ok){ listas = { maquinas: [], gramaturas: [], cores: [], resinas: [] }; return; }
+    if (!resp.ok){ listas = { maquinas: [], gramaturas: [], cores: [], resinas: [], operadores: [], frascos: [] }; return; }
     var json = await resp.json();
-    var novo = { maquinas: [], gramaturas: [], cores: [], resinas: [] };
+    var novo = { maquinas: [], gramaturas: [], cores: [], resinas: [], operadores: [], frascos: [] };
     (json.value || []).forEach(function(row){
       var v = row.values[0]; // tipo, valor
       var chave = LISTA_TIPO_PARA_CHAVE[v[0]];
@@ -1935,8 +2419,8 @@ async function carregarListas(token){
     });
     listas = novo;
   } catch (e) {
-    console.error('Falha ao carregar listas de apoio (Máquinas/Gramaturas/Cores/Resinas):', e);
-    listas = { maquinas: [], gramaturas: [], cores: [], resinas: [] };
+    console.error('Falha ao carregar listas de apoio (Máquinas/Gramaturas/Cores/Resinas/Operadores/Frascos):', e);
+    listas = { maquinas: [], gramaturas: [], cores: [], resinas: [], operadores: [], frascos: [] };
   }
   if (typeof renderListas === 'function') renderListas();
 }
@@ -2060,7 +2544,13 @@ function avisoCampoNaoCadastrado(chave, valor, rotulo){
 // ---- Lista de critérios agrupada por combinação (Máquina+Gramatura+Cor+Resina) ----
 function agruparTolerancias(){
   var grupos = {}, ordem = [];
+  // Essa lista/formulário (ainda) só entende Injeção — mostra os 41 parâmetros fixos e, ao
+  // salvar, grava processo:"Injeção" sempre. Uma linha de Sopro aqui (processo:"Sopro", onde
+  // "gramatura" na verdade guarda o Frasco) ficaria escondida atrás de Editar/Excluir
+  // pensados pra Injeção, e Editar a reescreveria como Injeção por engano — por isso fica de
+  // fora até a tela de Critérios do Sopro existir.
   tolerancias.forEach(function(t){
+    if (t.processo && t.processo !== 'Injeção') return;
     var chave = t._maquina+'|'+t._gramatura+'|'+t._cor+'|'+t._resina;
     if (!grupos[chave]){
       grupos[chave] = { maquina:t.maquina, gramatura:t.gramatura, cor:t.cor, resina:t.resina, itens:[] };
