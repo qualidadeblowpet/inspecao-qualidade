@@ -1,0 +1,2073 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sistema da Qualidade — BlowPet</title>
+<script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --bg:#0b0e13; --surface:#12161d; --surface-2:#1a1f28; --surface-3:#212733;
+  --border:#262d3a; --fg:#e7eaf0; --fg-dim:#8b93a3; --fg-faint:#596273;
+  --accent:#3bb0cf; --accent-ink:#06181c; --accent-soft:#0f2b33; --accent-border:#1f5866;
+  --ok:#3fb68b; --ok-soft:rgba(63,182,139,.16);
+  --warn:#e0a83b; --warn-soft:rgba(224,168,59,.16);
+  --danger:#e2585e; --danger-soft:rgba(226,88,94,.16);
+  --quar:#9c7bd9; --quar-soft:rgba(156,123,217,.16);
+  --font-display:'Archivo Narrow','Arial Narrow',sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'IBM Plex Mono','Courier New',monospace;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f2f3f5; --surface:#ffffff; --surface-2:#eef0f3; --surface-3:#e3e6eb;
+    --border:#d7dbe2; --fg:#15181d; --fg-dim:#5b6372; --fg-faint:#88909c;
+    --accent:#157f99; --accent-ink:#ffffff; --accent-soft:#e1f2f6; --accent-border:#bfe3ea;
+    --ok-soft:rgba(63,182,139,.14); --warn-soft:rgba(224,168,59,.18);
+    --danger-soft:rgba(226,88,94,.12); --quar-soft:rgba(156,123,217,.14);
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f2f3f5; --surface:#ffffff; --surface-2:#eef0f3; --surface-3:#e3e6eb;
+  --border:#d7dbe2; --fg:#15181d; --fg-dim:#5b6372; --fg-faint:#88909c;
+  --accent:#157f99; --accent-ink:#ffffff; --accent-soft:#e1f2f6; --accent-border:#bfe3ea;
+  --ok-soft:rgba(63,182,139,.14); --warn-soft:rgba(224,168,59,.18);
+  --danger-soft:rgba(226,88,94,.12); --quar-soft:rgba(156,123,217,.14);
+  color-scheme: light;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  background:var(--bg); color:var(--fg); font-family:var(--font-body); margin:0;
+  -webkit-font-smoothing:antialiased; padding-inline:20px; padding-block:28px 64px;
+}
+body.locked{overflow:hidden;}
+h1,h2,h3{font-family:var(--font-display); text-transform:uppercase; letter-spacing:.3px; margin:0; text-wrap:balance;}
+::selection{background:var(--accent-soft);}
+a{color:var(--accent);}
+.wrap{max-width:1180px; margin:0 auto;}
+.tabular{font-variant-numeric:tabular-nums;}
+.mono{font-family:var(--font-mono);}
+.hidden{display:none !important;}
+
+/* ---------- login ---------- */
+#loginScreen{min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center;}
+#loginScreen .mark{font-family:var(--font-display); font-size:30px; font-weight:700; letter-spacing:.5px;}
+#loginScreen .sub{color:var(--fg-dim); font-size:14px; margin-bottom:10px;}
+#loginScreen .loginMsg{font-size:12.5px; color:var(--danger); max-width:420px;}
+
+/* ---------- loading overlay ---------- */
+#loadingOverlay{position:fixed; inset:0; z-index:500; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;}
+.spinner{width:34px; height:34px; border-radius:50%; border:3px solid var(--border); border-top-color:var(--accent); animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#loadingOverlay p{color:var(--fg-dim); font-size:13px;}
+
+/* ---------- toast ---------- */
+#toastHost{position:fixed; bottom:18px; left:50%; transform:translateX(-50%); z-index:900; display:flex; flex-direction:column; gap:8px; align-items:center;}
+.toast{background:var(--surface-3); border:1px solid var(--border); color:var(--fg); padding:10px 16px; border-radius:9px; font-size:13px; box-shadow:0 10px 30px rgba(0,0,0,.3); max-width:90vw;}
+.toast.err{border-color:var(--danger); color:var(--danger);}
+.toast.ok{border-color:var(--ok); color:var(--ok);}
+
+/* ---------- masthead ---------- */
+.masthead{margin-bottom:22px;}
+.eyebrow{font-family:var(--font-display); font-size:12px; letter-spacing:1.6px; color:var(--accent); text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.eyebrow .dot{width:6px; height:6px; border-radius:50%; background:var(--accent);}
+.conn-status{display:inline-flex; align-items:center; gap:6px; font-family:var(--font-body); font-size:11.5px; letter-spacing:0; color:var(--fg-faint); text-transform:none; margin-left:auto;}
+.status-dot{width:7px; height:7px; border-radius:50%; background:var(--fg-faint);}
+.status-dot.online{background:var(--ok); box-shadow:0 0 5px var(--ok);}
+.status-dot.offline{background:var(--danger); box-shadow:0 0 5px var(--danger);}
+.masthead h1{font-size:30px; font-weight:700; margin-bottom:8px;}
+.masthead-row{display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap;}
+.masthead p{font-size:14px; color:var(--fg-dim); line-height:1.6; max-width:680px; margin:0;}
+.user-pill{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--fg-dim); background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:6px 12px 6px 6px; flex-shrink:0;}
+.user-pill .av{width:22px; height:22px; border-radius:50%; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:700;}
+.user-pill button{background:none; border:none; color:var(--fg-faint); cursor:pointer; font-size:12px; text-decoration:underline; padding:0;}
+
+/* ---------- segment nav ---------- */
+.segnav{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:20; display:flex; gap:4px;
+  background:var(--surface); border:1px solid var(--border); border-radius:11px; padding:4px;
+  margin-bottom:26px; overflow-x:auto; scrollbar-width:none;
+}
+.segnav::-webkit-scrollbar{display:none;}
+.segnav button{
+  flex:1 1 auto; white-space:nowrap; background:transparent; border:none; color:var(--fg-dim);
+  font-family:var(--font-body); font-size:13px; font-weight:600; padding:10px 14px; border-radius:8px; cursor:pointer;
+}
+.segnav button .n{font-family:var(--font-mono); font-size:10.5px; opacity:.7; margin-right:6px;}
+.segnav button.active{background:var(--accent); color:var(--accent-ink);}
+.segnav button:not(.active):hover{background:var(--surface-2); color:var(--fg);}
+
+/* ---------- tela wrapper ---------- */
+.tela{display:none;}
+.tela.active{display:block;}
+.tela-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:6px; flex-wrap:wrap;}
+.tela-head h2{font-size:18px;}
+.tela-head .tag{font-size:11px; color:var(--fg-faint); font-family:var(--font-mono);}
+.tela-sub{font-size:13px; color:var(--fg-dim); margin:0 0 16px; max-width:680px; line-height:1.55;}
+.screen{background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden;}
+
+/* ---------- home (tela 1) ---------- */
+.home-pad{padding:18px;}
+.kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:11px; margin-bottom:22px;}
+.kpi{background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:14px 15px;}
+.kpi .l{font-size:10.5px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.5px; margin-bottom:7px;}
+.kpi .v{font-family:var(--font-display); font-size:27px; font-weight:700; color:var(--fg);}
+.kpi .v.accent{color:var(--accent);} .kpi .v.warn{color:var(--warn);} .kpi .v.danger{color:var(--danger);}
+.module-section{margin-bottom:22px;}
+.module-section:last-child{margin-bottom:0;}
+.module-section-label{font-family:var(--font-display); font-size:11.5px; font-weight:700; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px;}
+.module-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(192px,1fr)); gap:10px;}
+.module-card{background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:15px 16px; cursor:pointer;
+  display:flex; flex-direction:column; gap:9px; text-align:left; font-family:var(--font-body); color:var(--fg);}
+.module-card:hover{border-color:var(--accent-border); background:var(--surface-3);}
+.module-card .top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
+.module-card .ic{font-size:21px;}
+.module-card .title{font-weight:700; font-size:13.5px; line-height:1.3;}
+.module-card .meta{font-size:11.5px; color:var(--fg-faint);}
+.activity{display:flex; flex-direction:column;}
+.act-row{display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid var(--border); font-size:12.5px;}
+.act-row:last-child{border-bottom:none;}
+.act-ic{width:30px; height:30px; border-radius:8px; background:var(--surface-3); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;}
+.act-main{flex:1; min-width:0;}
+.act-main .t1{font-weight:600;}
+.act-main .t2{color:var(--fg-faint); font-size:11px; margin-top:1px;}
+.act-date{font-family:var(--font-mono); font-size:11px; color:var(--fg-faint); white-space:nowrap;}
+.panel{background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:15px 16px;}
+.panel h3{font-size:12px; letter-spacing:.4px; margin-bottom:13px; color:var(--fg-dim);}
+
+/* ---------- app-shell ---------- */
+.app-shell{display:flex; min-height:560px;}
+.app-sidebar{width:216px; flex-shrink:0; border-right:1px solid var(--border); padding:16px 10px; display:flex; flex-direction:column; gap:2px;}
+.app-sidebar .brand{font-family:var(--font-display); font-weight:700; font-size:15px; letter-spacing:.3px; padding:4px 10px 14px; color:var(--fg);}
+.app-sidebar .lbl{font-size:10px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:1px; padding:12px 10px 5px;}
+.app-sidebar button{
+  display:flex; align-items:center; gap:9px; width:100%; text-align:left; background:transparent; border:none;
+  color:var(--fg-dim); font-family:var(--font-body); font-size:13px; font-weight:500; padding:9px 10px; border-radius:7px; cursor:pointer;
+}
+.app-sidebar button .ic{width:16px; text-align:center; font-size:13px; opacity:.85;}
+.app-sidebar button .ct{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; color:var(--fg-faint); background:var(--surface-2); border-radius:5px; padding:1px 5px;}
+.app-sidebar button:hover{background:var(--surface-2); color:var(--fg);}
+.app-sidebar button.active{background:var(--accent-soft); color:var(--accent); font-weight:700; border:1px solid var(--accent-border);}
+.app-sidebar button.active .ct{background:transparent; color:var(--accent);}
+.app-main{flex:1; min-width:0; padding:16px 18px 20px; display:flex; flex-direction:column;}
+
+.app-topbar{display:flex; flex-wrap:wrap; align-items:flex-end; gap:8px; margin-bottom:14px;}
+.app-topbar .material-title{font-family:var(--font-display); font-size:17px; font-weight:700; margin-right:auto; display:flex; align-items:center; gap:8px;}
+.tf{display:flex; flex-direction:column; gap:3px;}
+.tf label{font-size:9.5px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.5px;}
+.tf select, .tf input{
+  background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:7px;
+  padding:7px 9px; font-size:12px; font-family:var(--font-body); height:32px; min-width:120px;
+}
+.tf input[type=search]{min-width:160px;}
+.btn{display:inline-flex; align-items:center; gap:6px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2);
+  color:var(--fg); font-family:var(--font-body); font-weight:600; font-size:12.5px; padding:8px 13px; cursor:pointer; height:32px;}
+.btn:hover{border-color:var(--fg-faint);}
+.btn:disabled{opacity:.5; cursor:default;}
+.btn-accent{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
+.btn-accent:hover{filter:brightness(1.06);}
+.btn-ghost{background:transparent;}
+.view-toggle{display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; height:32px;}
+.view-toggle button{border:none; background:var(--surface-2); color:var(--fg-dim); font-size:12px; font-weight:600; padding:0 12px; cursor:pointer; font-family:var(--font-body);}
+.view-toggle button.active{background:var(--accent); color:var(--accent-ink);}
+
+.table-scroll{overflow-x:auto; border:1px solid var(--border); border-radius:10px; flex:1;}
+table.occ{width:100%; border-collapse:collapse; font-size:12.5px; min-width:760px;}
+table.occ th{position:sticky; top:0; background:var(--surface-2); text-align:left; padding:9px 11px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--fg-faint); white-space:nowrap; border-bottom:1px solid var(--border);}
+table.occ td{padding:10px 11px; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--fg);}
+table.occ tr:last-child td{border-bottom:none;}
+table.occ tr:hover td{background:var(--surface-2);}
+.cell-dim{color:var(--fg-dim);}
+.laudo-ic{display:inline-flex; width:22px; height:22px; border-radius:6px; align-items:center; justify-content:center; font-size:12px; text-decoration:none;}
+.laudo-ic.yes{background:var(--ok-soft); color:var(--ok);}
+.laudo-ic.no{background:var(--surface-3); color:var(--fg-faint);}
+.badge{display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; white-space:nowrap;}
+.badge::before{content:''; width:6px; height:6px; border-radius:50%; background:currentColor;}
+.badge.aprovado{background:var(--ok-soft); color:var(--ok);}
+.badge.analise{background:var(--warn-soft); color:var(--warn);}
+.badge.reprovado{background:var(--danger-soft); color:var(--danger);}
+.badge.quarentena{background:var(--quar-soft); color:var(--quar);}
+.badge.aberta{background:var(--warn-soft); color:var(--warn);}
+.badge.tratativa{background:var(--quar-soft); color:var(--quar);}
+.badge.encerrada{background:var(--ok-soft); color:var(--ok);}
+.badge.nd{background:var(--surface-3); color:var(--fg-faint);}
+.pill{display:inline-block; font-size:11px; padding:3px 10px; border-radius:999px; border:1px solid var(--border); color:var(--fg-dim); background:var(--surface-3); white-space:nowrap;}
+.conf{font-size:11.5px; font-weight:600;}
+.conf.ok{color:var(--ok);} .conf.div{color:var(--danger);}
+.empty-note{padding:40px 20px; text-align:center; color:var(--fg-dim); font-size:13px;}
+
+.cards-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px;}
+.rcard{background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:13px 14px; display:flex; flex-direction:column; gap:9px;}
+.rcard .top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
+.rcard .fornecedor{font-weight:700; font-size:13.5px;}
+.rcard .lote{font-family:var(--font-mono); font-size:11px; color:var(--fg-dim);}
+.rcard dl{display:grid; grid-template-columns:1fr 1fr; gap:7px 10px; margin:0; font-size:12px;}
+.rcard dt{color:var(--fg-faint); font-size:10px; text-transform:uppercase; letter-spacing:.4px; margin-bottom:1px;}
+.rcard dd{margin:0; color:var(--fg);}
+.rcard .foot{display:flex; justify-content:space-between; align-items:center; margin-top:2px;}
+
+/* ---------- modal ---------- */
+.modal-overlay{position:fixed; inset:0; z-index:200; background:rgba(8,10,14,.6); display:flex; align-items:flex-start; justify-content:center; padding:40px 20px; overflow-y:auto;}
+.modal-overlay.hidden{display:none;}
+.modal-card{width:100%; max-width:760px; margin:auto; background:var(--surface); border:1px solid var(--border); border-radius:16px; box-shadow:0 24px 60px rgba(0,0,0,.45); position:relative;}
+.modal-close{position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2); color:var(--fg-dim); cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center;}
+.modal-close:hover{color:var(--fg); border-color:var(--fg-faint);}
+.modal-head{padding:24px 50px 0 24px;}
+.modal-head h2{font-size:17px; font-family:var(--font-display); text-transform:uppercase;}
+.form-wrap{max-width:720px; margin:0 auto; padding:22px 24px;}
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px 14px;}
+.field{display:flex; flex-direction:column; gap:5px; min-width:0;}
+.field.full{grid-column:1/-1;}
+.field label{font-size:10.5px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.4px;}
+.field input, .field select, .field textarea{
+  background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:8px;
+  padding:10px 11px; font-size:13.5px; font-family:var(--font-body); width:100%;
+}
+.field input:disabled, .field select:disabled{opacity:.6;}
+.field textarea{resize:vertical; min-height:56px; font-family:var(--font-body);}
+.section-title{font-family:var(--font-display); font-size:11.5px; letter-spacing:.6px; color:var(--accent); text-transform:uppercase; margin:22px 0 11px; padding-bottom:7px; border-bottom:1px solid var(--border);}
+.section-title:first-of-type{margin-top:0;}
+.file-btn{
+  display:flex; align-items:center; gap:7px; width:100%; background:var(--surface-2); border:1px solid var(--border);
+  color:var(--fg); border-radius:8px; padding:10px 11px; font-size:13.5px; font-family:var(--font-body); cursor:pointer;
+  text-align:left;
+}
+.file-btn:hover{border-color:var(--fg-faint);}
+.file-btn .ic{opacity:.85; flex-shrink:0;}
+.file-btn span:last-child{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.upload{
+  border:1.5px dashed var(--border); border-radius:10px; padding:18px 14px; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; gap:7px; text-align:center; color:var(--fg-dim); font-size:12px; cursor:pointer;
+}
+.upload .ic{font-size:22px; opacity:.8;}
+.upload b{color:var(--fg); font-size:12.5px;}
+.form-actions{display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-top:24px; padding-top:18px; border-top:1px solid var(--border);}
+.form-actions .save-msg{margin-right:auto; font-size:12px; color:var(--fg-dim);}
+.form-actions .save-msg.err{color:var(--danger);}
+
+/* ---------- fotos de referência ---------- */
+.photo-card{border:1px solid var(--border); border-radius:12px; overflow:hidden; background:var(--surface-2);}
+.photo-card .lbl{display:flex; justify-content:space-between; align-items:center; padding:11px 13px; border-bottom:1px solid var(--border); font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.3px;}
+.photo-ph{display:block; width:100%; height:auto;}
+.photo-card .meta{padding:10px 13px 13px; font-size:11.5px; color:var(--fg-faint);}
+
+/* ---------- critério L/C/QA ---------- */
+.badge-crit{display:inline-flex; align-items:center; justify-content:center; width:28px; height:20px; border-radius:6px; font-size:10.5px; font-weight:700; font-family:var(--font-mono); flex-shrink:0;}
+.badge-crit.L{background:var(--accent-soft); color:var(--accent);}
+.badge-crit.QA{background:var(--quar-soft); color:var(--quar);}
+.badge-crit.C{background:var(--surface-3); color:var(--fg-dim);}
+.med-table td{white-space:normal; vertical-align:middle;}
+.med-table td:first-child{width:1%;}
+.med-table input, .med-table select{
+  background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:7px;
+  padding:7px 9px; font-size:12.5px; font-family:var(--font-body); width:100%; min-width:110px;
+}
+.med-note{font-size:11.5px; color:var(--fg-faint); margin:10px 0 0; line-height:1.6;}
+.med-note.ok-note{color:var(--ok);}
+
+/* ---------- especificações ---------- */
+.spec-card{border:1px solid var(--border); border-radius:12px; background:var(--surface-2); overflow:hidden;}
+.spec-card .head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding:14px 16px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
+.spec-card .head .title{font-family:var(--font-display); font-size:14.5px; text-transform:uppercase; letter-spacing:.3px;}
+.spec-card .head .doc{font-size:11px; color:var(--fg-faint); font-family:var(--font-mono); margin-top:3px;}
+.spec-card .crit-count{display:flex; gap:6px; flex-shrink:0;}
+.spec-card .crit-count span{font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px;}
+.spec-card .crit-count .L{background:var(--accent-soft); color:var(--accent);}
+.spec-card .crit-count .QA{background:var(--quar-soft); color:var(--quar);}
+.spec-card .crit-count .C{background:var(--surface-3); color:var(--fg-dim);}
+.spec-card table.occ{min-width:0;}
+.mini-input{
+  background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:6px;
+  padding:6px 8px; font-size:12.5px; font-family:var(--font-body); width:100%;
+}
+.remove-linha-espec{background:none; border:none; color:var(--fg-faint); cursor:pointer; font-size:14px; padding:4px;}
+.remove-linha-espec:hover{color:var(--danger);}
+
+/* ---------- ações ---------- */
+.card-actions{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+.icon-btn{background:var(--surface-3); border:1px solid var(--border); color:var(--fg-dim); border-radius:7px; padding:5px 10px; font-size:11px; font-family:var(--font-body); cursor:pointer; white-space:nowrap;}
+.icon-btn:hover{color:var(--fg); border-color:var(--fg-faint);}
+.icon-btn.danger:hover{color:var(--danger); border-color:var(--danger);}
+
+footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border); font-size:12.5px; color:var(--fg-dim); line-height:1.6;}
+
+@media (max-width:860px){
+  .app-shell{flex-direction:column; min-height:0;}
+  .app-sidebar{width:100%; flex-direction:row; overflow-x:auto; border-right:none; border-bottom:1px solid var(--border); padding:10px;}
+  .app-sidebar .brand,.app-sidebar .lbl{display:none;}
+  .app-sidebar button{flex:0 0 auto; white-space:nowrap;}
+  .app-sidebar button .ct{display:none;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .form-grid{grid-template-columns:1fr;}
+  .masthead-row{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="loginScreen">
+  <div class="mark">SISTEMA DA QUALIDADE</div>
+  <div class="sub">BlowPet — Recebimento, Reclamação de Cliente e Liberação Não Conforme</div>
+  <button class="btn btn-accent" id="btnLoginMicrosoft" style="padding:13px 24px; font-size:15px;">Entrar com Microsoft</button>
+  <div class="loginMsg" id="loginMsg"></div>
+</div>
+
+<!-- ===================== LOADING ===================== -->
+<div id="loadingOverlay" class="hidden">
+  <div class="spinner"></div>
+  <p id="loadingMsg">Conectando à planilha…</p>
+</div>
+
+<div id="toastHost"></div>
+<datalist id="listaFornecedores"></datalist>
+<datalist id="listaResponsaveis"></datalist>
+
+<!-- ===================== APP ===================== -->
+<div id="app" class="hidden">
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="masthead-row">
+      <div>
+        <div class="eyebrow"><span class="dot"></span>BLOWPET · QUALIDADE</div>
+        <h1>Sistema da Qualidade</h1>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span class="conn-status"><span class="status-dot" id="statusDot"></span><span id="statusText">conectando…</span></span>
+        <div class="user-pill">
+          <span class="av" id="userAvatar">—</span>
+          <span id="userEmail">—</span>
+          <button type="button" onclick="abrirConfiguracoes()">Config.</button>
+        </div>
+      </div>
+    </div>
+    <p>Recebimento de matéria-prima, Reclamação de Cliente e Registro de Liberação Não Conforme, num hub só — dados gravados direto na planilha da Qualidade no OneDrive.</p>
+  </div>
+
+  <nav class="segnav" id="segnav">
+    <button class="active" data-tela="visao"><span class="n">01</span>Visão geral</button>
+    <button data-tela="lista"><span class="n">02</span>Recebimento</button>
+    <button data-tela="cadastros"><span class="n">03</span>Cadastros</button>
+    <button data-tela="reclamacao"><span class="n">04</span>Reclamação de cliente</button>
+    <button data-tela="liberacao"><span class="n">05</span>Liberação não conforme</button>
+  </nav>
+
+  <!-- ===================== TELA 1 — VISÃO GERAL ===================== -->
+  <section class="tela active" id="tela-visao">
+    <div class="tela-head"><h2>Visão geral</h2><span class="tag">tela inicial · acesso aos módulos</span></div>
+    <p class="tela-sub">Resumo do que precisa de atenção e, abaixo, o acesso a cada módulo.</p>
+    <div class="screen home-pad">
+      <div class="kpi-row">
+        <div class="kpi"><div class="l">Recebimentos em análise</div><div class="v warn tabular" id="kpiAnalise">0</div></div>
+        <div class="kpi"><div class="l">Reclamações em aberto</div><div class="v danger tabular" id="kpiReclamacoes">0</div></div>
+        <div class="kpi"><div class="l">Liberações aguardando aprovação</div><div class="v accent tabular" id="kpiLiberacoes">0</div></div>
+        <div class="kpi"><div class="l">Lotes em quarentena</div><div class="v tabular" id="kpiQuarentena">0</div></div>
+      </div>
+
+      <div class="module-section">
+        <div class="module-section-label">Recebimento de matéria-prima</div>
+        <div class="module-grid">
+          <button class="module-card" onclick="abrirMaterial('resina')"><div class="top"><span class="ic">🧪</span></div><div class="title">Resina PET</div><div class="meta" id="metaResina">—</div></button>
+          <button class="module-card" onclick="abrirMaterial('rotulo')"><div class="top"><span class="ic">🏷️</span></div><div class="title">Rótulo</div><div class="meta" id="metaRotulo">—</div></button>
+          <button class="module-card" onclick="abrirMaterial('pigmento')"><div class="top"><span class="ic">🎨</span></div><div class="title">Pigmento</div><div class="meta" id="metaPigmento">—</div></button>
+          <button class="module-card" onclick="abrirMaterial('cinta')"><div class="top"><span class="ic">📦</span></div><div class="title">Caixa de Preforma (Cinta)</div><div class="meta" id="metaCinta">—</div></button>
+          <button class="module-card" onclick="abrirMaterial('tampa')"><div class="top"><span class="ic">📦</span></div><div class="title">Caixa de Preforma (Tampa)</div><div class="meta" id="metaTampa">—</div></button>
+        </div>
+      </div>
+
+      <div class="module-section">
+        <div class="module-section-label">Cadastros auxiliares</div>
+        <div class="module-grid">
+          <button class="module-card" onclick="abrirCadastro('rotulos')"><div class="top"><span class="ic">🖼️</span></div><div class="title">Rótulos Homologados</div><div class="meta" id="metaRotulosHom">—</div></button>
+          <button class="module-card" onclick="abrirCadastro('especificacoes')"><div class="top"><span class="ic">📐</span></div><div class="title">Especificações</div><div class="meta" id="metaEspec">—</div></button>
+          <button class="module-card" onclick="abrirCadastro('produtos')"><div class="top"><span class="ic">🧬</span></div><div class="title">Produtos de Resina</div><div class="meta" id="metaProdutos">—</div></button>
+        </div>
+      </div>
+
+      <div class="module-section">
+        <div class="module-section-label">Qualidade</div>
+        <div class="module-grid">
+          <button class="module-card" onclick="irPara('reclamacao')"><div class="top"><span class="ic">📣</span></div><div class="title">Reclamação de Cliente</div><div class="meta" id="metaReclamacoes">—</div></button>
+          <button class="module-card" onclick="irPara('liberacao')"><div class="top"><span class="ic">⚠️</span></div><div class="title">Registro de Liberação Não Conforme</div><div class="meta" id="metaLiberacoes">—</div></button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3>ATIVIDADE RECENTE — TODOS OS MÓDULOS</h3>
+        <div class="activity" id="atividadeRecente"><div class="ae-vazio" style="padding:14px 0; color:var(--fg-faint); font-size:12.5px;">Sem registros ainda.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TELA 2 — RECEBIMENTO ===================== -->
+  <section class="tela" id="tela-lista">
+    <div class="tela-head"><h2>Recebimento</h2></div>
+    <p class="tela-sub">Menu lateral com cada matéria-prima. Barra de filtros/ações em cima e os registros abaixo, em tabela ou em cartões.</p>
+    <div class="screen">
+      <div class="app-shell">
+        <div class="app-sidebar">
+          <div class="brand">QUALIDADE</div>
+          <div class="lbl">Visão</div>
+          <button onclick="irPara('visao')"><span class="ic">▦</span>Visão geral</button>
+          <div class="lbl">Recebimento</div>
+          <button class="mat-btn active" data-mat="resina"><span class="ic">🧪</span>Resina PET<span class="ct" id="ctResina">0</span></button>
+          <button class="mat-btn" data-mat="rotulo"><span class="ic">🏷️</span>Rótulo<span class="ct" id="ctRotulo">0</span></button>
+          <button class="mat-btn" data-mat="pigmento"><span class="ic">🎨</span>Pigmento<span class="ct" id="ctPigmento">0</span></button>
+          <button class="mat-btn" data-mat="cinta"><span class="ic">📦</span>Cx. Preforma (Cinta)<span class="ct" id="ctCinta">0</span></button>
+          <button class="mat-btn" data-mat="tampa"><span class="ic">📦</span>Cx. Preforma (Tampa)<span class="ct" id="ctTampa">0</span></button>
+          <div class="lbl">Sistema</div>
+          <button onclick="abrirConfiguracoes()"><span class="ic">⚙</span>Configurações</button>
+        </div>
+        <div class="app-main">
+          <div class="app-topbar">
+            <div class="material-title" id="matTitle">🧪 Resina PET</div>
+            <div class="tf"><label>Fornecedor</label><select id="fFornecedor"><option value="">Todos</option></select></div>
+            <div class="tf"><label>Status</label>
+              <select id="fStatus">
+                <option value="">Todos</option>
+                <option value="aprovado">Aprovado</option>
+                <option value="analise">Em análise</option>
+                <option value="reprovado">Reprovado</option>
+                <option value="quarentena">Quarentena</option>
+              </select>
+            </div>
+            <div class="tf"><label>Buscar</label><input type="search" id="fBusca" placeholder="NF, lote…"></div>
+            <div class="view-toggle">
+              <button class="active" data-view="tabela">☰ Tabela</button>
+              <button data-view="cards">▦ Cards</button>
+            </div>
+            <button class="btn btn-accent" onclick="abrirModalCadastro()">+ Novo recebimento</button>
+            <button class="btn" onclick="recarregarTudo()">⟳ Atualizar</button>
+          </div>
+          <div class="table-scroll" id="viewTabela">
+            <table class="occ">
+              <thead><tr id="theadRow"></tr></thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <div class="cards-grid" id="viewCards" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TELA 3 — RECLAMAÇÃO DE CLIENTE ===================== -->
+  <section class="tela" id="tela-reclamacao">
+    <div class="tela-head"><h2>Reclamação de cliente</h2></div>
+    <p class="tela-sub">Cliente, produto, motivo, classificação (procedente/improcedente) e andamento da tratativa.</p>
+    <div class="screen">
+      <div class="app-shell">
+        <div class="app-sidebar">
+          <div class="brand">QUALIDADE</div>
+          <div class="lbl">Visão</div>
+          <button onclick="irPara('visao')"><span class="ic">▦</span>Visão geral</button>
+          <div class="lbl">Qualidade</div>
+          <button class="active"><span class="ic">📣</span>Reclamação de Cliente<span class="ct" id="ctReclamacoes">0</span></button>
+          <div class="lbl">Sistema</div>
+          <button onclick="abrirConfiguracoes()"><span class="ic">⚙</span>Configurações</button>
+        </div>
+        <div class="app-main">
+          <div class="app-topbar">
+            <div class="material-title">📣 Reclamação de Cliente</div>
+            <div class="tf"><label>Classificação</label>
+              <select id="fClassReclamacao">
+                <option value="">Todas</option>
+                <option value="procedente">Procedente</option>
+                <option value="improcedente">Improcedente</option>
+              </select>
+            </div>
+            <div class="tf"><label>Status</label>
+              <select id="fStatusReclamacao">
+                <option value="">Todos</option>
+                <option value="aberta">Aberta</option>
+                <option value="tratativa">Em tratativa</option>
+                <option value="encerrada">Encerrada</option>
+              </select>
+            </div>
+            <div class="tf"><label>Buscar</label><input type="search" id="fBuscaReclamacao" placeholder="RAC, cliente…"></div>
+            <button class="btn btn-accent" style="margin-left:auto;" onclick="abrirModalReclamacao()">+ Nova reclamação</button>
+            <button class="btn" onclick="recarregarTudo()">⟳ Atualizar</button>
+          </div>
+          <div class="table-scroll">
+            <table class="occ">
+              <thead><tr><th>RAC</th><th>Data</th><th>Cliente</th><th>Produto</th><th>Motivo</th><th>Classificação</th><th>Status</th><th>Responsável</th></tr></thead>
+              <tbody id="tbodyReclamacao"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TELA 4 — LIBERAÇÃO NÃO CONFORME ===================== -->
+  <section class="tela" id="tela-liberacao">
+    <div class="tela-head"><h2>Liberação não conforme</h2></div>
+    <p class="tela-sub">Produto liberado mesmo com não conformidade — o que foi encontrado, a decisão e quem aprovou.</p>
+    <div class="screen">
+      <div class="app-shell">
+        <div class="app-sidebar">
+          <div class="brand">QUALIDADE</div>
+          <div class="lbl">Visão</div>
+          <button onclick="irPara('visao')"><span class="ic">▦</span>Visão geral</button>
+          <div class="lbl">Qualidade</div>
+          <button class="active"><span class="ic">⚠️</span>Liberação Não Conforme<span class="ct" id="ctLiberacoes">0</span></button>
+          <div class="lbl">Sistema</div>
+          <button onclick="abrirConfiguracoes()"><span class="ic">⚙</span>Configurações</button>
+        </div>
+        <div class="app-main">
+          <div class="app-topbar">
+            <div class="material-title">⚠️ Liberação Não Conforme</div>
+            <div class="tf"><label>Status</label>
+              <select id="fStatusLiberacao">
+                <option value="">Todos</option>
+                <option value="analise">Em análise</option>
+                <option value="aprovado">Aprovado</option>
+                <option value="reprovado">Reprovado</option>
+              </select>
+            </div>
+            <div class="tf"><label>Buscar</label><input type="search" id="fBuscaLiberacao" placeholder="Nº registro, produto…"></div>
+            <button class="btn btn-accent" style="margin-left:auto;" onclick="abrirModalLiberacao()">+ Novo registro</button>
+            <button class="btn" onclick="recarregarTudo()">⟳ Atualizar</button>
+          </div>
+          <div class="table-scroll">
+            <table class="occ">
+              <thead><tr><th>Nº Registro</th><th>Data</th><th>Produto / Processo</th><th>Não conformidade</th><th>Decisão</th><th>Qtd. liberada</th><th>Responsável</th><th>Status</th></tr></thead>
+              <tbody id="tbodyLiberacao"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TELA — CADASTROS ===================== -->
+  <section class="tela" id="tela-cadastros">
+    <div class="tela-head"><h2>Cadastros</h2></div>
+    <p class="tela-sub">Rótulos homologados (foto de referência), especificações de parâmetros/tolerâncias por material e os produtos de resina usados no lote interno.</p>
+    <div class="screen">
+      <div class="app-shell">
+        <div class="app-sidebar">
+          <div class="brand">QUALIDADE</div>
+          <div class="lbl">Visão</div>
+          <button onclick="irPara('visao')"><span class="ic">▦</span>Visão geral</button>
+          <div class="lbl">Cadastros</div>
+          <button class="cad-btn active" data-cad="rotulos"><span class="ic">🖼️</span>Rótulos Homologados<span class="ct" id="ctRotulosHom">0</span></button>
+          <button class="cad-btn" data-cad="especificacoes"><span class="ic">📐</span>Especificações<span class="ct" id="ctEspecificacoes">0</span></button>
+          <button class="cad-btn" data-cad="produtos"><span class="ic">🧬</span>Produtos de Resina<span class="ct" id="ctProdutos">0</span></button>
+          <div class="lbl">Sistema</div>
+          <button onclick="abrirConfiguracoes()"><span class="ic">⚙</span>Configurações</button>
+        </div>
+        <div class="app-main">
+          <div class="app-topbar">
+            <div class="material-title" id="cadTitle">🖼️ Rótulos Homologados</div>
+            <div class="tf"><label>Buscar</label><input type="search" id="cadBusca" placeholder="Nome do modelo…"></div>
+            <button class="btn btn-accent" style="margin-left:auto;" id="cadBtnNovo" onclick="abrirModalRotulo()">+ Novo rótulo homologado</button>
+          </div>
+          <div id="painelRotulos">
+            <div class="cards-grid" id="gridRotulos"></div>
+          </div>
+          <div id="painelEspecificacoes" style="display:none;">
+            <div id="gridEspecificacoes" style="display:flex; flex-direction:column; gap:16px;"></div>
+          </div>
+          <div id="painelProdutos" style="display:none;">
+            <div class="table-scroll">
+              <table class="occ">
+                <thead><tr><th>Código</th><th>Descrição</th><th>Tipo</th><th>Fornecedor</th><th></th></tr></thead>
+                <tbody id="tbodyProdutos"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== JANELA — NOVO RECEBIMENTO ===================== -->
+  <div class="modal-overlay hidden" id="modalCadastro">
+    <div class="modal-card">
+      <button class="modal-close" onclick="fecharModalCadastro()" aria-label="Fechar">✕</button>
+      <div class="modal-head">
+        <h2>Novo recebimento</h2>
+        <p class="tela-sub" style="margin-top:6px;">Preencher e salvar na planilha. O formulário muda conforme o Material.</p>
+      </div>
+      <div class="form-wrap" style="padding-top:10px;">
+        <div class="section-title">Dados do recebimento</div>
+        <div class="form-grid">
+          <div class="field"><label>Material</label>
+            <select id="materialSelect" onchange="atualizarCamposMaterial()">
+              <option value="resina">Resina PET</option>
+              <option value="rotulo">Rótulo</option>
+              <option value="pigmento">Pigmento</option>
+              <option value="cinta">Caixa de Preforma (Cinta)</option>
+              <option value="tampa">Caixa de Preforma (Tampa)</option>
+            </select>
+          </div>
+          <div class="field" id="campoFornecedorGenerico"><label>Fornecedor</label><input id="fornecedorGenericoInput" list="listaFornecedores" placeholder="Nome do fornecedor"></div>
+          <div class="field" id="campoProdutoResina">
+            <label>Tipo de resina (produto)</label>
+            <select id="produtoResinaSelect" onchange="verificarLoteExistente()"></select>
+          </div>
+          <div class="field" id="campoLoteFornecedorResina">
+            <label>Lote do fornecedor</label>
+            <input class="mono" id="loteFornecedorInput" placeholder="Ex: 2606216" oninput="verificarLoteExistente()">
+          </div>
+          <div class="field" id="campoLoteInternoResina">
+            <label>Lote interno</label>
+            <input class="mono" id="loteInternoDisplay" value="—" disabled>
+          </div>
+          <div class="field" id="campoTipoResina">
+            <label>Tipo / grade</label>
+            <select id="tipoResinaSelect" onchange="renderMedicoes(loteResinaExistente)">
+              <option value="prime">Prime</option>
+              <option value="off">OFF</option>
+            </select>
+          </div>
+          <div class="field" id="campoModeloRotulo">
+            <label>Modelo do rótulo</label>
+            <select id="modeloRotuloSelect" onchange="atualizarPreviaRotulo()"></select>
+          </div>
+          <div class="field" id="campoConferenciaRotulo">
+            <label>Conferência visual</label>
+            <select id="conferenciaRotuloSelect" onchange="sugerirStatusRecebimento()">
+              <option value="ok">Confere</option>
+              <option value="div">Divergente</option>
+            </select>
+          </div>
+          <div class="field"><label>Nota fiscal</label><input class="mono" id="notaFiscalInput" placeholder="Nº da NF"></div>
+          <div class="field" id="campoLoteGenerico"><label>Lote</label><input class="mono" id="loteGenericoInput" placeholder="Código do lote"></div>
+          <div class="field"><label>Data do recebimento</label><input type="date" id="dataRecebimentoInput"></div>
+          <div class="field"><label>Responsável pelo recebimento</label><input id="responsavelInput" list="listaResponsaveis" placeholder="Nome do responsável"></div>
+          <div class="field"><label>Quantidade</label><input id="quantidadeInput" placeholder="Ex: 24.000"></div>
+          <div class="field"><label>Unidade</label><select id="unidadeSelect"></select></div>
+          <div class="field"><label>Status</label><select id="statusRecebimentoSelect"></select></div>
+          <div class="field">
+            <label>Foto do laudo</label>
+            <button type="button" class="file-btn" onclick="document.getElementById('laudoFile').click()"><span class="ic">📄</span><span id="laudoFileLabel">Anexar laudo</span></button>
+            <input type="file" id="laudoFile" accept="image/*,.pdf" hidden onchange="document.getElementById('laudoFileLabel').textContent = this.files[0] ? this.files[0].name : 'Anexar laudo'">
+          </div>
+        </div>
+
+        <div id="secaoRotulo">
+          <div class="section-title">Conferência visual — rótulo homologado <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">referência</span></div>
+          <div class="photo-card">
+            <img class="photo-ph" id="previaRotuloImg" src="" alt="Foto de referência do rótulo homologado">
+            <div class="meta" id="previaRotuloNome">—</div>
+          </div>
+          <p class="tela-sub" style="margin:8px 0 0;">Foto cadastrada em <a href="#" onclick="fecharModalCadastro(); abrirCadastro('rotulos'); return false;">Rótulos Homologados</a> — só pra comparar visualmente; não gera um novo registro de foto neste recebimento.</p>
+        </div>
+
+        <div id="secaoResina">
+          <p class="med-note" id="loteInternoNota" style="margin:0 0 14px;">Informe o lote do fornecedor pra ver o lote interno.</p>
+          <div class="section-title" style="margin-top:0;">Medições <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;" id="medicoesFichaLabel">—</span></div>
+          <div class="table-scroll">
+            <table class="occ med-table">
+              <thead><tr><th>Critério</th><th>Teste</th><th>Especificação</th><th>Resultado</th><th>Situação</th></tr></thead>
+              <tbody id="tbodyMedicoes"></tbody>
+            </table>
+          </div>
+          <p class="med-note">L = liberativa, obrigatória pra aprovar o lote · QA = valor transcrito do laudo do fornecedor · C = complementar, não decide a aprovação. Parâmetros cadastrados em <a href="#" onclick="fecharModalCadastro(); abrirCadastro('especificacoes'); return false;">Especificações</a>.</p>
+        </div>
+
+        <div class="section-title">Observações</div>
+        <div class="field full"><textarea id="observacoesInput" placeholder="Alguma divergência, avaria na embalagem, etc."></textarea></div>
+
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgRecebimento"></span>
+          <button class="btn btn-ghost" onclick="fecharModalCadastro()">Cancelar</button>
+          <button class="btn btn-accent" id="btnSalvarRecebimento" onclick="salvarRecebimento()">Salvar recebimento</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TELA — CADASTROS: JANELA NOVA ESPECIFICAÇÃO ===================== -->
+  <div class="modal-overlay hidden" id="modalEspec">
+    <div class="modal-card">
+      <button class="modal-close" onclick="fecharModalEspec()" aria-label="Fechar">✕</button>
+      <div class="modal-head">
+        <h2 id="modalEspecTitulo">Nova especificação</h2>
+        <p class="tela-sub" style="margin-top:6px;">Parâmetros de um material (ou tipo/grade) a partir da especificação do fornecedor. Esses parâmetros definem as medições do recebimento.</p>
+      </div>
+      <div class="form-wrap" style="padding-top:10px;">
+        <div class="section-title">Dados da ficha</div>
+        <div class="form-grid">
+          <div class="field"><label>Material</label><select id="especMaterialSelect"><option value="resina">Resina PET</option><option value="rotulo">Rótulo</option><option value="pigmento">Pigmento</option><option value="cinta">Caixa de Preforma (Cinta)</option><option value="tampa">Caixa de Preforma (Tampa)</option></select></div>
+          <div class="field"><label>Tipo / grade</label><input id="especTipoNomeInput" placeholder="Ex: Prime, OFF — deixe em branco se não houver"></div>
+          <div class="field"><label>Código do documento</label><input class="mono" id="especDocInput" placeholder="Ex: EMP-002"></div>
+          <div class="field"><label>Revisão</label><input id="especRevInput" placeholder="Ex: Rev.000"></div>
+          <div class="field"><label>Data do documento</label><input id="especDataInput" placeholder="Ex: 05/09/2025"></div>
+        </div>
+
+        <div class="section-title">Parâmetros</div>
+        <div class="table-scroll">
+          <table class="occ med-table">
+            <thead><tr><th>Teste</th><th>Especificação / tolerância</th><th>Unidade</th><th>NT</th><th>Critério</th><th></th></tr></thead>
+            <tbody id="tbodyNovaEspec"></tbody>
+          </table>
+        </div>
+        <button type="button" class="btn" style="margin-top:10px;" onclick="adicionarLinhaEspec()">+ Adicionar parâmetro</button>
+        <p class="med-note">Dica pra faixa (mín.–máx.): use o travessão "–" (ex.: <span class="mono">0,790 – 0,890</span>). Pra mínimo/máximo isolado: <span class="mono">Mínimo 70,0</span> ou <span class="mono">Máximo 1,60</span>. Pra teste visual, coloque "Visual" na Unidade.</p>
+
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgEspec"></span>
+          <button class="btn btn-ghost" onclick="fecharModalEspec()">Cancelar</button>
+          <button class="btn btn-accent" onclick="salvarEspecificacao()">Salvar especificação</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — NOVO/EDITAR PRODUTO DE RESINA ===================== -->
+  <div class="modal-overlay hidden" id="modalProduto">
+    <div class="modal-card" style="max-width:520px;">
+      <button class="modal-close" onclick="fecharModalProduto()" aria-label="Fechar">✕</button>
+      <div class="modal-head">
+        <h2 id="modalProdutoTitulo">Novo produto de resina</h2>
+        <p class="tela-sub" style="margin-top:6px;">Código usado pra identificar o lote interno (ex.: J02-271).</p>
+      </div>
+      <div class="form-wrap" style="padding-top:10px; max-width:none;">
+        <div class="form-grid">
+          <div class="field"><label>Código</label><input class="mono" id="produtoCodigoInput" placeholder="Ex: J02"></div>
+          <div class="field"><label>Descrição</label><input id="produtoDescricaoInput" placeholder="Ex: Indorama Max"></div>
+          <div class="field"><label>Fornecedor</label><input id="produtoFornecedorInput" placeholder="Ex: Indorama Ventures"></div>
+          <div class="field"><label>Tipo</label>
+            <select id="produtoTipoInput">
+              <option value="Prime">Prime</option>
+              <option value="Prime ou OFF Grade">Prime ou OFF Grade</option>
+              <option value="-">—</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgProduto"></span>
+          <button class="btn btn-ghost" onclick="fecharModalProduto()">Cancelar</button>
+          <button class="btn btn-accent" onclick="salvarProduto()">Salvar produto</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — NOVO RÓTULO HOMOLOGADO ===================== -->
+  <div class="modal-overlay hidden" id="modalRotulo">
+    <div class="modal-card" style="max-width:560px;">
+      <button class="modal-close" onclick="fecharModalRotulo()" aria-label="Fechar">✕</button>
+      <div class="modal-head">
+        <h2 id="modalRotuloTitulo">Novo rótulo homologado</h2>
+        <p class="tela-sub" style="margin-top:6px;">A foto cadastrada aqui é a referência usada na conferência visual do recebimento.</p>
+      </div>
+      <div class="form-wrap" style="padding-top:10px; max-width:none;">
+        <div class="form-grid">
+          <div class="field full"><label>Nome do modelo</label><input id="rotuloNomeInput" placeholder="Ex: Água Indaiá 500 mL"></div>
+          <div class="field"><label>Aplicação</label><input id="rotuloAplicacaoInput" placeholder="Ex: Garrafa 500 mL rotulada"></div>
+          <div class="field"><label>Fornecedor habitual</label><input id="rotuloFornecedorInput" list="listaFornecedores" placeholder="Nome do fornecedor"></div>
+          <div class="field full"><label>Foto de referência</label>
+            <button type="button" class="file-btn" onclick="document.getElementById('rotuloFotoFile').click()"><span class="ic">🖼️</span><span id="rotuloFotoLabel">Anexar foto do rótulo</span></button>
+            <input type="file" id="rotuloFotoFile" accept="image/*" hidden onchange="document.getElementById('rotuloFotoLabel').textContent = this.files[0] ? this.files[0].name : 'Anexar foto do rótulo'">
+          </div>
+          <div class="field full"><label>Observações</label><textarea id="rotuloObsInput" placeholder="Variações aceitas, detalhes de impressão, etc."></textarea></div>
+        </div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgRotulo"></span>
+          <button class="btn btn-ghost" onclick="fecharModalRotulo()">Cancelar</button>
+          <button class="btn btn-accent" onclick="salvarRotulo()">Salvar rótulo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — NOVA RECLAMAÇÃO ===================== -->
+  <div class="modal-overlay hidden" id="modalReclamacao">
+    <div class="modal-card" style="max-width:620px;">
+      <button class="modal-close" onclick="fecharModalReclamacao()" aria-label="Fechar">✕</button>
+      <div class="modal-head">
+        <h2>Nova reclamação de cliente</h2>
+        <p class="tela-sub" style="margin-top:6px;">O número RAC é gerado automaticamente ao salvar.</p>
+      </div>
+      <div class="form-wrap" style="padding-top:10px; max-width:none;">
+        <div class="form-grid">
+          <div class="field"><label>Data</label><input type="date" id="reclamacaoDataInput"></div>
+          <div class="field"><label>Cliente</label><input id="reclamacaoClienteInput" placeholder="Nome do cliente"></div>
+          <div class="field full"><label>Produto</label><input id="reclamacaoProdutoInput" placeholder="Ex: Garrafa 500 mL s/ rótulo"></div>
+          <div class="field full"><label>Motivo</label><input id="reclamacaoMotivoInput" placeholder="Ex: Vazamento na tampa"></div>
+          <div class="field"><label>Classificação</label>
+            <select id="reclamacaoClassSelect"><option value="procedente">Procedente</option><option value="improcedente">Improcedente</option></select>
+          </div>
+          <div class="field"><label>Status</label>
+            <select id="reclamacaoStatusSelect"><option value="aberta">Aberta</option><option value="tratativa">Em tratativa</option><option value="encerrada">Encerrada</option></select>
+          </div>
+          <div class="field"><label>Responsável</label><input id="reclamacaoRespInput" list="listaResponsaveis" placeholder="Nome do responsável"></div>
+          <div class="field full"><label>Observações</label><textarea id="reclamacaoObsInput" placeholder="Detalhes da tratativa, contato com o cliente, etc."></textarea></div>
+        </div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgReclamacao"></span>
+          <button class="btn btn-ghost" onclick="fecharModalReclamacao()">Cancelar</button>
+          <button class="btn btn-accent" onclick="salvarReclamacao()">Salvar reclamação</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — NOVO REGISTRO DE LIBERAÇÃO ===================== -->
+  <div class="modal-overlay hidden" id="modalLiberacao">
+    <div class="modal-card" style="max-width:620px;">
+      <button class="modal-close" onclick="fecharModalLiberacao()" aria-label="Fechar">✕</button>
+      <div class="modal-head">
+        <h2>Novo registro de liberação não conforme</h2>
+        <p class="tela-sub" style="margin-top:6px;">O número do registro (LNC) é gerado automaticamente ao salvar.</p>
+      </div>
+      <div class="form-wrap" style="padding-top:10px; max-width:none;">
+        <div class="form-grid">
+          <div class="field"><label>Data</label><input type="date" id="liberacaoDataInput"></div>
+          <div class="field"><label>Quantidade liberada</label><input id="liberacaoQtdInput" placeholder="Ex: 1.200 un"></div>
+          <div class="field full"><label>Produto / processo</label><input id="liberacaoProdutoInput" placeholder="Ex: Garrafa 1500 mL — SBO2A"></div>
+          <div class="field full"><label>Não conformidade</label><input id="liberacaoNcInput" placeholder="Ex: Alinhamento de rótulo fora do padrão"></div>
+          <div class="field full"><label>Decisão</label><input id="liberacaoDecisaoInput" placeholder="Ex: Liberado com restrição / Retrabalho / Reprovado"></div>
+          <div class="field"><label>Status</label>
+            <select id="liberacaoStatusSelect"><option value="analise">Em análise</option><option value="aprovado">Aprovado</option><option value="reprovado">Reprovado</option></select>
+          </div>
+          <div class="field"><label>Responsável</label><input id="liberacaoRespInput" list="listaResponsaveis" placeholder="Nome do responsável"></div>
+          <div class="field full"><label>Observações</label><textarea id="liberacaoObsInput" placeholder="Contexto da decisão, quem aprovou, etc."></textarea></div>
+        </div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgLiberacao"></span>
+          <button class="btn btn-ghost" onclick="fecharModalLiberacao()">Cancelar</button>
+          <button class="btn btn-accent" onclick="salvarLiberacao()">Salvar registro</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — CONFIGURAÇÕES ===================== -->
+  <div class="modal-overlay hidden" id="modalConfig">
+    <div class="modal-card" style="max-width:480px;">
+      <button class="modal-close" onclick="fecharConfiguracoes()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2>Configurações</h2></div>
+      <div class="form-wrap" style="padding-top:10px; max-width:none;">
+        <div class="section-title" style="margin-top:0;">Conta</div>
+        <p class="tela-sub" style="margin:0 0 14px;">Conectado como <strong id="configUserEmail">—</strong></p>
+        <button class="btn" onclick="sair()">Sair</button>
+
+        <div class="section-title">Aparência</div>
+        <div class="form-grid">
+          <div class="field"><label>Tema</label>
+            <select id="temaSelect" onchange="aplicarTema(this.value)">
+              <option value="auto">Automático (sistema)</option>
+              <option value="dark">Escuro</option>
+              <option value="light">Claro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="section-title">Listas suspensas</div>
+        <p class="tela-sub" style="margin:0;">Fornecedores, responsáveis e as demais opções de menu são editados direto na aba <span class="mono">Listas</span> da planilha no OneDrive — mudou lá, aparece aqui na próxima vez que o app carregar os dados.</p>
+
+        <div class="form-actions">
+          <button class="btn btn-accent" onclick="fecharConfiguracoes()">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="note">
+    Sistema da Qualidade BlowPet — Recebimento (Resina PET, Rótulo, Pigmento, Caixa de Preforma Cinta/Tampa), Rótulos Homologados, Especificações, Produtos de Resina, Reclamação de Cliente e Liberação Não Conforme. Dados gravados na planilha <span class="mono">sistema_qualidade_blowpet_base.xlsx</span> via Microsoft Graph API, mesmo padrão do app de Inspeção da Qualidade.
+  </footer>
+
+</div>
+</div>
+
+<script>
+/* ===================================================================================
+   SISTEMA DA QUALIDADE — BlowPet
+   Login com conta Microsoft (MSAL.js) + leitura/gravação na planilha via Microsoft
+   Graph API — mesmo padrão do app de Inspeção da Qualidade já em produção. Nenhum dado
+   fictício fica embutido aqui: tudo que aparece vem das Tabelas do Excel na hora que o
+   app conecta; o que é cadastrado pelo usuário é gravado de volta na mesma planilha.
+   =================================================================================== */
+
+/* ====================== CONFIG ====================== */
+// Mesmo app registrado no Entra ID usado pelos outros sistemas (Client ID / tenant da
+// BlowPet) — login e consentimento já existem, não precisa criar um app novo. O
+// redirectUri é calculado a partir de onde esta página está hospedada: se o arquivo for
+// publicado em outro caminho, PRECISA cadastrar esse caminho exato como Redirect URI
+// adicional no app registrado no Azure (Portal Azure > Entra ID > Registros de
+// aplicativo > esse app > Autenticação > Adicionar URI de redirecionamento), senão o
+// login falha com erro de redirect_uri_mismatch.
+const msalConfig = {
+  auth: {
+    clientId: "f518fc60-a544-45d1-89a9-97e9f6b523ad",
+    authority: "https://login.microsoftonline.com/b38f2dcb-4251-4b93-977a-f469eb315033",
+    redirectUri: window.location.origin + window.location.pathname
+  }
+};
+const graphScopes = ["Files.ReadWrite", "User.Read"];
+
+// !!! TROCAR ANTES DE USAR !!! — link de compartilhamento (com permissão de edição) do
+// arquivo sistema_qualidade_blowpet_base.xlsx, igual à variável LINK_PLANILHA_PADRAO dos
+// outros apps. Pegue em: abrir o arquivo no OneDrive > Compartilhar > Copiar link
+// (com acesso de edição para a organização) e cole aqui no lugar deste texto.
+const LINK_PLANILHA_PADRAO = "COLE_AQUI_O_LINK_DE_COMPARTILHAMENTO_DO_ARQUIVO_XLSX";
+
+// Pasta no OneDrive (mesmo drive da planilha) onde as fotos de laudo e de rótulo
+// homologado são salvas. A Graph API cria as pastas do caminho automaticamente no
+// primeiro upload, não precisa criar na mão antes.
+const PASTA_FOTOS = "Aplicativos/SistemaQualidade_Fotos";
+
+/* Nome de cada Tabela do Excel (ver aba "Sobre" da planilha) e, na mesma ordem das
+   colunas de cada uma, o cabeçalho exato — é isso que faz a gravação de linha (um
+   array de valores) cair na coluna certa. Mudar o nome de uma coluna na planilha sem
+   atualizar aqui quebra a leitura/gravação dessa tabela. */
+const TABELAS = {
+  resina:      "TabelaRecebimentoResinaPET",
+  rotulo:      "TabelaRecebimentoRotulo",
+  pigmento:    "TabelaRecebimentoPigmento",
+  cinta:       "TabelaRecebimentoCxCinta",
+  tampa:       "TabelaRecebimentoCxTampa",
+  produtos:    "TabelaProdutosResina",
+  especificacoes: "TabelaEspecificacoesParametros",
+  rotulosHomologados: "TabelaRotulosHomologados",
+  reclamacoes: "TabelaReclamacoesCliente",
+  liberacoes:  "TabelaLiberacoesNaoConforme",
+  listas:      "TabelaListas"
+};
+const TABLE_COLS = {
+  resina: ['Lote Interno','Data Recebimento','Código Produto','Descrição Produto','Lote Fornecedor','Tipo/Grade','Fornecedor','Nota Fiscal','Quantidade','Unidade','Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Análise de Impureza','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  rotulo: ['Data','Nota Fiscal','Fornecedor','Lote','Modelo do Rótulo','Quantidade','Unidade','Conferência Visual','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  pigmento: ['Data','Nota Fiscal','Fornecedor','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  cinta: ['Data','Nota Fiscal','Fornecedor','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  tampa: ['Data','Nota Fiscal','Fornecedor','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  produtos: ['Código','Descrição','Fornecedor','Tipo'],
+  especificacoes: ['Material','Tipo/Grade','Código Documento','Revisão','Data Documento','Teste','Especificação/Tolerância','Unidade','NT','Critério'],
+  rotulosHomologados: ['ID','Nome do Modelo','Aplicação','Fornecedor Habitual','Arquivo da Foto','Status','Observações'],
+  reclamacoes: ['RAC','Data','Cliente','Produto','Motivo','Classificação','Status','Responsável','Observações'],
+  liberacoes: ['Número Registro','Data','Produto/Processo','Não Conformidade','Decisão','Quantidade Liberada','Responsável','Status','Observações'],
+  listas: ['Fornecedores','Responsaveis','Status Recebimento','Criterio','Unidades','Tipo Grade Lote','Tipo Grade Produto','Sim Nao','Conferencia Visual','Status Reclamacao','Classificacao Reclamacao','Status Liberacao','Status Rotulo']
+};
+const MAT_LABEL = {resina:'🧪 Resina PET', rotulo:'🏷️ Rótulo', pigmento:'🎨 Pigmento', cinta:'📦 Caixa de Preforma (Cinta)', tampa:'📦 Caixa de Preforma (Tampa)'};
+const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
+// Teste (nome usado em Especificacoes_Parametros) -> coluna correspondente em
+// Recebimento_Resina_PET. Um parâmetro novo cadastrado em Especificações que não esteja
+// nesta lista não tem coluna própria ainda — o valor digitado vai para Observações como
+// nota, pra não se perder, e aparece um aviso na tela.
+const PARAM_COL_MAP = {
+  'Viscosidade Intrínseca (IV) — Blowpet': 'Viscosidade IV Blowpet (dl/g)',
+  'Viscosidade Intrínseca (IV) — Fornecedor': 'Viscosidade IV Laudo (dl/g)',
+  'Análise de impureza': 'Análise de Impureza',
+  'Cor L': 'Cor L (CIELAB)',
+  'Cor b': 'Cor b (CIELAB)',
+  'Teor de Acetaldeído (AA)': 'Teor Acetaldeído AA (ppm)',
+  'Cristalinidade': 'Cristalinidade (% peso)',
+  'Densidade': 'Densidade (g/cm³)',
+  'Ponto de Fusão': 'Ponto de Fusão (°C)'
+};
+
+/* ====================== ESTADO ====================== */
+var DATA = { resina:[], rotulo:[], pigmento:[], cinta:[], tampa:[], produtos:[], especificacoes:{}, rotulosHomologados:[], reclamacoes:[], liberacoes:[], listas:{} };
+var matAtual = 'resina', viewAtual = 'tabela';
+var driveId = null, itemId = null;
+var msalInstance = null, msalPronto = null, contaAtual = null;
+
+/* ====================== TOAST ====================== */
+function mostrarToast(msg, isErr){
+  var host = document.getElementById('toastHost');
+  var el = document.createElement('div');
+  el.className = 'toast ' + (isErr ? 'err' : 'ok');
+  el.textContent = msg;
+  host.appendChild(el);
+  setTimeout(function(){ el.remove(); }, isErr ? 6000 : 3500);
+}
+
+/* ====================== TEMA ====================== */
+function aplicarTema(valor){
+  if (valor === 'auto') { document.documentElement.removeAttribute('data-theme'); }
+  else { document.documentElement.setAttribute('data-theme', valor); }
+  try { localStorage.setItem('tema_sistema_qualidade', valor); } catch(e){}
+  var sel = document.getElementById('temaSelect'); if (sel) sel.value = valor;
+}
+(function(){
+  try {
+    var salvo = localStorage.getItem('tema_sistema_qualidade');
+    if (salvo) aplicarTema(salvo);
+  } catch(e){}
+})();
+
+/* ====================== AUTENTICAÇÃO (MSAL) ====================== */
+if (typeof msal === 'undefined') {
+  document.getElementById('loginMsg').textContent = 'Erro: a biblioteca de login (MSAL) não carregou — provavelmente bloqueada pela rede da empresa. Tente outra rede ou avise o TI para liberar cdn.jsdelivr.net.';
+} else {
+  msalInstance = new msal.PublicClientApplication(msalConfig);
+  msalPronto = msalInstance.initialize();
+
+  async function getToken(){
+    await msalPronto;
+    var req = { scopes: graphScopes, account: contaAtual };
+    try { var res = await msalInstance.acquireTokenSilent(req); return res.accessToken; }
+    catch (e) { var res2 = await msalInstance.acquireTokenPopup(req); return res2.accessToken; }
+  }
+  window.getToken = getToken;
+
+  msalPronto.then(async function(){
+    try { await msalInstance.handleRedirectPromise(); } catch (e) { console.error(e); }
+    var contas = msalInstance.getAllAccounts();
+    if (contas.length > 0) { contaAtual = contas[0]; aposLogin(); }
+  });
+
+  document.getElementById('btnLoginMicrosoft').onclick = async function(){
+    try {
+      await msalPronto;
+      var res = await msalInstance.loginPopup({ scopes: graphScopes });
+      contaAtual = res.account;
+      aposLogin();
+    } catch (e) {
+      document.getElementById('loginMsg').textContent = 'Erro no login: ' + e.message;
+    }
+  };
+}
+
+function sair(){
+  if (msalInstance) msalInstance.logoutRedirect();
+}
+
+function aposLogin(){
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('userEmail').textContent = contaAtual.username;
+  document.getElementById('configUserEmail').textContent = contaAtual.username;
+  document.getElementById('userAvatar').textContent = (contaAtual.username || '?').charAt(0).toUpperCase();
+  conectarPlanilha();
+}
+
+/* ====================== CONEXÃO COM A PLANILHA ====================== */
+function mostrarCarregando(ativo, msg){
+  var ov = document.getElementById('loadingOverlay');
+  ov.classList.toggle('hidden', !ativo);
+  if (msg) document.getElementById('loadingMsg').textContent = msg;
+}
+
+async function conectarPlanilha(){
+  var dot = document.getElementById('statusDot'), label = document.getElementById('statusText');
+  label.textContent = 'conectando…';
+  mostrarCarregando(true, 'Conectando à planilha…');
+  try {
+    if (!LINK_PLANILHA_PADRAO || LINK_PLANILHA_PADRAO.indexOf('COLE_AQUI') === 0) {
+      dot.className = 'status-dot offline'; label.textContent = 'planilha não configurada';
+      mostrarToast('O link da planilha ainda não foi configurado no código (constante LINK_PLANILHA_PADRAO).', true);
+      mostrarCarregando(false);
+      return;
+    }
+    var token = await getToken();
+    var base64 = btoa(LINK_PLANILHA_PADRAO).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+    var sharingId = 'u!' + base64;
+    var resp = await fetch('https://graph.microsoft.com/v1.0/shares/' + sharingId + '/driveItem', { headers: { Authorization: 'Bearer ' + token } });
+    var json = await resp.json();
+    if (json.id) {
+      itemId = json.id; driveId = json.parentReference.driveId;
+      dot.className = 'status-dot online'; label.textContent = 'carregando dados…';
+      mostrarCarregando(true, 'Carregando os dados da planilha…');
+      await carregarTudo();
+      label.textContent = 'conectado';
+    } else {
+      dot.className = 'status-dot offline'; label.textContent = 'erro na planilha';
+      mostrarToast('Não foi possível localizar a planilha. Confira o link em LINK_PLANILHA_PADRAO e se a conta logada tem acesso de edição ao arquivo.', true);
+    }
+  } catch (err) {
+    dot.className = 'status-dot offline'; label.textContent = 'offline';
+    mostrarToast('Erro ao conectar: ' + err.message, true);
+  } finally {
+    mostrarCarregando(false);
+  }
+}
+
+function recarregarTudo(){
+  mostrarCarregando(true, 'Atualizando…');
+  carregarTudo().then(function(){ mostrarToast('Dados atualizados.'); }).catch(function(e){ mostrarToast('Erro ao atualizar: ' + e.message, true); }).finally(function(){ mostrarCarregando(false); });
+}
+
+/* ====================== GRAPH API — TABELAS ====================== */
+function urlTabela(nomeTabela){
+  return 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + nomeTabela;
+}
+async function lerLinhasBrutas(nomeTabela){
+  var token = await getToken();
+  var resp = await fetch(urlTabela(nomeTabela) + '/rows', { headers: { Authorization: 'Bearer ' + token } });
+  var json = await resp.json();
+  if (!resp.ok) throw new Error((json.error && json.error.message) || ('erro ao ler ' + nomeTabela));
+  return json.value || [];
+}
+function linhasParaObjetos(chaveTabela, linhasBrutas){
+  var cols = TABLE_COLS[chaveTabela];
+  return linhasBrutas.map(function(l){
+    var obj = { __index: l.index };
+    cols.forEach(function(h, i){ obj[h] = (l.values && l.values[0] && l.values[0][i] !== undefined) ? l.values[0][i] : ''; });
+    return obj;
+  });
+}
+function objetoParaValores(chaveTabela, obj){
+  return TABLE_COLS[chaveTabela].map(function(h){ return (obj[h] === undefined || obj[h] === null) ? '' : obj[h]; });
+}
+async function adicionarLinha(chaveTabela, obj){
+  var token = await getToken();
+  var valores = objetoParaValores(chaveTabela, obj);
+  var resp = await fetch(urlTabela(TABELAS[chaveTabela]) + '/rows/add', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [valores] })
+  });
+  var json = await resp.json();
+  if (!resp.ok) throw new Error((json.error && json.error.message) || 'erro ao gravar linha');
+  return json;
+}
+async function atualizarLinha(chaveTabela, index, obj){
+  var token = await getToken();
+  var valores = objetoParaValores(chaveTabela, obj);
+  var resp = await fetch(urlTabela(TABELAS[chaveTabela]) + '/rows/itemAt(index=' + index + ')', {
+    method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [valores] })
+  });
+  var json = await resp.json().catch(function(){ return {}; });
+  if (!resp.ok) throw new Error((json.error && json.error.message) || 'erro ao atualizar linha');
+}
+async function excluirLinhaPorIndice(chaveTabela, index){
+  var token = await getToken();
+  var resp = await fetch(urlTabela(TABELAS[chaveTabela]) + '/rows/itemAt(index=' + index + ')/delete', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + token }
+  });
+  if (!resp.ok) { var json = await resp.json().catch(function(){ return {}; }); throw new Error((json.error && json.error.message) || 'erro ao excluir linha'); }
+}
+async function excluirVariasLinhas(chaveTabela, indices){
+  // Apaga do maior índice pro menor — excluir de baixo pra cima evita que o índice das
+  // linhas seguintes mude no meio da operação.
+  var ordenado = indices.slice().sort(function(a,b){ return b - a; });
+  for (var i = 0; i < ordenado.length; i++) { await excluirLinhaPorIndice(chaveTabela, ordenado[i]); }
+}
+
+/* ====================== GRAPH API — UPLOAD DE FOTO ====================== */
+async function uploadArquivo(file, nomeArquivo){
+  var token = await getToken();
+  var ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  var nomeFinal = nomeArquivo + '.' + ext;
+  var caminho = PASTA_FOTOS.split('/').map(encodeURIComponent).join('/') + '/' + encodeURIComponent(nomeFinal);
+  var sessionResp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/root:/' + caminho + ':/createUploadSession', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ item: { '@microsoft.graph.conflictBehavior': 'rename' } })
+  });
+  var session = await sessionResp.json();
+  if (!session.uploadUrl) throw new Error((session.error && session.error.message) || 'não foi possível iniciar o upload');
+  var uploadResp = await fetch(session.uploadUrl, {
+    method: 'PUT', headers: { 'Content-Range': 'bytes 0-' + (file.size - 1) + '/' + file.size }, body: file
+  });
+  var uploadJson = await uploadResp.json();
+  if (!uploadResp.ok) throw new Error((uploadJson.error && uploadJson.error.message) || 'falha no upload da foto');
+  return uploadJson.webUrl || '';
+}
+
+/* ====================== CARREGAR TUDO ====================== */
+async function carregarTudo(){
+  var brutos = await Promise.all([
+    lerLinhasBrutas(TABELAS.resina), lerLinhasBrutas(TABELAS.rotulo), lerLinhasBrutas(TABELAS.pigmento),
+    lerLinhasBrutas(TABELAS.cinta), lerLinhasBrutas(TABELAS.tampa), lerLinhasBrutas(TABELAS.produtos),
+    lerLinhasBrutas(TABELAS.especificacoes), lerLinhasBrutas(TABELAS.rotulosHomologados),
+    lerLinhasBrutas(TABELAS.reclamacoes), lerLinhasBrutas(TABELAS.liberacoes), lerLinhasBrutas(TABELAS.listas)
+  ]);
+  DATA.resina = linhasParaObjetos('resina', brutos[0]);
+  DATA.rotulo = linhasParaObjetos('rotulo', brutos[1]);
+  DATA.pigmento = linhasParaObjetos('pigmento', brutos[2]);
+  DATA.cinta = linhasParaObjetos('cinta', brutos[3]);
+  DATA.tampa = linhasParaObjetos('tampa', brutos[4]);
+  DATA.produtos = linhasParaObjetos('produtos', brutos[5]);
+  var especLinhas = linhasParaObjetos('especificacoes', brutos[6]);
+  DATA.rotulosHomologados = linhasParaObjetos('rotulosHomologados', brutos[7]);
+  DATA.reclamacoes = linhasParaObjetos('reclamacoes', brutos[8]);
+  DATA.liberacoes = linhasParaObjetos('liberacoes', brutos[9]);
+  var listasLinhas = linhasParaObjetos('listas', brutos[10]);
+
+  DATA.especificacoes = montarEspecificacoes(especLinhas);
+  DATA.listas = montarListas(listasLinhas);
+
+  popularDatalists();
+  popularSelectsFixos();
+  renderTudo();
+}
+
+function montarListas(linhas){
+  var obj = {};
+  TABLE_COLS.listas.forEach(function(col){
+    obj[col] = linhas.map(function(l){ return l[col]; }).filter(function(v){ return v !== undefined && v !== null && String(v).trim() !== ''; });
+  });
+  return obj;
+}
+function slugify(s){
+  return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') || ('x-' + Date.now());
+}
+// Transforma a Teste/Especificação/Tolerância de uma linha da planilha no formato
+// estruturado (min/max/tipoResultado) usado pra avaliar Dentro/Fora na hora do recebimento.
+function parseEspecTexto(texto, unidade, criterio){
+  texto = String(texto || '').trim();
+  if (String(unidade || '').trim().toLowerCase() === 'visual') return { tipoResultado: 'visual' };
+  if (criterio === '-' || !criterio) return { tipoResultado: 'na' };
+  if (texto.indexOf('–') > -1) {
+    var partes = texto.split('–').map(function(p){ return parseFloat(p.trim().replace(',', '.')); });
+    if (partes.length === 2 && !isNaN(partes[0]) && !isNaN(partes[1])) return { tipoResultado: 'faixa', min: partes[0], max: partes[1] };
+  }
+  var mMin = texto.match(/m[ií]nimo\s*([\-\d.,]+)/i);
+  if (mMin) { var v = parseFloat(mMin[1].replace(',', '.')); if (!isNaN(v)) return { tipoResultado: 'min', min: v }; }
+  var mMax = texto.match(/m[áa]ximo\s*([\-\d.,]+)/i);
+  if (mMax) { var v2 = parseFloat(mMax[1].replace(',', '.')); if (!isNaN(v2)) return { tipoResultado: 'max', max: v2 }; }
+  // Formato não reconhecido — trata como teste qualitativo (Conforme/Não conforme) em
+  // vez de travar a tela; melhor degradar bem do que quebrar.
+  return { tipoResultado: 'visual' };
+}
+function montarEspecificacoes(linhas){
+  var out = {};
+  var grupos = {}; // chave: material|tipoGrade
+  linhas.forEach(function(l){
+    var matLabel = l['Material'], tipoGrade = l['Tipo/Grade'] || '';
+    var matKey = Object.keys(MAT_LABEL_PLANO).find(function(k){ return MAT_LABEL_PLANO[k] === matLabel; }) || slugify(matLabel);
+    var chave = matKey + '|' + tipoGrade;
+    if (!grupos[chave]) {
+      grupos[chave] = { matKey: matKey, doc: l['Código Documento'], rev: l['Revisão'], data: l['Data Documento'],
+        tipo: { id: slugify(tipoGrade || matKey), nome: tipoGrade ? (MAT_LABEL_PLANO[matKey] || matLabel) + ' (' + tipoGrade + ')' : (MAT_LABEL_PLANO[matKey] || matLabel), tipoGrade: tipoGrade, parametros: [] } };
+    }
+    var parsed = parseEspecTexto(l['Especificação/Tolerância'], l['Unidade'], l['Critério']);
+    grupos[chave].tipo.parametros.push(Object.assign({
+      teste: l['Teste'], unidade: l['Unidade'], nt: l['NT'] || '—', criterio: l['Critério'] || '-', especTexto: l['Especificação/Tolerância']
+    }, parsed));
+  });
+  Object.keys(grupos).forEach(function(chave){
+    var g = grupos[chave];
+    if (!out[g.matKey]) out[g.matKey] = { doc: g.doc, rev: g.rev, data: g.data, tipos: [] };
+    out[g.matKey].tipos.push(g.tipo);
+  });
+  return out;
+}
+function produtoPorCodigo(codigo){ return DATA.produtos.find(function(p){ return p['Código'] === codigo; }); }
+
+function popularDatalists(){
+  document.getElementById('listaFornecedores').innerHTML = (DATA.listas['Fornecedores'] || []).map(function(f){ return '<option value="'+f+'">'; }).join('');
+  document.getElementById('listaResponsaveis').innerHTML = (DATA.listas['Responsaveis'] || []).map(function(f){ return '<option value="'+f+'">'; }).join('');
+}
+function popularSelect(sel, valores, manterSeExistir){
+  var atual = sel.value;
+  sel.innerHTML = valores.map(function(v){ return '<option value="'+v+'">'+v+'</option>'; }).join('');
+  if (manterSeExistir && valores.indexOf(atual) > -1) sel.value = atual;
+}
+function popularSelectsFixos(){
+  popularSelect(document.getElementById('unidadeSelect'), DATA.listas['Unidades'] && DATA.listas['Unidades'].length ? DATA.listas['Unidades'] : ['kg','Unidades','Caixas'], true);
+  popularSelect(document.getElementById('statusRecebimentoSelect'), DATA.listas['Status Recebimento'] && DATA.listas['Status Recebimento'].length ? DATA.listas['Status Recebimento'] : ['Em análise','Aprovado','Reprovado','Quarentena'], true);
+  popularSelect(document.getElementById('conferenciaRotuloSelect'), DATA.listas['Conferencia Visual'] && DATA.listas['Conferencia Visual'].length ? DATA.listas['Conferencia Visual'] : ['Confere','Divergente'], true);
+  popularOpcoesProdutoResina();
+  popularOpcoesModeloRotulo();
+}
+
+/* ====================== HEURÍSTICAS DE STATUS (pra cor do badge) ====================== */
+function statusKey(label){
+  var l = String(label || '').toLowerCase();
+  if (l.indexOf('reprov') > -1) return 'reprovado';
+  if (l.indexOf('aprov') > -1) return 'aprovado';
+  if (l.indexOf('quarent') > -1) return 'quarentena';
+  if (l.indexOf('anal') > -1 || l.indexOf('anál') > -1) return 'analise';
+  if (l.indexOf('abert') > -1) return 'aberta';
+  if (l.indexOf('tratativ') > -1) return 'tratativa';
+  if (l.indexOf('encerr') > -1) return 'encerrada';
+  return 'analise';
+}
+function confereOk(label){ return String(label || '').toLowerCase().indexOf('diverg') === -1; }
+function badgeLabel(label){ return '<span class="badge ' + statusKey(label) + '">' + (label || '—') + '</span>'; }
+function laudoIc(url){ return url ? ('<a class="laudo-ic yes" href="'+url+'" target="_blank" title="Abrir laudo">✓</a>') : '<span class="laudo-ic no" title="Sem laudo">–</span>'; }
+const CLASS_RECLAMACAO_LABEL = { procedente: 'Procedente', improcedente: 'Improcedente' };
+const STATUS_RECLAMACAO_LABEL = { aberta: 'Aberta', tratativa: 'Em tratativa', encerrada: 'Encerrada' };
+const STATUS_LIBERACAO_LABEL = { analise: 'Em análise', aprovado: 'Aprovado', reprovado: 'Reprovado' };
+
+/* ====================== DATAS ====================== */
+function formatarDataBR(isoYYYYMMDD){
+  if (!isoYYYYMMDD) return '';
+  var p = isoYYYYMMDD.split('-');
+  if (p.length !== 3) return isoYYYYMMDD;
+  return p[2] + '/' + p[1] + '/' + p[0];
+}
+function hojeISO(){ var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+
+/* ====================== NAVEGAÇÃO ====================== */
+function irPara(tela){
+  document.querySelectorAll('.segnav button').forEach(function(b){ b.classList.toggle('active', b.dataset.tela === tela); });
+  document.querySelectorAll('.tela').forEach(function(s){ s.classList.toggle('active', s.id === 'tela-' + tela); });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.getElementById('segnav').addEventListener('click', function(e){
+  var btn = e.target.closest('button[data-tela]');
+  if (btn) irPara(btn.dataset.tela);
+});
+
+/* ====================== RENDER GERAL (home, KPIs, atividade) ====================== */
+function contarStatus(lista, chave){ return lista.filter(function(r){ return statusKey(r[chave]) === 'analise'; }).length; }
+function renderHome(){
+  document.getElementById('kpiAnalise').textContent = ['resina','rotulo','pigmento','cinta','tampa'].reduce(function(acc, m){ return acc + DATA[m].filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length; }, 0);
+  document.getElementById('kpiReclamacoes').textContent = DATA.reclamacoes.filter(function(r){ return statusKey(r['Status']) !== 'encerrada'; }).length;
+  document.getElementById('kpiLiberacoes').textContent = DATA.liberacoes.filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length;
+  document.getElementById('kpiQuarentena').textContent = ['resina','rotulo','pigmento','cinta','tampa'].reduce(function(acc, m){ return acc + DATA[m].filter(function(r){ return statusKey(r['Status']) === 'quarentena'; }).length; }, 0);
+  document.getElementById('metaResina').textContent = DATA.resina.length + ' recebimento(s)';
+  document.getElementById('metaRotulo').textContent = DATA.rotulo.length + ' recebimento(s)';
+  document.getElementById('metaPigmento').textContent = DATA.pigmento.length + ' recebimento(s)';
+  document.getElementById('metaCinta').textContent = DATA.cinta.length + ' recebimento(s)';
+  document.getElementById('metaTampa').textContent = DATA.tampa.length + ' recebimento(s)';
+  document.getElementById('metaRotulosHom').textContent = DATA.rotulosHomologados.length + ' modelo(s) cadastrado(s)';
+  var qtdEspec = Object.keys(DATA.especificacoes).reduce(function(a,k){ return a + DATA.especificacoes[k].tipos.length; }, 0);
+  document.getElementById('metaEspec').textContent = qtdEspec + ' ficha(s) cadastrada(s)';
+  document.getElementById('metaProdutos').textContent = DATA.produtos.length + ' produto(s) cadastrado(s)';
+  document.getElementById('metaReclamacoes').textContent = DATA.reclamacoes.filter(function(r){ return statusKey(r['Status']) !== 'encerrada'; }).length + ' em aberto de ' + DATA.reclamacoes.length;
+  document.getElementById('metaLiberacoes').textContent = DATA.liberacoes.filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length + ' aguardando aprovação';
+
+  var atividades = [];
+  var ICS = { resina:'🧪', rotulo:'🏷️', pigmento:'🎨', cinta:'📦', tampa:'📦' };
+  ['resina','rotulo','pigmento','cinta','tampa'].forEach(function(m){
+    DATA[m].forEach(function(r){ atividades.push({ ic: ICS[m], data: r['Data Recebimento'] || r['Data'], t1: MAT_LABEL_PLANO[m] + ' — ' + (r['Fornecedor']||'—'), t2: 'NF ' + (r['Nota Fiscal']||'—') + ' · ' + statusKeyLabelCurto(r['Status']) }); });
+  });
+  DATA.reclamacoes.forEach(function(r){ atividades.push({ ic:'📣', data:r['Data'], t1:'Reclamação de Cliente — ' + (r['Cliente']||'—'), t2:(r['RAC']||'') + ' · ' + statusKeyLabelCurto(r['Status']) }); });
+  DATA.liberacoes.forEach(function(r){ atividades.push({ ic:'⚠️', data:r['Data'], t1:'Liberação Não Conforme — ' + (r['Produto/Processo']||'—'), t2:(r['Número Registro']||'') + ' · ' + statusKeyLabelCurto(r['Status']) }); });
+  atividades.sort(function(a,b){ return dataParaOrdenar(b.data) - dataParaOrdenar(a.data); });
+  var el = document.getElementById('atividadeRecente');
+  if (!atividades.length) { el.innerHTML = '<div class="ae-vazio" style="padding:14px 0; color:var(--fg-faint); font-size:12.5px;">Sem registros ainda.</div>'; return; }
+  el.innerHTML = atividades.slice(0, 8).map(function(a){
+    return '<div class="act-row"><div class="act-ic">'+a.ic+'</div><div class="act-main"><div class="t1">'+a.t1+'</div><div class="t2">'+a.t2+'</div></div><div class="act-date">'+(a.data||'—')+'</div></div>';
+  }).join('');
+}
+function statusKeyLabelCurto(label){ return label || 'sem status'; }
+function dataParaOrdenar(brStr){
+  if (!brStr) return 0;
+  var p = String(brStr).split('/');
+  if (p.length !== 3) return 0;
+  return new Date(p[2], p[1]-1, p[0]).getTime();
+}
+
+function renderTudo(){
+  montarHead(matAtual); atualizarFornecedoresFiltro(); renderRecebimento();
+  renderReclamacoes(); renderLiberacoes(); renderRotulosHomologados();
+  renderEspecificacoes(); renderProdutos(); renderHome();
+  document.getElementById('ctResina').textContent = DATA.resina.length;
+  document.getElementById('ctRotulo').textContent = DATA.rotulo.length;
+  document.getElementById('ctPigmento').textContent = DATA.pigmento.length;
+  document.getElementById('ctCinta').textContent = DATA.cinta.length;
+  document.getElementById('ctTampa').textContent = DATA.tampa.length;
+  document.getElementById('ctReclamacoes').textContent = DATA.reclamacoes.length;
+  document.getElementById('ctLiberacoes').textContent = DATA.liberacoes.length;
+  document.getElementById('ctRotulosHom').textContent = DATA.rotulosHomologados.length;
+  var qtdEspec = Object.keys(DATA.especificacoes).reduce(function(a,k){ return a + DATA.especificacoes[k].tipos.length; }, 0);
+  document.getElementById('ctEspecificacoes').textContent = qtdEspec;
+  document.getElementById('ctProdutos').textContent = DATA.produtos.length;
+}
+
+/* ====================== RECEBIMENTO ====================== */
+function fornecedoresDe(mat){
+  var set = {}; DATA[mat].forEach(function(r){ if (r['Fornecedor']) set[r['Fornecedor']] = true; });
+  return Object.keys(set);
+}
+function montarHead(mat){
+  var cols;
+  if (mat === 'resina') cols = ['Data','Lote interno','Lote fornecedor','Produto','Tipo/grade','Quantidade','Viscosidade (Blowpet)','Nota fiscal','Laudo','Status','Responsável'];
+  else { cols = ['Data','Nota fiscal','Fornecedor','Lote','Quantidade']; if (mat === 'rotulo') cols.push('Conferência'); cols.push('Laudo','Status','Responsável'); }
+  document.getElementById('theadRow').innerHTML = cols.map(function(c){ return '<th>'+c+'</th>'; }).join('');
+}
+function linhasFiltradas(){
+  var mat = matAtual, status = document.getElementById('fStatus').value, fornecedor = document.getElementById('fFornecedor').value,
+      busca = document.getElementById('fBusca').value.trim().toLowerCase();
+  return DATA[mat].filter(function(r){
+    if (status && statusKey(r['Status']) !== status) return false;
+    if (fornecedor && r['Fornecedor'] !== fornecedor) return false;
+    if (busca){
+      var alvos = mat === 'resina' ? [r['Nota Fiscal'], r['Lote Interno'], r['Lote Fornecedor'], r['Fornecedor']] : [r['Nota Fiscal'], r['Lote'], r['Fornecedor']];
+      if (!alvos.some(function(v){ return v && String(v).toLowerCase().indexOf(busca) > -1; })) return false;
+    }
+    return true;
+  });
+}
+function linhaResina(r){
+  return '<tr>'+
+    '<td class="cell-dim tabular">'+(r['Data Recebimento']||'')+'</td>'+
+    '<td class="mono">'+(r['Lote Interno']||'')+'</td>'+
+    '<td class="mono cell-dim">'+(r['Lote Fornecedor']||'')+'</td>'+
+    '<td>'+(r['Descrição Produto']||r['Código Produto']||'')+'<div class="cell-dim" style="font-size:11px;">'+(r['Código Produto']||'')+' · '+(r['Fornecedor']||'')+'</div></td>'+
+    '<td><span class="pill">'+(r['Tipo/Grade']||'')+'</span></td>'+
+    '<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'+
+    '<td class="mono tabular">'+(r['Viscosidade IV Blowpet (dl/g)']||'—')+'</td>'+
+    '<td class="mono">'+(r['Nota Fiscal']||'')+'</td>'+
+    '<td>'+laudoIc(r['Arquivo do Laudo'])+'</td>'+
+    '<td>'+badgeLabel(r['Status'])+'</td>'+
+    '<td class="cell-dim">'+(r['Responsável']||'')+'</td>'+
+  '</tr>';
+}
+function cardResina(r){
+  return '<div class="rcard">'+
+    '<div class="top"><div><div class="fornecedor">'+(r['Descrição Produto']||r['Código Produto']||'')+' <span class="pill">'+(r['Tipo/Grade']||'')+'</span></div><div class="lote mono">'+(r['Lote Interno']||'')+' · lote forn. '+(r['Lote Fornecedor']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
+    '<dl><div><dt>Data</dt><dd class="tabular">'+(r['Data Recebimento']||'')+'</dd></div><div><dt>Nota fiscal</dt><dd class="mono">'+(r['Nota Fiscal']||'')+'</dd></div>'+
+    '<div><dt>Quantidade</dt><dd class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</dd></div><div><dt>Viscosidade</dt><dd class="mono">'+(r['Viscosidade IV Blowpet (dl/g)']||'—')+' dl/g</dd></div></dl>'+
+    '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span></div>'+
+  '</div>';
+}
+function renderRecebimentoTabela(){
+  var rows = linhasFiltradas(), mat = matAtual;
+  if (!rows.length) { document.getElementById('tbody').innerHTML = '<tr><td colspan="12" class="empty-note">Nenhum recebimento encontrado com esses filtros.</td></tr>'; return; }
+  if (mat === 'resina') { document.getElementById('tbody').innerHTML = rows.map(linhaResina).join(''); return; }
+  document.getElementById('tbody').innerHTML = rows.map(function(r){
+    var cells = ['<td class="cell-dim tabular">'+(r['Data']||'')+'</td>','<td class="mono">'+(r['Nota Fiscal']||'')+'</td>','<td>'+(r['Fornecedor']||'')+'</td>','<td class="mono cell-dim">'+(r['Lote']||'')+'</td>','<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'];
+    if (mat === 'rotulo') cells.push('<td class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</td>');
+    cells.push('<td>'+laudoIc(r['Arquivo do Laudo'])+'</td>','<td>'+badgeLabel(r['Status'])+'</td>','<td class="cell-dim">'+(r['Responsável']||'')+'</td>');
+    return '<tr>'+cells.join('')+'</tr>';
+  }).join('');
+}
+function renderRecebimentoCards(){
+  var rows = linhasFiltradas(), mat = matAtual, el = document.getElementById('viewCards');
+  if (!rows.length) { el.innerHTML = '<div class="empty-note" style="grid-column:1/-1;">Nenhum recebimento encontrado com esses filtros.</div>'; return; }
+  if (mat === 'resina') { el.innerHTML = rows.map(cardResina).join(''); return; }
+  el.innerHTML = rows.map(function(r){
+    var extra = mat === 'rotulo' ? ('<div><dt>Conferência</dt><dd class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</dd></div>') : ('<div><dt>Laudo</dt><dd>'+(r['Arquivo do Laudo']?'Anexado':'—')+'</dd></div>');
+    return '<div class="rcard">'+
+      '<div class="top"><div><div class="fornecedor">'+(r['Fornecedor']||'')+'</div><div class="lote mono">'+(r['Lote']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
+      '<dl><div><dt>Data</dt><dd class="tabular">'+(r['Data']||'')+'</dd></div><div><dt>Nota fiscal</dt><dd class="mono">'+(r['Nota Fiscal']||'')+'</dd></div>'+
+      '<div><dt>Quantidade</dt><dd class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</dd></div>'+extra+'</dl>'+
+      '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span></div>'+
+    '</div>';
+  }).join('');
+}
+function renderRecebimento(){ renderRecebimentoTabela(); renderRecebimentoCards(); }
+function atualizarFornecedoresFiltro(){
+  var sel = document.getElementById('fFornecedor'), atual = sel.value, lista = fornecedoresDe(matAtual);
+  sel.innerHTML = '<option value="">Todos</option>' + lista.map(function(f){ return '<option value="'+f+'">'+f+'</option>'; }).join('');
+  sel.value = lista.indexOf(atual) > -1 ? atual : '';
+}
+function escolherMaterial(mat){
+  matAtual = mat;
+  document.querySelectorAll('.mat-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.mat === mat); });
+  document.getElementById('matTitle').textContent = MAT_LABEL[mat];
+  document.getElementById('fStatus').value = ''; document.getElementById('fBusca').value = '';
+  montarHead(mat); atualizarFornecedoresFiltro(); renderRecebimento();
+}
+function abrirMaterial(mat){ if (!document.getElementById('tela-lista').classList.contains('active')) irPara('lista'); escolherMaterial(mat); }
+document.querySelectorAll('.mat-btn').forEach(function(btn){ btn.addEventListener('click', function(){ abrirMaterial(btn.dataset.mat); }); });
+['fStatus','fFornecedor'].forEach(function(id){ document.getElementById(id).addEventListener('change', renderRecebimento); });
+document.getElementById('fBusca').addEventListener('input', renderRecebimento);
+document.querySelectorAll('.view-toggle button').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.view-toggle button').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active'); viewAtual = btn.dataset.view;
+    document.getElementById('viewTabela').style.display = viewAtual === 'tabela' ? '' : 'none';
+    document.getElementById('viewCards').style.display = viewAtual === 'cards' ? '' : 'none';
+  });
+});
+
+/* ====================== RECLAMAÇÃO DE CLIENTE ====================== */
+function renderReclamacoes(){
+  var status = document.getElementById('fStatusReclamacao').value, classif = document.getElementById('fClassReclamacao').value,
+      busca = document.getElementById('fBuscaReclamacao').value.trim().toLowerCase();
+  var rows = DATA.reclamacoes.filter(function(r){
+    if (status && statusKey(r['Status']) !== status) return false;
+    if (classif && String(r['Classificação']).toLowerCase() !== CLASS_RECLAMACAO_LABEL[classif].toLowerCase()) return false;
+    if (busca && !((r['RAC']||'').toLowerCase().indexOf(busca) > -1 || (r['Cliente']||'').toLowerCase().indexOf(busca) > -1 || (r['Produto']||'').toLowerCase().indexOf(busca) > -1)) return false;
+    return true;
+  });
+  var tbody = document.getElementById('tbodyReclamacao');
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-note">Nenhuma reclamação encontrada com esses filtros.</td></tr>'; return; }
+  tbody.innerHTML = rows.map(function(r){
+    var improc = String(r['Classificação']||'').toLowerCase().indexOf('improc') > -1;
+    return '<tr><td class="mono">'+(r['RAC']||'')+'</td><td class="cell-dim tabular">'+(r['Data']||'')+'</td><td>'+(r['Cliente']||'')+'</td><td>'+(r['Produto']||'')+'</td><td class="cell-dim">'+(r['Motivo']||'')+'</td>'+
+      '<td class="conf '+(improc?'ok':'div')+'">'+(r['Classificação']||'')+'</td>'+
+      '<td>'+badgeLabel(r['Status'])+'</td><td class="cell-dim">'+(r['Responsável']||'')+'</td></tr>';
+  }).join('');
+}
+['fStatusReclamacao','fClassReclamacao'].forEach(function(id){ document.getElementById(id).addEventListener('change', renderReclamacoes); });
+document.getElementById('fBuscaReclamacao').addEventListener('input', renderReclamacoes);
+
+function proximoNumero(lista, campo, prefixo, digitos){
+  var max = 0;
+  lista.forEach(function(r){ var v = r[campo]; if (v && String(v).indexOf(prefixo) === 0) { var n = parseInt(String(v).split('-')[1], 10); if (!isNaN(n) && n > max) max = n; } });
+  return prefixo + '-' + String(max + 1).padStart(digitos, '0');
+}
+function abrirModalReclamacao(){
+  document.getElementById('reclamacaoDataInput').value = hojeISO();
+  document.getElementById('reclamacaoClienteInput').value = '';
+  document.getElementById('reclamacaoProdutoInput').value = '';
+  document.getElementById('reclamacaoMotivoInput').value = '';
+  document.getElementById('reclamacaoClassSelect').value = 'procedente';
+  document.getElementById('reclamacaoStatusSelect').value = 'aberta';
+  document.getElementById('reclamacaoRespInput').value = '';
+  document.getElementById('reclamacaoObsInput').value = '';
+  document.getElementById('saveMsgReclamacao').textContent = '';
+  document.getElementById('modalReclamacao').classList.remove('hidden');
+}
+function fecharModalReclamacao(){ document.getElementById('modalReclamacao').classList.add('hidden'); }
+document.getElementById('modalReclamacao').addEventListener('click', function(e){ if (e.target.id === 'modalReclamacao') fecharModalReclamacao(); });
+async function salvarReclamacao(){
+  var cliente = document.getElementById('reclamacaoClienteInput').value.trim();
+  if (!cliente) { document.getElementById('saveMsgReclamacao').textContent = 'Informe o cliente.'; document.getElementById('saveMsgReclamacao').className = 'save-msg err'; return; }
+  var msg = document.getElementById('saveMsgReclamacao'); msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    var rac = proximoNumero(DATA.reclamacoes, 'RAC', 'RAC', 4);
+    await adicionarLinha('reclamacoes', {
+      'RAC': rac, 'Data': formatarDataBR(document.getElementById('reclamacaoDataInput').value), 'Cliente': cliente,
+      'Produto': document.getElementById('reclamacaoProdutoInput').value.trim(), 'Motivo': document.getElementById('reclamacaoMotivoInput').value.trim(),
+      'Classificação': CLASS_RECLAMACAO_LABEL[document.getElementById('reclamacaoClassSelect').value],
+      'Status': STATUS_RECLAMACAO_LABEL[document.getElementById('reclamacaoStatusSelect').value],
+      'Responsável': document.getElementById('reclamacaoRespInput').value.trim(), 'Observações': document.getElementById('reclamacaoObsInput').value.trim()
+    });
+    DATA.reclamacoes = linhasParaObjetos('reclamacoes', await lerLinhasBrutas(TABELAS.reclamacoes));
+    renderReclamacoes(); renderHome();
+    document.getElementById('ctReclamacoes').textContent = DATA.reclamacoes.length;
+    mostrarToast(rac + ' salva com sucesso.');
+    fecharModalReclamacao();
+  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+}
+
+/* ====================== LIBERAÇÃO NÃO CONFORME ====================== */
+function renderLiberacoes(){
+  var status = document.getElementById('fStatusLiberacao').value, busca = document.getElementById('fBuscaLiberacao').value.trim().toLowerCase();
+  var rows = DATA.liberacoes.filter(function(r){
+    if (status && statusKey(r['Status']) !== status) return false;
+    if (busca && !((r['Número Registro']||'').toLowerCase().indexOf(busca) > -1 || (r['Produto/Processo']||'').toLowerCase().indexOf(busca) > -1)) return false;
+    return true;
+  });
+  var tbody = document.getElementById('tbodyLiberacao');
+  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-note">Nenhum registro encontrado com esses filtros.</td></tr>'; return; }
+  tbody.innerHTML = rows.map(function(r){
+    return '<tr><td class="mono">'+(r['Número Registro']||'')+'</td><td class="cell-dim tabular">'+(r['Data']||'')+'</td><td>'+(r['Produto/Processo']||'')+'</td><td class="cell-dim">'+(r['Não Conformidade']||'')+'</td>'+
+      '<td><span class="pill">'+(r['Decisão']||'')+'</span></td><td class="tabular">'+(r['Quantidade Liberada']||'')+'</td><td class="cell-dim">'+(r['Responsável']||'')+'</td>'+
+      '<td>'+badgeLabel(r['Status'])+'</td></tr>';
+  }).join('');
+}
+document.getElementById('fStatusLiberacao').addEventListener('change', renderLiberacoes);
+document.getElementById('fBuscaLiberacao').addEventListener('input', renderLiberacoes);
+
+function abrirModalLiberacao(){
+  document.getElementById('liberacaoDataInput').value = hojeISO();
+  document.getElementById('liberacaoQtdInput').value = '';
+  document.getElementById('liberacaoProdutoInput').value = '';
+  document.getElementById('liberacaoNcInput').value = '';
+  document.getElementById('liberacaoDecisaoInput').value = '';
+  document.getElementById('liberacaoStatusSelect').value = 'analise';
+  document.getElementById('liberacaoRespInput').value = '';
+  document.getElementById('liberacaoObsInput').value = '';
+  document.getElementById('saveMsgLiberacao').textContent = '';
+  document.getElementById('modalLiberacao').classList.remove('hidden');
+}
+function fecharModalLiberacao(){ document.getElementById('modalLiberacao').classList.add('hidden'); }
+document.getElementById('modalLiberacao').addEventListener('click', function(e){ if (e.target.id === 'modalLiberacao') fecharModalLiberacao(); });
+async function salvarLiberacao(){
+  var produto = document.getElementById('liberacaoProdutoInput').value.trim();
+  if (!produto) { document.getElementById('saveMsgLiberacao').textContent = 'Informe o produto/processo.'; document.getElementById('saveMsgLiberacao').className = 'save-msg err'; return; }
+  var msg = document.getElementById('saveMsgLiberacao'); msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    var numero = proximoNumero(DATA.liberacoes, 'Número Registro', 'LNC', 3);
+    await adicionarLinha('liberacoes', {
+      'Número Registro': numero, 'Data': formatarDataBR(document.getElementById('liberacaoDataInput').value), 'Produto/Processo': produto,
+      'Não Conformidade': document.getElementById('liberacaoNcInput').value.trim(), 'Decisão': document.getElementById('liberacaoDecisaoInput').value.trim(),
+      'Quantidade Liberada': document.getElementById('liberacaoQtdInput').value.trim(),
+      'Responsável': document.getElementById('liberacaoRespInput').value.trim(),
+      'Status': STATUS_LIBERACAO_LABEL[document.getElementById('liberacaoStatusSelect').value],
+      'Observações': document.getElementById('liberacaoObsInput').value.trim()
+    });
+    DATA.liberacoes = linhasParaObjetos('liberacoes', await lerLinhasBrutas(TABELAS.liberacoes));
+    renderLiberacoes(); renderHome();
+    document.getElementById('ctLiberacoes').textContent = DATA.liberacoes.length;
+    mostrarToast(numero + ' salvo com sucesso.');
+    fecharModalLiberacao();
+  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+}
+
+/* ====================== NOVO RECEBIMENTO ====================== */
+function abrirModalCadastro(){
+  document.getElementById('dataRecebimentoInput').value = hojeISO();
+  document.getElementById('notaFiscalInput').value = '';
+  document.getElementById('loteGenericoInput').value = '';
+  document.getElementById('quantidadeInput').value = '';
+  document.getElementById('fornecedorGenericoInput').value = '';
+  document.getElementById('responsavelInput').value = '';
+  document.getElementById('observacoesInput').value = '';
+  document.getElementById('laudoFile').value = '';
+  document.getElementById('laudoFileLabel').textContent = 'Anexar laudo';
+  document.getElementById('saveMsgRecebimento').textContent = '';
+  document.getElementById('modalCadastro').classList.remove('hidden');
+  atualizarCamposMaterial();
+}
+function fecharModalCadastro(){ document.getElementById('modalCadastro').classList.add('hidden'); }
+document.getElementById('modalCadastro').addEventListener('click', function(e){ if (e.target.id === 'modalCadastro') fecharModalCadastro(); });
+
+function popularOpcoesProdutoResina(){
+  var sel = document.getElementById('produtoResinaSelect'), atual = sel.value;
+  sel.innerHTML = DATA.produtos.map(function(p){ return '<option value="'+p['Código']+'">'+p['Descrição']+' — '+p['Código']+'</option>'; }).join('');
+  sel.value = produtoPorCodigo(atual) ? atual : (DATA.produtos[0] ? DATA.produtos[0]['Código'] : '');
+}
+function popularOpcoesModeloRotulo(){
+  var sel = document.getElementById('modeloRotuloSelect'), atual = sel.value;
+  sel.innerHTML = DATA.rotulosHomologados.map(function(r){ return '<option value="'+r['ID']+'">'+r['Nome do Modelo']+'</option>'; }).join('');
+  sel.value = DATA.rotulosHomologados.some(function(r){ return r['ID'] === atual; }) ? atual : (DATA.rotulosHomologados[0] ? DATA.rotulosHomologados[0]['ID'] : '');
+}
+function popularTiposResina(){
+  var sel = document.getElementById('tipoResinaSelect'), atual = sel.value;
+  var espec = DATA.especificacoes['resina'];
+  var opcoes = (espec && espec.tipos.length) ? espec.tipos.map(function(t){ return {id: t.id, nome: t.tipoGrade || t.nome}; })
+    : (DATA.listas['Tipo Grade Lote'] && DATA.listas['Tipo Grade Lote'].length ? DATA.listas['Tipo Grade Lote'].map(function(v){ return {id: slugify(v), nome: v}; }) : [{id:'prime', nome:'Prime'},{id:'off', nome:'OFF'}]);
+  sel.innerHTML = opcoes.map(function(o){ return '<option value="'+o.id+'">'+o.nome+'</option>'; }).join('');
+  if (opcoes.some(function(o){ return o.id === atual; })) sel.value = atual;
+}
+function atualizarCamposMaterial(){
+  var mat = document.getElementById('materialSelect').value;
+  var ehResina = mat === 'resina';
+  document.getElementById('campoModeloRotulo').style.display = mat === 'rotulo' ? '' : 'none';
+  document.getElementById('campoConferenciaRotulo').style.display = mat === 'rotulo' ? '' : 'none';
+  document.getElementById('secaoRotulo').style.display = mat === 'rotulo' ? '' : 'none';
+  // Os campos de Produto/Lote Fornecedor/Lote Interno são específicos do esquema de
+  // identidade de lote da Resina PET (código do produto + sequencial) — mesmo que outro
+  // material ganhe uma especificação cadastrada no futuro, esses campos continuam só da
+  // Resina; o que generaliza pra qualquer material com especificação é a seção de Medições.
+  document.getElementById('campoFornecedorGenerico').style.display = ehResina ? 'none' : '';
+  document.getElementById('campoLoteGenerico').style.display = ehResina ? 'none' : '';
+  document.getElementById('campoProdutoResina').style.display = ehResina ? '' : 'none';
+  document.getElementById('campoLoteFornecedorResina').style.display = ehResina ? '' : 'none';
+  document.getElementById('campoLoteInternoResina').style.display = ehResina ? '' : 'none';
+  document.getElementById('campoTipoResina').style.display = ehResina ? '' : 'none';
+  // A planilha só tem colunas de medição (Viscosidade, Cor, etc.) na aba de Resina PET —
+  // por isso a seção de Medições, por ora, só aparece pra Resina. Se outro material ganhar
+  // colunas de medição no futuro, esta tela e a aba correspondente precisam crescer juntas.
+  document.getElementById('secaoResina').style.display = ehResina ? '' : 'none';
+  if (mat === 'rotulo') { popularOpcoesModeloRotulo(); atualizarPreviaRotulo(); }
+  if (ehResina) { popularTiposResina(); document.getElementById('loteFornecedorInput').value = ''; verificarLoteExistente(); }
+  else { selecionarStatusPorChave('analise'); }
+}
+document.getElementById('materialSelect').addEventListener('change', atualizarCamposMaterial);
+document.getElementById('modeloRotuloSelect').addEventListener('change', atualizarPreviaRotulo);
+function atualizarPreviaRotulo(){
+  var sel = document.getElementById('modeloRotuloSelect');
+  var r = DATA.rotulosHomologados.find(function(x){ return x['ID'] === sel.value; });
+  document.getElementById('previaRotuloNome').textContent = r ? r['Nome do Modelo'] : 'Nenhum rótulo homologado cadastrado ainda.';
+  document.getElementById('previaRotuloImg').src = (r && r['Arquivo da Foto']) ? r['Arquivo da Foto'] : '';
+  document.getElementById('previaRotuloImg').style.display = (r && r['Arquivo da Foto']) ? '' : 'none';
+}
+
+function selecionarStatusPorChave(chave){
+  var sel = document.getElementById('statusRecebimentoSelect');
+  for (var i = 0; i < sel.options.length; i++) { if (statusKey(sel.options[i].value) === chave) { sel.value = sel.options[i].value; return; } }
+}
+function sugerirStatusRecebimento(){
+  var mat = document.getElementById('materialSelect').value;
+  if (mat === 'rotulo') { selecionarStatusPorChave(confereOk(document.getElementById('conferenciaRotuloSelect').value) ? 'aprovado' : 'analise'); return; }
+  if (!DATA.especificacoes[mat]) return;
+  var paramsL = ESPEC_PARAMS_ATUAL.filter(function(p){ return p.criterio === 'L'; });
+  if (!paramsL.length) return;
+  var algumFora = false, algumVazio = false;
+  paramsL.forEach(function(p, i){
+    var idx = ESPEC_PARAMS_ATUAL.indexOf(p);
+    var el = document.getElementById('medResultado_' + idx);
+    var resultado = el ? avaliarParametro(p, el.value) : null;
+    if (resultado === 'fora') algumFora = true;
+    if (resultado === null) algumVazio = true;
+  });
+  selecionarStatusPorChave(algumFora ? 'reprovado' : (algumVazio ? 'analise' : 'aprovado'));
+}
+
+/* ---- lote interno x entrada (resina) ---- */
+var loteResinaExistente = null;
+function proximoLoteInterno(codigo){
+  var max = 0;
+  DATA.resina.forEach(function(r){ if (r['Código Produto'] === codigo && r['Lote Interno']) { var n = parseInt(String(r['Lote Interno']).split('-')[1], 10); if (!isNaN(n) && n > max) max = n; } });
+  return codigo + '-' + (max + 1);
+}
+function buscarLoteExistente(codigo, loteForn){
+  return DATA.resina.find(function(r){ return r['Código Produto'] === codigo && String(r['Lote Fornecedor']).trim() === String(loteForn).trim(); });
+}
+function medicoesDeLinha(row){
+  var m = {};
+  Object.keys(PARAM_COL_MAP).forEach(function(teste){ var col = PARAM_COL_MAP[teste]; if (row[col] !== undefined && row[col] !== '') m[teste] = row[col]; });
+  return m;
+}
+function habilitarMedicoes(editavel){ document.querySelectorAll('#tbodyMedicoes input, #tbodyMedicoes select').forEach(function(el){ el.disabled = !editavel; }); }
+function verificarLoteExistente(){
+  var codigo = document.getElementById('produtoResinaSelect').value, loteForn = document.getElementById('loteFornecedorInput').value.trim();
+  var display = document.getElementById('loteInternoDisplay'), nota = document.getElementById('loteInternoNota'), tipoSel = document.getElementById('tipoResinaSelect');
+  if (!loteForn){
+    loteResinaExistente = null; display.value = '—';
+    nota.textContent = 'Informe o lote do fornecedor pra ver o lote interno.'; nota.className = 'med-note';
+    tipoSel.disabled = false; renderMedicoes(null); habilitarMedicoes(true); return;
+  }
+  var existente = buscarLoteExistente(codigo, loteForn);
+  if (existente){
+    loteResinaExistente = existente; display.value = existente['Lote Interno'];
+    nota.textContent = 'Lote já cadastrado (primeira entrada em ' + existente['Data Recebimento'] + ') — resultado da análise herdado, não precisa lançar de novo.';
+    nota.className = 'med-note ok-note';
+    popularTiposResina();
+    var tipoId = slugify(existente['Tipo/Grade']);
+    if (Array.prototype.some.call(tipoSel.options, function(o){ return o.value === tipoId; })) tipoSel.value = tipoId;
+    tipoSel.disabled = true; renderMedicoes(existente); habilitarMedicoes(false);
+  } else {
+    loteResinaExistente = null; display.value = proximoLoteInterno(codigo) + ' (novo — gerado ao salvar)';
+    nota.textContent = 'Lote novo pra esse produto — o lote interno é gerado automaticamente ao salvar, e a análise completa é obrigatória.'; nota.className = 'med-note';
+    tipoSel.disabled = false; renderMedicoes(null); habilitarMedicoes(true);
+  }
+  sugerirStatusRecebimento();
+}
+
+/* ---- medições (L / C / QA) ---- */
+var ESPEC_PARAMS_ATUAL = [];
+function parseNum(v){ if (v === undefined || v === null || v === '') return NaN; return parseFloat(String(v).replace(',', '.')); }
+function avaliarParametro(p, valorRaw){
+  if (p.tipoResultado === 'visual') { if (valorRaw === 'conforme') return 'dentro'; if (valorRaw === 'nao-conforme') return 'fora'; return null; }
+  if (p.tipoResultado === 'na') return null;
+  var v = parseNum(valorRaw); if (isNaN(v)) return null;
+  if (p.min !== undefined && v < p.min) return 'fora';
+  if (p.max !== undefined && v > p.max) return 'fora';
+  return 'dentro';
+}
+function renderMedicoes(entradaExistente){
+  var mat = document.getElementById('materialSelect').value, espec = DATA.especificacoes[mat];
+  if (!espec) { document.getElementById('tbodyMedicoes').innerHTML = ''; ESPEC_PARAMS_ATUAL = []; return; }
+  // Só a Resina tem seletor de tipo/grade na tela; pros demais materiais usa a primeira
+  // (única, por ora) ficha cadastrada pra esse material.
+  var tipo;
+  if (mat === 'resina') { var tipoSel = document.getElementById('tipoResinaSelect'); tipo = espec.tipos.find(function(t){ return t.id === tipoSel.value; }) || espec.tipos[0]; }
+  else { tipo = espec.tipos[0]; }
+  if (!tipo) { document.getElementById('tbodyMedicoes').innerHTML = '<tr><td class="empty-note" colspan="5">Nenhuma especificação cadastrada pra esse material ainda.</td></tr>'; ESPEC_PARAMS_ATUAL = []; return; }
+  ESPEC_PARAMS_ATUAL = tipo.parametros.filter(function(p){ return p.criterio !== '-'; });
+  document.getElementById('medicoesFichaLabel').textContent = (espec.doc || '') + ' · ' + tipo.nome;
+  document.getElementById('tbodyMedicoes').innerHTML = ESPEC_PARAMS_ATUAL.map(function(p, idx){
+    var valorPrevio = (entradaExistente ? medicoesDeLinha(entradaExistente)[p.teste] : '') || '';
+    var inputHtml;
+    if (p.tipoResultado === 'visual'){
+      inputHtml = '<select id="medResultado_'+idx+'" onchange="atualizarStatusMedicao('+idx+')">'+
+        '<option value="">—</option>'+
+        '<option value="conforme"'+(valorPrevio==='conforme'?' selected':'')+'>Conforme</option>'+
+        '<option value="nao-conforme"'+(valorPrevio==='nao-conforme'?' selected':'')+'>Não conforme</option></select>';
+    } else {
+      inputHtml = '<input id="medResultado_'+idx+'" type="text" inputmode="decimal" value="'+valorPrevio+'" placeholder="'+(p.criterio==='QA'?'Valor do laudo':'Resultado')+'" oninput="atualizarStatusMedicao('+idx+')">';
+    }
+    return '<tr><td><span class="badge-crit '+p.criterio+'">'+p.criterio+'</span></td><td>'+p.teste+' <span class="cell-dim">('+(p.unidade||'')+')</span></td>'+
+      '<td class="cell-dim">'+(p.especTexto||'')+'</td><td>'+inputHtml+'</td><td><span id="medStatus_'+idx+'" class="badge nd">—</span></td></tr>';
+  }).join('');
+  ESPEC_PARAMS_ATUAL.forEach(function(p, idx){ atualizarStatusMedicao(idx); });
+}
+function atualizarStatusMedicao(idx){
+  var p = ESPEC_PARAMS_ATUAL[idx], el = document.getElementById('medResultado_'+idx); if (!el) return;
+  var resultado = avaliarParametro(p, el.value), statusEl = document.getElementById('medStatus_'+idx);
+  if (resultado === 'dentro') { statusEl.className = 'badge aprovado'; statusEl.textContent = 'Dentro'; }
+  else if (resultado === 'fora') { statusEl.className = 'badge reprovado'; statusEl.textContent = 'Fora'; }
+  else { statusEl.className = 'badge nd'; statusEl.textContent = '—'; }
+  sugerirStatusRecebimento();
+}
+
+async function salvarRecebimento(){
+  var mat = document.getElementById('materialSelect').value;
+  var btn = document.getElementById('btnSalvarRecebimento'), msg = document.getElementById('saveMsgRecebimento');
+  var dataISO = document.getElementById('dataRecebimentoInput').value;
+  if (!dataISO) { msg.className = 'save-msg err'; msg.textContent = 'Informe a data do recebimento.'; return; }
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    var laudoUrl = '';
+    var laudoFile = document.getElementById('laudoFile').files[0];
+    if (laudoFile) {
+      msg.textContent = 'Enviando foto do laudo…';
+      var nomeBase = 'Laudo_' + mat + '_' + Date.now();
+      laudoUrl = await uploadArquivo(laudoFile, nomeBase);
+    }
+    var dataBR = formatarDataBR(dataISO);
+    var obs = document.getElementById('observacoesInput').value.trim();
+    var statusTexto = document.getElementById('statusRecebimentoSelect').value;
+
+    if (mat === 'resina') {
+      var codigo = document.getElementById('produtoResinaSelect').value;
+      var produto = produtoPorCodigo(codigo);
+      var loteForn = document.getElementById('loteFornecedorInput').value.trim();
+      if (!loteForn) { throw new Error('Informe o lote do fornecedor.'); }
+      var loteInterno = loteResinaExistente ? loteResinaExistente['Lote Interno'] : proximoLoteInterno(codigo);
+      var medicoes = {}, extras = [];
+      ESPEC_PARAMS_ATUAL.forEach(function(p, idx){
+        var el = document.getElementById('medResultado_' + idx);
+        var val = el ? el.value : '';
+        if (PARAM_COL_MAP[p.teste]) medicoes[PARAM_COL_MAP[p.teste]] = val;
+        else if (val) extras.push(p.teste + ': ' + val);
+      });
+      var row = {
+        'Lote Interno': loteInterno, 'Data Recebimento': dataBR, 'Código Produto': codigo,
+        'Descrição Produto': produto ? produto['Descrição'] : '', 'Lote Fornecedor': loteForn,
+        'Tipo/Grade': (function(){ var sel=document.getElementById('tipoResinaSelect'); return sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent : sel.value; })(),
+        'Fornecedor': produto ? produto['Fornecedor'] : '', 'Nota Fiscal': document.getElementById('notaFiscalInput').value.trim(),
+        'Quantidade': document.getElementById('quantidadeInput').value.trim(), 'Unidade': document.getElementById('unidadeSelect').value,
+        'Laudo Anexado': laudoUrl ? 'Sim' : 'Não', 'Arquivo do Laudo': laudoUrl, 'Status': statusTexto,
+        'Responsável': document.getElementById('responsavelInput').value.trim(), 'Observações': obs + (extras.length ? (' | ' + extras.join('; ')) : '')
+      };
+      Object.keys(medicoes).forEach(function(col){ row[col] = medicoes[col]; });
+      await adicionarLinha('resina', row);
+      DATA.resina = linhasParaObjetos('resina', await lerLinhasBrutas(TABELAS.resina));
+      mostrarToast('Recebimento ' + loteInterno + ' salvo com sucesso.');
+    } else {
+      var tableKey = mat;
+      var row2 = {
+        'Data': dataBR, 'Nota Fiscal': document.getElementById('notaFiscalInput').value.trim(),
+        'Fornecedor': document.getElementById('fornecedorGenericoInput').value.trim(), 'Lote': document.getElementById('loteGenericoInput').value.trim(),
+        'Quantidade': document.getElementById('quantidadeInput').value.trim(), 'Unidade': document.getElementById('unidadeSelect').value,
+        'Laudo Anexado': laudoUrl ? 'Sim' : 'Não', 'Arquivo do Laudo': laudoUrl, 'Status': statusTexto,
+        'Responsável': document.getElementById('responsavelInput').value.trim(), 'Observações': obs
+      };
+      if (mat === 'rotulo') {
+        var modeloSel = document.getElementById('modeloRotuloSelect');
+        var modeloNome = modeloSel.options[modeloSel.selectedIndex] ? modeloSel.options[modeloSel.selectedIndex].textContent : '';
+        row2['Modelo do Rótulo'] = modeloNome;
+        row2['Conferência Visual'] = document.getElementById('conferenciaRotuloSelect').value;
+      }
+      await adicionarLinha(tableKey, row2);
+      DATA[tableKey] = linhasParaObjetos(tableKey, await lerLinhasBrutas(TABELAS[tableKey]));
+      mostrarToast('Recebimento salvo com sucesso.');
+    }
+    document.getElementById('ct' + mat.charAt(0).toUpperCase() + mat.slice(1)).textContent = DATA[mat].length;
+    if (matAtual === mat) renderRecebimento();
+    renderHome();
+    fecharModalCadastro();
+  } catch (e) {
+    msg.className = 'save-msg err'; msg.textContent = 'Erro ao salvar: ' + e.message;
+  } finally { btn.disabled = false; }
+}
+
+/* ====================== ESPECIFICAÇÕES ====================== */
+function renderEspecificacoes(){
+  var cards = [];
+  Object.keys(DATA.especificacoes).forEach(function(mat){
+    var espec = DATA.especificacoes[mat];
+    espec.tipos.forEach(function(tipo){
+      var contagem = { L:0, C:0, QA:0 };
+      tipo.parametros.forEach(function(p){ if (contagem[p.criterio] !== undefined) contagem[p.criterio]++; });
+      var linhas = tipo.parametros.map(function(p){
+        return '<tr><td>'+p.teste+'</td><td class="cell-dim">'+(p.especTexto||'')+'</td><td class="cell-dim">'+(p.unidade||'')+'</td><td class="cell-dim mono">'+(p.nt||'')+'</td>'+
+          '<td>'+(p.criterio === '-' ? '<span class="cell-dim">—</span>' : '<span class="badge-crit '+p.criterio+'">'+p.criterio+'</span>')+'</td></tr>';
+      }).join('');
+      cards.push(
+        '<div class="spec-card"><div class="head"><div><div class="title">'+tipo.nome+'</div>'+
+        '<div class="doc">'+(espec.doc||'')+' · '+(espec.rev||'')+' · '+(espec.data||'')+'</div></div>'+
+        '<div class="card-actions"><div class="crit-count"><span class="L">'+contagem.L+' L</span><span class="QA">'+contagem.QA+' QA</span><span class="C">'+contagem.C+' C</span></div>'+
+        '<button type="button" class="icon-btn" onclick="abrirModalEspec(\''+mat+'\',\''+tipo.id+'\')">✎ Editar</button>'+
+        '<button type="button" class="icon-btn danger" onclick="excluirEspecificacao(\''+mat+'\',\''+tipo.id+'\')">🗑 Excluir</button></div></div>'+
+        '<div class="table-scroll"><table class="occ"><thead><tr><th>Teste</th><th>Especificação</th><th>Unidade</th><th>NT</th><th>Critério</th></tr></thead><tbody>'+linhas+'</tbody></table></div></div>'
+      );
+    });
+  });
+  document.getElementById('gridEspecificacoes').innerHTML = cards.length ? cards.join('') : '<div class="empty-note">Nenhuma especificação cadastrada ainda.</div>';
+}
+function adicionarLinhaEspec(p){
+  var tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td><input class="mini-input espec-teste" placeholder="Nome do teste" value="'+(p?p.teste:'')+'"></td>'+
+    '<td><input class="mini-input espec-tolerancia" placeholder="Ex: 0,790 – 0,890" value="'+(p?(p.especTexto||''):'')+'"></td>'+
+    '<td><input class="mini-input espec-unidade" placeholder="Ex: dl/g" value="'+(p?(p.unidade||''):'')+'"></td>'+
+    '<td><input class="mini-input espec-nt" placeholder="NT" value="'+(p&&p.nt!=='—'?p.nt:'')+'"></td>'+
+    '<td><select class="mini-input espec-criterio"><option value="L"'+(p&&p.criterio==='L'?' selected':'')+'>L</option><option value="C"'+(p&&p.criterio==='C'?' selected':'')+'>C</option><option value="QA"'+(p&&p.criterio==='QA'?' selected':'')+'>QA</option><option value="-"'+(p&&p.criterio==='-'?' selected':'')+'>—</option></select></td>'+
+    '<td><button type="button" class="remove-linha-espec" onclick="this.closest(\'tr\').remove()">✕</button></td>';
+  document.getElementById('tbodyNovaEspec').appendChild(tr);
+}
+var especEditando = null;
+function abrirModalEspec(mat, tipoId){
+  var tipo = (mat && DATA.especificacoes[mat]) ? DATA.especificacoes[mat].tipos.find(function(t){ return t.id === tipoId; }) : null;
+  especEditando = tipo ? { mat: mat, tipoId: tipoId } : null;
+  document.getElementById('modalEspecTitulo').textContent = tipo ? 'Editar especificação' : 'Nova especificação';
+  document.getElementById('especMaterialSelect').value = mat || 'resina';
+  document.getElementById('especMaterialSelect').disabled = !!tipo;
+  document.getElementById('especTipoNomeInput').value = tipo ? (tipo.tipoGrade || '') : '';
+  document.getElementById('especDocInput').value = tipo ? DATA.especificacoes[mat].doc : '';
+  document.getElementById('especRevInput').value = tipo ? DATA.especificacoes[mat].rev : '';
+  document.getElementById('especDataInput').value = tipo ? DATA.especificacoes[mat].data : '';
+  document.getElementById('tbodyNovaEspec').innerHTML = '';
+  if (tipo) tipo.parametros.forEach(function(p){ adicionarLinhaEspec(p); }); else adicionarLinhaEspec();
+  document.getElementById('saveMsgEspec').textContent = '';
+  document.getElementById('modalEspec').classList.remove('hidden');
+}
+function fecharModalEspec(){ document.getElementById('modalEspec').classList.add('hidden'); }
+document.getElementById('modalEspec').addEventListener('click', function(e){ if (e.target.id === 'modalEspec') fecharModalEspec(); });
+async function salvarEspecificacao(){
+  var mat = document.getElementById('especMaterialSelect').value, nomeTipo = document.getElementById('especTipoNomeInput').value.trim();
+  var doc = document.getElementById('especDocInput').value.trim(), rev = document.getElementById('especRevInput').value.trim(), dataDoc = document.getElementById('especDataInput').value.trim();
+  var linhas = Array.prototype.map.call(document.querySelectorAll('#tbodyNovaEspec tr'), function(tr){
+    return {
+      teste: tr.querySelector('.espec-teste').value.trim(), especTexto: tr.querySelector('.espec-tolerancia').value.trim(),
+      unidade: tr.querySelector('.espec-unidade').value.trim(), nt: tr.querySelector('.espec-nt').value.trim(), criterio: tr.querySelector('.espec-criterio').value
+    };
+  }).filter(function(p){ return p.teste; });
+  if (!linhas.length) { document.getElementById('saveMsgEspec').className = 'save-msg err'; document.getElementById('saveMsgEspec').textContent = 'Adicione ao menos um parâmetro.'; return; }
+  var msg = document.getElementById('saveMsgEspec'); msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    if (especEditando) {
+      var grupoAtual = DATA.especificacoes[especEditando.mat].tipos.find(function(t){ return t.id === especEditando.tipoId; });
+      var indicesParaApagar = [];
+      // Recalcula quais linhas brutas da tabela pertencem a esse grupo (material + tipo/grade originais).
+      var brutas = linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes));
+      brutas.forEach(function(l){
+        var matLabel = MAT_LABEL_PLANO[especEditando.mat];
+        if (l['Material'] === matLabel && (l['Tipo/Grade'] || '') === (grupoAtual.tipoGrade || '')) indicesParaApagar.push(l.__index);
+      });
+      if (indicesParaApagar.length) await excluirVariasLinhas('especificacoes', indicesParaApagar);
+    }
+    for (var i = 0; i < linhas.length; i++) {
+      var p = linhas[i];
+      await adicionarLinha('especificacoes', {
+        'Material': MAT_LABEL_PLANO[mat], 'Tipo/Grade': nomeTipo, 'Código Documento': doc, 'Revisão': rev, 'Data Documento': dataDoc,
+        'Teste': p.teste, 'Especificação/Tolerância': p.especTexto, 'Unidade': p.unidade, 'NT': p.nt, 'Critério': p.criterio
+      });
+    }
+    DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes)));
+    renderEspecificacoes(); renderHome(); popularTiposResina();
+    var qtdEspec = Object.keys(DATA.especificacoes).reduce(function(a,k){ return a + DATA.especificacoes[k].tipos.length; }, 0);
+    document.getElementById('ctEspecificacoes').textContent = qtdEspec;
+    mostrarToast('Especificação salva com sucesso.');
+    fecharModalEspec();
+  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+}
+async function excluirEspecificacao(mat, tipoId){
+  var tipo = DATA.especificacoes[mat].tipos.find(function(t){ return t.id === tipoId; });
+  if (!confirm('Excluir a especificação "' + (tipo ? tipo.nome : tipoId) + '"? Isso também remove as medições desse tipo/grade no Novo Recebimento.')) return;
+  try {
+    var brutas = linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes));
+    var matLabel = MAT_LABEL_PLANO[mat];
+    var indices = brutas.filter(function(l){ return l['Material'] === matLabel && (l['Tipo/Grade'] || '') === (tipo.tipoGrade || ''); }).map(function(l){ return l.__index; });
+    if (indices.length) await excluirVariasLinhas('especificacoes', indices);
+    DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes)));
+    renderEspecificacoes(); renderHome(); popularTiposResina();
+    mostrarToast('Especificação excluída.');
+  } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
+}
+
+/* ====================== RÓTULOS HOMOLOGADOS ====================== */
+function renderRotulosHomologados(){
+  var el = document.getElementById('gridRotulos');
+  if (!DATA.rotulosHomologados.length) { el.innerHTML = '<div class="empty-note">Nenhum rótulo homologado cadastrado ainda.</div>'; return; }
+  el.innerHTML = DATA.rotulosHomologados.map(function(r){
+    return '<div class="photo-card"><div class="lbl"><span>'+r['Nome do Modelo']+'</span>'+badgeLabel(r['Status'])+'</div>'+
+      (r['Arquivo da Foto'] ? ('<img class="photo-ph" src="'+r['Arquivo da Foto']+'" alt="Foto de referência">') : '<div class="empty-note" style="padding:24px 12px;">Sem foto</div>')+
+      '<div class="meta">'+(r['Aplicação']||'')+
+        '<div class="card-actions" style="margin-top:9px;"><button type="button" class="icon-btn" onclick="abrirModalRotulo(\''+r['ID']+'\')">✎ Editar</button>'+
+        '<button type="button" class="icon-btn danger" onclick="excluirRotulo(\''+r['ID']+'\')">🗑 Excluir</button></div></div></div>';
+  }).join('');
+}
+var rotuloEditando = null;
+function abrirModalRotulo(id){
+  rotuloEditando = id || null;
+  var r = id ? DATA.rotulosHomologados.find(function(x){ return x['ID'] === id; }) : null;
+  document.getElementById('modalRotuloTitulo').textContent = r ? 'Editar rótulo homologado' : 'Novo rótulo homologado';
+  document.getElementById('rotuloNomeInput').value = r ? r['Nome do Modelo'] : '';
+  document.getElementById('rotuloAplicacaoInput').value = r ? r['Aplicação'] : '';
+  document.getElementById('rotuloFornecedorInput').value = r ? r['Fornecedor Habitual'] : '';
+  document.getElementById('rotuloObsInput').value = r ? r['Observações'] : '';
+  document.getElementById('rotuloFotoFile').value = '';
+  document.getElementById('rotuloFotoLabel').textContent = 'Anexar foto do rótulo';
+  document.getElementById('saveMsgRotulo').textContent = '';
+  document.getElementById('modalRotulo').classList.remove('hidden');
+}
+function fecharModalRotulo(){ document.getElementById('modalRotulo').classList.add('hidden'); }
+document.getElementById('modalRotulo').addEventListener('click', function(e){ if (e.target.id === 'modalRotulo') fecharModalRotulo(); });
+async function salvarRotulo(){
+  var nome = document.getElementById('rotuloNomeInput').value.trim();
+  if (!nome) { document.getElementById('saveMsgRotulo').className = 'save-msg err'; document.getElementById('saveMsgRotulo').textContent = 'Informe o nome do modelo.'; return; }
+  var msg = document.getElementById('saveMsgRotulo'); msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    var r = rotuloEditando ? DATA.rotulosHomologados.find(function(x){ return x['ID'] === rotuloEditando; }) : null;
+    var fotoUrl = r ? r['Arquivo da Foto'] : '';
+    var fotoFile = document.getElementById('rotuloFotoFile').files[0];
+    if (fotoFile) { msg.textContent = 'Enviando foto…'; fotoUrl = await uploadArquivo(fotoFile, 'Rotulo_' + slugify(nome) + '_' + Date.now()); }
+    var obj = {
+      'ID': r ? r['ID'] : slugify(nome), 'Nome do Modelo': nome, 'Aplicação': document.getElementById('rotuloAplicacaoInput').value.trim(),
+      'Fornecedor Habitual': document.getElementById('rotuloFornecedorInput').value.trim(), 'Arquivo da Foto': fotoUrl,
+      'Status': r ? r['Status'] : 'Ativo', 'Observações': document.getElementById('rotuloObsInput').value.trim()
+    };
+    if (r) await atualizarLinha('rotulosHomologados', r.__index, obj); else await adicionarLinha('rotulosHomologados', obj);
+    DATA.rotulosHomologados = linhasParaObjetos('rotulosHomologados', await lerLinhasBrutas(TABELAS.rotulosHomologados));
+    renderRotulosHomologados(); renderHome(); popularOpcoesModeloRotulo();
+    document.getElementById('ctRotulosHom').textContent = DATA.rotulosHomologados.length;
+    mostrarToast('Rótulo homologado salvo.');
+    fecharModalRotulo();
+  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+}
+async function excluirRotulo(id){
+  var r = DATA.rotulosHomologados.find(function(x){ return x['ID'] === id; });
+  if (!confirm('Excluir o rótulo homologado "' + (r ? r['Nome do Modelo'] : id) + '"?')) return;
+  try {
+    await excluirLinhaPorIndice('rotulosHomologados', r.__index);
+    DATA.rotulosHomologados = linhasParaObjetos('rotulosHomologados', await lerLinhasBrutas(TABELAS.rotulosHomologados));
+    renderRotulosHomologados(); renderHome(); popularOpcoesModeloRotulo();
+    document.getElementById('ctRotulosHom').textContent = DATA.rotulosHomologados.length;
+    mostrarToast('Rótulo excluído.');
+  } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
+}
+
+/* ====================== PRODUTOS DE RESINA ====================== */
+function renderProdutos(){
+  var el = document.getElementById('tbodyProdutos');
+  if (!DATA.produtos.length) { el.innerHTML = '<tr><td colspan="5" class="empty-note">Nenhum produto cadastrado ainda.</td></tr>'; return; }
+  el.innerHTML = DATA.produtos.map(function(p){
+    return '<tr><td class="mono">'+p['Código']+'</td><td>'+p['Descrição']+'</td><td class="cell-dim">'+(p['Tipo']||'—')+'</td><td class="cell-dim">'+(p['Fornecedor']||'')+'</td>'+
+      '<td><div class="card-actions"><button type="button" class="icon-btn" onclick="abrirModalProduto(\''+p['Código']+'\')">✎ Editar</button>'+
+      '<button type="button" class="icon-btn danger" onclick="excluirProduto(\''+p['Código']+'\')">🗑 Excluir</button></div></td></tr>';
+  }).join('');
+}
+var produtoEditando = null;
+function abrirModalProduto(codigo){
+  produtoEditando = codigo || null;
+  var p = codigo ? produtoPorCodigo(codigo) : null;
+  document.getElementById('modalProdutoTitulo').textContent = p ? 'Editar produto de resina' : 'Novo produto de resina';
+  document.getElementById('produtoCodigoInput').value = p ? p['Código'] : '';
+  document.getElementById('produtoCodigoInput').disabled = !!p;
+  document.getElementById('produtoDescricaoInput').value = p ? p['Descrição'] : '';
+  document.getElementById('produtoFornecedorInput').value = p ? p['Fornecedor'] : '';
+  document.getElementById('produtoTipoInput').value = p ? p['Tipo'] : 'Prime';
+  document.getElementById('saveMsgProduto').textContent = '';
+  document.getElementById('modalProduto').classList.remove('hidden');
+}
+function fecharModalProduto(){ document.getElementById('modalProduto').classList.add('hidden'); }
+document.getElementById('modalProduto').addEventListener('click', function(e){ if (e.target.id === 'modalProduto') fecharModalProduto(); });
+async function salvarProduto(){
+  var codigo = document.getElementById('produtoCodigoInput').value.trim().toUpperCase(), descricao = document.getElementById('produtoDescricaoInput').value.trim();
+  if (!codigo || !descricao) { document.getElementById('saveMsgProduto').className = 'save-msg err'; document.getElementById('saveMsgProduto').textContent = 'Informe código e descrição.'; return; }
+  var msg = document.getElementById('saveMsgProduto'); msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    var obj = { 'Código': codigo, 'Descrição': descricao, 'Fornecedor': document.getElementById('produtoFornecedorInput').value.trim(), 'Tipo': document.getElementById('produtoTipoInput').value };
+    if (produtoEditando) { var p = produtoPorCodigo(produtoEditando); await atualizarLinha('produtos', p.__index, obj); }
+    else { if (produtoPorCodigo(codigo)) throw new Error('Já existe um produto com esse código.'); await adicionarLinha('produtos', obj); }
+    DATA.produtos = linhasParaObjetos('produtos', await lerLinhasBrutas(TABELAS.produtos));
+    renderProdutos(); renderHome(); popularOpcoesProdutoResina();
+    document.getElementById('ctProdutos').textContent = DATA.produtos.length;
+    mostrarToast('Produto salvo.');
+    fecharModalProduto();
+  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+}
+async function excluirProduto(codigo){
+  var p = produtoPorCodigo(codigo);
+  if (!confirm('Excluir o produto "' + (p ? p['Descrição'] : codigo) + ' — ' + codigo + '"? Lotes já recebidos com esse código continuam no histórico.')) return;
+  try {
+    await excluirLinhaPorIndice('produtos', p.__index);
+    DATA.produtos = linhasParaObjetos('produtos', await lerLinhasBrutas(TABELAS.produtos));
+    renderProdutos(); renderHome(); popularOpcoesProdutoResina();
+    document.getElementById('ctProdutos').textContent = DATA.produtos.length;
+    mostrarToast('Produto excluído.');
+  } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
+}
+
+/* ====================== CADASTROS (navegação entre sub-telas) ====================== */
+var CAD_INFO = {
+  rotulos: { icone:'🖼️', titulo:'Rótulos Homologados', busca:'Nome do modelo…', botao:'+ Novo rótulo homologado', acao:'abrirModalRotulo()' },
+  especificacoes: { icone:'📐', titulo:'Especificações', busca:'Material, tipo, teste…', botao:'+ Nova especificação', acao:'abrirModalEspec()' },
+  produtos: { icone:'🧬', titulo:'Produtos de Resina', busca:'Código ou descrição…', botao:'+ Novo produto', acao:'abrirModalProduto()' }
+};
+function escolherCadastro(cad){
+  var info = CAD_INFO[cad];
+  document.querySelectorAll('.cad-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.cad === cad); });
+  document.getElementById('cadTitle').textContent = info.icone + ' ' + info.titulo;
+  document.getElementById('cadBusca').placeholder = info.busca;
+  var btnNovo = document.getElementById('cadBtnNovo'); btnNovo.textContent = info.botao; btnNovo.setAttribute('onclick', info.acao);
+  document.getElementById('painelRotulos').style.display = cad === 'rotulos' ? '' : 'none';
+  document.getElementById('painelEspecificacoes').style.display = cad === 'especificacoes' ? '' : 'none';
+  document.getElementById('painelProdutos').style.display = cad === 'produtos' ? '' : 'none';
+}
+function abrirCadastro(cad){ if (!document.getElementById('tela-cadastros').classList.contains('active')) irPara('cadastros'); escolherCadastro(cad); }
+document.querySelectorAll('.cad-btn').forEach(function(btn){ btn.addEventListener('click', function(){ abrirCadastro(btn.dataset.cad); }); });
+
+/* ====================== CONFIGURAÇÕES ====================== */
+function abrirConfiguracoes(){ document.getElementById('modalConfig').classList.remove('hidden'); }
+function fecharConfiguracoes(){ document.getElementById('modalConfig').classList.add('hidden'); }
+document.getElementById('modalConfig').addEventListener('click', function(e){ if (e.target.id === 'modalConfig') fecharConfiguracoes(); });
+</script>
+</body>
+</html>
