@@ -909,7 +909,19 @@ const LISTA_CHAVE_PARA_TIPO = {
   maquinas:'maquinasInjecao', gramaturas:'gramaturas', cores:'cores', resinas:'resinas', operadores:'operadoresInjecao',
   maquinasSopro:'maquinasSopro', gramaturasSopro:'gramaturasSopro', coresSopro:'coresSopro', frascos:'frascosSopro', operadoresSopro:'operadoresSopro'
 };
+// Qual chave de lista mora em qual planilha/tabela — Sopro tem sua própria aba/tabela
+// (Listas_App_Sopro / TabelaListas_Sopro), separada da Listas_App da Injeção.
+const LISTA_CHAVE_PARA_TABELA = {
+  maquinas:'injecao', gramaturas:'injecao', cores:'injecao', resinas:'injecao', operadores:'injecao',
+  maquinasSopro:'sopro', gramaturasSopro:'sopro', coresSopro:'sopro', frascos:'sopro', operadoresSopro:'sopro'
+};
+const TABELA_LISTAS_INJECAO = { worksheet:'Listas_App', tabela:'TabelaListas' };
+const TABELA_LISTAS_SOPRO = { worksheet:'Listas_App_Sopro', tabela:'TabelaListas_Sopro' };
+const TABELA_TOLERANCIAS_INJECAO = { worksheet:'Tolerancias_App', tabela:'TabelaTolerancias' };
+const TABELA_TOLERANCIAS_SOPRO = { worksheet:'Tolerancias_App_Sopro', tabela:'TabelaTolerancias_Sopro' };
 let colunasTextoPreparadas = false;
+let toleranciasSopro = []; // tolerâncias do Sopro — tabela própria (TabelaTolerancias_Sopro), sem coluna "processo"
+var tabelasSoproGarantidas = {}; // cache por tabela, evita checar/criar de novo a cada chamada nesta sessão
 
 // =============================================================================
 // Lógica de leitura da planilha (mesma lógica validada em test-parser.js /
@@ -1092,16 +1104,14 @@ function buscarTolerancia(maquina, gramatura, cor, resina, parametro){
   return null;
 }
 
-// Tolerância do Sopro — mesma TabelaTolerancias da Injeção, identificação por
-// Máquina + Gramatura + Cor + Frasco (mesma lógica/4 campos da Injeção). Reaproveita a
-// coluna "resina" da planilha pra guardar o Frasco nas linhas de Sopro (processo="Sopro"),
-// assim não precisa mexer na estrutura da Tolerancias_App.
+// Tolerância do Sopro — tabela própria (TabelaTolerancias_Sopro, aba Tolerancias_App_Sopro),
+// separada da TabelaTolerancias da Injeção. Identificação por Máquina + Gramatura + Cor + Frasco
+// (mesma lógica/4 campos da Injeção).
 function buscarToleranciaSopro(maquina, gramatura, cor, frasco, parametro){
   var chaveM = norm(maquina), chaveG = norm(gramatura), chaveC = norm(cor), chaveF = norm(frasco), chaveP = norm(parametro);
-  for (var i = 0; i < tolerancias.length; i++){
-    var t = tolerancias[i];
+  for (var i = 0; i < toleranciasSopro.length; i++){
+    var t = toleranciasSopro[i];
     if (t.ativoFalso) continue;
-    if (t.processo !== 'Sopro') continue;
     if (t._maquina === chaveM && t._gramatura === chaveG && t._cor === chaveC && t._resina === chaveF && t._parametro === chaveP){
       return t;
     }
@@ -2544,31 +2554,64 @@ async function carregarTolerancias(token){
     tolerancias = [];
   }
   if (typeof renderCriterios === 'function') renderCriterios();
+}
+
+// Tolerâncias do Sopro — tabela própria (TabelaTolerancias_Sopro, aba Tolerancias_App_Sopro),
+// sem coluna "processo" (a separação agora é pela própria tabela, não por um filtro). Pode ainda
+// não existir (Cleber criou só a aba) — nesse caso segue com toleranciasSopro vazio, sem erro;
+// a tabela é criada no primeiro "Salvar critérios" (ver garantirTabelaSopro).
+async function carregarToleranciasSopro(token){
+  try {
+    var resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + TABELA_TOLERANCIAS_SOPRO.worksheet + '/tables/' + TABELA_TOLERANCIAS_SOPRO.tabela + '/rows', { headers: { Authorization: 'Bearer ' + token } });
+    if (!resp.ok){ toleranciasSopro = []; if (typeof renderCriteriosSopro === 'function') renderCriteriosSopro(); return; }
+    var json = await resp.json();
+    toleranciasSopro = (json.value || []).map(function(row){
+      var v = row.values[0]; // maquina, gramatura, cor, frasco, parametro, valor_min, valor_max, ativo
+      var ativo = v[7];
+      return {
+        maquina: v[0], gramatura: v[1], cor: v[2], frasco: v[3], parametro: v[4],
+        valor_min: v[5] !== undefined && v[5] !== null ? String(v[5]) : '', valor_max: v[6] !== undefined && v[6] !== null ? String(v[6]) : '',
+        ativoFalso: (ativo === false || ativo === 'FALSE' || ativo === 'Não' || ativo === 'NAO' || ativo === 0 || ativo === '0'),
+        _maquina: norm(v[0]), _gramatura: norm(v[1]), _cor: norm(v[2]), _resina: norm(v[3]), _parametro: norm(v[4]),
+        _index: row.index
+      };
+    });
+  } catch (e) {
+    console.error('Falha ao carregar tolerâncias do Sopro:', e);
+    toleranciasSopro = [];
+  }
   if (typeof renderCriteriosSopro === 'function') renderCriteriosSopro();
 }
 
-// Lê a TabelaListas (Listas_App) e separa por tipo/chave (10 chaves — 5 da Injeção, 5 do
-// Sopro, ver LISTA_TIPO_PARA_CHAVE). O tipo parametrosInjecao (41 linhas fixas) é ignorado
-// aqui porque já vem da constante PARAMETROS_INJECAO, não precisa duplicar.
-async function carregarListas(token){
+// Lê as listas de apoio de DUAS tabelas separadas — TabelaListas (Injeção, aba Listas_App) e
+// TabelaListas_Sopro (Sopro, aba Listas_App_Sopro) — e junta tudo no mesmo objeto `listas`
+// (10 chaves — 5 da Injeção, 5 do Sopro, ver LISTA_TIPO_PARA_CHAVE). A tabela de Sopro pode
+// ainda nem existir (Cleber criou só a aba vazia) — nesse caso essas 5 chaves ficam vazias,
+// sem gerar erro; a tabela é criada sozinha no primeiro "+" clicado em qualquer lista do Sopro
+// (ver garantirTabelaSopro, chamada em adicionarItemLista). O tipo parametrosInjecao (41 linhas
+// fixas) é ignorado aqui porque já vem da constante PARAMETROS_INJECAO, não precisa duplicar.
+async function carregarUmaTabelaListas(worksheet, tabela, token, destino){
   try {
-    var resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/Listas_App/tables/TabelaListas/rows', { headers: { Authorization: 'Bearer ' + token } });
-    if (!resp.ok){ listas = { maquinas: [], gramaturas: [], cores: [], resinas: [], operadores: [], maquinasSopro: [], gramaturasSopro: [], coresSopro: [], frascos: [], operadoresSopro: [] }; return; }
+    var resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + worksheet + '/tables/' + tabela + '/rows', { headers: { Authorization: 'Bearer ' + token } });
+    if (!resp.ok) return; // tabela ainda não existe (ex.: Sopro antes do 1º cadastro) — segue com as listas vazias
     var json = await resp.json();
-    var novo = { maquinas: [], gramaturas: [], cores: [], resinas: [], operadores: [], maquinasSopro: [], gramaturasSopro: [], coresSopro: [], frascos: [], operadoresSopro: [] };
     (json.value || []).forEach(function(row){
       var v = row.values[0]; // tipo, valor
       var chave = LISTA_TIPO_PARA_CHAVE[v[0]];
-      if (!chave) return;
+      if (!chave || LISTA_CHAVE_PARA_TABELA[chave] !== destino) return;
       var valor = (v[1] === undefined || v[1] === null) ? '' : String(v[1]).trim();
       if (!valor) return;
-      novo[chave].push({ valor: valor, _index: row.index });
+      listas[chave].push({ valor: valor, _index: row.index });
     });
-    listas = novo;
   } catch (e) {
-    console.error('Falha ao carregar listas de apoio (Injeção e Sopro):', e);
-    listas = { maquinas: [], gramaturas: [], cores: [], resinas: [], operadores: [], maquinasSopro: [], gramaturasSopro: [], coresSopro: [], frascos: [], operadoresSopro: [] };
+    console.error('Falha ao carregar listas de apoio de ' + worksheet + ':', e);
   }
+}
+
+async function carregarListas(token){
+  listas = { maquinas: [], gramaturas: [], cores: [], resinas: [], operadores: [], maquinasSopro: [], gramaturasSopro: [], coresSopro: [], frascos: [], operadoresSopro: [] };
+  await carregarUmaTabelaListas(TABELA_LISTAS_INJECAO.worksheet, TABELA_LISTAS_INJECAO.tabela, token, 'injecao');
+  await carregarUmaTabelaListas(TABELA_LISTAS_SOPRO.worksheet, TABELA_LISTAS_SOPRO.tabela, token, 'sopro');
   if (typeof renderListas === 'function') renderListas();
 }
 
@@ -2624,6 +2667,42 @@ async function atualizarLinhaTabela(worksheet, tabela, idx, valores, token){
   }
 }
 
+// Garante que a Tabela do Excel exista na aba de Sopro (Tolerancias_App_Sopro / Listas_App_Sopro)
+// antes do primeiro cadastro — o Cleber criou as abas vazias, sem tabela ainda ("pode ser criado
+// no primeiro cadastro"). Se a tabela já existe (checagem simples por GET), não faz nada. Se não
+// existe, escreve o cabeçalho na primeira linha e transforma esse intervalo numa Tabela do Excel
+// via API (tables/add), depois renomeia pro nome esperado pelo resto do app. Cacheia por tabela
+// pra não checar de novo a cada chamada na mesma sessão. Se a criação falhar (ex.: permissão,
+// ou algo específico desse arquivo gerado por script), o erro sobe pra quem chamou, que mostra
+// uma mensagem pedindo pra criar a tabela manualmente (Inserir → Tabela) com esse mesmo nome.
+async function garantirTabelaSopro(worksheet, tabela, headers, token){
+  if (tabelasSoproGarantidas[tabela]) return;
+  var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook';
+  var check = await fetch(base + '/worksheets/' + worksheet + '/tables/' + tabela, { headers: { Authorization: 'Bearer ' + token } });
+  if (check.ok){ tabelasSoproGarantidas[tabela] = true; return; }
+
+  var endereco = 'A1:' + colLetterFromIndex(headers.length - 1) + '1';
+  var urlRange = base + "/worksheets/" + worksheet + "/range(address='" + endereco + "')";
+  var respHeader = await fetch(urlRange, { method:'PATCH', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: [headers] }) });
+  if (!respHeader.ok){
+    throw new Error('Não consegui escrever o cabeçalho em ' + worksheet + ' (confira se a aba "' + worksheet + '" existe exatamente com esse nome).');
+  }
+
+  var respAdd = await fetch(base + '/worksheets/' + worksheet + '/tables/add', {
+    method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' },
+    body: JSON.stringify({ address: endereco, hasHeaders: true })
+  });
+  if (!respAdd.ok){
+    throw new Error('Não consegui criar a tabela "' + tabela + '" em ' + worksheet + ' automaticamente — crie manualmente: selecione ' + endereco + ' nessa aba, Inserir → Tabela, e nomeie a tabela (Design da Tabela → Nome da Tabela) exatamente como "' + tabela + '".');
+  }
+  var tableJson = await respAdd.json();
+  await fetch(base + '/tables/' + tableJson.id, {
+    method:'PATCH', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' },
+    body: JSON.stringify({ name: tabela })
+  });
+  tabelasSoproGarantidas[tabela] = true;
+}
+
 // ---- Listas de apoio (Máquinas/Gramaturas/Cores/Resinas) ----
 function renderListas(){
   Object.keys(LISTA_CHAVE_PARA_TIPO).forEach(function(chave){
@@ -2643,11 +2722,14 @@ async function adicionarItemLista(chave){
   var jaExiste = listas[chave].some(function(i){ return norm(i.valor) === norm(valor); });
   if (jaExiste){ mostrarToast('"'+valor+'" já está cadastrado.', true); return; }
 
+  var destino = LISTA_CHAVE_PARA_TABELA[chave] === 'sopro' ? TABELA_LISTAS_SOPRO : TABELA_LISTAS_INJECAO;
+
   var btn = document.getElementById('listaBtnAdd_'+chave);
   btn.disabled = true;
   try {
     var token = await getToken();
-    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaListas/rows/add';
+    if (destino === TABELA_LISTAS_SOPRO) await garantirTabelaSopro(destino.worksheet, destino.tabela, ['tipo','valor'], token);
+    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + destino.tabela + '/rows/add';
     var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: [[LISTA_CHAVE_PARA_TIPO[chave], valor]] }) });
     if (resp.ok){
       inputEl.value = '';
@@ -2666,7 +2748,8 @@ async function adicionarItemLista(chave){
 async function removerItemLista(chave, idx){
   try {
     var token = await getToken();
-    await excluirLinhaTabela('Listas_App', 'TabelaListas', idx, token);
+    var destino = LISTA_CHAVE_PARA_TABELA[chave] === 'sopro' ? TABELA_LISTAS_SOPRO : TABELA_LISTAS_INJECAO;
+    await excluirLinhaTabela(destino.worksheet, destino.tabela, idx, token);
     await carregarListas(token);
     mostrarToast('Removido.');
   } catch (err) {
@@ -2932,6 +3015,7 @@ async function atualizarCriterios(){
   try {
     var token = await getToken();
     await carregarTolerancias(token);
+    await carregarToleranciasSopro(token);
     await carregarListas(token);
     mostrarToast('Critérios atualizados ✓');
   } catch (err) {
@@ -2961,11 +3045,10 @@ function listaParametrosSopro(maquina){
 
 function agruparToleranciasSopro(){
   var grupos = {}, ordem = [];
-  tolerancias.forEach(function(t){
-    if (t.processo !== 'Sopro') return;
+  toleranciasSopro.forEach(function(t){
     var chave = t._maquina+'|'+t._gramatura+'|'+t._cor+'|'+t._resina;
     if (!grupos[chave]){
-      grupos[chave] = { maquina:t.maquina, gramatura:t.gramatura, cor:t.cor, frasco:t.resina, itens:[] };
+      grupos[chave] = { maquina:t.maquina, gramatura:t.gramatura, cor:t.cor, frasco:t.frasco, itens:[] };
       ordem.push(chave);
     }
     grupos[chave].itens.push(t);
@@ -3116,8 +3199,8 @@ async function salvarCriterioLoteSopro(){
 
   var chaveM = norm(maquina), chaveG = norm(gramatura), chaveC = norm(cor), chaveF = norm(frasco);
   var existentePorParam = {};
-  (critGrupoOriginalSopro ? critGrupoOriginalSopro.itens : tolerancias.filter(function(t){
-    return t.processo === 'Sopro' && t._maquina===chaveM && t._gramatura===chaveG && t._cor===chaveC && t._resina===chaveF;
+  (critGrupoOriginalSopro ? critGrupoOriginalSopro.itens : toleranciasSopro.filter(function(t){
+    return t._maquina===chaveM && t._gramatura===chaveG && t._cor===chaveC && t._resina===chaveF;
   })).forEach(function(t){ existentePorParam[t.parametro] = t; });
 
   var toPatch = [], toAdd = [], toDelete = [];
@@ -3131,8 +3214,8 @@ async function salvarCriterioLoteSopro(){
       erro('Em "'+param+'", o mínimo não pode ser maior que o máximo.'); return;
     }
     var existente = existentePorParam[param];
-    // ['processo','maquina','gramatura','cor','resina','parametro','valor_min','valor_max','ativo'] — "resina" guarda o Frasco pra linhas de Sopro.
-    var linha = ['Sopro', maquina, gramatura, cor, frasco, param, min || null, max || null, true];
+    // ['maquina','gramatura','cor','frasco','parametro','valor_min','valor_max','ativo'] — tabela própria do Sopro, sem "processo".
+    var linha = [maquina, gramatura, cor, frasco, param, min || null, max || null, true];
     if (min || max){
       if (existente) toPatch.push({ index: existente._index, linha: linha });
       else toAdd.push(linha);
@@ -3149,18 +3232,19 @@ async function salvarCriterioLoteSopro(){
   btn.disabled = true; btn.textContent = 'Salvando…';
   try {
     var token = await getToken();
-    var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias/rows';
+    await garantirTabelaSopro(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, ['maquina','gramatura','cor','frasco','parametro','valor_min','valor_max','ativo'], token);
+    var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + TABELA_TOLERANCIAS_SOPRO.tabela + '/rows';
     for (var p = 0; p < toPatch.length; p++){
-      await atualizarLinhaTabela('Tolerancias_App', 'TabelaTolerancias', toPatch[p].index, toPatch[p].linha, token);
+      await atualizarLinhaTabela(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, toPatch[p].index, toPatch[p].linha, token);
     }
     for (var a = 0; a < toAdd.length; a++){
       await fetch(base + '/add', { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values:[toAdd[a]] }) });
     }
     toDelete.sort(function(x,y){ return y - x; });
     for (var d = 0; d < toDelete.length; d++){
-      await excluirLinhaTabela('Tolerancias_App', 'TabelaTolerancias', toDelete[d], token);
+      await excluirLinhaTabela(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, toDelete[d], token);
     }
-    await carregarTolerancias(token);
+    await carregarToleranciasSopro(token);
     fecharFormCriterioSopro();
     mostrarToast('Critérios salvos: ' + toAdd.length + ' criado(s), ' + toPatch.length + ' atualizado(s), ' + toDelete.length + ' removido(s).');
   } catch (err) {
@@ -3193,9 +3277,9 @@ async function excluirGrupoSopro(i){
   try {
     var token = await getToken();
     for (var k = 0; k < indices.length; k++){
-      await excluirLinhaTabela('Tolerancias_App', 'TabelaTolerancias', indices[k], token);
+      await excluirLinhaTabela(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, indices[k], token);
     }
-    await carregarTolerancias(token);
+    await carregarToleranciasSopro(token);
     mostrarToast('Critérios de ' + g.maquina + ' · ' + g.gramatura + ' · ' + g.cor + ' · ' + g.frasco + ' removidos.');
   } catch (err) {
     mostrarToast('Falha de conexão: ' + err.message, true);
@@ -3207,7 +3291,7 @@ async function atualizarCriteriosSopro(){
   btn.disabled = true; btn.textContent = 'Atualizando…';
   try {
     var token = await getToken();
-    await carregarTolerancias(token);
+    await carregarToleranciasSopro(token);
     await carregarListas(token);
     mostrarToast('Critérios atualizados ✓');
   } catch (err) {
@@ -3230,6 +3314,7 @@ async function conectarPlanilha(){
       itemId = json.id; driveId = json.parentReference.driveId;
       dot.className = 'status-dot online'; label.textContent = 'conectado';
       await carregarTolerancias(token);
+      await carregarToleranciasSopro(token);
       await carregarListas(token);
       return true;
     } else {
