@@ -1105,6 +1105,12 @@ function linhasParaObjetos(chaveTabela, linhasBrutas){
     var obj = { __index: l.index };
     cols.forEach(function(h, i){ obj[h] = (l.values && l.values[0] && l.values[0][i] !== undefined) ? l.values[0][i] : ''; });
     return obj;
+  }).filter(function(obj){
+    // A Tabela do Excel sempre precisa de pelo menos 1 linha de dados além do
+    // cabeçalho (senão o próprio Excel considera o arquivo danificado), então a
+    // planilha nova chega com uma linha em branco "placeholder" por baixo de cada
+    // cabeçalho. Essa linha nunca deve aparecer como um registro de verdade.
+    return cols.some(function(h){ return String(obj[h] || '').trim() !== ''; });
   });
 }
 function objetoParaValores(chaveTabela, obj){
