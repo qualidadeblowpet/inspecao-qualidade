@@ -6,7 +6,7 @@
 <title>Sistema da Qualidade — BlowPet</title>
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&display=swap">
 <style>
 :root{
   --bg:#0b0e13; --surface:#12161d; --surface-2:#1a1f28; --surface-3:#212733;
@@ -16,9 +16,9 @@
   --warn:#e0a83b; --warn-soft:rgba(224,168,59,.16);
   --danger:#e2585e; --danger-soft:rgba(226,88,94,.16);
   --quar:#9c7bd9; --quar-soft:rgba(156,123,217,.16);
-  --font-display:'Archivo Narrow','Arial Narrow',sans-serif;
+  --font-display:'Inter',system-ui,-apple-system,sans-serif;
   --font-body:'Inter',system-ui,-apple-system,sans-serif;
-  --font-mono:'IBM Plex Mono','Courier New',monospace;
+  --font-mono:'Inter',system-ui,-apple-system,sans-serif;
   color-scheme: dark;
 }
 @media (prefers-color-scheme: light){
@@ -46,17 +46,17 @@ body{
   -webkit-font-smoothing:antialiased; padding-inline:20px; padding-block:28px 64px;
 }
 body.locked{overflow:hidden;}
-h1,h2,h3{font-family:var(--font-display); text-transform:uppercase; letter-spacing:.3px; margin:0; text-wrap:balance;}
+h1,h2,h3{font-family:var(--font-display); font-weight:600; margin:0; text-wrap:balance;}
 ::selection{background:var(--accent-soft);}
 a{color:var(--accent);}
 .wrap{max-width:1180px; margin:0 auto;}
 .tabular{font-variant-numeric:tabular-nums;}
-.mono{font-family:var(--font-mono);}
+.mono{font-family:var(--font-mono); font-variant-numeric:tabular-nums;}
 .hidden{display:none !important;}
 
 /* ---------- login ---------- */
 #loginScreen{min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center;}
-#loginScreen .mark{font-family:var(--font-display); font-size:30px; font-weight:700; letter-spacing:.5px;}
+#loginScreen .mark{font-family:var(--font-display); font-size:26px; font-weight:600; letter-spacing:-.2px;}
 #loginScreen .sub{color:var(--fg-dim); font-size:14px; margin-bottom:10px;}
 #loginScreen .loginMsg{font-size:12.5px; color:var(--danger); max-width:420px;}
 
@@ -74,18 +74,19 @@ a{color:var(--accent);}
 
 /* ---------- masthead ---------- */
 .masthead{margin-bottom:22px;}
-.eyebrow{font-family:var(--font-display); font-size:12px; letter-spacing:1.6px; color:var(--accent); text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
-.eyebrow .dot{width:6px; height:6px; border-radius:50%; background:var(--accent);}
+.eyebrow{font-family:var(--font-display); font-size:12px; font-weight:500; letter-spacing:.8px; color:var(--accent); text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.eyebrow .dot{width:5px; height:5px; border-radius:50%; background:var(--accent);}
 .conn-status{display:inline-flex; align-items:center; gap:6px; font-family:var(--font-body); font-size:11.5px; letter-spacing:0; color:var(--fg-faint); text-transform:none; margin-left:auto;}
 .status-dot{width:7px; height:7px; border-radius:50%; background:var(--fg-faint);}
 .status-dot.online{background:var(--ok); box-shadow:0 0 5px var(--ok);}
 .status-dot.offline{background:var(--danger); box-shadow:0 0 5px var(--danger);}
-.masthead h1{font-size:30px; font-weight:700; margin-bottom:8px;}
+.masthead h1{font-size:27px; font-weight:600; letter-spacing:-.2px; margin-bottom:8px;}
 .masthead-row{display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap;}
 .masthead p{font-size:14px; color:var(--fg-dim); line-height:1.6; max-width:680px; margin:0;}
 .user-pill{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--fg-dim); background:var(--surface); border:1px solid var(--border); border-radius:999px; padding:6px 12px 6px 6px; flex-shrink:0;}
 .user-pill .av{width:22px; height:22px; border-radius:50%; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:10.5px; font-weight:700;}
-.user-pill button{background:none; border:none; color:var(--fg-faint); cursor:pointer; font-size:12px; text-decoration:underline; padding:0;}
+.user-pill button{display:inline-flex; align-items:center; gap:4px; background:none; border:none; color:var(--fg-faint); cursor:pointer; font-size:12px; font-weight:500; padding:0;}
+.user-pill button:hover{color:var(--accent);}
 
 /* ---------- segment nav ---------- */
 .segnav{
@@ -95,18 +96,20 @@ a{color:var(--accent);}
 }
 .segnav::-webkit-scrollbar{display:none;}
 .segnav button{
+  display:inline-flex; align-items:center; gap:8px;
   flex:1 1 auto; white-space:nowrap; background:transparent; border:none; color:var(--fg-dim);
-  font-family:var(--font-body); font-size:13px; font-weight:600; padding:10px 14px; border-radius:8px; cursor:pointer;
+  font-family:var(--font-body); font-size:13px; font-weight:500; padding:10px 14px; border-radius:8px; cursor:pointer;
 }
-.segnav button .n{font-family:var(--font-mono); font-size:10.5px; opacity:.7; margin-right:6px;}
-.segnav button.active{background:var(--accent); color:var(--accent-ink);}
+.segnav button svg{width:15px; height:15px; opacity:.75; flex-shrink:0;}
+.segnav button.active{background:var(--accent); color:var(--accent-ink); font-weight:600;}
+.segnav button.active svg{opacity:1;}
 .segnav button:not(.active):hover{background:var(--surface-2); color:var(--fg);}
 
 /* ---------- tela wrapper ---------- */
 .tela{display:none;}
 .tela.active{display:block;}
 .tela-head{display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:6px; flex-wrap:wrap;}
-.tela-head h2{font-size:18px;}
+.tela-head h2{font-size:18px; font-weight:600;}
 .tela-head .tag{font-size:11px; color:var(--fg-faint); font-family:var(--font-mono);}
 .tela-sub{font-size:13px; color:var(--fg-dim); margin:0 0 16px; max-width:680px; line-height:1.55;}
 .screen{background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden;}
@@ -115,49 +118,55 @@ a{color:var(--accent);}
 .home-pad{padding:18px;}
 .kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:11px; margin-bottom:22px;}
 .kpi{background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:14px 15px;}
-.kpi .l{font-size:10.5px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.5px; margin-bottom:7px;}
-.kpi .v{font-family:var(--font-display); font-size:27px; font-weight:700; color:var(--fg);}
+.kpi .top{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:9px;}
+.kpi .l{font-size:10.5px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.5px; font-weight:500;}
+.kpi .top svg{width:15px; height:15px; color:var(--fg-faint); flex-shrink:0;}
+.kpi .v{font-family:var(--font-display); font-size:25px; font-weight:600; letter-spacing:-.2px; color:var(--fg);}
 .kpi .v.accent{color:var(--accent);} .kpi .v.warn{color:var(--warn);} .kpi .v.danger{color:var(--danger);}
 .module-section{margin-bottom:22px;}
 .module-section:last-child{margin-bottom:0;}
-.module-section-label{font-family:var(--font-display); font-size:11.5px; font-weight:700; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.8px; margin-bottom:10px;}
+.module-section-label{font-family:var(--font-display); font-size:11.5px; font-weight:500; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.6px; margin-bottom:10px;}
 .module-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(192px,1fr)); gap:10px;}
 .module-card{background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:15px 16px; cursor:pointer;
-  display:flex; flex-direction:column; gap:9px; text-align:left; font-family:var(--font-body); color:var(--fg);}
+  display:flex; flex-direction:column; gap:11px; text-align:left; font-family:var(--font-body); color:var(--fg);}
 .module-card:hover{border-color:var(--accent-border); background:var(--surface-3);}
 .module-card .top{display:flex; align-items:flex-start; justify-content:space-between; gap:8px;}
-.module-card .ic{font-size:21px;}
-.module-card .title{font-weight:700; font-size:13.5px; line-height:1.3;}
+.module-card .ic{width:34px; height:34px; border-radius:9px; background:var(--surface-3); color:var(--accent); display:flex; align-items:center; justify-content:center;}
+.module-card .ic svg{width:17px; height:17px;}
+.module-card .title{font-weight:500; font-size:13.5px; line-height:1.3;}
 .module-card .meta{font-size:11.5px; color:var(--fg-faint);}
 .activity{display:flex; flex-direction:column;}
 .act-row{display:flex; align-items:center; gap:11px; padding:9px 0; border-bottom:1px solid var(--border); font-size:12.5px;}
 .act-row:last-child{border-bottom:none;}
-.act-ic{width:30px; height:30px; border-radius:8px; background:var(--surface-3); display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0;}
+.act-ic{width:30px; height:30px; border-radius:8px; background:var(--surface-3); color:var(--fg-dim); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.act-ic svg{width:14px; height:14px;}
 .act-main{flex:1; min-width:0;}
-.act-main .t1{font-weight:600;}
+.act-main .t1{font-weight:500;}
 .act-main .t2{color:var(--fg-faint); font-size:11px; margin-top:1px;}
-.act-date{font-family:var(--font-mono); font-size:11px; color:var(--fg-faint); white-space:nowrap;}
+.act-date{font-family:var(--font-mono); font-size:11px; color:var(--fg-faint); white-space:nowrap; font-variant-numeric:tabular-nums;}
 .panel{background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:15px 16px;}
-.panel h3{font-size:12px; letter-spacing:.4px; margin-bottom:13px; color:var(--fg-dim);}
+.panel h3{font-size:12px; font-weight:500; letter-spacing:.5px; text-transform:uppercase; margin-bottom:13px; color:var(--fg-dim);}
 
 /* ---------- app-shell ---------- */
 .app-shell{display:flex; min-height:560px;}
 .app-sidebar{width:216px; flex-shrink:0; border-right:1px solid var(--border); padding:16px 10px; display:flex; flex-direction:column; gap:2px;}
-.app-sidebar .brand{font-family:var(--font-display); font-weight:700; font-size:15px; letter-spacing:.3px; padding:4px 10px 14px; color:var(--fg);}
+.app-sidebar .brand{font-family:var(--font-display); font-weight:600; font-size:14.5px; letter-spacing:0; padding:4px 10px 14px; color:var(--fg);}
 .app-sidebar .lbl{font-size:10px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:1px; padding:12px 10px 5px;}
 .app-sidebar button{
-  display:flex; align-items:center; gap:9px; width:100%; text-align:left; background:transparent; border:none;
+  display:flex; align-items:center; gap:10px; width:100%; text-align:left; background:transparent; border:none;
   color:var(--fg-dim); font-family:var(--font-body); font-size:13px; font-weight:500; padding:9px 10px; border-radius:7px; cursor:pointer;
 }
-.app-sidebar button .ic{width:16px; text-align:center; font-size:13px; opacity:.85;}
+.app-sidebar button .ic{width:16px; height:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0; opacity:.8;}
+.app-sidebar button .ic svg{width:16px; height:16px;}
 .app-sidebar button .ct{margin-left:auto; font-family:var(--font-mono); font-size:10.5px; color:var(--fg-faint); background:var(--surface-2); border-radius:5px; padding:1px 5px;}
 .app-sidebar button:hover{background:var(--surface-2); color:var(--fg);}
-.app-sidebar button.active{background:var(--accent-soft); color:var(--accent); font-weight:700; border:1px solid var(--accent-border);}
+.app-sidebar button.active{background:var(--accent-soft); color:var(--accent); font-weight:600; border:1px solid var(--accent-border);}
+.app-sidebar button.active .ic{opacity:1;}
 .app-sidebar button.active .ct{background:transparent; color:var(--accent);}
 .app-main{flex:1; min-width:0; padding:16px 18px 20px; display:flex; flex-direction:column;}
 
 .app-topbar{display:flex; flex-wrap:wrap; align-items:flex-end; gap:8px; margin-bottom:14px;}
-.app-topbar .material-title{font-family:var(--font-display); font-size:17px; font-weight:700; margin-right:auto; display:flex; align-items:center; gap:8px;}
+.app-topbar .material-title{font-family:var(--font-display); font-size:16.5px; font-weight:600; margin-right:auto; display:flex; align-items:center; gap:8px;}
 .tf{display:flex; flex-direction:column; gap:3px;}
 .tf label{font-size:9.5px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.5px;}
 .tf select, .tf input{
@@ -165,25 +174,28 @@ a{color:var(--accent);}
   padding:7px 9px; font-size:12px; font-family:var(--font-body); height:32px; min-width:120px;
 }
 .tf input[type=search]{min-width:160px;}
-.btn{display:inline-flex; align-items:center; gap:6px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2);
-  color:var(--fg); font-family:var(--font-body); font-weight:600; font-size:12.5px; padding:8px 13px; cursor:pointer; height:32px;}
+.btn{display:inline-flex; align-items:center; gap:7px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2);
+  color:var(--fg); font-family:var(--font-body); font-weight:500; font-size:12.5px; padding:8px 13px; cursor:pointer; height:32px;}
+.btn svg{width:14px; height:14px; flex-shrink:0;}
 .btn:hover{border-color:var(--fg-faint);}
 .btn:disabled{opacity:.5; cursor:default;}
 .btn-accent{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
 .btn-accent:hover{filter:brightness(1.06);}
 .btn-ghost{background:transparent;}
 .view-toggle{display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; height:32px;}
-.view-toggle button{border:none; background:var(--surface-2); color:var(--fg-dim); font-size:12px; font-weight:600; padding:0 12px; cursor:pointer; font-family:var(--font-body);}
+.view-toggle button{display:inline-flex; align-items:center; gap:6px; border:none; background:var(--surface-2); color:var(--fg-dim); font-size:12px; font-weight:500; padding:0 12px; cursor:pointer; font-family:var(--font-body);}
+.view-toggle button svg{width:14px; height:14px;}
 .view-toggle button.active{background:var(--accent); color:var(--accent-ink);}
 
 .table-scroll{overflow-x:auto; border:1px solid var(--border); border-radius:10px; flex:1;}
-table.occ{width:100%; border-collapse:collapse; font-size:12.5px; min-width:760px;}
+table.occ{width:100%; border-collapse:collapse; font-size:13.5px; min-width:760px;}
 table.occ th{position:sticky; top:0; background:var(--surface-2); text-align:left; padding:9px 11px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--fg-faint); white-space:nowrap; border-bottom:1px solid var(--border);}
 table.occ td{padding:10px 11px; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--fg);}
 table.occ tr:last-child td{border-bottom:none;}
 table.occ tr:hover td{background:var(--surface-2);}
 .cell-dim{color:var(--fg-dim);}
 .laudo-ic{display:inline-flex; width:22px; height:22px; border-radius:6px; align-items:center; justify-content:center; font-size:12px; text-decoration:none;}
+.laudo-ic svg{width:13px; height:13px;}
 .laudo-ic.yes{background:var(--ok-soft); color:var(--ok);}
 .laudo-ic.no{background:var(--surface-3); color:var(--fg-faint);}
 .badge{display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; white-space:nowrap;}
@@ -204,8 +216,8 @@ table.occ tr:hover td{background:var(--surface-2);}
 .cards-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:10px;}
 .rcard{background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:13px 14px; display:flex; flex-direction:column; gap:9px;}
 .rcard .top{display:flex; justify-content:space-between; align-items:flex-start; gap:8px;}
-.rcard .fornecedor{font-weight:700; font-size:13.5px;}
-.rcard .lote{font-family:var(--font-mono); font-size:11px; color:var(--fg-dim);}
+.rcard .fornecedor{font-weight:500; font-size:13.5px;}
+.rcard .lote{font-size:12.5px; font-weight:500; color:var(--fg-dim); font-variant-numeric:tabular-nums;}
 .rcard dl{display:grid; grid-template-columns:1fr 1fr; gap:7px 10px; margin:0; font-size:12px;}
 .rcard dt{color:var(--fg-faint); font-size:10px; text-transform:uppercase; letter-spacing:.4px; margin-bottom:1px;}
 .rcard dd{margin:0; color:var(--fg);}
@@ -218,7 +230,7 @@ table.occ tr:hover td{background:var(--surface-2);}
 .modal-close{position:absolute; top:14px; right:14px; width:30px; height:30px; border-radius:8px; border:1px solid var(--border); background:var(--surface-2); color:var(--fg-dim); cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center;}
 .modal-close:hover{color:var(--fg); border-color:var(--fg-faint);}
 .modal-head{padding:24px 50px 0 24px;}
-.modal-head h2{font-size:17px; font-family:var(--font-display); text-transform:uppercase;}
+.modal-head h2{font-size:17px; font-family:var(--font-display); font-weight:600;}
 .form-wrap{max-width:720px; margin:0 auto; padding:22px 24px;}
 .form-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px 14px;}
 .field{display:flex; flex-direction:column; gap:5px; min-width:0;}
@@ -238,7 +250,8 @@ table.occ tr:hover td{background:var(--surface-2);}
   text-align:left;
 }
 .file-btn:hover{border-color:var(--fg-faint);}
-.file-btn .ic{opacity:.85; flex-shrink:0;}
+.file-btn .ic{opacity:.85; flex-shrink:0; display:inline-flex;}
+.file-btn .ic svg{width:16px; height:16px;}
 .file-btn span:last-child{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .upload{
   border:1.5px dashed var(--border); border-radius:10px; padding:18px 14px; display:flex; flex-direction:column;
@@ -273,7 +286,7 @@ table.occ tr:hover td{background:var(--surface-2);}
 /* ---------- especificações ---------- */
 .spec-card{border:1px solid var(--border); border-radius:12px; background:var(--surface-2); overflow:hidden;}
 .spec-card .head{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; padding:14px 16px; border-bottom:1px solid var(--border); flex-wrap:wrap;}
-.spec-card .head .title{font-family:var(--font-display); font-size:14.5px; text-transform:uppercase; letter-spacing:.3px;}
+.spec-card .head .title{font-family:var(--font-display); font-size:14.5px; font-weight:600;}
 .spec-card .head .doc{font-size:11px; color:var(--fg-faint); font-family:var(--font-mono); margin-top:3px;}
 .spec-card .crit-count{display:flex; gap:6px; flex-shrink:0;}
 .spec-card .crit-count span{font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:999px;}
@@ -290,7 +303,8 @@ table.occ tr:hover td{background:var(--surface-2);}
 
 /* ---------- ações ---------- */
 .card-actions{display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
-.icon-btn{background:var(--surface-3); border:1px solid var(--border); color:var(--fg-dim); border-radius:7px; padding:5px 10px; font-size:11px; font-family:var(--font-body); cursor:pointer; white-space:nowrap;}
+.icon-btn{display:inline-flex; align-items:center; gap:5px; background:var(--surface-3); border:1px solid var(--border); color:var(--fg-dim); border-radius:7px; padding:5px 10px; font-size:11px; font-weight:500; font-family:var(--font-body); cursor:pointer; white-space:nowrap;}
+.icon-btn svg{width:12px; height:12px;}
 .icon-btn:hover{color:var(--fg); border-color:var(--fg-faint);}
 .icon-btn.danger:hover{color:var(--danger); border-color:var(--danger);}
 
@@ -310,9 +324,38 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
 </head>
 <body>
 
+<!-- ======= sprite de ícones (traço fino, 1.6px, estilo outline) ======= -->
+<svg width="0" height="0" style="position:absolute">
+<defs>
+<symbol id="i-flask" viewBox="0 0 24 24"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8.5 2h7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M7 16h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="7.5" cy="7.5" r="1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 2.69s5.66 5.743 8 10.302A8 8 0 0 1 4 13c2.34-4.557 8-10.311 8-10.311Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-package" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 22V12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="m3.3 7 8.7 5 8.7-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.5 4.27 16.5 9.73" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-package-lid" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 12v10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3.3 7 12 12l8.7-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 2v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="9" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m21 15-4.35-4.35a2 2 0 0 0-2.82 0L6 18.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><line x1="21" y1="4" x2="14" y2="4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="10" y1="4" x2="3" y2="4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="21" y1="12" x2="12" y2="12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="8" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="21" y1="20" x2="16" y2="20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="12" y1="20" x2="3" y2="20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="2" x2="14" y2="6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="8" y1="10" x2="8" y2="14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="16" y1="18" x2="16" y2="22" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="m12.83 2.18-9.85 4.48a1 1 0 0 0 0 1.83l9.85 4.48a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83l-8.58-3.9a2 2 0 0 0-1.66 0Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 17.65a1 1 0 0 1-.6.92l-8.58 3.9a2 2 0 0 1-1.66 0l-8.58-3.9a1 1 0 0 1-.58-.92" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 12.65a1 1 0 0 1-.6.92l-8.58 3.9a2 2 0 0 1-1.66 0l-8.58-3.9a1 1 0 0 1-.58-.92" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-megaphone" viewBox="0 0 24 24"><path d="m3 11 18-5v12L3 13v-2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-shield-alert" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="15.5" r="1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-inbox" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 3v5h-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 16H3v5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 7v5l3.2 1.9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-rows" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="14" width="18" height="5" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="3" width="8" height="8" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="13" width="8" height="8" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="13" width="8" height="8" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.6"/></symbol>
+<symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="m15 5 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v4a2 2 0 0 0 2 2h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 13H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 17H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</defs>
+</svg>
+
 <!-- ===================== LOGIN ===================== -->
 <div id="loginScreen">
-  <div class="mark">SISTEMA DA QUALIDADE</div>
+  <div class="mark">Sistema da Qualidade</div>
   <div class="sub">BlowPet — Recebimento, Reclamação de Cliente e Liberação Não Conforme</div>
   <button class="btn btn-accent" id="btnLoginMicrosoft" style="padding:13px 24px; font-size:15px;">Entrar com Microsoft</button>
   <div class="loginMsg" id="loginMsg"></div>
@@ -343,7 +386,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
         <div class="user-pill">
           <span class="av" id="userAvatar">—</span>
           <span id="userEmail">—</span>
-          <button type="button" onclick="abrirConfiguracoes()">Config.</button>
+          <button type="button" onclick="abrirConfiguracoes()"><svg width="13" height="13"><use href="#i-gear"/></svg> Config.</button>
         </div>
       </div>
     </div>
@@ -351,11 +394,11 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
   </div>
 
   <nav class="segnav" id="segnav">
-    <button class="active" data-tela="visao"><span class="n">01</span>Visão geral</button>
-    <button data-tela="lista"><span class="n">02</span>Recebimento</button>
-    <button data-tela="cadastros"><span class="n">03</span>Cadastros</button>
-    <button data-tela="reclamacao"><span class="n">04</span>Reclamação de cliente</button>
-    <button data-tela="liberacao"><span class="n">05</span>Liberação não conforme</button>
+    <button class="active" data-tela="visao"><svg><use href="#i-home"/></svg>Visão geral</button>
+    <button data-tela="lista"><svg><use href="#i-inbox"/></svg>Recebimento</button>
+    <button data-tela="cadastros"><svg><use href="#i-folder"/></svg>Cadastros</button>
+    <button data-tela="reclamacao"><svg><use href="#i-megaphone"/></svg>Reclamação de cliente</button>
+    <button data-tela="liberacao"><svg><use href="#i-shield-alert"/></svg>Liberação não conforme</button>
   </nav>
 
   <!-- ===================== TELA 1 — VISÃO GERAL ===================== -->
@@ -364,42 +407,42 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
     <p class="tela-sub">Resumo do que precisa de atenção e, abaixo, o acesso a cada módulo.</p>
     <div class="screen home-pad">
       <div class="kpi-row">
-        <div class="kpi"><div class="l">Recebimentos em análise</div><div class="v warn tabular" id="kpiAnalise">0</div></div>
-        <div class="kpi"><div class="l">Reclamações em aberto</div><div class="v danger tabular" id="kpiReclamacoes">0</div></div>
-        <div class="kpi"><div class="l">Liberações aguardando aprovação</div><div class="v accent tabular" id="kpiLiberacoes">0</div></div>
-        <div class="kpi"><div class="l">Lotes em quarentena</div><div class="v tabular" id="kpiQuarentena">0</div></div>
+        <div class="kpi"><div class="top"><span class="l">Recebimentos em análise</span><svg><use href="#i-clock"/></svg></div><div class="v warn tabular" id="kpiAnalise">0</div></div>
+        <div class="kpi"><div class="top"><span class="l">Reclamações em aberto</span><svg><use href="#i-megaphone"/></svg></div><div class="v danger tabular" id="kpiReclamacoes">0</div></div>
+        <div class="kpi"><div class="top"><span class="l">Liberações aguardando aprovação</span><svg><use href="#i-shield-alert"/></svg></div><div class="v accent tabular" id="kpiLiberacoes">0</div></div>
+        <div class="kpi"><div class="top"><span class="l">Lotes em quarentena</span><svg><use href="#i-package"/></svg></div><div class="v tabular" id="kpiQuarentena">0</div></div>
       </div>
 
       <div class="module-section">
         <div class="module-section-label">Recebimento de matéria-prima</div>
         <div class="module-grid">
-          <button class="module-card" onclick="abrirMaterial('resina')"><div class="top"><span class="ic">🧪</span></div><div class="title">Resina PET</div><div class="meta" id="metaResina">—</div></button>
-          <button class="module-card" onclick="abrirMaterial('rotulo')"><div class="top"><span class="ic">🏷️</span></div><div class="title">Rótulo</div><div class="meta" id="metaRotulo">—</div></button>
-          <button class="module-card" onclick="abrirMaterial('pigmento')"><div class="top"><span class="ic">🎨</span></div><div class="title">Pigmento</div><div class="meta" id="metaPigmento">—</div></button>
-          <button class="module-card" onclick="abrirMaterial('cinta')"><div class="top"><span class="ic">📦</span></div><div class="title">Caixa de Preforma (Cinta)</div><div class="meta" id="metaCinta">—</div></button>
-          <button class="module-card" onclick="abrirMaterial('tampa')"><div class="top"><span class="ic">📦</span></div><div class="title">Caixa de Preforma (Tampa)</div><div class="meta" id="metaTampa">—</div></button>
+          <button class="module-card" onclick="abrirMaterial('resina')"><div class="top"><span class="ic"><svg><use href="#i-flask"/></svg></span></div><div class="title">Resina PET</div><div class="meta" id="metaResina">—</div></button>
+          <button class="module-card" onclick="abrirMaterial('rotulo')"><div class="top"><span class="ic"><svg><use href="#i-tag"/></svg></span></div><div class="title">Rótulo</div><div class="meta" id="metaRotulo">—</div></button>
+          <button class="module-card" onclick="abrirMaterial('pigmento')"><div class="top"><span class="ic"><svg><use href="#i-droplet"/></svg></span></div><div class="title">Pigmento</div><div class="meta" id="metaPigmento">—</div></button>
+          <button class="module-card" onclick="abrirMaterial('cinta')"><div class="top"><span class="ic"><svg><use href="#i-package"/></svg></span></div><div class="title">Caixa de Preforma (Cinta)</div><div class="meta" id="metaCinta">—</div></button>
+          <button class="module-card" onclick="abrirMaterial('tampa')"><div class="top"><span class="ic"><svg><use href="#i-package-lid"/></svg></span></div><div class="title">Caixa de Preforma (Tampa)</div><div class="meta" id="metaTampa">—</div></button>
         </div>
       </div>
 
       <div class="module-section">
         <div class="module-section-label">Cadastros auxiliares</div>
         <div class="module-grid">
-          <button class="module-card" onclick="abrirCadastro('rotulos')"><div class="top"><span class="ic">🖼️</span></div><div class="title">Rótulos Homologados</div><div class="meta" id="metaRotulosHom">—</div></button>
-          <button class="module-card" onclick="abrirCadastro('especificacoes')"><div class="top"><span class="ic">📐</span></div><div class="title">Especificações</div><div class="meta" id="metaEspec">—</div></button>
-          <button class="module-card" onclick="abrirCadastro('produtos')"><div class="top"><span class="ic">🧬</span></div><div class="title">Produtos de Resina</div><div class="meta" id="metaProdutos">—</div></button>
+          <button class="module-card" onclick="abrirCadastro('rotulos')"><div class="top"><span class="ic"><svg><use href="#i-image"/></svg></span></div><div class="title">Rótulos Homologados</div><div class="meta" id="metaRotulosHom">—</div></button>
+          <button class="module-card" onclick="abrirCadastro('especificacoes')"><div class="top"><span class="ic"><svg><use href="#i-sliders"/></svg></span></div><div class="title">Especificações</div><div class="meta" id="metaEspec">—</div></button>
+          <button class="module-card" onclick="abrirCadastro('produtos')"><div class="top"><span class="ic"><svg><use href="#i-layers"/></svg></span></div><div class="title">Produtos de Resina</div><div class="meta" id="metaProdutos">—</div></button>
         </div>
       </div>
 
       <div class="module-section">
         <div class="module-section-label">Qualidade</div>
         <div class="module-grid">
-          <button class="module-card" onclick="irPara('reclamacao')"><div class="top"><span class="ic">📣</span></div><div class="title">Reclamação de Cliente</div><div class="meta" id="metaReclamacoes">—</div></button>
-          <button class="module-card" onclick="irPara('liberacao')"><div class="top"><span class="ic">⚠️</span></div><div class="title">Registro de Liberação Não Conforme</div><div class="meta" id="metaLiberacoes">—</div></button>
+          <button class="module-card" onclick="irPara('reclamacao')"><div class="top"><span class="ic"><svg><use href="#i-megaphone"/></svg></span></div><div class="title">Reclamação de Cliente</div><div class="meta" id="metaReclamacoes">—</div></button>
+          <button class="module-card" onclick="irPara('liberacao')"><div class="top"><span class="ic"><svg><use href="#i-shield-alert"/></svg></span></div><div class="title">Registro de Liberação Não Conforme</div><div class="meta" id="metaLiberacoes">—</div></button>
         </div>
       </div>
 
       <div class="panel">
-        <h3>ATIVIDADE RECENTE — TODOS OS MÓDULOS</h3>
+        <h3>Atividade recente — todos os módulos</h3>
         <div class="activity" id="atividadeRecente"><div class="ae-vazio" style="padding:14px 0; color:var(--fg-faint); font-size:12.5px;">Sem registros ainda.</div></div>
       </div>
     </div>
@@ -414,19 +457,19 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
         <div class="app-sidebar">
           <div class="brand">QUALIDADE</div>
           <div class="lbl">Visão</div>
-          <button onclick="irPara('visao')"><span class="ic">▦</span>Visão geral</button>
+          <button onclick="irPara('visao')"><span class="ic"><svg><use href="#i-home"/></svg></span>Visão geral</button>
           <div class="lbl">Recebimento</div>
-          <button class="mat-btn active" data-mat="resina"><span class="ic">🧪</span>Resina PET<span class="ct" id="ctResina">0</span></button>
-          <button class="mat-btn" data-mat="rotulo"><span class="ic">🏷️</span>Rótulo<span class="ct" id="ctRotulo">0</span></button>
-          <button class="mat-btn" data-mat="pigmento"><span class="ic">🎨</span>Pigmento<span class="ct" id="ctPigmento">0</span></button>
-          <button class="mat-btn" data-mat="cinta"><span class="ic">📦</span>Cx. Preforma (Cinta)<span class="ct" id="ctCinta">0</span></button>
-          <button class="mat-btn" data-mat="tampa"><span class="ic">📦</span>Cx. Preforma (Tampa)<span class="ct" id="ctTampa">0</span></button>
+          <button class="mat-btn active" data-mat="resina"><span class="ic"><svg><use href="#i-flask"/></svg></span>Resina PET<span class="ct" id="ctResina">0</span></button>
+          <button class="mat-btn" data-mat="rotulo"><span class="ic"><svg><use href="#i-tag"/></svg></span>Rótulo<span class="ct" id="ctRotulo">0</span></button>
+          <button class="mat-btn" data-mat="pigmento"><span class="ic"><svg><use href="#i-droplet"/></svg></span>Pigmento<span class="ct" id="ctPigmento">0</span></button>
+          <button class="mat-btn" data-mat="cinta"><span class="ic"><svg><use href="#i-package"/></svg></span>Cx. Preforma (Cinta)<span class="ct" id="ctCinta">0</span></button>
+          <button class="mat-btn" data-mat="tampa"><span class="ic"><svg><use href="#i-package-lid"/></svg></span>Cx. Preforma (Tampa)<span class="ct" id="ctTampa">0</span></button>
           <div class="lbl">Sistema</div>
-          <button onclick="abrirConfiguracoes()"><span class="ic">⚙</span>Configurações</button>
+          <button onclick="abrirConfiguracoes()"><span class="ic"><svg><use href="#i-gear"/></svg></span>Configurações</button>
         </div>
         <div class="app-main">
           <div class="app-topbar">
-            <div class="material-title" id="matTitle">🧪 Resina PET</div>
+            <div class="material-title" id="matTitle">Resina PET</div>
             <div class="tf"><label>Fornecedor</label><select id="fFornecedor"><option value="">Todos</option></select></div>
             <div class="tf"><label>Status</label>
               <select id="fStatus">
@@ -439,11 +482,11 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
             </div>
             <div class="tf"><label>Buscar</label><input type="search" id="fBusca" placeholder="NF, lote…"></div>
             <div class="view-toggle">
-              <button class="active" data-view="tabela">☰ Tabela</button>
-              <button data-view="cards">▦ Cards</button>
+              <button class="active" data-view="tabela"><svg><use href="#i-rows"/></svg> Tabela</button>
+              <button data-view="cards"><svg><use href="#i-grid"/></svg> Cards</button>
             </div>
-            <button class="btn btn-accent" onclick="abrirModalCadastro()">+ Novo recebimento</button>
-            <button class="btn" onclick="recarregarTudo()">⟳ Atualizar</button>
+            <button class="btn btn-accent" onclick="abrirModalCadastro()"><svg><use href="#i-plus"/></svg> Novo recebimento</button>
+            <button class="btn" onclick="recarregarTudo()"><svg><use href="#i-refresh"/></svg> Atualizar</button>
           </div>
           <div class="table-scroll" id="viewTabela">
             <table class="occ">
@@ -466,15 +509,15 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
         <div class="app-sidebar">
           <div class="brand">QUALIDADE</div>
           <div class="lbl">Visão</div>
-          <button onclick="irPara('visao')"><span class="ic">▦</span>Visão geral</button>
+          <button onclick="irPara('visao')"><span class="ic"><svg><use href="#i-home"/></svg></span>Visão geral</button>
           <div class="lbl">Qualidade</div>
-          <button class="active"><span class="ic">📣</span>Reclamação de Cliente<span class="ct" id="ctReclamacoes">0</span></button>
+          <button class="active"><span class="ic"><svg><use href="#i-megaphone"/></svg></span>Reclamação de Cliente<span class="ct" id="ctReclamacoes">0</span></button>
           <div class="lbl">Sistema</div>
-          <button onclick="abrirConfiguracoes()"><span class="ic">⚙</span>Configurações</button>
+          <button onclick="abrirConfiguracoes()"><span class="ic"><svg><use href="#i-gear"/></svg></span>Configurações</button>
         </div>
         <div class="app-main">
           <div class="app-topbar">
-            <div class="material-title">📣 Reclamação de Cliente</div>
+            <div class="material-title">Reclamação de Cliente</div>
             <div class="tf"><label>Classificação</label>
               <select id="fClassReclamacao">
                 <option value="">Todas</option>
@@ -491,8 +534,8 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
               </select>
             </div>
             <div class="tf"><label>Buscar</label><input type="search" id="fBuscaReclamacao" placeholder="RAC, cliente…"></div>
-            <button class="btn btn-accent" style="margin-left:auto;" onclick="abrirModalReclamacao()">+ Nova reclamação</button>
-            <button class="btn" onclick="recarregarTudo()">⟳ Atualizar</button>
+            <button class="btn btn-accent" style="margin-left:auto;" onclick="abrirModalReclamacao()"><svg><use href="#i-plus"/></svg> Nova reclamação</button>
+            <button class="btn" onclick="recarregarTudo()"><svg><use href="#i-refresh"/></svg> Atualizar</button>
           </div>
           <div class="table-scroll">
             <table class="occ">
@@ -514,15 +557,15 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
         <div class="app-sidebar">
           <div class="brand">QUALIDADE</div>
           <div class="lbl">Visão</div>
-          <button onclick="irPara('visao')"><span class="ic">▦</span>Visão geral</button>
+          <button onclick="irPara('visao')"><span class="ic"><svg><use href="#i-home"/></svg></span>Visão geral</button>
           <div class="lbl">Qualidade</div>
-          <button class="active"><span class="ic">⚠️</span>Liberação Não Conforme<span class="ct" id="ctLiberacoes">0</span></button>
+          <button class="active"><span class="ic"><svg><use href="#i-shield-alert"/></svg></span>Liberação Não Conforme<span class="ct" id="ctLiberacoes">0</span></button>
           <div class="lbl">Sistema</div>
-          <button onclick="abrirConfiguracoes()"><span class="ic">⚙</span>Configurações</button>
+          <button onclick="abrirConfiguracoes()"><span class="ic"><svg><use href="#i-gear"/></svg></span>Configurações</button>
         </div>
         <div class="app-main">
           <div class="app-topbar">
-            <div class="material-title">⚠️ Liberação Não Conforme</div>
+            <div class="material-title">Liberação Não Conforme</div>
             <div class="tf"><label>Status</label>
               <select id="fStatusLiberacao">
                 <option value="">Todos</option>
@@ -532,8 +575,8 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
               </select>
             </div>
             <div class="tf"><label>Buscar</label><input type="search" id="fBuscaLiberacao" placeholder="Nº registro, produto…"></div>
-            <button class="btn btn-accent" style="margin-left:auto;" onclick="abrirModalLiberacao()">+ Novo registro</button>
-            <button class="btn" onclick="recarregarTudo()">⟳ Atualizar</button>
+            <button class="btn btn-accent" style="margin-left:auto;" onclick="abrirModalLiberacao()"><svg><use href="#i-plus"/></svg> Novo registro</button>
+            <button class="btn" onclick="recarregarTudo()"><svg><use href="#i-refresh"/></svg> Atualizar</button>
           </div>
           <div class="table-scroll">
             <table class="occ">
@@ -555,19 +598,19 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
         <div class="app-sidebar">
           <div class="brand">QUALIDADE</div>
           <div class="lbl">Visão</div>
-          <button onclick="irPara('visao')"><span class="ic">▦</span>Visão geral</button>
+          <button onclick="irPara('visao')"><span class="ic"><svg><use href="#i-home"/></svg></span>Visão geral</button>
           <div class="lbl">Cadastros</div>
-          <button class="cad-btn active" data-cad="rotulos"><span class="ic">🖼️</span>Rótulos Homologados<span class="ct" id="ctRotulosHom">0</span></button>
-          <button class="cad-btn" data-cad="especificacoes"><span class="ic">📐</span>Especificações<span class="ct" id="ctEspecificacoes">0</span></button>
-          <button class="cad-btn" data-cad="produtos"><span class="ic">🧬</span>Produtos de Resina<span class="ct" id="ctProdutos">0</span></button>
+          <button class="cad-btn active" data-cad="rotulos"><span class="ic"><svg><use href="#i-image"/></svg></span>Rótulos Homologados<span class="ct" id="ctRotulosHom">0</span></button>
+          <button class="cad-btn" data-cad="especificacoes"><span class="ic"><svg><use href="#i-sliders"/></svg></span>Especificações<span class="ct" id="ctEspecificacoes">0</span></button>
+          <button class="cad-btn" data-cad="produtos"><span class="ic"><svg><use href="#i-layers"/></svg></span>Produtos de Resina<span class="ct" id="ctProdutos">0</span></button>
           <div class="lbl">Sistema</div>
-          <button onclick="abrirConfiguracoes()"><span class="ic">⚙</span>Configurações</button>
+          <button onclick="abrirConfiguracoes()"><span class="ic"><svg><use href="#i-gear"/></svg></span>Configurações</button>
         </div>
         <div class="app-main">
           <div class="app-topbar">
-            <div class="material-title" id="cadTitle">🖼️ Rótulos Homologados</div>
+            <div class="material-title" id="cadTitle">Rótulos Homologados</div>
             <div class="tf"><label>Buscar</label><input type="search" id="cadBusca" placeholder="Nome do modelo…"></div>
-            <button class="btn btn-accent" style="margin-left:auto;" id="cadBtnNovo" onclick="abrirModalRotulo()">+ Novo rótulo homologado</button>
+            <button class="btn btn-accent" style="margin-left:auto;" id="cadBtnNovo" onclick="abrirModalRotulo()"><svg><use href="#i-plus"/></svg> Novo rótulo homologado</button>
           </div>
           <div id="painelRotulos">
             <div class="cards-grid" id="gridRotulos"></div>
@@ -648,7 +691,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
           <div class="field"><label>Status</label><select id="statusRecebimentoSelect"></select></div>
           <div class="field">
             <label>Foto do laudo</label>
-            <button type="button" class="file-btn" onclick="document.getElementById('laudoFile').click()"><span class="ic">📄</span><span id="laudoFileLabel">Anexar laudo</span></button>
+            <button type="button" class="file-btn" onclick="document.getElementById('laudoFile').click()"><span class="ic"><svg><use href="#i-file-text"/></svg></span><span id="laudoFileLabel">Anexar laudo</span></button>
             <input type="file" id="laudoFile" accept="image/*,.pdf" hidden onchange="document.getElementById('laudoFileLabel').textContent = this.files[0] ? this.files[0].name : 'Anexar laudo'">
           </div>
         </div>
@@ -767,7 +810,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
           <div class="field"><label>Aplicação</label><input id="rotuloAplicacaoInput" placeholder="Ex: Garrafa 500 mL rotulada"></div>
           <div class="field"><label>Fornecedor habitual</label><input id="rotuloFornecedorInput" list="listaFornecedores" placeholder="Nome do fornecedor"></div>
           <div class="field full"><label>Foto de referência</label>
-            <button type="button" class="file-btn" onclick="document.getElementById('rotuloFotoFile').click()"><span class="ic">🖼️</span><span id="rotuloFotoLabel">Anexar foto do rótulo</span></button>
+            <button type="button" class="file-btn" onclick="document.getElementById('rotuloFotoFile').click()"><span class="ic"><svg><use href="#i-image"/></svg></span><span id="rotuloFotoLabel">Anexar foto do rótulo</span></button>
             <input type="file" id="rotuloFotoFile" accept="image/*" hidden onchange="document.getElementById('rotuloFotoLabel').textContent = this.files[0] ? this.files[0].name : 'Anexar foto do rótulo'">
           </div>
           <div class="field full"><label>Observações</label><textarea id="rotuloObsInput" placeholder="Variações aceitas, detalhes de impressão, etc."></textarea></div>
@@ -948,7 +991,7 @@ const TABLE_COLS = {
   liberacoes: ['Número Registro','Data','Produto/Processo','Não Conformidade','Decisão','Quantidade Liberada','Responsável','Status','Observações'],
   listas: ['Fornecedores','Responsaveis','Status Recebimento','Criterio','Unidades','Tipo Grade Lote','Tipo Grade Produto','Sim Nao','Conferencia Visual','Status Reclamacao','Classificacao Reclamacao','Status Liberacao','Status Rotulo']
 };
-const MAT_LABEL = {resina:'🧪 Resina PET', rotulo:'🏷️ Rótulo', pigmento:'🎨 Pigmento', cinta:'📦 Caixa de Preforma (Cinta)', tampa:'📦 Caixa de Preforma (Tampa)'};
+const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 // Teste (nome usado em Especificacoes_Parametros) -> coluna correspondente em
 // Recebimento_Resina_PET. Um parâmetro novo cadastrado em Especificações que não esteja
@@ -1283,7 +1326,7 @@ function statusKey(label){
 }
 function confereOk(label){ return String(label || '').toLowerCase().indexOf('diverg') === -1; }
 function badgeLabel(label){ return '<span class="badge ' + statusKey(label) + '">' + (label || '—') + '</span>'; }
-function laudoIc(url){ return url ? ('<a class="laudo-ic yes" href="'+url+'" target="_blank" title="Abrir laudo">✓</a>') : '<span class="laudo-ic no" title="Sem laudo">–</span>'; }
+function laudoIc(url){ return url ? ('<a class="laudo-ic yes" href="'+url+'" target="_blank" title="Abrir laudo"><svg><use href="#i-check"/></svg></a>') : '<span class="laudo-ic no" title="Sem laudo">–</span>'; }
 const CLASS_RECLAMACAO_LABEL = { procedente: 'Procedente', improcedente: 'Improcedente' };
 const STATUS_RECLAMACAO_LABEL = { aberta: 'Aberta', tratativa: 'Em tratativa', encerrada: 'Encerrada' };
 const STATUS_LIBERACAO_LABEL = { analise: 'Em análise', aprovado: 'Aprovado', reprovado: 'Reprovado' };
@@ -1328,17 +1371,17 @@ function renderHome(){
   document.getElementById('metaLiberacoes').textContent = DATA.liberacoes.filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length + ' aguardando aprovação';
 
   var atividades = [];
-  var ICS = { resina:'🧪', rotulo:'🏷️', pigmento:'🎨', cinta:'📦', tampa:'📦' };
+  var ICS = { resina:'i-flask', rotulo:'i-tag', pigmento:'i-droplet', cinta:'i-package', tampa:'i-package-lid' };
   ['resina','rotulo','pigmento','cinta','tampa'].forEach(function(m){
     DATA[m].forEach(function(r){ atividades.push({ ic: ICS[m], data: r['Data Recebimento'] || r['Data'], t1: MAT_LABEL_PLANO[m] + ' — ' + (r['Fornecedor']||'—'), t2: 'NF ' + (r['Nota Fiscal']||'—') + ' · ' + statusKeyLabelCurto(r['Status']) }); });
   });
-  DATA.reclamacoes.forEach(function(r){ atividades.push({ ic:'📣', data:r['Data'], t1:'Reclamação de Cliente — ' + (r['Cliente']||'—'), t2:(r['RAC']||'') + ' · ' + statusKeyLabelCurto(r['Status']) }); });
-  DATA.liberacoes.forEach(function(r){ atividades.push({ ic:'⚠️', data:r['Data'], t1:'Liberação Não Conforme — ' + (r['Produto/Processo']||'—'), t2:(r['Número Registro']||'') + ' · ' + statusKeyLabelCurto(r['Status']) }); });
+  DATA.reclamacoes.forEach(function(r){ atividades.push({ ic:'i-megaphone', data:r['Data'], t1:'Reclamação de Cliente — ' + (r['Cliente']||'—'), t2:(r['RAC']||'') + ' · ' + statusKeyLabelCurto(r['Status']) }); });
+  DATA.liberacoes.forEach(function(r){ atividades.push({ ic:'i-shield-alert', data:r['Data'], t1:'Liberação Não Conforme — ' + (r['Produto/Processo']||'—'), t2:(r['Número Registro']||'') + ' · ' + statusKeyLabelCurto(r['Status']) }); });
   atividades.sort(function(a,b){ return dataParaOrdenar(b.data) - dataParaOrdenar(a.data); });
   var el = document.getElementById('atividadeRecente');
   if (!atividades.length) { el.innerHTML = '<div class="ae-vazio" style="padding:14px 0; color:var(--fg-faint); font-size:12.5px;">Sem registros ainda.</div>'; return; }
   el.innerHTML = atividades.slice(0, 8).map(function(a){
-    return '<div class="act-row"><div class="act-ic">'+a.ic+'</div><div class="act-main"><div class="t1">'+a.t1+'</div><div class="t2">'+a.t2+'</div></div><div class="act-date">'+(a.data||'—')+'</div></div>';
+    return '<div class="act-row"><div class="act-ic"><svg><use href="#'+a.ic+'"/></svg></div><div class="act-main"><div class="t1">'+a.t1+'</div><div class="t2">'+a.t2+'</div></div><div class="act-date">'+(a.data||'—')+'</div></div>';
   }).join('');
 }
 function statusKeyLabelCurto(label){ return label || 'sem status'; }
@@ -1848,8 +1891,8 @@ function renderEspecificacoes(){
         '<div class="spec-card"><div class="head"><div><div class="title">'+tipo.nome+'</div>'+
         '<div class="doc">'+(espec.doc||'')+' · '+(espec.rev||'')+' · '+(espec.data||'')+'</div></div>'+
         '<div class="card-actions"><div class="crit-count"><span class="L">'+contagem.L+' L</span><span class="QA">'+contagem.QA+' QA</span><span class="C">'+contagem.C+' C</span></div>'+
-        '<button type="button" class="icon-btn" onclick="abrirModalEspec(\''+mat+'\',\''+tipo.id+'\')">✎ Editar</button>'+
-        '<button type="button" class="icon-btn danger" onclick="excluirEspecificacao(\''+mat+'\',\''+tipo.id+'\')">🗑 Excluir</button></div></div>'+
+        '<button type="button" class="icon-btn" onclick="abrirModalEspec(\''+mat+'\',\''+tipo.id+'\')"><svg><use href="#i-pencil"/></svg> Editar</button>'+
+        '<button type="button" class="icon-btn danger" onclick="excluirEspecificacao(\''+mat+'\',\''+tipo.id+'\')"><svg><use href="#i-trash"/></svg> Excluir</button></div></div>'+
         '<div class="table-scroll"><table class="occ"><thead><tr><th>Teste</th><th>Especificação</th><th>Unidade</th><th>NT</th><th>Critério</th></tr></thead><tbody>'+linhas+'</tbody></table></div></div>'
       );
     });
@@ -1945,8 +1988,8 @@ function renderRotulosHomologados(){
     return '<div class="photo-card"><div class="lbl"><span>'+r['Nome do Modelo']+'</span>'+badgeLabel(r['Status'])+'</div>'+
       (r['Arquivo da Foto'] ? ('<img class="photo-ph" src="'+r['Arquivo da Foto']+'" alt="Foto de referência">') : '<div class="empty-note" style="padding:24px 12px;">Sem foto</div>')+
       '<div class="meta">'+(r['Aplicação']||'')+
-        '<div class="card-actions" style="margin-top:9px;"><button type="button" class="icon-btn" onclick="abrirModalRotulo(\''+r['ID']+'\')">✎ Editar</button>'+
-        '<button type="button" class="icon-btn danger" onclick="excluirRotulo(\''+r['ID']+'\')">🗑 Excluir</button></div></div></div>';
+        '<div class="card-actions" style="margin-top:9px;"><button type="button" class="icon-btn" onclick="abrirModalRotulo(\''+r['ID']+'\')"><svg><use href="#i-pencil"/></svg> Editar</button>'+
+        '<button type="button" class="icon-btn danger" onclick="excluirRotulo(\''+r['ID']+'\')"><svg><use href="#i-trash"/></svg> Excluir</button></div></div></div>';
   }).join('');
 }
 var rotuloEditando = null;
@@ -2005,8 +2048,8 @@ function renderProdutos(){
   if (!DATA.produtos.length) { el.innerHTML = '<tr><td colspan="5" class="empty-note">Nenhum produto cadastrado ainda.</td></tr>'; return; }
   el.innerHTML = DATA.produtos.map(function(p){
     return '<tr><td class="mono">'+p['Código']+'</td><td>'+p['Descrição']+'</td><td class="cell-dim">'+(p['Tipo']||'—')+'</td><td class="cell-dim">'+(p['Fornecedor']||'')+'</td>'+
-      '<td><div class="card-actions"><button type="button" class="icon-btn" onclick="abrirModalProduto(\''+p['Código']+'\')">✎ Editar</button>'+
-      '<button type="button" class="icon-btn danger" onclick="excluirProduto(\''+p['Código']+'\')">🗑 Excluir</button></div></td></tr>';
+      '<td><div class="card-actions"><button type="button" class="icon-btn" onclick="abrirModalProduto(\''+p['Código']+'\')"><svg><use href="#i-pencil"/></svg> Editar</button>'+
+      '<button type="button" class="icon-btn danger" onclick="excluirProduto(\''+p['Código']+'\')"><svg><use href="#i-trash"/></svg> Excluir</button></div></td></tr>';
   }).join('');
 }
 var produtoEditando = null;
@@ -2053,16 +2096,16 @@ async function excluirProduto(codigo){
 
 /* ====================== CADASTROS (navegação entre sub-telas) ====================== */
 var CAD_INFO = {
-  rotulos: { icone:'🖼️', titulo:'Rótulos Homologados', busca:'Nome do modelo…', botao:'+ Novo rótulo homologado', acao:'abrirModalRotulo()' },
-  especificacoes: { icone:'📐', titulo:'Especificações', busca:'Material, tipo, teste…', botao:'+ Nova especificação', acao:'abrirModalEspec()' },
-  produtos: { icone:'🧬', titulo:'Produtos de Resina', busca:'Código ou descrição…', botao:'+ Novo produto', acao:'abrirModalProduto()' }
+  rotulos: { titulo:'Rótulos Homologados', busca:'Nome do modelo…', botao:'Novo rótulo homologado', acao:'abrirModalRotulo()' },
+  especificacoes: { titulo:'Especificações', busca:'Material, tipo, teste…', botao:'Nova especificação', acao:'abrirModalEspec()' },
+  produtos: { titulo:'Produtos de Resina', busca:'Código ou descrição…', botao:'Novo produto', acao:'abrirModalProduto()' }
 };
 function escolherCadastro(cad){
   var info = CAD_INFO[cad];
   document.querySelectorAll('.cad-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.cad === cad); });
-  document.getElementById('cadTitle').textContent = info.icone + ' ' + info.titulo;
+  document.getElementById('cadTitle').textContent = info.titulo;
   document.getElementById('cadBusca').placeholder = info.busca;
-  var btnNovo = document.getElementById('cadBtnNovo'); btnNovo.textContent = info.botao; btnNovo.setAttribute('onclick', info.acao);
+  var btnNovo = document.getElementById('cadBtnNovo'); btnNovo.innerHTML = '<svg><use href="#i-plus"/></svg> ' + info.botao; btnNovo.setAttribute('onclick', info.acao);
   document.getElementById('painelRotulos').style.display = cad === 'rotulos' ? '' : 'none';
   document.getElementById('painelEspecificacoes').style.display = cad === 'especificacoes' ? '' : 'none';
   document.getElementById('painelProdutos').style.display = cad === 'produtos' ? '' : 'none';
