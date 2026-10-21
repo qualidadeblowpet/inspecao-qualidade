@@ -307,6 +307,9 @@ table.occ tr:hover td{background:var(--surface-2);}
 .icon-btn svg{width:12px; height:12px;}
 .icon-btn:hover{color:var(--fg); border-color:var(--fg-faint);}
 .icon-btn.danger:hover{color:var(--danger); border-color:var(--danger);}
+.icon-btn.icon-only{padding:5px 7px;}
+.row-actions{display:inline-flex; align-items:center; gap:4px; white-space:nowrap;}
+td.row-actions-cell{text-align:right;}
 
 footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border); font-size:12.5px; color:var(--fg-dim); line-height:1.6;}
 
@@ -636,7 +639,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
     <div class="modal-card">
       <button class="modal-close" onclick="fecharModalCadastro()" aria-label="Fechar">✕</button>
       <div class="modal-head">
-        <h2>Novo recebimento</h2>
+        <h2 id="modalCadastroTitulo">Novo recebimento</h2>
         <p class="tela-sub" style="margin-top:6px;">Preencher e salvar na planilha. O formulário muda conforme o Material.</p>
       </div>
       <div class="form-wrap" style="padding-top:10px;">
@@ -1338,6 +1341,12 @@ function formatarDataBR(isoYYYYMMDD){
   if (p.length !== 3) return isoYYYYMMDD;
   return p[2] + '/' + p[1] + '/' + p[0];
 }
+function dataBRparaISO(dataBR){
+  if (!dataBR) return '';
+  var p = String(dataBR).split('/');
+  if (p.length !== 3) return '';
+  return p[2] + '-' + p[1] + '-' + p[0];
+}
 function hojeISO(){ var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
 
 /* ====================== NAVEGAÇÃO ====================== */
@@ -1416,9 +1425,14 @@ function fornecedoresDe(mat){
 }
 function montarHead(mat){
   var cols;
-  if (mat === 'resina') cols = ['Data','Lote interno','Lote fornecedor','Produto','Tipo/grade','Quantidade','Viscosidade (Blowpet)','Nota fiscal','Laudo','Status','Responsável'];
-  else { cols = ['Data','Nota fiscal','Fornecedor','Lote','Quantidade']; if (mat === 'rotulo') cols.push('Conferência'); cols.push('Laudo','Status','Responsável'); }
+  if (mat === 'resina') cols = ['Data','Lote interno','Lote fornecedor','Produto','Tipo/grade','Quantidade','Viscosidade (Blowpet)','Nota fiscal','Laudo','Status','Responsável',''];
+  else { cols = ['Data','Nota fiscal','Fornecedor','Lote','Quantidade']; if (mat === 'rotulo') cols.push('Conferência'); cols.push('Laudo','Status','Responsável',''); }
   document.getElementById('theadRow').innerHTML = cols.map(function(c){ return '<th>'+c+'</th>'; }).join('');
+}
+function acoesRecebimentoHtml(mat, idx){
+  return '<td class="row-actions-cell"><span class="row-actions">'+
+    '<button type="button" class="icon-btn icon-only" title="Editar" onclick="editarRecebimento(\''+mat+'\','+idx+')"><svg><use href="#i-pencil"/></svg></button>'+
+    '<button type="button" class="icon-btn icon-only danger" title="Excluir" onclick="excluirRecebimento(\''+mat+'\','+idx+')"><svg><use href="#i-trash"/></svg></button></span></td>';
 }
 function linhasFiltradas(){
   var mat = matAtual, status = document.getElementById('fStatus').value, fornecedor = document.getElementById('fFornecedor').value,
@@ -1446,6 +1460,7 @@ function linhaResina(r){
     '<td>'+laudoIc(r['Arquivo do Laudo'])+'</td>'+
     '<td>'+badgeLabel(r['Status'])+'</td>'+
     '<td class="cell-dim">'+(r['Responsável']||'')+'</td>'+
+    acoesRecebimentoHtml('resina', r.__index)+
   '</tr>';
 }
 function cardResina(r){
@@ -1453,7 +1468,9 @@ function cardResina(r){
     '<div class="top"><div><div class="fornecedor">'+(r['Descrição Produto']||r['Código Produto']||'')+' <span class="pill">'+(r['Tipo/Grade']||'')+'</span></div><div class="lote mono">'+(r['Lote Interno']||'')+' · lote forn. '+(r['Lote Fornecedor']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
     '<dl><div><dt>Data</dt><dd class="tabular">'+(r['Data Recebimento']||'')+'</dd></div><div><dt>Nota fiscal</dt><dd class="mono">'+(r['Nota Fiscal']||'')+'</dd></div>'+
     '<div><dt>Quantidade</dt><dd class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</dd></div><div><dt>Viscosidade</dt><dd class="mono">'+(r['Viscosidade IV Blowpet (dl/g)']||'—')+' dl/g</dd></div></dl>'+
-    '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span></div>'+
+    '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span><span class="row-actions">'+
+    '<button type="button" class="icon-btn icon-only" title="Editar" onclick="editarRecebimento(\'resina\','+r.__index+')"><svg><use href="#i-pencil"/></svg></button>'+
+    '<button type="button" class="icon-btn icon-only danger" title="Excluir" onclick="excluirRecebimento(\'resina\','+r.__index+')"><svg><use href="#i-trash"/></svg></button></span></div>'+
   '</div>';
 }
 function renderRecebimentoTabela(){
@@ -1464,7 +1481,7 @@ function renderRecebimentoTabela(){
     var cells = ['<td class="cell-dim tabular">'+(r['Data']||'')+'</td>','<td class="mono">'+(r['Nota Fiscal']||'')+'</td>','<td>'+(r['Fornecedor']||'')+'</td>','<td class="mono cell-dim">'+(r['Lote']||'')+'</td>','<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'];
     if (mat === 'rotulo') cells.push('<td class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</td>');
     cells.push('<td>'+laudoIc(r['Arquivo do Laudo'])+'</td>','<td>'+badgeLabel(r['Status'])+'</td>','<td class="cell-dim">'+(r['Responsável']||'')+'</td>');
-    return '<tr>'+cells.join('')+'</tr>';
+    return '<tr>'+cells.join('')+acoesRecebimentoHtml(mat, r.__index)+'</tr>';
   }).join('');
 }
 function renderRecebimentoCards(){
@@ -1477,7 +1494,9 @@ function renderRecebimentoCards(){
       '<div class="top"><div><div class="fornecedor">'+(r['Fornecedor']||'')+'</div><div class="lote mono">'+(r['Lote']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
       '<dl><div><dt>Data</dt><dd class="tabular">'+(r['Data']||'')+'</dd></div><div><dt>Nota fiscal</dt><dd class="mono">'+(r['Nota Fiscal']||'')+'</dd></div>'+
       '<div><dt>Quantidade</dt><dd class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</dd></div>'+extra+'</dl>'+
-      '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span></div>'+
+      '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span><span class="row-actions">'+
+      '<button type="button" class="icon-btn icon-only" title="Editar" onclick="editarRecebimento(\''+mat+'\','+r.__index+')"><svg><use href="#i-pencil"/></svg></button>'+
+      '<button type="button" class="icon-btn icon-only danger" title="Excluir" onclick="excluirRecebimento(\''+mat+'\','+r.__index+')"><svg><use href="#i-trash"/></svg></button></span></div>'+
     '</div>';
   }).join('');
 }
@@ -1625,21 +1644,82 @@ async function salvarLiberacao(){
 }
 
 /* ====================== NOVO RECEBIMENTO ====================== */
-function abrirModalCadastro(){
-  document.getElementById('dataRecebimentoInput').value = hojeISO();
-  document.getElementById('notaFiscalInput').value = '';
-  document.getElementById('loteGenericoInput').value = '';
-  document.getElementById('quantidadeInput').value = '';
-  document.getElementById('fornecedorGenericoInput').value = '';
-  document.getElementById('responsavelInput').value = '';
-  document.getElementById('observacoesInput').value = '';
+// recebimentoEditando guarda {mat, index} quando a janela está editando um recebimento já
+// salvo (reaberto pelo botão de lápis na lista/cards), e fica null numa abertura normal de
+// "Novo recebimento". Index é o __index real da linha na Tabela do Excel (via Graph API),
+// não a posição no array DATA[mat] (que pode ter buracos por causa do filtro de linha vazia).
+var recebimentoEditando = null;
+function abrirModalCadastro(matEdit, indexEdit){
+  var editando = matEdit !== undefined && indexEdit !== undefined;
+  var row = editando ? DATA[matEdit].find(function(x){ return x.__index === indexEdit; }) : null;
+  recebimentoEditando = (editando && row) ? { mat: matEdit, index: indexEdit } : null;
+  document.getElementById('modalCadastroTitulo').textContent = recebimentoEditando ? 'Editar recebimento' : 'Novo recebimento';
+  document.getElementById('btnSalvarRecebimento').textContent = recebimentoEditando ? 'Salvar alterações' : 'Salvar recebimento';
+  document.getElementById('materialSelect').disabled = !!recebimentoEditando;
   document.getElementById('laudoFile').value = '';
-  document.getElementById('laudoFileLabel').textContent = 'Anexar laudo';
   document.getElementById('saveMsgRecebimento').textContent = '';
+  if (recebimentoEditando) {
+    document.getElementById('materialSelect').value = matEdit;
+    document.getElementById('notaFiscalInput').value = row['Nota Fiscal'] || '';
+    document.getElementById('quantidadeInput').value = row['Quantidade'] || '';
+    document.getElementById('responsavelInput').value = row['Responsável'] || '';
+    document.getElementById('observacoesInput').value = row['Observações'] || '';
+    document.getElementById('dataRecebimentoInput').value = dataBRparaISO(row['Data Recebimento'] || row['Data'] || '');
+    document.getElementById('laudoFileLabel').textContent = row['Arquivo do Laudo'] ? 'Laudo já anexado — escolher outro substitui' : 'Anexar laudo';
+  } else {
+    document.getElementById('dataRecebimentoInput').value = hojeISO();
+    document.getElementById('notaFiscalInput').value = '';
+    document.getElementById('loteGenericoInput').value = '';
+    document.getElementById('quantidadeInput').value = '';
+    document.getElementById('fornecedorGenericoInput').value = '';
+    document.getElementById('responsavelInput').value = '';
+    document.getElementById('observacoesInput').value = '';
+    document.getElementById('laudoFileLabel').textContent = 'Anexar laudo';
+  }
   document.getElementById('modalCadastro').classList.remove('hidden');
   atualizarCamposMaterial();
+  if (recebimentoEditando) preencherEdicaoRecebimento(matEdit, row);
 }
-function fecharModalCadastro(){ document.getElementById('modalCadastro').classList.add('hidden'); }
+function editarRecebimento(mat, index){ abrirModalCadastro(mat, index); }
+function preencherEdicaoRecebimento(mat, row){
+  if (mat === 'resina') {
+    document.getElementById('produtoResinaSelect').value = row['Código Produto'] || '';
+    document.getElementById('loteFornecedorInput').value = row['Lote Fornecedor'] || '';
+    document.getElementById('loteInternoDisplay').value = row['Lote Interno'] || '—';
+    document.getElementById('loteInternoNota').textContent = 'Editando o recebimento ' + (row['Lote Interno']||'') + ' — complete ou corrija os dados abaixo.';
+    document.getElementById('loteInternoNota').className = 'med-note';
+    var tipoSel = document.getElementById('tipoResinaSelect');
+    var tipoId = slugify(row['Tipo/Grade'] || '');
+    if (Array.prototype.some.call(tipoSel.options, function(o){ return o.value === tipoId; })) tipoSel.value = tipoId;
+    loteResinaExistente = null;
+    renderMedicoes(row); habilitarMedicoes(true);
+  } else {
+    document.getElementById('fornecedorGenericoInput').value = row['Fornecedor'] || '';
+    document.getElementById('loteGenericoInput').value = row['Lote'] || '';
+    if (mat === 'rotulo') {
+      var modeloSel = document.getElementById('modeloRotuloSelect');
+      var modeloMatch = DATA.rotulosHomologados.find(function(r){ return r['Nome do Modelo'] === row['Modelo do Rótulo']; });
+      if (modeloMatch) modeloSel.value = modeloMatch['ID'];
+      atualizarPreviaRotulo();
+      document.getElementById('conferenciaRotuloSelect').value = confereOk(row['Conferência Visual']) ? 'ok' : 'div';
+    }
+  }
+  selecionarStatusPorChave(statusKey(row['Status']));
+}
+async function excluirRecebimento(mat, index){
+  var row = DATA[mat].find(function(x){ return x.__index === index; });
+  var ref = row ? (mat === 'resina' ? row['Lote Interno'] : (row['Nota Fiscal'] || row['Lote'] || '')) : '';
+  if (!confirm('Excluir este recebimento' + (ref ? (' (' + ref + ')') : '') + '? Essa ação não pode ser desfeita.')) return;
+  try {
+    await excluirLinhaPorIndice(mat, index);
+    DATA[mat] = linhasParaObjetos(mat, await lerLinhasBrutas(TABELAS[mat]));
+    document.getElementById('ct' + mat.charAt(0).toUpperCase() + mat.slice(1)).textContent = DATA[mat].length;
+    if (matAtual === mat) renderRecebimento();
+    renderHome();
+    mostrarToast('Recebimento excluído.');
+  } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
+}
+function fecharModalCadastro(){ document.getElementById('modalCadastro').classList.add('hidden'); recebimentoEditando = null; document.getElementById('materialSelect').disabled = false; }
 document.getElementById('modalCadastro').addEventListener('click', function(e){ if (e.target.id === 'modalCadastro') fecharModalCadastro(); });
 
 function popularOpcoesProdutoResina(){
@@ -1681,8 +1761,10 @@ function atualizarCamposMaterial(){
   // colunas de medição no futuro, esta tela e a aba correspondente precisam crescer juntas.
   document.getElementById('secaoResina').style.display = ehResina ? '' : 'none';
   if (mat === 'rotulo') { popularOpcoesModeloRotulo(); atualizarPreviaRotulo(); }
-  if (ehResina) { popularTiposResina(); document.getElementById('loteFornecedorInput').value = ''; verificarLoteExistente(); }
-  else { selecionarStatusPorChave('analise'); }
+  if (ehResina) {
+    popularTiposResina();
+    if (!recebimentoEditando) { document.getElementById('loteFornecedorInput').value = ''; verificarLoteExistente(); }
+  } else if (!recebimentoEditando) { selecionarStatusPorChave('analise'); }
 }
 document.getElementById('materialSelect').addEventListener('change', atualizarCamposMaterial);
 document.getElementById('modeloRotuloSelect').addEventListener('change', atualizarPreviaRotulo);
@@ -1732,6 +1814,10 @@ function medicoesDeLinha(row){
 }
 function habilitarMedicoes(editavel){ document.querySelectorAll('#tbodyMedicoes input, #tbodyMedicoes select').forEach(function(el){ el.disabled = !editavel; }); }
 function verificarLoteExistente(){
+  // Em edição de um recebimento já salvo, o lote interno e as medições já foram carregados
+  // por preencherEdicaoRecebimento() e não devem ser refeitos/zerados só porque o usuário
+  // tocou no campo Lote do fornecedor pra corrigir um valor.
+  if (recebimentoEditando && recebimentoEditando.mat === 'resina') return;
   var codigo = document.getElementById('produtoResinaSelect').value, loteForn = document.getElementById('loteFornecedorInput').value.trim();
   var display = document.getElementById('loteInternoDisplay'), nota = document.getElementById('loteInternoNota'), tipoSel = document.getElementById('tipoResinaSelect');
   if (!loteForn){
@@ -1809,8 +1895,10 @@ async function salvarRecebimento(){
   var dataISO = document.getElementById('dataRecebimentoInput').value;
   if (!dataISO) { msg.className = 'save-msg err'; msg.textContent = 'Informe a data do recebimento.'; return; }
   btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  var editando = recebimentoEditando;
+  var rowOriginal = editando ? DATA[editando.mat].find(function(x){ return x.__index === editando.index; }) : null;
   try {
-    var laudoUrl = '';
+    var laudoUrl = rowOriginal ? (rowOriginal['Arquivo do Laudo'] || '') : '';
     var laudoFile = document.getElementById('laudoFile').files[0];
     if (laudoFile) {
       msg.textContent = 'Enviando foto do laudo…';
@@ -1826,7 +1914,7 @@ async function salvarRecebimento(){
       var produto = produtoPorCodigo(codigo);
       var loteForn = document.getElementById('loteFornecedorInput').value.trim();
       if (!loteForn) { throw new Error('Informe o lote do fornecedor.'); }
-      var loteInterno = loteResinaExistente ? loteResinaExistente['Lote Interno'] : proximoLoteInterno(codigo);
+      var loteInterno = editando ? document.getElementById('loteInternoDisplay').value : (loteResinaExistente ? loteResinaExistente['Lote Interno'] : proximoLoteInterno(codigo));
       var medicoes = {}, extras = [];
       ESPEC_PARAMS_ATUAL.forEach(function(p, idx){
         var el = document.getElementById('medResultado_' + idx);
@@ -1844,9 +1932,9 @@ async function salvarRecebimento(){
         'Responsável': document.getElementById('responsavelInput').value.trim(), 'Observações': obs + (extras.length ? (' | ' + extras.join('; ')) : '')
       };
       Object.keys(medicoes).forEach(function(col){ row[col] = medicoes[col]; });
-      await adicionarLinha('resina', row);
+      if (editando) { await atualizarLinha('resina', editando.index, row); mostrarToast('Recebimento ' + loteInterno + ' atualizado com sucesso.'); }
+      else { await adicionarLinha('resina', row); mostrarToast('Recebimento ' + loteInterno + ' salvo com sucesso.'); }
       DATA.resina = linhasParaObjetos('resina', await lerLinhasBrutas(TABELAS.resina));
-      mostrarToast('Recebimento ' + loteInterno + ' salvo com sucesso.');
     } else {
       var tableKey = mat;
       var row2 = {
@@ -1862,9 +1950,9 @@ async function salvarRecebimento(){
         row2['Modelo do Rótulo'] = modeloNome;
         row2['Conferência Visual'] = document.getElementById('conferenciaRotuloSelect').value;
       }
-      await adicionarLinha(tableKey, row2);
+      if (editando) { await atualizarLinha(tableKey, editando.index, row2); mostrarToast('Recebimento atualizado com sucesso.'); }
+      else { await adicionarLinha(tableKey, row2); mostrarToast('Recebimento salvo com sucesso.'); }
       DATA[tableKey] = linhasParaObjetos(tableKey, await lerLinhasBrutas(TABELAS[tableKey]));
-      mostrarToast('Recebimento salvo com sucesso.');
     }
     document.getElementById('ct' + mat.charAt(0).toUpperCase() + mat.slice(1)).textContent = DATA[mat].length;
     if (matAtual === mat) renderRecebimento();
