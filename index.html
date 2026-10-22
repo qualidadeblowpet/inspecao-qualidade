@@ -229,6 +229,17 @@
      meio de um). */
   .analise-def-nome { flex: 1; min-width: 0; }
   .analise-def-direita { display: flex; align-items: center; gap: 10px; flex: 0 0 auto; white-space: nowrap; }
+  /* Selo LEVE/MÉDIO/GRAVE do Top 3 que abre a foto da última ocorrência daquele nível (ver mostrarPopoverFotoNivel) */
+  .badge[data-foto-key] { cursor: pointer; transition: box-shadow .12s; }
+  .badge[data-foto-key]:hover, .badge[data-foto-key]:focus-visible { box-shadow: 0 0 0 1px currentColor; outline: none; }
+  #fotoNivelPopover { position: fixed; z-index: 9999; width: 290px; max-width: calc(100vw - 16px); background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px; box-shadow: 0 12px 32px rgba(0,0,0,.55); font-size: 12px; color: var(--text); display: none; }
+  #fotoNivelPopover .fn-ttl { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 8px; color: var(--text-dim); font-size: 11px; }
+  #fotoNivelPopover .fn-ttl b { color: var(--text); font-size: 12px; }
+  #fotoNivelPopover .fn-img { width: 100%; height: 170px; border-radius: 6px; background: #101113; display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--text-dim); text-align: center; padding: 0 10px; }
+  #fotoNivelPopover .fn-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  #fotoNivelPopover .fn-leg { margin-top: 8px; line-height: 1.45; }
+  #fotoNivelPopover .fn-leg small { display: block; color: var(--text-dim); font-size: 11px; margin-top: 2px; }
+  #fotoNivelPopover .fn-leg a { color: var(--accent); }
   .analise-def-vol { color: var(--text-dim); font-size: 12px; }
   .analise-tags { display: flex; flex-wrap: wrap; gap: 8px; }
   .analise-tag { background: var(--surface); border: 1px solid var(--border); border-radius: 999px; padding: 5px 12px; font-size: 12px; }
@@ -4222,7 +4233,10 @@ function renderCardMaquina(equip, todasLinhasFiltro, dias) {
   const top3 = top3Defeitos(desviosMaquina);
   const critClasse = function(c) { return c === 'GRAVE' ? 'grave' : c === 'MÉDIO' ? 'medio' : 'leve'; };
   const top3Html = top3.length ? top3.map(function(d, i) {
-    const selos = d.criticidades.map(function(c) { return '<span class="badge ' + critClasse(c) + '">' + c + '</span>'; }).join('');
+    const selos = d.criticidades.map(function(c) {
+      const chaveFoto = registrarOcorrenciaNivel(equip, d.nome, c, desviosMaquina);
+      return '<span class="badge ' + critClasse(c) + '"' + (chaveFoto ? ' data-foto-key="' + chaveFoto + '" tabindex="0" title="Passe o mouse para ver a foto da última ocorrência"' : '') + '>' + c + '</span>';
+    }).join('');
     return '<div class="analise-defeito-linha">' +
       '<div class="analise-def-nome">' + (i + 1) + '. ' + d.nome + '</div>' +
       '<div class="analise-def-direita"><span class="analise-def-vol">' + d.qtd + 'x</span>' + selos + '</div>' +
@@ -4364,9 +4378,149 @@ function construirAnaliseHtmlParaPDF(linhasFiltradas, processo) {
 function gerarAnaliseIA() {
   const el = document.getElementById('analiseResultado');
   if (!el || !itemId) return;
-  const html = construirAnalisePeriodoHtml();
+  // Só a análise exibida na tela registra as ocorrências por nível (pro popover de foto). A análise
+  // gerada pro PDF (outra chamada, com outros filtros) não registra nada e não leva os atributos.
+  fotoNivelRegistro = {};
+  registrandoFotosNivel = true;
+  let html;
+  try { html = construirAnalisePeriodoHtml(); } finally { registrandoFotosNivel = false; }
   el.innerHTML = html || '<div class="analise-vazio">Nenhum cadastro encontrado para os filtros atuais.</div>';
 }
+
+/* ---------------- Foto da última ocorrência por criticidade (popover nos selos do Top 3) ---------------- */
+// Nada é buscado ao montar a análise: só se calcula, na memória, qual é a última ocorrência de cada
+// (máquina, defeito, criticidade). A foto só é pedida ao OneDrive quando o usuário para o mouse (ou
+// toca) num selo, e a miniatura (não a foto original) fica guardada pra próxima vez.
+let fotoNivelRegistro = {};
+let registrandoFotosNivel = false;
+const fotoNivelMiniaturaCache = {}; // webUrl -> url da miniatura | '' (falhou)
+
+function chaveOrdemOcorrencia(l) { return (l.data || '') + ' ' + (l.hora_fim || l.hora_inicio || '') + ' ' + (l.criado_em || ''); }
+
+function registrarOcorrenciaNivel(equip, defeito, crit, desviosMaquina) {
+  if (!registrandoFotosNivel) return '';
+  const ocorrencias = desviosMaquina.filter(function(l) {
+    return (l.defeito || '—') === defeito && (l.criticidade || '—').toUpperCase() === crit;
+  }).sort(function(a, b) { return chaveOrdemOcorrencia(b) < chaveOrdemOcorrencia(a) ? -1 : chaveOrdemOcorrencia(b) > chaveOrdemOcorrencia(a) ? 1 : 0; });
+  if (!ocorrencias.length) return '';
+  const chave = 'fn' + Object.keys(fotoNivelRegistro).length;
+  fotoNivelRegistro[chave] = {
+    equip: equip, defeito: defeito, crit: crit,
+    ultima: ocorrencias[0],
+    comFoto: ocorrencias.filter(function(l) { return l.foto_url && /^https?:\/\//i.test(l.foto_url); })[0] || null
+  };
+  return chave;
+}
+
+function escaparHtmlFoto(t) {
+  return String(t === undefined || t === null ? '' : t).replace(/[&<>"']/g, function(c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; });
+}
+function rotuloDataHoraOcorrencia(l) {
+  const hora = l.hora_fim || l.hora_inicio || '';
+  return (l.data ? formatarDataBR(l.data).split('-').slice(0, 2).join('/') : '—') + (hora ? ' · ' + hora : '');
+}
+
+// Resolve o link do SharePoint salvo na planilha (webUrl, exige login) numa miniatura que o <img> abre.
+async function obterMiniaturaFoto(webUrl) {
+  if (webUrl in fotoNivelMiniaturaCache) return fotoNivelMiniaturaCache[webUrl];
+  let url = '';
+  try {
+    const token = await getToken();
+    const codificado = 'u!' + btoa(unescape(encodeURIComponent(webUrl))).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+    const resp = await fetch('https://graph.microsoft.com/v1.0/shares/' + codificado + '/driveItem/thumbnails', { headers: { Authorization: 'Bearer ' + token } });
+    if (resp.ok) {
+      const json = await resp.json();
+      const set = (json.value || [])[0];
+      if (set) url = (set.medium && set.medium.url) || (set.large && set.large.url) || (set.small && set.small.url) || '';
+    }
+  } catch (e) { url = ''; }
+  fotoNivelMiniaturaCache[webUrl] = url;
+  return url;
+}
+
+let fotoNivelTimerAbrir = null, fotoNivelTimerFechar = null, fotoNivelSeq = 0, fotoNivelSeloAtual = null;
+
+function fecharPopoverFotoNivel() {
+  clearTimeout(fotoNivelTimerAbrir); clearTimeout(fotoNivelTimerFechar);
+  fotoNivelSeq++; fotoNivelSeloAtual = null;
+  const pop = document.getElementById('fotoNivelPopover');
+  if (pop) pop.style.display = 'none';
+}
+
+function posicionarPopoverFotoNivel(selo, pop) {
+  const r = selo.getBoundingClientRect();
+  pop.style.display = 'block';
+  const w = pop.offsetWidth, h = pop.offsetHeight;
+  let left = Math.min(Math.max(8, r.right - w), window.innerWidth - w - 8);
+  let top = r.top - h - 10;
+  if (top < 8) top = Math.min(r.bottom + 10, window.innerHeight - h - 8);
+  pop.style.left = left + 'px'; pop.style.top = Math.max(8, top) + 'px';
+}
+
+async function mostrarPopoverFotoNivel(selo) {
+  const reg = fotoNivelRegistro[selo.getAttribute('data-foto-key')];
+  if (!reg) return;
+  let pop = document.getElementById('fotoNivelPopover');
+  if (!pop) {
+    pop = document.createElement('div'); pop.id = 'fotoNivelPopover';
+    pop.addEventListener('mouseenter', function() { clearTimeout(fotoNivelTimerFechar); });
+    pop.addEventListener('mouseleave', function() { fotoNivelTimerFechar = setTimeout(fecharPopoverFotoNivel, 150); });
+    document.body.appendChild(pop);
+  }
+  const meu = ++fotoNivelSeq; fotoNivelSeloAtual = selo;
+  const base = reg.comFoto || reg.ultima;
+  const semFotoNaUltima = reg.comFoto && reg.comFoto !== reg.ultima;
+  const titulo = '<div class="fn-ttl"><b>Último ' + escaparHtmlFoto(reg.crit) + ' · ' + escaparHtmlFoto(reg.defeito) + '</b><span>' + escaparHtmlFoto(rotuloDataHoraOcorrencia(base)) + '</span></div>';
+  const legenda = '<div class="fn-leg">' + (base.cavidade ? 'Cavidade ' + escaparHtmlFoto(String(base.cavidade).toUpperCase() === 'TODAS' ? 'todas' : base.cavidade) + ' · ' : '') + 'Inspetor: ' + escaparHtmlFoto(base.responsavel || '—') +
+    (base.observacao ? '<small>Obs.: ' + escaparHtmlFoto(base.observacao) + '</small>' : '') +
+    (semFotoNaUltima ? '<small>A ocorrência mais recente (' + escaparHtmlFoto(rotuloDataHoraOcorrencia(reg.ultima)) + ') não tem foto.</small>' : '') + '</div>';
+
+  if (!reg.comFoto) {
+    pop.innerHTML = '<div class="fn-ttl"><b>Último ' + escaparHtmlFoto(reg.crit) + ' · ' + escaparHtmlFoto(reg.defeito) + '</b><span>' + escaparHtmlFoto(rotuloDataHoraOcorrencia(reg.ultima)) + '</span></div>' +
+      '<div class="fn-img" style="height:80px;">Nenhuma foto anexada nas ocorrências ' + escaparHtmlFoto(reg.crit) + ' deste defeito.</div>' + legenda;
+    posicionarPopoverFotoNivel(selo, pop); return;
+  }
+  pop.innerHTML = titulo + '<div class="fn-img">Carregando foto…</div>' + legenda;
+  posicionarPopoverFotoNivel(selo, pop);
+
+  const miniatura = await obterMiniaturaFoto(reg.comFoto.foto_url);
+  if (meu !== fotoNivelSeq) return; // o usuário já saiu desse selo / abriu outro
+  const caixa = pop.querySelector('.fn-img');
+  const linkAbrir = '<a href="' + escaparHtmlFoto(reg.comFoto.foto_url) + '" target="_blank" rel="noopener">Abrir foto</a>';
+  if (!miniatura) { caixa.innerHTML = '<span>Não consegui carregar a prévia.<br>' + linkAbrir + '</span>'; posicionarPopoverFotoNivel(selo, pop); return; }
+  const img = new Image();
+  img.onload = function() { if (meu === fotoNivelSeq) { caixa.innerHTML = ''; caixa.appendChild(img); } };
+  img.onerror = function() { delete fotoNivelMiniaturaCache[reg.comFoto.foto_url]; if (meu === fotoNivelSeq) caixa.innerHTML = '<span>Não consegui carregar a prévia.<br>' + linkAbrir + '</span>'; };
+  img.alt = 'Foto da última ocorrência'; img.src = miniatura;
+}
+
+// Delegação única no documento (a análise é re-renderizada o tempo todo, então nada de listener por selo).
+// Mouse: abre só se ficar parado ~0,3 s no selo (quem só atravessa o card não dispara nada).
+// Toque/teclado: clique ou foco abre; clique fora fecha.
+document.addEventListener('mouseover', function(ev) {
+  const selo = ev.target.closest && ev.target.closest('.badge[data-foto-key]');
+  if (!selo || selo === fotoNivelSeloAtual) { if (selo) clearTimeout(fotoNivelTimerFechar); return; }
+  clearTimeout(fotoNivelTimerAbrir); clearTimeout(fotoNivelTimerFechar);
+  fotoNivelTimerAbrir = setTimeout(function() { mostrarPopoverFotoNivel(selo); }, 300);
+});
+document.addEventListener('mouseout', function(ev) {
+  const selo = ev.target.closest && ev.target.closest('.badge[data-foto-key]');
+  if (!selo) return;
+  clearTimeout(fotoNivelTimerAbrir);
+  fotoNivelTimerFechar = setTimeout(fecharPopoverFotoNivel, 150);
+});
+document.addEventListener('click', function(ev) {
+  const selo = ev.target.closest && ev.target.closest('.badge[data-foto-key]');
+  if (selo) { if (selo === fotoNivelSeloAtual) fecharPopoverFotoNivel(); else { clearTimeout(fotoNivelTimerAbrir); mostrarPopoverFotoNivel(selo); } return; }
+  if (!(ev.target.closest && ev.target.closest('#fotoNivelPopover'))) fecharPopoverFotoNivel();
+});
+document.addEventListener('focusin', function(ev) {
+  const selo = ev.target.closest && ev.target.closest('.badge[data-foto-key]');
+  // Só foco por teclado (Tab): o foco que vem de um clique/toque já é tratado pelo handler de 'click'.
+  if (selo && selo.matches(':focus-visible')) mostrarPopoverFotoNivel(selo);
+});
+document.addEventListener('keydown', function(ev) { if (ev.key === 'Escape') fecharPopoverFotoNivel(); });
+window.addEventListener('scroll', function() { if (fotoNivelSeloAtual) fecharPopoverFotoNivel(); }, true);
 
 /* ---------------- Tabela de últimas ocorrências ---------------- */
 function abrev(v) {
