@@ -915,10 +915,11 @@
             <thead>
               <tr>
                 <th>Data</th><th>Hora</th><th>Equipamento</th><th>Responsável</th><th>Operador</th><th>Cor</th>
-                <th>Gramatura</th><th>Resina</th><th>°C Mín - Gate</th><th>°C Máx - Gate</th><th>°C Mín - Corpo</th><th>°C Max - Corpo</th>
+                <th>Gramatura</th><th>OP</th><th>N° Caixa</th><th>Resina</th>
+                <th>Defeito Detectado</th><th>Criticidade</th><th>Foto</th><th>Cavidade</th>
+                <th>°C Mín - Gate</th><th>°C Máx - Gate</th><th>°C Mín - Corpo</th><th>°C Max - Corpo</th>
                 <th>Organização Linha</th><th>Tonalidade</th><th>Alinhamento Etiqueta</th>
-                <th>Defeito Detectado</th><th>Cavidade</th><th>Criticidade</th>
-                <th>Operador Ciente</th><th>Status</th><th>Observação</th><th>Foto</th>
+                <th>Operador Ciente</th><th>Status</th><th>Observação</th>
               </tr>
             </thead>
             <tbody id="tabelaInjecaoBody"></tbody>
@@ -4529,14 +4530,16 @@ function renderTabelaInjecao() {
     return '<tr>' +
       '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_fim||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
       '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
-      '<td>'+(l.gramatura||'—')+'</td>' + '<td>'+(l.resina||'—')+'</td>' +
+      '<td>'+(l.gramatura||'—')+'</td>' + '<td>'+(l.op||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+(l.resina||'—')+'</td>' +
+      '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' +
+      '<td>'+(l.criticidade ? '<span class="badge '+critClasse+'">'+l.criticidade+'</span>' : '—')+'</td>' +
+      '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
+      '<td style="white-space:nowrap;">'+(l.cavidade||'—')+'</td>' +
       '<td>'+formatarTemperatura(l.temperatura_gate_min)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_gate_max)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_corpo_min)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_corpo_max)+'</td>' +
       '<td>'+badgeAprovadoReprovado(l.organizacao_linha_produtiva)+'</td>' + '<td>'+badgeAprovadoReprovado(l.tonalidade_preforma)+'</td>' + '<td>'+badgeAprovadoReprovado(l.alinhamento_etiqueta_caixa)+'</td>' +
-      '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' + '<td style="white-space:nowrap;">'+(l.cavidade||'—')+'</td>' +
-      '<td>'+(l.criticidade ? '<span class="badge '+critClasse+'">'+l.criticidade+'</span>' : '—')+'</td>' + '<td>'+porExtenso(l.operador_ciente)+'</td>' +
+      '<td>'+porExtenso(l.operador_ciente)+'</td>' +
       '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
       '<td class="col-obs" title="'+(l.observacao||'').replace(/"/g,'&quot;')+'">'+(l.observacao||'')+'</td>' +
-      '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
     '</tr>';
   }).join('');
   loading.classList.add('hidden');
