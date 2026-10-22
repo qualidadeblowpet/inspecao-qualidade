@@ -3763,9 +3763,13 @@ function linhasFiltradasBase() {
   return aplicarFiltrosComuns(todos, false);
 }
 
+// Base das telas "Ocorrência — Injeção/Sopro" (tabela, PDF e WhatsApp): TODAS as linhas do processo,
+// SEM herdar os filtros do Dashboard (Período, Equipamento, Responsável, Criticidade). Essas telas têm
+// filtros próprios (Buscar, Data, Horário, Cadastros, Linhas) aplicados depois por filtrarBuscaEData().
+// Antes elas herdavam os filtros do Dashboard sem mostrar isso na tela, e um Período curto esquecido
+// lá (ex.: "Últimas 6 horas") fazia um dia inteiro parecer "sem cadastro" na Ocorrência.
 function linhasFiltradasPorProcesso(processoFixo) {
-  const todos = dadosCache[processoFixo] ? dadosCache[processoFixo].slice() : [];
-  return aplicarFiltrosComuns(todos, true);
+  return dadosCache[processoFixo] ? dadosCache[processoFixo].slice() : [];
 }
 
 function aplicarFiltrosComuns(todos, manterSemDefeito) {
