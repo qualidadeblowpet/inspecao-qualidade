@@ -4235,7 +4235,7 @@ function renderCardMaquina(equip, todasLinhasFiltro, dias) {
   const top3Html = top3.length ? top3.map(function(d, i) {
     const selos = d.criticidades.map(function(c) {
       const chaveFoto = registrarOcorrenciaNivel(equip, d.nome, c, desviosMaquina);
-      return '<span class="badge ' + critClasse(c) + '"' + (chaveFoto ? ' data-foto-key="' + chaveFoto + '" tabindex="0" title="Passe o mouse para ver a foto da última ocorrência"' : '') + '>' + c + '</span>';
+      return '<span class="badge ' + critClasse(c) + '"' + (chaveFoto ? ' data-foto-key="' + chaveFoto + '" tabindex="0" aria-label="Ver a foto da última ocorrência"' : '') + '>' + c + '</span>';
     }).join('');
     return '<div class="analise-defeito-linha">' +
       '<div class="analise-def-nome">' + (i + 1) + '. ' + d.nome + '</div>' +
@@ -4431,7 +4431,10 @@ async function obterMiniaturaFoto(webUrl) {
     if (resp.ok) {
       const json = await resp.json();
       const set = (json.value || [])[0];
-      if (set) url = (set.medium && set.medium.url) || (set.large && set.large.url) || (set.small && set.small.url) || '';
+      // "large" (até 800 px no lado maior) é a que casa com o quadro de ~280x370 px mesmo em telas de alta
+      // densidade; "medium" tem só 176 px e ficava esticada/embaçada. Ainda é uma miniatura (~100-200 KB),
+      // não a foto original de vários MB. Só cai pra menor se o OneDrive não tiver gerado a "large".
+      if (set) url = (set.large && set.large.url) || (set.medium && set.medium.url) || (set.small && set.small.url) || '';
     }
   } catch (e) { url = ''; }
   fotoNivelMiniaturaCache[webUrl] = url;
