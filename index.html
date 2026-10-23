@@ -161,6 +161,14 @@
   .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .charts-grid .card.wide { grid-column: 1 / -1; }
   .chart-wrap { position: relative; height: 260px; }
+  /* "Intervalo entre inspeções": Injeção e Sopro em dois gráficos empilhados, cada um com sua escala */
+  .chart-wrap-48 { height: 210px; }
+  .chart48-sub { border: 1px solid var(--border); border-radius: 10px; padding: 12px 12px 8px; margin-top: 12px; }
+  .chart48-cab { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .chart48-cab span { margin-left: auto; font-weight: 400; font-size: 11.5px; color: var(--text-dim); }
+  .chart48-chip { width: 12px; height: 12px; border-radius: 3px; border: 2px solid; display: inline-block; }
+  .chart48-chip.inj { border-color: #9c7bd9; background: rgba(156,123,217,.25); }
+  .chart48-chip.sop { border-color: #5b9bf2; background: rgba(91,155,242,.25); }
   /* Responsividade mobile fica no final do CSS, perto do fechamento da tag de estilo */
 
   /* ---------- Table ---------- */
@@ -844,7 +852,10 @@
       </div>
 
       <div class="charts-grid">
-        <div class="card wide"><h3>Intervalo entre inspeções — últimas 48 horas</h3><div class="chart-wrap"><canvas id="chart48h"></canvas></div></div>
+        <div class="card wide"><h3>Intervalo entre inspeções — últimas 48 horas</h3>
+          <div class="chart48-sub"><div class="chart48-cab"><i class="chart48-chip inj"></i>Injeção<span id="chart48TotInj"></span></div><div class="chart-wrap chart-wrap-48"><canvas id="chart48hInj"></canvas></div></div>
+          <div class="chart48-sub"><div class="chart48-cab"><i class="chart48-chip sop"></i>Sopro<span id="chart48TotSop"></span></div><div class="chart-wrap chart-wrap-48"><canvas id="chart48hSop"></canvas></div></div>
+        </div>
         <div class="card wide">
           <div class="analise-topo">
             <h3 style="margin:0;">Análise do período por máquina</h3>
@@ -3894,10 +3905,6 @@ function atualizarGrafico48h() {
   processar(dadosCache.injecao, contInj);
   processar(dadosCache.sopro, contSop);
 
-  destruirChart('chart48h');
-  const canvas = document.getElementById('chart48h');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
   const c = coresGrafico();
 
   const pontoMaiorOndeHaInspecao = function(context) {
@@ -3947,29 +3954,39 @@ function atualizarGrafico48h() {
     }
   };
 
-  charts['chart48h'] = new Chart(ctx, {
-    type: 'line',
-    data: { labels: labels, datasets: [
-      { label: 'Injeção', data: contInj, borderColor: '#9c7bd9', backgroundColor: 'rgba(156,123,217,0.12)', fill: true, tension: 0.25, borderWidth: 1.5, pointRadius: pontoMaiorOndeHaInspecao, pointHoverRadius: pontoHoverMaiorOndeHaInspecao },
-      { label: 'Sopro', data: contSop, borderColor: '#5b9bf2', backgroundColor: 'rgba(91,155,242,0.12)', fill: true, tension: 0.25, borderWidth: 1.5, pointRadius: pontoMaiorOndeHaInspecao, pointHoverRadius: pontoHoverMaiorOndeHaInspecao }
-    ] },
-    plugins: [bandaDatasPlugin],
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: true, labels: { color: c.legenda, boxWidth: 12, font: { size: 11 } } },
-        bandaDatas: { grupos: gruposData, textColor: c.tick, lineColor: c.grid }
-      },
-      scales: {
-        x: {
-          ticks: { color: c.tick, font: { size: 9 }, maxRotation: 0, minRotation: 0, autoSkip: false },
-          grid: { display: false },
-          afterFit: function(scale) { scale.height += 18; }
+  // Dois gráficos separados (Injeção e Sopro), cada um com a própria escala — antes eram duas linhas no
+  // mesmo gráfico e uma escondia a outra. Mesma contagem (cadastros únicos por hora) de antes.
+  function criarGrafico48h(chave, canvasId, nome, dados, cor, fundo, totalId) {
+    destruirChart(chave);
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const totalEl = document.getElementById(totalId);
+    if (totalEl) { const t = dados.reduce(function(x, y) { return x + y; }, 0); totalEl.textContent = t + ' cadastro' + (t === 1 ? '' : 's') + ' nas 48h'; }
+    charts[chave] = new Chart(canvas.getContext('2d'), {
+      type: 'line',
+      data: { labels: labels, datasets: [
+        { label: nome, data: dados, borderColor: cor, backgroundColor: fundo, fill: true, tension: 0.25, borderWidth: 1.5, pointRadius: pontoMaiorOndeHaInspecao, pointHoverRadius: pontoHoverMaiorOndeHaInspecao }
+      ] },
+      plugins: [bandaDatasPlugin],
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          bandaDatas: { grupos: gruposData, textColor: c.tick, lineColor: c.grid }
         },
-        y: { ticks: { color: c.tick, precision: 0 }, grid: { color: c.grid }, beginAtZero: true }
+        scales: {
+          x: {
+            ticks: { color: c.tick, font: { size: 9 }, maxRotation: 0, minRotation: 0, autoSkip: false },
+            grid: { display: false },
+            afterFit: function(scale) { scale.height += 18; }
+          },
+          y: { ticks: { color: c.tick, precision: 0 }, grid: { color: c.grid }, beginAtZero: true, suggestedMax: 2 }
+        }
       }
-    }
-  });
+    });
+  }
+  criarGrafico48h('chart48hInj', 'chart48hInj', 'Injeção', contInj, '#9c7bd9', 'rgba(156,123,217,0.12)', 'chart48TotInj');
+  criarGrafico48h('chart48hSop', 'chart48hSop', 'Sopro', contSop, '#5b9bf2', 'rgba(91,155,242,0.12)', 'chart48TotSop');
 }
 
 async function atualizarDashboard() {
