@@ -374,6 +374,88 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
   .kpi-row{grid-template-columns:1fr 1fr; gap:8px;}
   .module-grid{grid-template-columns:1fr 1fr;}
 }
+
+/* ===================== LAYOUT A — menu lateral único ===================== */
+#app{position:fixed; inset:0; background:var(--bg); z-index:1;}
+#app.hidden{display:none !important;}
+.a-shell{display:flex; height:100%;}
+.a-side{width:264px; flex-shrink:0; background:var(--surface); border-right:1px solid var(--border); display:flex; flex-direction:column; height:100%; overflow-y:auto;
+  padding-top:env(safe-area-inset-top,0px); padding-left:env(safe-area-inset-left,0px);}
+.a-brand{display:flex; gap:11px; align-items:center; padding:18px 18px 10px;}
+.a-logo{width:34px; height:34px; border-radius:10px; background:var(--accent); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-weight:700; font-size:15px; flex-shrink:0;}
+.a-brand b{display:block; font-size:14.5px; font-weight:600;} .a-brand small{font-size:11.5px; color:var(--fg-faint);}
+.a-nav{display:flex; flex-direction:column; padding-bottom:12px;}
+.a-grp{font-size:10.5px; text-transform:uppercase; letter-spacing:.9px; color:var(--fg-faint); padding:16px 22px 6px;}
+.a-item{display:flex; align-items:center; gap:11px; margin:1px 10px; border:none; background:transparent; padding:9px 12px; border-radius:8px; font-family:var(--font-body); font-size:13.5px; color:var(--fg-dim); cursor:pointer; text-align:left; white-space:nowrap;}
+.a-item svg{width:17px; height:17px; flex-shrink:0; opacity:.8;}
+.a-item .ct{margin-left:auto; font-size:11px; color:var(--fg-faint); font-variant-numeric:tabular-nums;}
+.a-item:hover{background:var(--surface-2); color:var(--fg);}
+.a-item.on{background:var(--accent-soft); color:var(--accent); font-weight:600;}
+.a-item.on svg{opacity:1;} .a-item.on .ct{color:var(--accent);}
+.a-user{margin-top:auto; border-top:1px solid var(--border); padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px)); display:flex; gap:10px; align-items:center;}
+.a-user .av{width:32px; height:32px; border-radius:50%; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;}
+.a-user .who{flex:1; min-width:0;} .a-user .who b{display:block; font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.a-user .who small{display:block; font-size:11px; color:var(--fg-faint); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.a-ic-btn{border:1px solid var(--border); background:var(--surface); color:var(--fg-dim); border-radius:8px; width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0;}
+.a-ic-btn:hover{color:var(--fg); border-color:var(--fg-faint);}
+.a-ic-btn svg{width:16px; height:16px;}
+.a-main{flex:1; min-width:0; display:flex; flex-direction:column; height:100%;}
+.a-top{display:flex; align-items:center; gap:10px; padding:12px 24px; padding-top:calc(12px + env(safe-area-inset-top,0px)); padding-right:max(24px, env(safe-area-inset-right,0px)); border-bottom:1px solid var(--border); background:var(--surface); flex-shrink:0;}
+.a-crumb{flex:1; min-width:0; font-size:13.5px; color:var(--fg-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.a-crumb b{color:var(--fg); font-weight:600;}
+.a-burger{display:none;}
+.a-content{flex:1; overflow-y:auto; padding:22px 24px 40px; padding-right:max(24px, env(safe-area-inset-right,0px)); padding-bottom:calc(40px + env(safe-area-inset-bottom,0px));}
+.a-content .tela-head{margin-bottom:4px;} .a-content .tela-head h2{font-size:20px;}
+.a-content .app-shell{min-height:calc(100vh - 210px); min-height:calc(100dvh - 210px);}
+.a-scrim{display:none;}
+.kpi-btn{text-align:left; cursor:pointer; font:inherit; color:inherit; width:100%; background:var(--surface);}
+.kpi-btn:hover{border-color:var(--accent-border);}
+.kpi .v.quar{color:var(--quar);}
+.home-cols{display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:14px; align-items:start;}
+.home-cols .panel{background:var(--surface); padding:0; overflow:hidden;}
+.home-cols .panel h3{padding:14px 16px; margin:0; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;}
+.home-cols .activity{padding:2px 16px;}
+.att-row{display:flex; gap:12px; align-items:center; width:100%; padding:11px 16px; border:none; border-bottom:1px solid var(--border); background:transparent; text-align:left; cursor:pointer; font-family:var(--font-body); color:var(--fg); font-size:13px;}
+.att-row:last-child{border-bottom:none;} .att-row:hover{background:var(--surface-2);}
+.att-row .m{flex:1; min-width:0;} .att-row .m b{font-weight:500;} .att-row .m .s2{font-size:11.5px; color:var(--fg-faint); margin-top:2px;}
+.act-row.clicavel{cursor:pointer;} .act-row.clicavel:hover .t1{color:var(--accent);}
+.vazio-home{padding:22px 16px; color:var(--fg-faint); font-size:12.5px;}
+table.occ tbody tr.clicavel{cursor:pointer;}
+.rcard.clicavel{cursor:pointer;} .rcard.clicavel:hover{border-color:var(--accent-border);}
+/* painel lateral (detalhe do recebimento) */
+.drawer-scrim{position:fixed; inset:0; background:rgba(8,12,16,.38); z-index:150;}
+.drawer{position:fixed; top:0; right:0; bottom:0; width:min(540px, 100vw); background:var(--surface); border-left:1px solid var(--border); z-index:151; display:flex; flex-direction:column; box-shadow:-18px 0 50px rgba(0,0,0,.18);
+  padding-top:env(safe-area-inset-top,0px); padding-right:env(safe-area-inset-right,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
+.drawer-h{display:flex; gap:12px; align-items:flex-start; padding:18px 20px 14px; border-bottom:1px solid var(--border);}
+.drawer-h .mi{width:34px; height:34px; border-radius:9px; background:var(--surface-3); color:var(--accent); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+.drawer-h .mi svg{width:17px; height:17px;}
+.drawer-h h3{margin:0; font-size:17px; font-weight:600; font-variant-numeric:tabular-nums;}
+.drawer-h .sub{font-size:12px; color:var(--fg-faint); margin-top:3px;}
+.drawer-b{flex:1; overflow-y:auto; padding:4px 20px 20px;}
+.drawer-f{padding:12px 20px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;}
+.dw-kv{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px 18px; margin:0; font-size:13px;}
+.dw-kv dt{font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--fg-faint); margin-bottom:3px;}
+.dw-kv dd{margin:0; overflow-wrap:anywhere;}
+.dw-prog{display:flex; align-items:center; gap:10px; font-size:12px; color:var(--fg-dim); margin:2px 0 10px;}
+.dw-prog .bar{flex:1; height:6px; border-radius:6px; background:var(--surface-3); overflow:hidden;}
+.dw-prog .bar i{display:block; height:100%; background:var(--accent);}
+.dw-obs{font-size:13px; color:var(--fg-dim); white-space:pre-wrap; margin:0;}
+.res-pend{color:var(--fg-faint);}
+@media (max-width:900px){
+  .a-side{position:fixed; left:0; top:0; bottom:0; z-index:120; transform:translateX(-105%); transition:transform .2s ease; box-shadow:0 0 50px rgba(0,0,0,.25);}
+  .a-shell.menu-on .a-side{transform:none;}
+  .a-shell.menu-on .a-scrim{display:block; position:fixed; inset:0; background:rgba(8,12,16,.38); z-index:110;}
+  .a-burger{display:inline-flex;}
+  .a-top{padding-left:max(12px, env(safe-area-inset-left,0px)); padding-right:max(12px, env(safe-area-inset-right,0px));}
+  .a-content{padding:16px max(12px, env(safe-area-inset-right,0px)) 40px max(12px, env(safe-area-inset-left,0px));}
+  .home-cols{grid-template-columns:1fr;}
+  .a-content .app-shell{min-height:0;}
+}
+@media (max-width:640px){
+  .a-top .hide-sm{display:none;} .a-top .conn-status{display:none;}
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .dw-kv{grid-template-columns:1fr 1fr;}
+}
 </style>
 </head>
 <body>
@@ -404,6 +486,8 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
 <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
 <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-truck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></g></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v4a2 2 0 0 0 2 2h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 13H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 17H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
@@ -430,100 +514,64 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
 
 <!-- ===================== APP ===================== -->
 <div id="app" class="hidden">
-<div class="wrap">
-
-  <div class="masthead">
-    <div class="masthead-row">
-      <div>
-        <div class="eyebrow"><span class="dot"></span>BLOWPET · QUALIDADE</div>
-        <h1>Sistema da Qualidade</h1>
-      </div>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <span class="conn-status"><span class="status-dot" id="statusDot"></span><span id="statusText">conectando…</span></span>
-        <div class="user-pill">
-          <span class="av" id="userAvatar">—</span>
-          <span id="userEmail">—</span>
-          <button type="button" onclick="abrirConfiguracoes()"><svg width="13" height="13"><use href="#i-gear"/></svg> Config.</button>
-        </div>
-      </div>
+<div class="a-shell" id="shell">
+  <aside class="a-side" id="aSide">
+    <div class="a-brand"><div class="a-logo">Q</div><div><b>Sistema da Qualidade</b><small>BlowPet · Qualidade</small></div></div>
+    <nav class="a-nav">
+      <button class="a-item" data-nav="visao" onclick="irPara('visao')"><svg><use href="#i-home"/></svg><span>Visão geral</span></button>
+      <div class="a-grp">Recebimento</div>
+      <button class="a-item mat-btn" data-nav="lista:resina" data-mat="resina"><svg><use href="#i-flask"/></svg><span>Resina PET</span><span class="ct" id="ctResina">0</span></button>
+      <button class="a-item mat-btn" data-nav="lista:rotulo" data-mat="rotulo"><svg><use href="#i-tag"/></svg><span>Rótulo</span><span class="ct" id="ctRotulo">0</span></button>
+      <button class="a-item mat-btn" data-nav="lista:pigmento" data-mat="pigmento"><svg><use href="#i-droplet"/></svg><span>Pigmento</span><span class="ct" id="ctPigmento">0</span></button>
+      <button class="a-item mat-btn" data-nav="lista:cinta" data-mat="cinta"><svg><use href="#i-package"/></svg><span>Cx. Preforma (Cinta)</span><span class="ct" id="ctCinta">0</span></button>
+      <button class="a-item mat-btn" data-nav="lista:tampa" data-mat="tampa"><svg><use href="#i-package-lid"/></svg><span>Cx. Preforma (Tampa)</span><span class="ct" id="ctTampa">0</span></button>
+      <div class="a-grp">Qualidade</div>
+      <button class="a-item" data-nav="reclamacao" onclick="irPara('reclamacao')"><svg><use href="#i-megaphone"/></svg><span>Reclamações de cliente</span><span class="ct" id="ctReclamacoes">0</span></button>
+      <button class="a-item" data-nav="liberacao" onclick="irPara('liberacao')"><svg><use href="#i-shield-alert"/></svg><span>Liberações não conforme</span><span class="ct" id="ctLiberacoes">0</span></button>
+      <div class="a-grp">Cadastros</div>
+      <button class="a-item cad-btn" data-nav="cadastros:fornecedores" data-cad="fornecedores"><svg><use href="#i-truck"/></svg><span>Fornecedores</span><span class="ct" id="ctFornecedores">0</span></button>
+      <button class="a-item cad-btn" data-nav="cadastros:especificacoes" data-cad="especificacoes"><svg><use href="#i-sliders"/></svg><span>Especificações</span><span class="ct" id="ctEspecificacoes">0</span></button>
+      <button class="a-item cad-btn" data-nav="cadastros:rotulos" data-cad="rotulos"><svg><use href="#i-image"/></svg><span>Rótulos homologados</span><span class="ct" id="ctRotulosHom">0</span></button>
+    </nav>
+    <div class="a-user">
+      <span class="av" id="userAvatar">—</span>
+      <div class="who"><b id="userNome">—</b><small id="userEmail">—</small></div>
+      <button class="a-ic-btn" title="Configurações" onclick="abrirConfiguracoes()"><svg><use href="#i-gear"/></svg></button>
     </div>
-    <p>Recebimento de matéria-prima, Reclamação de Cliente e Registro de Liberação Não Conforme, num hub só — dados gravados direto na planilha da Qualidade no OneDrive.</p>
-  </div>
-
-  <nav class="segnav" id="segnav">
-    <button class="active" data-tela="visao"><svg><use href="#i-home"/></svg>Visão geral</button>
-    <button data-tela="lista"><svg><use href="#i-inbox"/></svg>Recebimento</button>
-    <button data-tela="cadastros"><svg><use href="#i-folder"/></svg>Cadastros</button>
-    <button data-tela="reclamacao"><svg><use href="#i-megaphone"/></svg>Reclamação de cliente</button>
-    <button data-tela="liberacao"><svg><use href="#i-shield-alert"/></svg>Liberação não conforme</button>
-  </nav>
+  </aside>
+  <div class="a-scrim" onclick="toggleMenu(false)"></div>
+  <main class="a-main">
+    <header class="a-top">
+      <button class="a-ic-btn a-burger" onclick="toggleMenu()" aria-label="Menu"><svg><use href="#i-menu"/></svg></button>
+      <div class="a-crumb" id="aCrumb"><b>Visão geral</b></div>
+      <span class="conn-status"><span class="status-dot" id="statusDot"></span><span id="statusText">conectando…</span></span>
+      <button class="btn" onclick="recarregarTudo()" title="Atualizar os dados da planilha"><svg><use href="#i-refresh"/></svg><span class="hide-sm">Atualizar</span></button>
+      <button class="btn btn-accent" onclick="novoRecebimentoGlobal()"><svg><use href="#i-plus"/></svg><span class="hide-sm">Novo recebimento</span></button>
+    </header>
+    <div class="a-content" id="aContent">
 
   <!-- ===================== TELA 1 — VISÃO GERAL ===================== -->
   <section class="tela active" id="tela-visao">
-    <div class="tela-head"><h2>Visão geral</h2><span class="tag">tela inicial · acesso aos módulos</span></div>
-    <p class="tela-sub">Resumo do que precisa de atenção e, abaixo, o acesso a cada módulo.</p>
-    <div class="screen home-pad">
-      <div class="kpi-row">
-        <div class="kpi"><div class="top"><span class="l">Recebimentos em análise</span><svg><use href="#i-clock"/></svg></div><div class="v warn tabular" id="kpiAnalise">0</div></div>
-        <div class="kpi"><div class="top"><span class="l">Reclamações em aberto</span><svg><use href="#i-megaphone"/></svg></div><div class="v danger tabular" id="kpiReclamacoes">0</div></div>
-        <div class="kpi"><div class="top"><span class="l">Liberações aguardando aprovação</span><svg><use href="#i-shield-alert"/></svg></div><div class="v accent tabular" id="kpiLiberacoes">0</div></div>
-        <div class="kpi"><div class="top"><span class="l">Lotes em quarentena</span><svg><use href="#i-package"/></svg></div><div class="v tabular" id="kpiQuarentena">0</div></div>
-      </div>
-
-      <div class="module-section">
-        <div class="module-section-label">Recebimento de matéria-prima</div>
-        <div class="module-grid">
-          <button class="module-card" onclick="abrirMaterial('resina')"><div class="top"><span class="ic"><svg><use href="#i-flask"/></svg></span></div><div class="title">Resina PET</div><div class="meta" id="metaResina">—</div></button>
-          <button class="module-card" onclick="abrirMaterial('rotulo')"><div class="top"><span class="ic"><svg><use href="#i-tag"/></svg></span></div><div class="title">Rótulo</div><div class="meta" id="metaRotulo">—</div></button>
-          <button class="module-card" onclick="abrirMaterial('pigmento')"><div class="top"><span class="ic"><svg><use href="#i-droplet"/></svg></span></div><div class="title">Pigmento</div><div class="meta" id="metaPigmento">—</div></button>
-          <button class="module-card" onclick="abrirMaterial('cinta')"><div class="top"><span class="ic"><svg><use href="#i-package"/></svg></span></div><div class="title">Caixa de Preforma (Cinta)</div><div class="meta" id="metaCinta">—</div></button>
-          <button class="module-card" onclick="abrirMaterial('tampa')"><div class="top"><span class="ic"><svg><use href="#i-package-lid"/></svg></span></div><div class="title">Caixa de Preforma (Tampa)</div><div class="meta" id="metaTampa">—</div></button>
-        </div>
-      </div>
-
-      <div class="module-section">
-        <div class="module-section-label">Cadastros auxiliares</div>
-        <div class="module-grid">
-          <button class="module-card" onclick="abrirCadastro('rotulos')"><div class="top"><span class="ic"><svg><use href="#i-image"/></svg></span></div><div class="title">Rótulos Homologados</div><div class="meta" id="metaRotulosHom">—</div></button>
-          <button class="module-card" onclick="abrirCadastro('especificacoes')"><div class="top"><span class="ic"><svg><use href="#i-sliders"/></svg></span></div><div class="title">Especificações</div><div class="meta" id="metaEspec">—</div></button>
-          <button class="module-card" onclick="abrirCadastro('fornecedores')"><div class="top"><span class="ic"><svg><use href="#i-truck"/></svg></span></div><div class="title">Fornecedores</div><div class="meta" id="metaFornecedores">—</div></button>
-        </div>
-      </div>
-
-      <div class="module-section">
-        <div class="module-section-label">Qualidade</div>
-        <div class="module-grid">
-          <button class="module-card" onclick="irPara('reclamacao')"><div class="top"><span class="ic"><svg><use href="#i-megaphone"/></svg></span></div><div class="title">Reclamação de Cliente</div><div class="meta" id="metaReclamacoes">—</div></button>
-          <button class="module-card" onclick="irPara('liberacao')"><div class="top"><span class="ic"><svg><use href="#i-shield-alert"/></svg></span></div><div class="title">Registro de Liberação Não Conforme</div><div class="meta" id="metaLiberacoes">—</div></button>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h3>Atividade recente — todos os módulos</h3>
-        <div class="activity" id="atividadeRecente"><div class="ae-vazio" style="padding:14px 0; color:var(--fg-faint); font-size:12.5px;">Sem registros ainda.</div></div>
-      </div>
+    <div class="tela-head"><h2>Visão geral</h2></div>
+    <p class="tela-sub">O que precisa de atenção agora e a atividade recente de todos os módulos.</p>
+    <div class="kpi-row">
+      <button class="kpi kpi-btn" onclick="irParaStatus('analise')"><div class="top"><span class="l">Recebimentos em análise</span><svg><use href="#i-clock"/></svg></div><div class="v warn tabular" id="kpiAnalise">0</div></button>
+      <button class="kpi kpi-btn" onclick="irParaStatus('quarentena')"><div class="top"><span class="l">Lotes em quarentena</span><svg><use href="#i-package"/></svg></div><div class="v quar tabular" id="kpiQuarentena">0</div></button>
+      <button class="kpi kpi-btn" onclick="irPara('reclamacao')"><div class="top"><span class="l">Reclamações em aberto</span><svg><use href="#i-megaphone"/></svg></div><div class="v danger tabular" id="kpiReclamacoes">0</div></button>
+      <button class="kpi kpi-btn" onclick="irPara('liberacao')"><div class="top"><span class="l">Liberações aguardando aprovação</span><svg><use href="#i-shield-alert"/></svg></div><div class="v accent tabular" id="kpiLiberacoes">0</div></button>
+    </div>
+    <div class="home-cols">
+      <div class="panel"><h3>Precisa de atenção <span class="tabular" id="atencaoCt" style="color:var(--fg-faint);"></span></h3><div id="precisaAtencao"><div class="vazio-home">Nada pendente.</div></div></div>
+      <div class="panel"><h3>Atividade recente — todos os módulos</h3><div class="activity" id="atividadeRecente"><div class="vazio-home">Sem registros ainda.</div></div></div>
     </div>
   </section>
 
   <!-- ===================== TELA 2 — RECEBIMENTO ===================== -->
   <section class="tela" id="tela-lista">
     <div class="tela-head"><h2>Recebimento</h2></div>
-    <p class="tela-sub">Menu lateral com cada matéria-prima. Barra de filtros/ações em cima e os registros abaixo, em tabela ou em cartões.</p>
+    <p class="tela-sub">Clique num recebimento pra ver os dados e as medições e completar a análise. Escolha o material no menu ao lado.</p>
     <div class="screen">
       <div class="app-shell">
-        <div class="app-sidebar">
-          <div class="brand">QUALIDADE</div>
-          <div class="lbl">Visão</div>
-          <button onclick="irPara('visao')"><span class="ic"><svg><use href="#i-home"/></svg></span>Visão geral</button>
-          <div class="lbl">Recebimento</div>
-          <button class="mat-btn active" data-mat="resina"><span class="ic"><svg><use href="#i-flask"/></svg></span>Resina PET<span class="ct" id="ctResina">0</span></button>
-          <button class="mat-btn" data-mat="rotulo"><span class="ic"><svg><use href="#i-tag"/></svg></span>Rótulo<span class="ct" id="ctRotulo">0</span></button>
-          <button class="mat-btn" data-mat="pigmento"><span class="ic"><svg><use href="#i-droplet"/></svg></span>Pigmento<span class="ct" id="ctPigmento">0</span></button>
-          <button class="mat-btn" data-mat="cinta"><span class="ic"><svg><use href="#i-package"/></svg></span>Cx. Preforma (Cinta)<span class="ct" id="ctCinta">0</span></button>
-          <button class="mat-btn" data-mat="tampa"><span class="ic"><svg><use href="#i-package-lid"/></svg></span>Cx. Preforma (Tampa)<span class="ct" id="ctTampa">0</span></button>
-          <div class="lbl">Sistema</div>
-          <button onclick="abrirConfiguracoes()"><span class="ic"><svg><use href="#i-gear"/></svg></span>Configurações</button>
-        </div>
         <div class="app-main">
           <div class="app-topbar">
             <div class="material-title" id="matTitle">Resina PET</div>
@@ -542,8 +590,6 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
               <button class="active" data-view="tabela"><svg><use href="#i-rows"/></svg> Tabela</button>
               <button data-view="cards"><svg><use href="#i-grid"/></svg> Cards</button>
             </div>
-            <button class="btn btn-accent" onclick="abrirModalCadastro()"><svg><use href="#i-plus"/></svg> Novo recebimento</button>
-            <button class="btn" onclick="recarregarTudo()"><svg><use href="#i-refresh"/></svg> Atualizar</button>
           </div>
           <div class="table-scroll" id="viewTabela">
             <table class="occ">
@@ -563,15 +609,6 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
     <p class="tela-sub">Cliente, produto, motivo, classificação (procedente/improcedente) e andamento da tratativa.</p>
     <div class="screen">
       <div class="app-shell">
-        <div class="app-sidebar">
-          <div class="brand">QUALIDADE</div>
-          <div class="lbl">Visão</div>
-          <button onclick="irPara('visao')"><span class="ic"><svg><use href="#i-home"/></svg></span>Visão geral</button>
-          <div class="lbl">Qualidade</div>
-          <button class="active"><span class="ic"><svg><use href="#i-megaphone"/></svg></span>Reclamação de Cliente<span class="ct" id="ctReclamacoes">0</span></button>
-          <div class="lbl">Sistema</div>
-          <button onclick="abrirConfiguracoes()"><span class="ic"><svg><use href="#i-gear"/></svg></span>Configurações</button>
-        </div>
         <div class="app-main">
           <div class="app-topbar">
             <div class="material-title">Reclamação de Cliente</div>
@@ -592,7 +629,6 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
             </div>
             <div class="tf"><label>Buscar</label><input type="search" id="fBuscaReclamacao" placeholder="RAC, cliente…"></div>
             <button class="btn btn-accent" style="margin-left:auto;" onclick="abrirModalReclamacao()"><svg><use href="#i-plus"/></svg> Nova reclamação</button>
-            <button class="btn" onclick="recarregarTudo()"><svg><use href="#i-refresh"/></svg> Atualizar</button>
           </div>
           <div class="table-scroll">
             <table class="occ">
@@ -611,15 +647,6 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
     <p class="tela-sub">Produto liberado mesmo com não conformidade — o que foi encontrado, a decisão e quem aprovou.</p>
     <div class="screen">
       <div class="app-shell">
-        <div class="app-sidebar">
-          <div class="brand">QUALIDADE</div>
-          <div class="lbl">Visão</div>
-          <button onclick="irPara('visao')"><span class="ic"><svg><use href="#i-home"/></svg></span>Visão geral</button>
-          <div class="lbl">Qualidade</div>
-          <button class="active"><span class="ic"><svg><use href="#i-shield-alert"/></svg></span>Liberação Não Conforme<span class="ct" id="ctLiberacoes">0</span></button>
-          <div class="lbl">Sistema</div>
-          <button onclick="abrirConfiguracoes()"><span class="ic"><svg><use href="#i-gear"/></svg></span>Configurações</button>
-        </div>
         <div class="app-main">
           <div class="app-topbar">
             <div class="material-title">Liberação Não Conforme</div>
@@ -633,7 +660,6 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
             </div>
             <div class="tf"><label>Buscar</label><input type="search" id="fBuscaLiberacao" placeholder="Nº registro, produto…"></div>
             <button class="btn btn-accent" style="margin-left:auto;" onclick="abrirModalLiberacao()"><svg><use href="#i-plus"/></svg> Novo registro</button>
-            <button class="btn" onclick="recarregarTudo()"><svg><use href="#i-refresh"/></svg> Atualizar</button>
           </div>
           <div class="table-scroll">
             <table class="occ">
@@ -652,17 +678,6 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
     <p class="tela-sub">Fornecedores e o que cada um fornece, especificações de parâmetros/tolerâncias e rótulos homologados. O recebimento puxa fornecedor, tipo e código daqui.</p>
     <div class="screen">
       <div class="app-shell">
-        <div class="app-sidebar">
-          <div class="brand">QUALIDADE</div>
-          <div class="lbl">Visão</div>
-          <button onclick="irPara('visao')"><span class="ic"><svg><use href="#i-home"/></svg></span>Visão geral</button>
-          <div class="lbl">Cadastros</div>
-          <button class="cad-btn" data-cad="fornecedores"><span class="ic"><svg><use href="#i-truck"/></svg></span>Fornecedores<span class="ct" id="ctFornecedores">0</span></button>
-          <button class="cad-btn" data-cad="especificacoes"><span class="ic"><svg><use href="#i-sliders"/></svg></span>Especificações<span class="ct" id="ctEspecificacoes">0</span></button>
-          <button class="cad-btn" data-cad="rotulos"><span class="ic"><svg><use href="#i-image"/></svg></span>Rótulos Homologados<span class="ct" id="ctRotulosHom">0</span></button>
-          <div class="lbl">Sistema</div>
-          <button onclick="abrirConfiguracoes()"><span class="ic"><svg><use href="#i-gear"/></svg></span>Configurações</button>
-        </div>
         <div class="app-main">
           <div class="app-topbar">
             <div class="material-title" id="cadTitle">Rótulos Homologados</div>
@@ -682,6 +697,29 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
       </div>
     </div>
   </section>
+
+  <footer class="note">
+    Sistema da Qualidade BlowPet — Recebimento (Resina PET, Rótulo, Pigmento, Caixa de Preforma Cinta/Tampa), Fornecedores, Especificações, Rótulos Homologados, Reclamação de Cliente e Liberação Não Conforme. Dados gravados na planilha <span class="mono">sistema_qualidade_blowpet_base.xlsx</span> via Microsoft Graph API, mesmo padrão do app de Inspeção da Qualidade.
+  </footer>
+    </div>
+  </main>
+</div>
+
+  <!-- ===================== PAINEL LATERAL — DETALHE DO RECEBIMENTO ===================== -->
+  <div class="drawer-scrim hidden" id="drawerScrim" onclick="fecharDetalhe()"></div>
+  <aside class="drawer hidden" id="drawer" aria-label="Detalhe do recebimento">
+    <div class="drawer-h">
+      <span class="mi" id="dwIc"></span>
+      <div style="flex:1; min-width:0;"><h3 id="dwTitulo">—</h3><div class="sub" id="dwSub"></div></div>
+      <span id="dwBadge"></span>
+      <button class="a-ic-btn" onclick="fecharDetalhe()" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
+    </div>
+    <div class="drawer-b" id="dwBody"></div>
+    <div class="drawer-f">
+      <button class="btn" id="dwExcluir"><svg><use href="#i-trash"/></svg> Excluir</button>
+      <button class="btn btn-accent" id="dwEditar"><svg><use href="#i-pencil"/></svg> Editar</button>
+    </div>
+  </aside>
 
   <!-- ===================== JANELA — NOVO RECEBIMENTO ===================== -->
   <div class="modal-overlay hidden" id="modalCadastro">
@@ -964,7 +1002,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
         </div>
 
         <div class="section-title">Listas suspensas</div>
-        <p class="tela-sub" style="margin:0;">Fornecedores, responsáveis e as demais opções de menu são editados direto na aba <span class="mono">Listas</span> da planilha no OneDrive — mudou lá, aparece aqui na próxima vez que o app carregar os dados.</p>
+        <p class="tela-sub" style="margin:0;">Responsáveis, unidades e as demais opções de menu são editados direto na aba <span class="mono">Listas</span> da planilha no OneDrive — mudou lá, aparece aqui na próxima vez que o app carregar os dados. Fornecedores e tipos são cadastrados em Cadastros › Fornecedores.</p>
 
         <div class="form-actions">
           <button class="btn btn-accent" onclick="fecharConfiguracoes()">Fechar</button>
@@ -973,11 +1011,6 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
     </div>
   </div>
 
-  <footer class="note">
-    Sistema da Qualidade BlowPet — Recebimento (Resina PET, Rótulo, Pigmento, Caixa de Preforma Cinta/Tampa), Fornecedores, Especificações, Rótulos Homologados, Reclamação de Cliente e Liberação Não Conforme. Dados gravados na planilha <span class="mono">sistema_qualidade_blowpet_base.xlsx</span> via Microsoft Graph API, mesmo padrão do app de Inspeção da Qualidade.
-  </footer>
-
-</div>
 </div>
 
 <script>
@@ -1074,7 +1107,7 @@ const PARAM_COL_MAP = {
 
 /* ====================== ESTADO ====================== */
 var DATA = { resina:[], rotulo:[], pigmento:[], cinta:[], tampa:[], fornecedores:[], especificacoes:[], rotulosHomologados:[], reclamacoes:[], liberacoes:[], listas:{} };
-var matAtual = 'resina', viewAtual = 'tabela';
+var matAtual = 'resina', viewAtual = 'tabela', telaAtual = 'visao';
 var driveId = null, itemId = null;
 var msalInstance = null, msalPronto = null, contaAtual = null;
 
@@ -1144,7 +1177,9 @@ function aposLogin(){
   document.getElementById('app').classList.remove('hidden');
   document.getElementById('userEmail').textContent = contaAtual.username;
   document.getElementById('configUserEmail').textContent = contaAtual.username;
-  document.getElementById('userAvatar').textContent = (contaAtual.username || '?').charAt(0).toUpperCase();
+  var nomeUsuario = contaAtual.name || String(contaAtual.username || '').split('@')[0] || '—';
+  document.getElementById('userNome').textContent = nomeUsuario;
+  document.getElementById('userAvatar').textContent = nomeUsuario.split(/\s+/).filter(function(x){ return x; }).slice(0, 2).map(function(x){ return x.charAt(0).toUpperCase(); }).join('') || '?';
   conectarPlanilha();
 }
 
@@ -1512,46 +1547,82 @@ function hojeISO(){ var d = new Date(); return d.getFullYear() + '-' + String(d.
 
 /* ====================== NAVEGAÇÃO ====================== */
 function irPara(tela){
-  document.querySelectorAll('.segnav button').forEach(function(b){ b.classList.toggle('active', b.dataset.tela === tela); });
+  telaAtual = tela;
   document.querySelectorAll('.tela').forEach(function(s){ s.classList.toggle('active', s.id === 'tela-' + tela); });
-  window.scrollTo({top:0, behavior:'smooth'});
+  var c = document.getElementById('aContent'); if (c) c.scrollTop = 0;
+  toggleMenu(false);
+  marcarMenu();
 }
-document.getElementById('segnav').addEventListener('click', function(e){
-  var btn = e.target.closest('button[data-tela]');
-  if (btn) irPara(btn.dataset.tela);
-});
+// Destaca no menu lateral o item da tela atual e atualiza o "caminho" na barra de cima.
+function marcarMenu(){
+  var chave = telaAtual === 'lista' ? 'lista:' + matAtual : telaAtual === 'cadastros' ? 'cadastros:' + (typeof cadAtual !== 'undefined' ? cadAtual : '') : telaAtual;
+  document.querySelectorAll('.a-item').forEach(function(b){ b.classList.toggle('on', b.dataset.nav === chave); });
+  var crumb = { visao:'<b>Visão geral</b>', reclamacao:'Qualidade / <b>Reclamações de cliente</b>', liberacao:'Qualidade / <b>Liberações não conforme</b>' }[telaAtual];
+  if (telaAtual === 'lista') crumb = 'Recebimento / <b>' + escHtml(MAT_LABEL_PLANO[matAtual] || '') + '</b>';
+  if (telaAtual === 'cadastros') crumb = 'Cadastros / <b>' + escHtml((typeof CAD_INFO !== 'undefined' && CAD_INFO[cadAtual]) ? CAD_INFO[cadAtual].titulo : '') + '</b>';
+  var el = document.getElementById('aCrumb'); if (el && crumb) el.innerHTML = crumb;
+}
+function toggleMenu(forcar){
+  var sh = document.getElementById('shell'); if (!sh) return;
+  sh.classList.toggle('menu-on', forcar === undefined ? !sh.classList.contains('menu-on') : !!forcar);
+}
+// KPI da Visão geral → abre o recebimento já filtrado pelo status (no material atual, se tiver algum; senão no primeiro que tiver).
+function irParaStatus(chave){
+  var mats = ['resina','rotulo','pigmento','cinta','tampa'];
+  var tem = function(m){ return DATA[m].some(function(r){ return statusKey(r['Status']) === chave; }); };
+  var mat = tem(matAtual) ? matAtual : (mats.find(tem) || matAtual);
+  abrirMaterial(mat);
+  document.getElementById('fStatus').value = chave;
+  renderRecebimento();
+}
+function novoRecebimentoGlobal(){ toggleMenu(false); abrirModalCadastro(); }
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { fecharDetalhe(); toggleMenu(false); } });
 
 /* ====================== RENDER GERAL (home, KPIs, atividade) ====================== */
 function contarStatus(lista, chave){ return lista.filter(function(r){ return statusKey(r[chave]) === 'analise'; }).length; }
 function renderHome(){
-  document.getElementById('kpiAnalise').textContent = ['resina','rotulo','pigmento','cinta','tampa'].reduce(function(acc, m){ return acc + DATA[m].filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length; }, 0);
+  var mats = ['resina','rotulo','pigmento','cinta','tampa'];
+  var ICS = { resina:'i-flask', rotulo:'i-tag', pigmento:'i-droplet', cinta:'i-package', tampa:'i-package-lid' };
+  document.getElementById('kpiAnalise').textContent = mats.reduce(function(acc, m){ return acc + DATA[m].filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length; }, 0);
   document.getElementById('kpiReclamacoes').textContent = DATA.reclamacoes.filter(function(r){ return statusKey(r['Status']) !== 'encerrada'; }).length;
   document.getElementById('kpiLiberacoes').textContent = DATA.liberacoes.filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length;
-  document.getElementById('kpiQuarentena').textContent = ['resina','rotulo','pigmento','cinta','tampa'].reduce(function(acc, m){ return acc + DATA[m].filter(function(r){ return statusKey(r['Status']) === 'quarentena'; }).length; }, 0);
-  document.getElementById('metaResina').textContent = DATA.resina.length + ' recebimento(s)';
-  document.getElementById('metaRotulo').textContent = DATA.rotulo.length + ' recebimento(s)';
-  document.getElementById('metaPigmento').textContent = DATA.pigmento.length + ' recebimento(s)';
-  document.getElementById('metaCinta').textContent = DATA.cinta.length + ' recebimento(s)';
-  document.getElementById('metaTampa').textContent = DATA.tampa.length + ' recebimento(s)';
-  document.getElementById('metaRotulosHom').textContent = DATA.rotulosHomologados.length + ' modelo(s) cadastrado(s)';
-  document.getElementById('metaEspec').textContent = DATA.especificacoes.length + ' ficha(s) cadastrada(s)';
-  document.getElementById('metaFornecedores').textContent = grupoFornecedores().length + ' fornecedor(es) cadastrado(s)';
-  document.getElementById('metaReclamacoes').textContent = DATA.reclamacoes.filter(function(r){ return statusKey(r['Status']) !== 'encerrada'; }).length + ' em aberto de ' + DATA.reclamacoes.length;
-  document.getElementById('metaLiberacoes').textContent = DATA.liberacoes.filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length + ' aguardando aprovação';
+  document.getElementById('kpiQuarentena').textContent = mats.reduce(function(acc, m){ return acc + DATA[m].filter(function(r){ return statusKey(r['Status']) === 'quarentena'; }).length; }, 0);
+
+  // Precisa de atenção: recebimentos em análise ou em quarentena, mais recentes primeiro.
+  var atencao = [];
+  mats.forEach(function(m){ DATA[m].forEach(function(r){ var k = statusKey(r['Status']); if (k === 'analise' || k === 'quarentena') atencao.push({ m: m, r: r }); }); });
+  atencao.sort(function(a, b){ return dataParaOrdenar(b.r['Data Recebimento'] || b.r['Data']) - dataParaOrdenar(a.r['Data Recebimento'] || a.r['Data']); });
+  document.getElementById('atencaoCt').textContent = atencao.length || '';
+  document.getElementById('precisaAtencao').innerHTML = atencao.length ? atencao.slice(0, 12).map(function(a){
+    var r = a.r, prog = progressoAnalises(a.m, r);
+    var titulo = a.m === 'resina' ? (r['Lote Interno'] || '—') : (r['Lote'] || ('NF ' + (r['Nota Fiscal'] || '—')));
+    return '<button class="att-row" onclick="abrirDetalheDe(\'' + a.m + '\',' + r.__index + ')"><span class="act-ic"><svg><use href="#' + ICS[a.m] + '"/></svg></span>' +
+      '<span class="m"><b class="mono">' + escHtml(titulo) + '</b> · ' + escHtml(r['Tipo'] || MAT_LABEL_PLANO[a.m]) +
+      '<div class="s2">' + escHtml(r['Fornecedor'] || '—') + ' · ' + escHtml(r['Data Recebimento'] || r['Data'] || '') + (prog ? ' · ' + prog.feitas + ' de ' + prog.total + ' análises' : '') + '</div></span>' + badgeLabel(r['Status']) + '</button>';
+  }).join('') : '<div class="vazio-home">Nada pendente — nenhum recebimento em análise ou em quarentena.</div>';
 
   var atividades = [];
-  var ICS = { resina:'i-flask', rotulo:'i-tag', pigmento:'i-droplet', cinta:'i-package', tampa:'i-package-lid' };
-  ['resina','rotulo','pigmento','cinta','tampa'].forEach(function(m){
-    DATA[m].forEach(function(r){ atividades.push({ ic: ICS[m], data: r['Data Recebimento'] || r['Data'], t1: MAT_LABEL_PLANO[m] + ' — ' + (r['Fornecedor']||'—'), t2: 'NF ' + (r['Nota Fiscal']||'—') + ' · ' + statusKeyLabelCurto(r['Status']) }); });
+  mats.forEach(function(m){
+    DATA[m].forEach(function(r){ atividades.push({ ic: ICS[m], data: r['Data Recebimento'] || r['Data'], t1: MAT_LABEL_PLANO[m] + ' — ' + (r['Fornecedor']||'—'), t2: 'NF ' + (r['Nota Fiscal']||'—') + ' · ' + statusKeyLabelCurto(r['Status']), acao: "abrirDetalheDe('" + m + "'," + r.__index + ")" }); });
   });
-  DATA.reclamacoes.forEach(function(r){ atividades.push({ ic:'i-megaphone', data:r['Data'], t1:'Reclamação de Cliente — ' + (r['Cliente']||'—'), t2:(r['RAC']||'') + ' · ' + statusKeyLabelCurto(r['Status']) }); });
-  DATA.liberacoes.forEach(function(r){ atividades.push({ ic:'i-shield-alert', data:r['Data'], t1:'Liberação Não Conforme — ' + (r['Produto/Processo']||'—'), t2:(r['Número Registro']||'') + ' · ' + statusKeyLabelCurto(r['Status']) }); });
+  DATA.reclamacoes.forEach(function(r){ atividades.push({ ic:'i-megaphone', data:r['Data'], t1:'Reclamação de Cliente — ' + (r['Cliente']||'—'), t2:(r['RAC']||'') + ' · ' + statusKeyLabelCurto(r['Status']), acao:"irPara('reclamacao')" }); });
+  DATA.liberacoes.forEach(function(r){ atividades.push({ ic:'i-shield-alert', data:r['Data'], t1:'Liberação Não Conforme — ' + (r['Produto/Processo']||'—'), t2:(r['Número Registro']||'') + ' · ' + statusKeyLabelCurto(r['Status']), acao:"irPara('liberacao')" }); });
   atividades.sort(function(a,b){ return dataParaOrdenar(b.data) - dataParaOrdenar(a.data); });
   var el = document.getElementById('atividadeRecente');
-  if (!atividades.length) { el.innerHTML = '<div class="ae-vazio" style="padding:14px 0; color:var(--fg-faint); font-size:12.5px;">Sem registros ainda.</div>'; return; }
+  if (!atividades.length) { el.innerHTML = '<div class="vazio-home">Sem registros ainda.</div>'; return; }
   el.innerHTML = atividades.slice(0, 8).map(function(a){
-    return '<div class="act-row"><div class="act-ic"><svg><use href="#'+a.ic+'"/></svg></div><div class="act-main"><div class="t1">'+a.t1+'</div><div class="t2">'+a.t2+'</div></div><div class="act-date">'+(a.data||'—')+'</div></div>';
+    return '<div class="act-row clicavel" onclick="' + a.acao + '"><div class="act-ic"><svg><use href="#'+a.ic+'"/></svg></div><div class="act-main"><div class="t1">'+escHtml(a.t1)+'</div><div class="t2">'+escHtml(a.t2)+'</div></div><div class="act-date">'+escHtml(a.data||'—')+'</div></div>';
   }).join('');
+}
+// Quantas medições da ficha (critérios L/QA/C) já têm resultado — só Resina, que tem ficha.
+function progressoAnalises(mat, r){
+  if (mat !== 'resina') return null;
+  var ficha = fichaDe('resina', String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim());
+  if (!ficha) return null;
+  var params = ficha.parametros.filter(function(p){ return p.criterio !== '-'; });
+  if (!params.length) return null;
+  var med = medicoesDeLinha(r);
+  return { feitas: params.filter(function(p){ return med[p.teste] !== undefined && String(med[p.teste]).trim() !== ''; }).length, total: params.length };
 }
 function statusKeyLabelCurto(label){ return label || 'sem status'; }
 function dataParaOrdenar(brStr){
@@ -1592,10 +1663,12 @@ function montarHead(mat){
   else { cols = ['Data','Nota fiscal','Fornecedor / tipo','Lote','Quantidade']; if (mat === 'rotulo') cols.push('Conferência'); cols.push('Laudo','Status','Responsável',''); }
   document.getElementById('theadRow').innerHTML = cols.map(function(c){ return '<th>'+c+'</th>'; }).join('');
 }
+function botoesAcaoRecebimento(mat, idx){
+  return '<button type="button" class="icon-btn icon-only" title="Editar" onclick="event.stopPropagation(); editarRecebimento(\''+mat+'\','+idx+')"><svg><use href="#i-pencil"/></svg></button>'+
+    '<button type="button" class="icon-btn icon-only danger" title="Excluir" onclick="event.stopPropagation(); excluirRecebimento(\''+mat+'\','+idx+')"><svg><use href="#i-trash"/></svg></button>';
+}
 function acoesRecebimentoHtml(mat, idx){
-  return '<td class="row-actions-cell"><span class="row-actions">'+
-    '<button type="button" class="icon-btn icon-only" title="Editar" onclick="editarRecebimento(\''+mat+'\','+idx+')"><svg><use href="#i-pencil"/></svg></button>'+
-    '<button type="button" class="icon-btn icon-only danger" title="Excluir" onclick="excluirRecebimento(\''+mat+'\','+idx+')"><svg><use href="#i-trash"/></svg></button></span></td>';
+  return '<td class="row-actions-cell"><span class="row-actions">' + botoesAcaoRecebimento(mat, idx) + '</span></td>';
 }
 function linhasFiltradas(){
   var mat = matAtual, status = document.getElementById('fStatus').value, fornecedor = document.getElementById('fFornecedor').value,
@@ -1611,7 +1684,7 @@ function linhasFiltradas(){
   });
 }
 function linhaResina(r){
-  return '<tr>'+
+  return '<tr class="clicavel" onclick="abrirDetalhe(\'resina\','+r.__index+')">'+
     '<td class="cell-dim tabular">'+(r['Data Recebimento']||'')+'</td>'+
     '<td class="mono">'+(r['Lote Interno']||'')+'</td>'+
     '<td class="mono cell-dim">'+(r['Lote Fornecedor']||'')+'</td>'+
@@ -1626,13 +1699,12 @@ function linhaResina(r){
   '</tr>';
 }
 function cardResina(r){
-  return '<div class="rcard">'+
+  return '<div class="rcard clicavel" onclick="abrirDetalhe(\'resina\','+r.__index+')">'+
     '<div class="top"><div><div class="fornecedor">'+escHtml(r['Tipo']||r['Código Produto']||'')+'</div><div class="cell-dim" style="font-size:11.5px; margin:1px 0 2px;">'+escHtml(r['Fornecedor']||'')+'</div><div class="lote mono">'+(r['Lote Interno']||'')+' · lote forn. '+(r['Lote Fornecedor']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
     '<dl><div><dt>Data</dt><dd class="tabular">'+(r['Data Recebimento']||'')+'</dd></div><div><dt>Nota fiscal</dt><dd class="mono">'+(r['Nota Fiscal']||'')+'</dd></div>'+
     '<div><dt>Quantidade</dt><dd class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</dd></div><div><dt>Viscosidade</dt><dd class="mono">'+(r['Viscosidade IV Blowpet (dl/g)']||'—')+' dl/g</dd></div></dl>'+
     '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span><span class="row-actions">'+
-    '<button type="button" class="icon-btn icon-only" title="Editar" onclick="editarRecebimento(\'resina\','+r.__index+')"><svg><use href="#i-pencil"/></svg></button>'+
-    '<button type="button" class="icon-btn icon-only danger" title="Excluir" onclick="excluirRecebimento(\'resina\','+r.__index+')"><svg><use href="#i-trash"/></svg></button></span></div>'+
+    botoesAcaoRecebimento('resina', r.__index)+'</span></div>'+
   '</div>';
 }
 function renderRecebimentoTabela(){
@@ -1643,7 +1715,7 @@ function renderRecebimentoTabela(){
     var cells = ['<td class="cell-dim tabular">'+(r['Data']||'')+'</td>','<td class="mono">'+(r['Nota Fiscal']||'')+'</td>','<td>'+escHtml(r['Fornecedor']||'')+'<div class="cell-dim" style="font-size:11px;">'+escHtml(r['Tipo']||'')+'</div></td>','<td class="mono cell-dim">'+(r['Lote']||'')+'</td>','<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'];
     if (mat === 'rotulo') cells.push('<td class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</td>');
     cells.push('<td>'+laudoIc(r['Arquivo do Laudo'])+'</td>','<td>'+badgeLabel(r['Status'])+'</td>','<td class="cell-dim">'+(r['Responsável']||'')+'</td>');
-    return '<tr>'+cells.join('')+acoesRecebimentoHtml(mat, r.__index)+'</tr>';
+    return '<tr class="clicavel" onclick="abrirDetalhe(\''+mat+'\','+r.__index+')">'+cells.join('')+acoesRecebimentoHtml(mat, r.__index)+'</tr>';
   }).join('');
 }
 function renderRecebimentoCards(){
@@ -1652,17 +1724,70 @@ function renderRecebimentoCards(){
   if (mat === 'resina') { el.innerHTML = rows.map(cardResina).join(''); return; }
   el.innerHTML = rows.map(function(r){
     var extra = mat === 'rotulo' ? ('<div><dt>Conferência</dt><dd class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</dd></div>') : ('<div><dt>Laudo</dt><dd>'+(r['Arquivo do Laudo']?'Anexado':'—')+'</dd></div>');
-    return '<div class="rcard">'+
+    return '<div class="rcard clicavel" onclick="abrirDetalhe(\''+mat+'\','+r.__index+')">'+
       '<div class="top"><div><div class="fornecedor">'+escHtml(r['Fornecedor']||'')+'</div><div class="cell-dim" style="font-size:11.5px; margin:1px 0 2px;">'+escHtml(r['Tipo']||'')+'</div><div class="lote mono">'+(r['Lote']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
       '<dl><div><dt>Data</dt><dd class="tabular">'+(r['Data']||'')+'</dd></div><div><dt>Nota fiscal</dt><dd class="mono">'+(r['Nota Fiscal']||'')+'</dd></div>'+
       '<div><dt>Quantidade</dt><dd class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</dd></div>'+extra+'</dl>'+
       '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span><span class="row-actions">'+
-      '<button type="button" class="icon-btn icon-only" title="Editar" onclick="editarRecebimento(\''+mat+'\','+r.__index+')"><svg><use href="#i-pencil"/></svg></button>'+
-      '<button type="button" class="icon-btn icon-only danger" title="Excluir" onclick="excluirRecebimento(\''+mat+'\','+r.__index+')"><svg><use href="#i-trash"/></svg></button></span></div>'+
+      botoesAcaoRecebimento(mat, r.__index)+'</span></div>'+
     '</div>';
   }).join('');
 }
 function renderRecebimento(){ renderRecebimentoTabela(); renderRecebimentoCards(); }
+
+/* ---- painel lateral: detalhe do recebimento (abre ao clicar na linha/cartão) ---- */
+var detalheAtual = null;
+function abrirDetalheDe(mat, index){ abrirMaterial(mat); abrirDetalhe(mat, index); }
+function abrirDetalhe(mat, index){
+  var r = DATA[mat].find(function(x){ return x.__index === index; });
+  if (!r) return;
+  detalheAtual = { mat: mat, index: index };
+  var ICS = { resina:'i-flask', rotulo:'i-tag', pigmento:'i-droplet', cinta:'i-package', tampa:'i-package-lid' };
+  var ehResina = mat === 'resina';
+  document.getElementById('dwIc').innerHTML = '<svg><use href="#' + ICS[mat] + '"/></svg>';
+  document.getElementById('dwTitulo').textContent = ehResina ? (r['Lote Interno'] || '—') : (r['Lote'] || ('NF ' + (r['Nota Fiscal'] || '—')));
+  document.getElementById('dwSub').textContent = MAT_LABEL_PLANO[mat] + ' · ' + (r['Fornecedor'] || '—') + (r['Tipo'] ? ' — ' + r['Tipo'] : '');
+  document.getElementById('dwBadge').innerHTML = badgeLabel(r['Status']);
+  function kv(rot, val, cls){ return '<div><dt>' + rot + '</dt><dd' + (cls ? ' class="' + cls + '"' : '') + '>' + (val ? escHtml(val) : '<span class="res-pend">—</span>') + '</dd></div>'; }
+  var html = '<div class="section-title">Dados</div><dl class="dw-kv">' +
+    kv('Data', r['Data Recebimento'] || r['Data'], 'tabular') + kv('Nota fiscal', r['Nota Fiscal'], 'mono') +
+    kv('Fornecedor', r['Fornecedor']) + kv('Tipo', r['Tipo']) +
+    (ehResina ? kv('Lote do fornecedor', r['Lote Fornecedor'], 'mono') + kv('Código', r['Código Produto'], 'mono') : kv('Lote', r['Lote'], 'mono')) +
+    kv('Quantidade', [r['Quantidade'], r['Unidade']].filter(function(x){ return x; }).join(' '), 'tabular') + kv('Responsável', r['Responsável']) +
+    (mat === 'rotulo' ? kv('Modelo do rótulo', r['Modelo do Rótulo']) + kv('Conferência visual', r['Conferência Visual']) : '') +
+    '<div><dt>Laudo</dt><dd>' + (r['Arquivo do Laudo'] ? '<a href="' + escHtml(r['Arquivo do Laudo']) + '" target="_blank">abrir laudo</a>' : '<span class="res-pend">sem laudo</span>') + '</dd></div></dl>';
+  if (ehResina) {
+    var ficha = fichaDe('resina', String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim());
+    html += '<div class="section-title">Medições' + (ficha ? ' <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">' + escHtml([ficha.doc, ficha.rev].filter(function(x){ return x; }).join(' · ')) + '</span>' : '') + '</div>';
+    if (ficha) {
+      var med = medicoesDeLinha(r), params = ficha.parametros.filter(function(p){ return p.criterio !== '-'; });
+      var prog = progressoAnalises('resina', r);
+      if (prog) html += '<div class="dw-prog"><span class="bar"><i style="width:' + Math.round(prog.feitas / prog.total * 100) + '%"></i></span>' + prog.feitas + ' de ' + prog.total + ' análises lançadas</div>';
+      html += '<div class="table-scroll"><table class="occ" style="min-width:0;"><thead><tr><th>Crit.</th><th>Teste</th><th>Especificação</th><th>Resultado</th></tr></thead><tbody>' +
+        params.map(function(p){
+          var v = med[p.teste], vv = String(v == null ? '' : v).toLowerCase(), aval = avaliarParametro(p, vv === 'não conforme' ? 'nao-conforme' : (vv === 'conforme' ? 'conforme' : v));
+          var cor = aval === 'dentro' ? 'var(--ok)' : aval === 'fora' ? 'var(--danger)' : 'var(--fg)';
+          return '<tr><td><span class="badge-crit ' + p.criterio + '">' + p.criterio + '</span></td><td style="white-space:normal;">' + escHtml(p.teste) + '</td><td class="cell-dim" style="white-space:normal;">' + escHtml(p.especTexto || '') + '</td>' +
+            '<td>' + (v ? '<span style="color:' + cor + '; font-weight:500;">' + escHtml(v) + '</span>' : '<span class="res-pend">pendente</span>') + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+    } else {
+      html += '<p class="dw-obs">Sem ficha de especificação cadastrada para esse fornecedor/tipo.</p>';
+    }
+  }
+  if (r['Observações']) html += '<div class="section-title">Observações</div><p class="dw-obs">' + escHtml(r['Observações']) + '</p>';
+  document.getElementById('dwBody').innerHTML = html;
+  var bEd = document.getElementById('dwEditar');
+  bEd.innerHTML = '<svg><use href="#i-pencil"/></svg> ' + (statusKey(r['Status']) === 'analise' ? 'Completar análise' : 'Editar');
+  bEd.onclick = function(){ fecharDetalhe(); editarRecebimento(mat, index); };
+  document.getElementById('dwExcluir').onclick = async function(){ await excluirRecebimento(mat, index); if (!DATA[mat].some(function(x){ return x.__index === index && x === r; })) fecharDetalhe(); };
+  document.getElementById('drawerScrim').classList.remove('hidden');
+  document.getElementById('drawer').classList.remove('hidden');
+}
+function fecharDetalhe(){
+  detalheAtual = null;
+  var d = document.getElementById('drawer'); if (!d) return;
+  d.classList.add('hidden'); document.getElementById('drawerScrim').classList.add('hidden');
+}
 function atualizarFornecedoresFiltro(){
   var sel = document.getElementById('fFornecedor'), atual = sel.value, lista = fornecedoresDe(matAtual);
   sel.innerHTML = '<option value="">Todos</option>' + lista.map(function(f){ return '<option value="'+f+'">'+f+'</option>'; }).join('');
@@ -1674,8 +1799,9 @@ function escolherMaterial(mat){
   document.getElementById('matTitle').textContent = MAT_LABEL[mat];
   document.getElementById('fStatus').value = ''; document.getElementById('fBusca').value = '';
   montarHead(mat); atualizarFornecedoresFiltro(); renderRecebimento();
+  marcarMenu();
 }
-function abrirMaterial(mat){ if (!document.getElementById('tela-lista').classList.contains('active')) irPara('lista'); escolherMaterial(mat); }
+function abrirMaterial(mat){ if (!document.getElementById('tela-lista').classList.contains('active')) irPara('lista'); escolherMaterial(mat); toggleMenu(false); }
 document.querySelectorAll('.mat-btn').forEach(function(btn){ btn.addEventListener('click', function(){ abrirMaterial(btn.dataset.mat); }); });
 ['fStatus','fFornecedor'].forEach(function(id){ document.getElementById(id).addEventListener('change', renderRecebimento); });
 document.getElementById('fBusca').addEventListener('input', renderRecebimento);
@@ -2561,11 +2687,12 @@ function escolherCadastro(cad){
   document.getElementById('painelEspecificacoes').style.display = cad === 'especificacoes' ? '' : 'none';
   document.getElementById('painelRotulos').style.display = cad === 'rotulos' ? '' : 'none';
   renderCadastroAtual();
+  marcarMenu();
 }
 function renderCadastroAtual(){
   if (cadAtual === 'fornecedores') renderFornecedores(); else if (cadAtual === 'especificacoes') renderEspecificacoes(); else renderRotulosHomologados();
 }
-function abrirCadastro(cad){ if (!document.getElementById('tela-cadastros').classList.contains('active')) irPara('cadastros'); escolherCadastro(cad); }
+function abrirCadastro(cad){ if (!document.getElementById('tela-cadastros').classList.contains('active')) irPara('cadastros'); escolherCadastro(cad); toggleMenu(false); }
 document.querySelectorAll('.cad-btn').forEach(function(btn){ btn.addEventListener('click', function(){ abrirCadastro(btn.dataset.cad); }); });
 document.getElementById('cadBusca').addEventListener('input', renderCadastroAtual);
 escolherCadastro('fornecedores');
