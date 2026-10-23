@@ -266,6 +266,16 @@ table.occ tr:hover td{background:var(--surface-2);}
 .laudo-preview .info{flex:1; min-width:0;}
 .laudo-preview .nome{font-size:12.5px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .laudo-preview .det{font-size:11px; color:var(--fg-faint);}
+.itens-table td{padding:6px 8px;}
+.itens-table select, .itens-table input{width:100%; background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:7px; padding:7px 9px; font-family:var(--font-body); font-size:13px; min-width:110px;}
+.itens-table input:disabled{opacity:.45;}
+.forn-sub{font-size:11.5px; color:var(--fg-faint); margin-top:3px;}
+.mat-chip{display:inline-flex; align-items:center; gap:6px; font-size:12.5px;}
+.mat-chip svg{width:14px; height:14px; color:var(--fg-dim);}
+.ficha-ok{display:inline-flex; align-items:center; gap:5px; font-size:11.5px; color:var(--ok); background:var(--ok-soft); padding:3px 9px; border-radius:999px; white-space:nowrap;}
+.ficha-ok svg{width:11px; height:11px;}
+.ficha-no{font-size:11.5px; color:var(--fg-faint);}
+.aviso-ficha{border:1px dashed var(--border); border-radius:10px; padding:12px 14px; font-size:12.5px; color:var(--fg-dim); line-height:1.55;}
 .laudo-existente{font-size:11.5px; color:var(--fg-dim); margin-top:6px;}
 .upload{
   border:1.5px dashed var(--border); border-radius:10px; padding:18px 14px; display:flex; flex-direction:column;
@@ -393,6 +403,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
 <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="m15 5 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
 <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-truck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></g></symbol>
 <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v4a2 2 0 0 0 2 2h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 13H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 17H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
@@ -475,7 +486,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
         <div class="module-grid">
           <button class="module-card" onclick="abrirCadastro('rotulos')"><div class="top"><span class="ic"><svg><use href="#i-image"/></svg></span></div><div class="title">Rótulos Homologados</div><div class="meta" id="metaRotulosHom">—</div></button>
           <button class="module-card" onclick="abrirCadastro('especificacoes')"><div class="top"><span class="ic"><svg><use href="#i-sliders"/></svg></span></div><div class="title">Especificações</div><div class="meta" id="metaEspec">—</div></button>
-          <button class="module-card" onclick="abrirCadastro('produtos')"><div class="top"><span class="ic"><svg><use href="#i-layers"/></svg></span></div><div class="title">Produtos de Resina</div><div class="meta" id="metaProdutos">—</div></button>
+          <button class="module-card" onclick="abrirCadastro('fornecedores')"><div class="top"><span class="ic"><svg><use href="#i-truck"/></svg></span></div><div class="title">Fornecedores</div><div class="meta" id="metaFornecedores">—</div></button>
         </div>
       </div>
 
@@ -638,7 +649,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
   <!-- ===================== TELA — CADASTROS ===================== -->
   <section class="tela" id="tela-cadastros">
     <div class="tela-head"><h2>Cadastros</h2></div>
-    <p class="tela-sub">Rótulos homologados (foto de referência), especificações de parâmetros/tolerâncias por material e os produtos de resina usados no lote interno.</p>
+    <p class="tela-sub">Fornecedores e o que cada um fornece, especificações de parâmetros/tolerâncias e rótulos homologados. O recebimento puxa fornecedor, tipo e código daqui.</p>
     <div class="screen">
       <div class="app-shell">
         <div class="app-sidebar">
@@ -646,9 +657,9 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
           <div class="lbl">Visão</div>
           <button onclick="irPara('visao')"><span class="ic"><svg><use href="#i-home"/></svg></span>Visão geral</button>
           <div class="lbl">Cadastros</div>
-          <button class="cad-btn active" data-cad="rotulos"><span class="ic"><svg><use href="#i-image"/></svg></span>Rótulos Homologados<span class="ct" id="ctRotulosHom">0</span></button>
+          <button class="cad-btn" data-cad="fornecedores"><span class="ic"><svg><use href="#i-truck"/></svg></span>Fornecedores<span class="ct" id="ctFornecedores">0</span></button>
           <button class="cad-btn" data-cad="especificacoes"><span class="ic"><svg><use href="#i-sliders"/></svg></span>Especificações<span class="ct" id="ctEspecificacoes">0</span></button>
-          <button class="cad-btn" data-cad="produtos"><span class="ic"><svg><use href="#i-layers"/></svg></span>Produtos de Resina<span class="ct" id="ctProdutos">0</span></button>
+          <button class="cad-btn" data-cad="rotulos"><span class="ic"><svg><use href="#i-image"/></svg></span>Rótulos Homologados<span class="ct" id="ctRotulosHom">0</span></button>
           <div class="lbl">Sistema</div>
           <button onclick="abrirConfiguracoes()"><span class="ic"><svg><use href="#i-gear"/></svg></span>Configurações</button>
         </div>
@@ -664,13 +675,8 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
           <div id="painelEspecificacoes" style="display:none;">
             <div id="gridEspecificacoes" style="display:flex; flex-direction:column; gap:16px;"></div>
           </div>
-          <div id="painelProdutos" style="display:none;">
-            <div class="table-scroll">
-              <table class="occ">
-                <thead><tr><th>Código</th><th>Descrição</th><th>Tipo</th><th>Fornecedor</th><th>Último lote</th><th></th></tr></thead>
-                <tbody id="tbodyProdutos"></tbody>
-              </table>
-            </div>
+          <div id="painelFornecedores" style="display:none;">
+            <div id="listaFornecedoresCad" style="display:flex; flex-direction:column; gap:14px;"></div>
           </div>
         </div>
       </div>
@@ -697,11 +703,8 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
               <option value="tampa">Caixa de Preforma (Tampa)</option>
             </select>
           </div>
-          <div class="field" id="campoFornecedorGenerico"><label>Fornecedor</label><input id="fornecedorGenericoInput" list="listaFornecedores" placeholder="Nome do fornecedor"></div>
-          <div class="field" id="campoProdutoResina">
-            <label>Tipo de resina (produto)</label>
-            <select id="produtoResinaSelect" onchange="verificarLoteExistente()"></select>
-          </div>
+          <div class="field"><label>Fornecedor</label><select id="fornecedorSelect" onchange="aoMudarFornecedorReceb()"></select></div>
+          <div class="field"><label>Tipo</label><select id="tipoSelect" onchange="aoMudarTipoReceb()"></select></div>
           <div class="field" id="campoLoteFornecedorResina">
             <label>Lote do fornecedor</label>
             <input class="mono" id="loteFornecedorInput" placeholder="Ex: 2606216" oninput="verificarLoteExistente()">
@@ -709,13 +712,6 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
           <div class="field" id="campoLoteInternoResina">
             <label>Lote interno</label>
             <input class="mono" id="loteInternoDisplay" value="—" disabled>
-          </div>
-          <div class="field" id="campoTipoResina">
-            <label>Tipo / grade</label>
-            <select id="tipoResinaSelect" onchange="renderMedicoes(loteResinaExistente)">
-              <option value="prime">Prime</option>
-              <option value="off">OFF</option>
-            </select>
           </div>
           <div class="field" id="campoModeloRotulo">
             <label>Modelo do rótulo</label>
@@ -751,6 +747,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
             <input type="file" id="laudoFile" accept="image/*,.pdf" hidden onchange="laudoEscolhido(this)">
           </div>
         </div>
+        <p class="med-note hidden" id="notaSemFornecedor"></p>
 
         <div id="secaoRotulo">
           <div class="section-title">Conferência visual — rótulo homologado <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">referência</span></div>
@@ -791,17 +788,19 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
       <button class="modal-close" onclick="fecharModalEspec()" aria-label="Fechar">✕</button>
       <div class="modal-head">
         <h2 id="modalEspecTitulo">Nova especificação</h2>
-        <p class="tela-sub" style="margin-top:6px;">Parâmetros de um material (ou tipo/grade) a partir da especificação do fornecedor. Esses parâmetros definem as medições do recebimento.</p>
+        <p class="tela-sub" style="margin-top:6px;">Parâmetros de um tipo de material de um fornecedor. Esses parâmetros definem as medições do recebimento.</p>
       </div>
       <div class="form-wrap" style="padding-top:10px;">
         <div class="section-title">Dados da ficha</div>
         <div class="form-grid">
-          <div class="field"><label>Material</label><select id="especMaterialSelect"><option value="resina">Resina PET</option><option value="rotulo">Rótulo</option><option value="pigmento">Pigmento</option><option value="cinta">Caixa de Preforma (Cinta)</option><option value="tampa">Caixa de Preforma (Tampa)</option></select></div>
-          <div class="field"><label>Tipo / grade</label><input id="especTipoNomeInput" placeholder="Ex: Prime, OFF — deixe em branco se não houver"></div>
+          <div class="field"><label>Material</label><select id="especMaterialSelect" onchange="popularCascataEspec()"><option value="resina">Resina PET</option><option value="rotulo">Rótulo</option><option value="pigmento">Pigmento</option><option value="cinta">Caixa de Preforma (Cinta)</option><option value="tampa">Caixa de Preforma (Tampa)</option></select></div>
+          <div class="field"><label>Fornecedor</label><select id="especFornSelect" onchange="popularCascataEspec(this.value)"></select></div>
+          <div class="field"><label>Tipo</label><select id="especTipoSelect"></select></div>
           <div class="field"><label>Código do documento</label><input class="mono" id="especDocInput" placeholder="Ex: EMP-002"></div>
           <div class="field"><label>Revisão</label><input id="especRevInput" placeholder="Ex: Rev.000"></div>
-          <div class="field"><label>Data do documento</label><input id="especDataInput" placeholder="Ex: 05/09/2025"></div>
+          <div class="field"><label>Data do documento</label><input type="date" id="especDataInput"></div>
         </div>
+        <p class="med-note" id="notaEspecForn">Fornecedor e Tipo vêm do cadastro de Fornecedores. Se faltar um tipo, cadastre-o primeiro no fornecedor.</p>
 
         <div class="section-title">Parâmetros</div>
         <div class="table-scroll">
@@ -822,33 +821,32 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
     </div>
   </div>
 
-  <!-- ===================== JANELA — NOVO/EDITAR PRODUTO DE RESINA ===================== -->
-  <div class="modal-overlay hidden" id="modalProduto">
-    <div class="modal-card" style="max-width:520px;">
-      <button class="modal-close" onclick="fecharModalProduto()" aria-label="Fechar">✕</button>
+  <!-- ===================== JANELA — NOVO/EDITAR FORNECEDOR ===================== -->
+  <div class="modal-overlay hidden" id="modalFornecedor">
+    <div class="modal-card" style="max-width:820px;">
+      <button class="modal-close" onclick="fecharModalFornecedor()" aria-label="Fechar">✕</button>
       <div class="modal-head">
-        <h2 id="modalProdutoTitulo">Novo produto de resina</h2>
-        <p class="tela-sub" style="margin-top:6px;">Código usado pra identificar o lote interno (ex.: J02-271).</p>
+        <h2 id="modalFornecedorTitulo">Novo fornecedor</h2>
+        <p class="tela-sub" style="margin-top:6px;">Cadastre o fornecedor e cada item que ele fornece. Especificações e recebimentos puxam fornecedor e tipo daqui.</p>
       </div>
       <div class="form-wrap" style="padding-top:10px; max-width:none;">
+        <div class="section-title">Fornecedor</div>
         <div class="form-grid">
-          <div class="field"><label>Código</label><input class="mono" id="produtoCodigoInput" placeholder="Ex: J02"></div>
-          <div class="field"><label>Descrição</label><input id="produtoDescricaoInput" placeholder="Ex: Indorama Max"></div>
-          <div class="field"><label>Fornecedor</label><input id="produtoFornecedorInput" placeholder="Ex: Indorama Ventures"></div>
-          <div class="field"><label>Tipo</label>
-            <select id="produtoTipoInput">
-              <option value="Prime">Prime</option>
-              <option value="Prime ou OFF Grade">Prime ou OFF Grade</option>
-              <option value="-">—</option>
-            </select>
-          </div>
-          <div class="field" id="campoUltimoLote"><label>Último lote interno usado</label><input class="mono" id="produtoUltimoLoteInput" inputmode="numeric" placeholder="Ex: 270 (opcional)"></div>
+          <div class="field" style="grid-column:1/-1;"><label>Nome do fornecedor</label><input id="fornNomeInput" placeholder="Ex: Indorama Ventures"></div>
         </div>
-        <p class="med-note" id="notaUltimoLote" style="margin:10px 0 0;"></p>
+        <div class="section-title">O que ele fornece</div>
+        <div class="table-scroll">
+          <table class="occ itens-table">
+            <thead><tr><th>Matéria-prima / insumo</th><th>Tipo</th><th>Código (lote interno)</th><th>Último lote usado</th><th></th></tr></thead>
+            <tbody id="tbodyItensForn"></tbody>
+          </table>
+        </div>
+        <button type="button" class="btn" style="margin-top:10px;" onclick="adicionarItemForn()"><svg><use href="#i-plus"/></svg> Adicionar item</button>
+        <p class="med-note">Código e último lote só existem pra Resina PET: o código forma o lote interno (ex.: J02-271), e itens com o mesmo código (ex.: Max Prime e Max Off Grade) usam a mesma numeração. "Último lote usado" é opcional — serve pra continuar a numeração de antes do sistema. Renomear o fornecedor ou um tipo atualiza também as fichas de especificação ligadas a ele.</p>
         <div class="form-actions">
-          <span class="save-msg" id="saveMsgProduto"></span>
-          <button class="btn btn-ghost" onclick="fecharModalProduto()">Cancelar</button>
-          <button class="btn btn-accent" onclick="salvarProduto()">Salvar produto</button>
+          <span class="save-msg" id="saveMsgForn"></span>
+          <button class="btn btn-ghost" onclick="fecharModalFornecedor()">Cancelar</button>
+          <button class="btn btn-accent" id="btnSalvarForn" onclick="salvarFornecedor()">Salvar fornecedor</button>
         </div>
       </div>
     </div>
@@ -976,7 +974,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
   </div>
 
   <footer class="note">
-    Sistema da Qualidade BlowPet — Recebimento (Resina PET, Rótulo, Pigmento, Caixa de Preforma Cinta/Tampa), Rótulos Homologados, Especificações, Produtos de Resina, Reclamação de Cliente e Liberação Não Conforme. Dados gravados na planilha <span class="mono">sistema_qualidade_blowpet_base.xlsx</span> via Microsoft Graph API, mesmo padrão do app de Inspeção da Qualidade.
+    Sistema da Qualidade BlowPet — Recebimento (Resina PET, Rótulo, Pigmento, Caixa de Preforma Cinta/Tampa), Fornecedores, Especificações, Rótulos Homologados, Reclamação de Cliente e Liberação Não Conforme. Dados gravados na planilha <span class="mono">sistema_qualidade_blowpet_base.xlsx</span> via Microsoft Graph API, mesmo padrão do app de Inspeção da Qualidade.
   </footer>
 
 </div>
@@ -1029,26 +1027,33 @@ const TABELAS = {
   pigmento:    "TabelaRecebimentoPigmento",
   cinta:       "TabelaRecebimentoCxCinta",
   tampa:       "TabelaRecebimentoCxTampa",
-  produtos:    "TabelaProdutosResina",
+  fornecedores: "TabelaFornecedores",
   especificacoes: "TabelaEspecificacoesParametros",
   rotulosHomologados: "TabelaRotulosHomologados",
   reclamacoes: "TabelaReclamacoesCliente",
   liberacoes:  "TabelaLiberacoesNaoConforme",
   listas:      "TabelaListas"
 };
+// Colunas PADRÃO de cada Tabela. Ao conectar, o app lê o cabeçalho real de cada Tabela na
+// planilha (lerCabecalhos) e passa a usar a ordem/nomes de lá — assim, acrescentar uma coluna na
+// planilha não quebra a gravação. Se faltar alguma coluna esperada, aparece um aviso.
 const TABLE_COLS = {
-  resina: ['Lote Interno','Data Recebimento','Código Produto','Descrição Produto','Lote Fornecedor','Tipo/Grade','Fornecedor','Nota Fiscal','Quantidade','Unidade','Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Análise de Impureza','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
-  rotulo: ['Data','Nota Fiscal','Fornecedor','Lote','Modelo do Rótulo','Quantidade','Unidade','Conferência Visual','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
-  pigmento: ['Data','Nota Fiscal','Fornecedor','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
-  cinta: ['Data','Nota Fiscal','Fornecedor','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
-  tampa: ['Data','Nota Fiscal','Fornecedor','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
-  produtos: ['Código','Descrição','Fornecedor','Tipo'],
-  especificacoes: ['Material','Tipo/Grade','Código Documento','Revisão','Data Documento','Teste','Especificação/Tolerância','Unidade','NT','Critério'],
+  resina: ['Lote Interno','Data Recebimento','Fornecedor','Tipo','Código Produto','Lote Fornecedor','Nota Fiscal','Quantidade','Unidade','Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Análise de Impureza','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  rotulo: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Modelo do Rótulo','Quantidade','Unidade','Conferência Visual','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  pigmento: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  cinta: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  tampa: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  fornecedores: ['Fornecedor','Material','Tipo','Código','Último Lote Interno'],
+  especificacoes: ['Material','Fornecedor','Tipo','Código Documento','Revisão','Data Documento','Teste','Especificação/Tolerância','Unidade','NT','Critério'],
   rotulosHomologados: ['ID','Nome do Modelo','Aplicação','Fornecedor Habitual','Arquivo da Foto','Status','Observações'],
   reclamacoes: ['RAC','Data','Cliente','Produto','Motivo','Classificação','Status','Responsável','Observações'],
   liberacoes: ['Número Registro','Data','Produto/Processo','Não Conformidade','Decisão','Quantidade Liberada','Responsável','Status','Observações'],
-  listas: ['Fornecedores','Responsaveis','Status Recebimento','Criterio','Unidades','Tipo Grade Lote','Tipo Grade Produto','Sim Nao','Conferencia Visual','Status Reclamacao','Classificacao Reclamacao','Status Liberacao','Status Rotulo']
+  listas: ['Responsaveis','Status Recebimento','Criterio','Unidades','Materiais','Sim Nao','Conferencia Visual','Status Reclamacao','Classificacao Reclamacao','Status Liberacao','Status Rotulo']
 };
+const TABLE_COLS_PADRAO = JSON.parse(JSON.stringify(TABLE_COLS));
+// Colunas gravadas como NÚMERO (o resto vai como texto, pra o Excel não converter datas/NF/lotes).
+const COLS_NUM_QTD = ['Quantidade'];
+const COLS_NUM_MED = ['Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)'];
 const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 // Teste (nome usado em Especificacoes_Parametros) -> coluna correspondente em
@@ -1068,7 +1073,7 @@ const PARAM_COL_MAP = {
 };
 
 /* ====================== ESTADO ====================== */
-var DATA = { resina:[], rotulo:[], pigmento:[], cinta:[], tampa:[], produtos:[], especificacoes:{}, rotulosHomologados:[], reclamacoes:[], liberacoes:[], listas:{} };
+var DATA = { resina:[], rotulo:[], pigmento:[], cinta:[], tampa:[], fornecedores:[], especificacoes:[], rotulosHomologados:[], reclamacoes:[], liberacoes:[], listas:{} };
 var matAtual = 'resina', viewAtual = 'tabela';
 var driveId = null, itemId = null;
 var msalInstance = null, msalPronto = null, contaAtual = null;
@@ -1200,22 +1205,59 @@ async function lerLinhasBrutas(nomeTabela){
   if (!resp.ok) throw new Error((json.error && json.error.message) || ('erro ao ler ' + nomeTabela));
   return json.value || [];
 }
+function escHtml(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function pad2(n){ return (n < 10 ? '0' : '') + n; }
+// Data do Excel (número de série) -> dd/mm/aaaa. Aparece quando uma data foi digitada/colada
+// direto na planilha e o Excel a guardou como data de verdade.
+function serialParaDataBR(n){ var d = new Date(Math.round((n - 25569) * 86400000)); return pad2(d.getUTCDate()) + '/' + pad2(d.getUTCMonth() + 1) + '/' + d.getUTCFullYear(); }
+// Lê um número no formato brasileiro. milhar=true (Quantidade): "27.500" = 27500. Nas medições o
+// ponto é sempre decimal ("0.830" = 0,83). Vírgula é sempre decimal.
+function numeroBR(v, milhar){
+  var t = String(v == null ? '' : v).trim().replace(/\s/g, '');
+  if (!t) return null;
+  if (t.indexOf(',') > -1) t = t.replace(/\./g, '').replace(',', '.');
+  else if (milhar && /^-?\d{1,3}(\.\d{3})+$/.test(t)) t = t.replace(/\./g, '');
+  return /^-?\d+(\.\d+)?$/.test(t) ? parseFloat(t) : null;
+}
+function valorDaPlanilha(col, v){
+  if (v === null || v === undefined) return '';
+  if (typeof v === 'number') {
+    if (/^data/i.test(col) && v > 20000 && v < 80000) return serialParaDataBR(v);
+    if (COLS_NUM_QTD.indexOf(col) > -1) return v.toLocaleString('pt-BR', { maximumFractionDigits: 3 });
+    if (COLS_NUM_MED.indexOf(col) > -1) return String(v).replace('.', ',');
+    return String(v);
+  }
+  if (typeof v === 'boolean') return v ? 'Sim' : 'Não';
+  var t = String(v);
+  return t.charAt(0) === "'" ? t.slice(1) : t;
+}
+// Texto vai com apóstrofo na frente: no Excel isso significa "guardar como texto" (o apóstrofo
+// não aparece na célula). Sem isso o Excel Online, que está no padrão americano, transforma
+// "05/09/2025" em 9 de maio, "000" em 0, NF "012345" em 12345 etc.
+function valorParaPlanilha(col, v){
+  if (v === undefined || v === null) return '';
+  if (typeof v === 'number') return v;
+  var t = String(v);
+  if (t.trim() === '') return '';
+  var ehQtd = COLS_NUM_QTD.indexOf(col) > -1, ehMed = COLS_NUM_MED.indexOf(col) > -1;
+  if (ehQtd || ehMed) { var n = numeroBR(t, ehQtd); if (n !== null) return n; }
+  return "'" + t;
+}
 function linhasParaObjetos(chaveTabela, linhasBrutas){
   var cols = TABLE_COLS[chaveTabela];
   return linhasBrutas.map(function(l){
     var obj = { __index: l.index };
-    cols.forEach(function(h, i){ obj[h] = (l.values && l.values[0] && l.values[0][i] !== undefined) ? l.values[0][i] : ''; });
+    cols.forEach(function(h, i){ obj[h] = valorDaPlanilha(h, (l.values && l.values[0]) ? l.values[0][i] : ''); });
     return obj;
   }).filter(function(obj){
-    // A Tabela do Excel sempre precisa de pelo menos 1 linha de dados além do
-    // cabeçalho (senão o próprio Excel considera o arquivo danificado), então a
-    // planilha nova chega com uma linha em branco "placeholder" por baixo de cada
-    // cabeçalho. Essa linha nunca deve aparecer como um registro de verdade.
+    // A Tabela do Excel sempre precisa de pelo menos 1 linha de dados além do cabeçalho (senão o
+    // Excel considera o arquivo danificado), então pode existir uma linha em branco "placeholder".
+    // Essa linha nunca deve aparecer como registro.
     return cols.some(function(h){ return String(obj[h] || '').trim() !== ''; });
   });
 }
 function objetoParaValores(chaveTabela, obj){
-  return TABLE_COLS[chaveTabela].map(function(h){ return (obj[h] === undefined || obj[h] === null) ? '' : obj[h]; });
+  return TABLE_COLS[chaveTabela].map(function(h){ return valorParaPlanilha(h, obj[h]); });
 }
 async function adicionarLinha(chaveTabela, obj){
   var token = await getToken();
@@ -1305,24 +1347,27 @@ async function uploadArquivo(file, nomeArquivo){
 }
 
 /* ====================== CARREGAR TUDO ====================== */
-// A coluna "Último Lote Interno" na aba Produtos_Resina é opcional: o app lê o cabeçalho real da
-// Tabela e só usa/grava essa coluna se ela existir (planilhas antigas sem ela continuam funcionando).
-var COL_ULTIMO_LOTE = 'Último Lote Interno';
-async function lerCabecalhoProdutos(){
-  try {
-    var token = await getToken();
-    var resp = await fetch(urlTabela(TABELAS.produtos) + '/headerRowRange', { headers: { Authorization: 'Bearer ' + token } });
-    var json = await resp.json();
-    var cab = (resp.ok && json.values && json.values[0]) ? json.values[0].map(function(h){ return String(h).trim(); }) : null;
-    if (cab && ['Código','Descrição','Fornecedor','Tipo'].every(function(h){ return cab.indexOf(h) > -1; })) TABLE_COLS.produtos = cab;
-  } catch (e) { /* mantém as 4 colunas padrão */ }
+async function lerCabecalhos(){
+  var token = await getToken();
+  var chaves = Object.keys(TABELAS), faltando = [];
+  await Promise.all(chaves.map(async function(k){
+    try {
+      var resp = await fetch(urlTabela(TABELAS[k]) + '/headerRowRange', { headers: { Authorization: 'Bearer ' + token } });
+      var json = await resp.json();
+      var cab = (resp.ok && json.values && json.values[0]) ? json.values[0].map(function(h){ return String(h == null ? '' : h).trim(); }) : null;
+      if (cab && cab.some(function(h){ return h; })) {
+        TABLE_COLS[k] = cab;
+        TABLE_COLS_PADRAO[k].forEach(function(h){ if (cab.indexOf(h) === -1) faltando.push(TABELAS[k] + ' → "' + h + '"'); });
+      }
+    } catch (e) { /* mantém as colunas padrão */ }
+  }));
+  if (faltando.length) mostrarToast('A planilha está com colunas faltando (' + faltando.slice(0, 3).join('; ') + (faltando.length > 3 ? '…' : '') + '). Use a planilha-base mais recente.', true);
 }
-function temColunaUltimoLote(){ return TABLE_COLS.produtos.indexOf(COL_ULTIMO_LOTE) > -1; }
 async function carregarTudo(){
-  await lerCabecalhoProdutos();
+  await lerCabecalhos();
   var brutos = await Promise.all([
     lerLinhasBrutas(TABELAS.resina), lerLinhasBrutas(TABELAS.rotulo), lerLinhasBrutas(TABELAS.pigmento),
-    lerLinhasBrutas(TABELAS.cinta), lerLinhasBrutas(TABELAS.tampa), lerLinhasBrutas(TABELAS.produtos),
+    lerLinhasBrutas(TABELAS.cinta), lerLinhasBrutas(TABELAS.tampa), lerLinhasBrutas(TABELAS.fornecedores),
     lerLinhasBrutas(TABELAS.especificacoes), lerLinhasBrutas(TABELAS.rotulosHomologados),
     lerLinhasBrutas(TABELAS.reclamacoes), lerLinhasBrutas(TABELAS.liberacoes), lerLinhasBrutas(TABELAS.listas)
   ]);
@@ -1331,15 +1376,12 @@ async function carregarTudo(){
   DATA.pigmento = linhasParaObjetos('pigmento', brutos[2]);
   DATA.cinta = linhasParaObjetos('cinta', brutos[3]);
   DATA.tampa = linhasParaObjetos('tampa', brutos[4]);
-  DATA.produtos = linhasParaObjetos('produtos', brutos[5]);
-  var especLinhas = linhasParaObjetos('especificacoes', brutos[6]);
+  DATA.fornecedores = linhasParaObjetos('fornecedores', brutos[5]);
+  DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', brutos[6]));
   DATA.rotulosHomologados = linhasParaObjetos('rotulosHomologados', brutos[7]);
   DATA.reclamacoes = linhasParaObjetos('reclamacoes', brutos[8]);
   DATA.liberacoes = linhasParaObjetos('liberacoes', brutos[9]);
-  var listasLinhas = linhasParaObjetos('listas', brutos[10]);
-
-  DATA.especificacoes = montarEspecificacoes(especLinhas);
-  DATA.listas = montarListas(listasLinhas);
+  DATA.listas = montarListas(linhasParaObjetos('listas', brutos[10]));
 
   popularDatalists();
   popularSelectsFixos();
@@ -1374,33 +1416,52 @@ function parseEspecTexto(texto, unidade, criterio){
   // vez de travar a tela; melhor degradar bem do que quebrar.
   return { tipoResultado: 'visual' };
 }
+function matKeyDeLabel(label){ return Object.keys(MAT_LABEL_PLANO).find(function(k){ return MAT_LABEL_PLANO[k] === String(label || '').trim(); }) || ''; }
+// Cada ficha de especificação = Material + Fornecedor + Tipo, com seus parâmetros.
 function montarEspecificacoes(linhas){
-  var out = {};
-  var grupos = {}; // chave: material|tipoGrade
+  var mapa = {}, lista = [];
   linhas.forEach(function(l){
-    var matLabel = l['Material'], tipoGrade = l['Tipo/Grade'] || '';
-    var matKey = Object.keys(MAT_LABEL_PLANO).find(function(k){ return MAT_LABEL_PLANO[k] === matLabel; }) || slugify(matLabel);
-    var chave = matKey + '|' + tipoGrade;
-    if (!grupos[chave]) {
-      grupos[chave] = { matKey: matKey, doc: l['Código Documento'], rev: l['Revisão'], data: l['Data Documento'],
-        tipo: { id: slugify(tipoGrade || matKey), nome: tipoGrade ? (MAT_LABEL_PLANO[matKey] || matLabel) + ' (' + tipoGrade + ')' : (MAT_LABEL_PLANO[matKey] || matLabel), tipoGrade: tipoGrade, parametros: [] } };
+    var mat = matKeyDeLabel(l['Material']) || slugify(l['Material']), forn = String(l['Fornecedor'] || '').trim(), tipo = String(l['Tipo'] || '').trim();
+    var chave = mat + '|' + forn + '|' + tipo;
+    if (!mapa[chave]) {
+      mapa[chave] = { id: slugify(chave), mat: mat, forn: forn, tipo: tipo, doc: l['Código Documento'], rev: l['Revisão'], data: l['Data Documento'], parametros: [] };
+      lista.push(mapa[chave]);
     }
     var parsed = parseEspecTexto(l['Especificação/Tolerância'], l['Unidade'], l['Critério']);
-    grupos[chave].tipo.parametros.push(Object.assign({
+    mapa[chave].parametros.push(Object.assign({
       teste: l['Teste'], unidade: l['Unidade'], nt: l['NT'] || '—', criterio: l['Critério'] || '-', especTexto: l['Especificação/Tolerância']
     }, parsed));
   });
-  Object.keys(grupos).forEach(function(chave){
-    var g = grupos[chave];
-    if (!out[g.matKey]) out[g.matKey] = { doc: g.doc, rev: g.rev, data: g.data, tipos: [] };
-    out[g.matKey].tipos.push(g.tipo);
-  });
-  return out;
+  return lista;
 }
-function produtoPorCodigo(codigo){ return DATA.produtos.find(function(p){ return p['Código'] === codigo; }); }
+function fichaDe(mat, forn, tipo){ return DATA.especificacoes.find(function(f){ return f.mat === mat && f.forn === forn && f.tipo === tipo; }); }
+function tituloFicha(f){ return (MAT_LABEL_PLANO[f.mat] || f.mat) + ' · ' + (f.forn || '—') + ' — ' + (f.tipo || '—'); }
+
+/* ---- cadastro de fornecedores: cada linha da planilha = um item (fornecedor + material + tipo) ---- */
+function itensFornecedores(){
+  return DATA.fornecedores.map(function(r){
+    return { forn: String(r['Fornecedor'] || '').trim(), mat: matKeyDeLabel(r['Material']), matLabel: r['Material'] || '', tipo: String(r['Tipo'] || '').trim(),
+             cod: String(r['Código'] || '').trim().toUpperCase(), ult: r['Último Lote Interno'] || '', __index: r.__index };
+  }).filter(function(i){ return i.forn; });
+}
+function grupoFornecedores(){
+  var mapa = {}, lista = [];
+  itensFornecedores().forEach(function(i){
+    if (!mapa[i.forn]) { mapa[i.forn] = { nome: i.forn, itens: [] }; lista.push(mapa[i.forn]); }
+    mapa[i.forn].itens.push(i);
+  });
+  return lista.sort(function(a, b){ return a.nome.localeCompare(b.nome, 'pt-BR'); });
+}
+function unicos(arr){ var vistos = {}; return arr.filter(function(v){ if (!v || vistos[v]) return false; vistos[v] = true; return true; }); }
+function fornecedoresDoMaterial(mat){ return unicos(itensFornecedores().filter(function(i){ return i.mat === mat; }).map(function(i){ return i.forn; })).sort(function(a, b){ return a.localeCompare(b, 'pt-BR'); }); }
+function tiposDe(forn, mat){ return unicos(itensFornecedores().filter(function(i){ return i.forn === forn && i.mat === mat; }).map(function(i){ return i.tipo; })); }
+function itemFornecedor(forn, mat, tipo){ return itensFornecedores().find(function(i){ return i.forn === forn && i.mat === mat && i.tipo === tipo; }); }
+function opcoesHtml(lista, vazio){
+  return lista.length ? lista.map(function(v){ return '<option value="' + escHtml(v) + '">' + escHtml(v) + '</option>'; }).join('') : '<option value="">' + escHtml(vazio) + '</option>';
+}
 
 function popularDatalists(){
-  document.getElementById('listaFornecedores').innerHTML = (DATA.listas['Fornecedores'] || []).map(function(f){ return '<option value="'+f+'">'; }).join('');
+  document.getElementById('listaFornecedores').innerHTML = grupoFornecedores().map(function(g){ return '<option value="' + escHtml(g.nome) + '">'; }).join('');
   document.getElementById('listaResponsaveis').innerHTML = (DATA.listas['Responsaveis'] || []).map(function(f){ return '<option value="'+f+'">'; }).join('');
 }
 function popularSelect(sel, valores, manterSeExistir){
@@ -1412,7 +1473,6 @@ function popularSelectsFixos(){
   popularSelect(document.getElementById('unidadeSelect'), DATA.listas['Unidades'] && DATA.listas['Unidades'].length ? DATA.listas['Unidades'] : ['kg','Unidades','Caixas'], true);
   popularSelect(document.getElementById('statusRecebimentoSelect'), DATA.listas['Status Recebimento'] && DATA.listas['Status Recebimento'].length ? DATA.listas['Status Recebimento'] : ['Em análise','Aprovado','Reprovado','Quarentena'], true);
   popularSelect(document.getElementById('conferenciaRotuloSelect'), DATA.listas['Conferencia Visual'] && DATA.listas['Conferencia Visual'].length ? DATA.listas['Conferencia Visual'] : ['Confere','Divergente'], true);
-  popularOpcoesProdutoResina();
   popularOpcoesModeloRotulo();
 }
 
@@ -1474,9 +1534,8 @@ function renderHome(){
   document.getElementById('metaCinta').textContent = DATA.cinta.length + ' recebimento(s)';
   document.getElementById('metaTampa').textContent = DATA.tampa.length + ' recebimento(s)';
   document.getElementById('metaRotulosHom').textContent = DATA.rotulosHomologados.length + ' modelo(s) cadastrado(s)';
-  var qtdEspec = Object.keys(DATA.especificacoes).reduce(function(a,k){ return a + DATA.especificacoes[k].tipos.length; }, 0);
-  document.getElementById('metaEspec').textContent = qtdEspec + ' ficha(s) cadastrada(s)';
-  document.getElementById('metaProdutos').textContent = DATA.produtos.length + ' produto(s) cadastrado(s)';
+  document.getElementById('metaEspec').textContent = DATA.especificacoes.length + ' ficha(s) cadastrada(s)';
+  document.getElementById('metaFornecedores').textContent = grupoFornecedores().length + ' fornecedor(es) cadastrado(s)';
   document.getElementById('metaReclamacoes').textContent = DATA.reclamacoes.filter(function(r){ return statusKey(r['Status']) !== 'encerrada'; }).length + ' em aberto de ' + DATA.reclamacoes.length;
   document.getElementById('metaLiberacoes').textContent = DATA.liberacoes.filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length + ' aguardando aprovação';
 
@@ -1505,7 +1564,7 @@ function dataParaOrdenar(brStr){
 function renderTudo(){
   montarHead(matAtual); atualizarFornecedoresFiltro(); renderRecebimento();
   renderReclamacoes(); renderLiberacoes(); renderRotulosHomologados();
-  renderEspecificacoes(); renderProdutos(); renderHome();
+  renderEspecificacoes(); renderFornecedores(); renderHome();
   document.getElementById('ctResina').textContent = DATA.resina.length;
   document.getElementById('ctRotulo').textContent = DATA.rotulo.length;
   document.getElementById('ctPigmento').textContent = DATA.pigmento.length;
@@ -1514,9 +1573,12 @@ function renderTudo(){
   document.getElementById('ctReclamacoes').textContent = DATA.reclamacoes.length;
   document.getElementById('ctLiberacoes').textContent = DATA.liberacoes.length;
   document.getElementById('ctRotulosHom').textContent = DATA.rotulosHomologados.length;
-  var qtdEspec = Object.keys(DATA.especificacoes).reduce(function(a,k){ return a + DATA.especificacoes[k].tipos.length; }, 0);
-  document.getElementById('ctEspecificacoes').textContent = qtdEspec;
-  document.getElementById('ctProdutos').textContent = DATA.produtos.length;
+  atualizarContagensCadastros();
+}
+function atualizarContagensCadastros(){
+  document.getElementById('ctEspecificacoes').textContent = DATA.especificacoes.length;
+  document.getElementById('ctFornecedores').textContent = grupoFornecedores().length;
+  document.getElementById('ctRotulosHom').textContent = DATA.rotulosHomologados.length;
 }
 
 /* ====================== RECEBIMENTO ====================== */
@@ -1526,8 +1588,8 @@ function fornecedoresDe(mat){
 }
 function montarHead(mat){
   var cols;
-  if (mat === 'resina') cols = ['Data','Lote interno','Lote fornecedor','Produto','Tipo/grade','Quantidade','Viscosidade (Blowpet)','Nota fiscal','Laudo','Status','Responsável',''];
-  else { cols = ['Data','Nota fiscal','Fornecedor','Lote','Quantidade']; if (mat === 'rotulo') cols.push('Conferência'); cols.push('Laudo','Status','Responsável',''); }
+  if (mat === 'resina') cols = ['Data','Lote interno','Lote fornecedor','Fornecedor / tipo','Quantidade','Viscosidade (Blowpet)','Nota fiscal','Laudo','Status','Responsável',''];
+  else { cols = ['Data','Nota fiscal','Fornecedor / tipo','Lote','Quantidade']; if (mat === 'rotulo') cols.push('Conferência'); cols.push('Laudo','Status','Responsável',''); }
   document.getElementById('theadRow').innerHTML = cols.map(function(c){ return '<th>'+c+'</th>'; }).join('');
 }
 function acoesRecebimentoHtml(mat, idx){
@@ -1542,7 +1604,7 @@ function linhasFiltradas(){
     if (status && statusKey(r['Status']) !== status) return false;
     if (fornecedor && r['Fornecedor'] !== fornecedor) return false;
     if (busca){
-      var alvos = mat === 'resina' ? [r['Nota Fiscal'], r['Lote Interno'], r['Lote Fornecedor'], r['Fornecedor']] : [r['Nota Fiscal'], r['Lote'], r['Fornecedor']];
+      var alvos = mat === 'resina' ? [r['Nota Fiscal'], r['Lote Interno'], r['Lote Fornecedor'], r['Fornecedor'], r['Tipo'], r['Código Produto']] : [r['Nota Fiscal'], r['Lote'], r['Fornecedor'], r['Tipo']];
       if (!alvos.some(function(v){ return v && String(v).toLowerCase().indexOf(busca) > -1; })) return false;
     }
     return true;
@@ -1553,8 +1615,7 @@ function linhaResina(r){
     '<td class="cell-dim tabular">'+(r['Data Recebimento']||'')+'</td>'+
     '<td class="mono">'+(r['Lote Interno']||'')+'</td>'+
     '<td class="mono cell-dim">'+(r['Lote Fornecedor']||'')+'</td>'+
-    '<td>'+(r['Descrição Produto']||r['Código Produto']||'')+'<div class="cell-dim" style="font-size:11px;">'+(r['Código Produto']||'')+' · '+(r['Fornecedor']||'')+'</div></td>'+
-    '<td><span class="pill">'+(r['Tipo/Grade']||'')+'</span></td>'+
+    '<td>'+escHtml(r['Tipo']||r['Código Produto']||'')+'<div class="cell-dim" style="font-size:11px;">'+escHtml(r['Código Produto']||'')+' · '+escHtml(r['Fornecedor']||'')+'</div></td>'+
     '<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'+
     '<td class="mono tabular">'+(r['Viscosidade IV Blowpet (dl/g)']||'—')+'</td>'+
     '<td class="mono">'+(r['Nota Fiscal']||'')+'</td>'+
@@ -1566,7 +1627,7 @@ function linhaResina(r){
 }
 function cardResina(r){
   return '<div class="rcard">'+
-    '<div class="top"><div><div class="fornecedor">'+(r['Descrição Produto']||r['Código Produto']||'')+' <span class="pill">'+(r['Tipo/Grade']||'')+'</span></div><div class="lote mono">'+(r['Lote Interno']||'')+' · lote forn. '+(r['Lote Fornecedor']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
+    '<div class="top"><div><div class="fornecedor">'+escHtml(r['Tipo']||r['Código Produto']||'')+'</div><div class="cell-dim" style="font-size:11.5px; margin:1px 0 2px;">'+escHtml(r['Fornecedor']||'')+'</div><div class="lote mono">'+(r['Lote Interno']||'')+' · lote forn. '+(r['Lote Fornecedor']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
     '<dl><div><dt>Data</dt><dd class="tabular">'+(r['Data Recebimento']||'')+'</dd></div><div><dt>Nota fiscal</dt><dd class="mono">'+(r['Nota Fiscal']||'')+'</dd></div>'+
     '<div><dt>Quantidade</dt><dd class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</dd></div><div><dt>Viscosidade</dt><dd class="mono">'+(r['Viscosidade IV Blowpet (dl/g)']||'—')+' dl/g</dd></div></dl>'+
     '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span><span class="row-actions">'+
@@ -1579,7 +1640,7 @@ function renderRecebimentoTabela(){
   if (!rows.length) { document.getElementById('tbody').innerHTML = '<tr><td colspan="12" class="empty-note">Nenhum recebimento encontrado com esses filtros.</td></tr>'; return; }
   if (mat === 'resina') { document.getElementById('tbody').innerHTML = rows.map(linhaResina).join(''); return; }
   document.getElementById('tbody').innerHTML = rows.map(function(r){
-    var cells = ['<td class="cell-dim tabular">'+(r['Data']||'')+'</td>','<td class="mono">'+(r['Nota Fiscal']||'')+'</td>','<td>'+(r['Fornecedor']||'')+'</td>','<td class="mono cell-dim">'+(r['Lote']||'')+'</td>','<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'];
+    var cells = ['<td class="cell-dim tabular">'+(r['Data']||'')+'</td>','<td class="mono">'+(r['Nota Fiscal']||'')+'</td>','<td>'+escHtml(r['Fornecedor']||'')+'<div class="cell-dim" style="font-size:11px;">'+escHtml(r['Tipo']||'')+'</div></td>','<td class="mono cell-dim">'+(r['Lote']||'')+'</td>','<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'];
     if (mat === 'rotulo') cells.push('<td class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</td>');
     cells.push('<td>'+laudoIc(r['Arquivo do Laudo'])+'</td>','<td>'+badgeLabel(r['Status'])+'</td>','<td class="cell-dim">'+(r['Responsável']||'')+'</td>');
     return '<tr>'+cells.join('')+acoesRecebimentoHtml(mat, r.__index)+'</tr>';
@@ -1592,7 +1653,7 @@ function renderRecebimentoCards(){
   el.innerHTML = rows.map(function(r){
     var extra = mat === 'rotulo' ? ('<div><dt>Conferência</dt><dd class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</dd></div>') : ('<div><dt>Laudo</dt><dd>'+(r['Arquivo do Laudo']?'Anexado':'—')+'</dd></div>');
     return '<div class="rcard">'+
-      '<div class="top"><div><div class="fornecedor">'+(r['Fornecedor']||'')+'</div><div class="lote mono">'+(r['Lote']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
+      '<div class="top"><div><div class="fornecedor">'+escHtml(r['Fornecedor']||'')+'</div><div class="cell-dim" style="font-size:11.5px; margin:1px 0 2px;">'+escHtml(r['Tipo']||'')+'</div><div class="lote mono">'+(r['Lote']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
       '<dl><div><dt>Data</dt><dd class="tabular">'+(r['Data']||'')+'</dd></div><div><dt>Nota fiscal</dt><dd class="mono">'+(r['Nota Fiscal']||'')+'</dd></div>'+
       '<div><dt>Quantidade</dt><dd class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</dd></div>'+extra+'</dl>'+
       '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span><span class="row-actions">'+
@@ -1833,11 +1894,12 @@ function abrirModalCadastro(matEdit, indexEdit){
     document.getElementById('observacoesInput').value = row['Observações'] || '';
     document.getElementById('dataRecebimentoInput').value = dataBRparaISO(row['Data Recebimento'] || row['Data'] || '');
   } else {
+    // Abre já no material da tela em que a pessoa está (Resina, Rótulo…).
+    if (MAT_LABEL_PLANO[matAtual]) document.getElementById('materialSelect').value = matAtual;
     document.getElementById('dataRecebimentoInput').value = hojeISO();
     document.getElementById('notaFiscalInput').value = '';
     document.getElementById('loteGenericoInput').value = '';
     document.getElementById('quantidadeInput').value = '';
-    document.getElementById('fornecedorGenericoInput').value = '';
     document.getElementById('responsavelInput').value = '';
     document.getElementById('observacoesInput').value = '';
   }
@@ -1847,26 +1909,24 @@ function abrirModalCadastro(matEdit, indexEdit){
 }
 function editarRecebimento(mat, index){ abrirModalCadastro(mat, index); }
 function preencherEdicaoRecebimento(mat, row){
+  popularFornecedoresReceb(row['Fornecedor'] || '');
+  popularTiposReceb(row['Tipo'] || '');
   if (mat === 'resina') {
-    document.getElementById('produtoResinaSelect').value = row['Código Produto'] || '';
     document.getElementById('loteFornecedorInput').value = row['Lote Fornecedor'] || '';
     document.getElementById('loteInternoDisplay').value = row['Lote Interno'] || '—';
     document.getElementById('loteInternoNota').textContent = 'Editando o recebimento ' + (row['Lote Interno']||'') + ' — complete ou corrija os dados abaixo.';
     document.getElementById('loteInternoNota').className = 'med-note';
-    var tipoSel = document.getElementById('tipoResinaSelect');
-    var tipoId = slugify(row['Tipo/Grade'] || '');
-    if (Array.prototype.some.call(tipoSel.options, function(o){ return o.value === tipoId; })) tipoSel.value = tipoId;
     loteResinaExistente = null;
     renderMedicoes(row); habilitarMedicoes(true);
   } else {
-    document.getElementById('fornecedorGenericoInput').value = row['Fornecedor'] || '';
     document.getElementById('loteGenericoInput').value = row['Lote'] || '';
     if (mat === 'rotulo') {
       var modeloSel = document.getElementById('modeloRotuloSelect');
       var modeloMatch = DATA.rotulosHomologados.find(function(r){ return r['Nome do Modelo'] === row['Modelo do Rótulo']; });
       if (modeloMatch) modeloSel.value = modeloMatch['ID'];
       atualizarPreviaRotulo();
-      document.getElementById('conferenciaRotuloSelect').value = confereOk(row['Conferência Visual']) ? 'ok' : 'div';
+      var confSel = document.getElementById('conferenciaRotuloSelect'), alvoOk = confereOk(row['Conferência Visual']);
+      for (var oi = 0; oi < confSel.options.length; oi++) { if (confereOk(confSel.options[oi].value) === alvoOk) { confSel.value = confSel.options[oi].value; break; } }
     }
   }
   selecionarStatusPorChave(statusKey(row['Status']));
@@ -1887,23 +1947,47 @@ async function excluirRecebimento(mat, index){
 function fecharModalCadastro(){ document.getElementById('modalCadastro').classList.add('hidden'); recebimentoEditando = null; document.getElementById('materialSelect').disabled = false; }
 document.getElementById('modalCadastro').addEventListener('click', function(e){ if (e.target.id === 'modalCadastro') fecharModalCadastro(); });
 
-function popularOpcoesProdutoResina(){
-  var sel = document.getElementById('produtoResinaSelect'), atual = sel.value;
-  sel.innerHTML = DATA.produtos.map(function(p){ return '<option value="'+p['Código']+'">'+p['Descrição']+' — '+p['Código']+'</option>'; }).join('');
-  sel.value = produtoPorCodigo(atual) ? atual : (DATA.produtos[0] ? DATA.produtos[0]['Código'] : '');
+/* ---- Fornecedor e Tipo (vêm do cadastro de Fornecedores, filtrados pelo material) ---- */
+// "manter" = valor que precisa continuar aparecendo mesmo se não estiver mais no cadastro
+// (ex.: editar um recebimento antigo de um fornecedor que foi removido).
+function popularFornecedoresReceb(manter){
+  var mat = document.getElementById('materialSelect').value, sel = document.getElementById('fornecedorSelect');
+  var atual = manter !== undefined ? manter : sel.value;
+  var cadastrados = fornecedoresDoMaterial(mat), lista = cadastrados.slice();
+  if (manter && lista.indexOf(manter) === -1) lista.push(manter);
+  sel.innerHTML = opcoesHtml(lista, '— nenhum fornecedor cadastrado —');
+  if (lista.indexOf(atual) > -1) sel.value = atual;
+  var nota = document.getElementById('notaSemFornecedor');
+  if (!cadastrados.length) {
+    nota.innerHTML = 'Nenhum fornecedor de ' + escHtml(MAT_LABEL_PLANO[mat]) + ' cadastrado ainda — <a href="#" onclick="fecharModalCadastro(); abrirCadastro(\'fornecedores\'); return false;">cadastrar em Fornecedores</a>.';
+    nota.classList.remove('hidden');
+  } else { nota.classList.add('hidden'); }
 }
+function popularTiposReceb(manter){
+  var mat = document.getElementById('materialSelect').value, forn = document.getElementById('fornecedorSelect').value, sel = document.getElementById('tipoSelect');
+  var atual = manter !== undefined ? manter : sel.value;
+  var lista = forn ? tiposDe(forn, mat) : [];
+  if (manter && lista.indexOf(manter) === -1) lista.push(manter);
+  sel.innerHTML = opcoesHtml(lista, forn ? '— nenhum tipo cadastrado —' : '—');
+  if (lista.indexOf(atual) > -1) sel.value = atual;
+}
+function aoMudarFornecedorReceb(){ popularTiposReceb(); aoMudarTipoReceb(); }
+function aoMudarTipoReceb(){
+  if (document.getElementById('materialSelect').value !== 'resina') return;
+  if (recebimentoEditando) renderMedicoes(medicoesDigitadasComoLinha()); else verificarLoteExistente();
+}
+// Valores já digitados nas medições, no formato de uma linha da planilha (pra não perder o que foi
+// digitado quando a ficha é redesenhada).
+function medicoesDigitadasComoLinha(){
+  var linha = {};
+  ESPEC_PARAMS_ATUAL.forEach(function(p, idx){ var el = document.getElementById('medResultado_' + idx); if (el && PARAM_COL_MAP[p.teste]) linha[PARAM_COL_MAP[p.teste]] = el.value; });
+  return linha;
+}
+
 function popularOpcoesModeloRotulo(){
   var sel = document.getElementById('modeloRotuloSelect'), atual = sel.value;
-  sel.innerHTML = DATA.rotulosHomologados.map(function(r){ return '<option value="'+r['ID']+'">'+r['Nome do Modelo']+'</option>'; }).join('');
+  sel.innerHTML = DATA.rotulosHomologados.map(function(r){ return '<option value="'+escHtml(r['ID'])+'">'+escHtml(r['Nome do Modelo'])+'</option>'; }).join('');
   sel.value = DATA.rotulosHomologados.some(function(r){ return r['ID'] === atual; }) ? atual : (DATA.rotulosHomologados[0] ? DATA.rotulosHomologados[0]['ID'] : '');
-}
-function popularTiposResina(){
-  var sel = document.getElementById('tipoResinaSelect'), atual = sel.value;
-  var espec = DATA.especificacoes['resina'];
-  var opcoes = (espec && espec.tipos.length) ? espec.tipos.map(function(t){ return {id: t.id, nome: t.tipoGrade || t.nome}; })
-    : (DATA.listas['Tipo Grade Lote'] && DATA.listas['Tipo Grade Lote'].length ? DATA.listas['Tipo Grade Lote'].map(function(v){ return {id: slugify(v), nome: v}; }) : [{id:'prime', nome:'Prime'},{id:'off', nome:'OFF'}]);
-  sel.innerHTML = opcoes.map(function(o){ return '<option value="'+o.id+'">'+o.nome+'</option>'; }).join('');
-  if (opcoes.some(function(o){ return o.id === atual; })) sel.value = atual;
 }
 function atualizarCamposMaterial(){
   var mat = document.getElementById('materialSelect').value;
@@ -1911,28 +1995,25 @@ function atualizarCamposMaterial(){
   document.getElementById('campoModeloRotulo').style.display = mat === 'rotulo' ? '' : 'none';
   document.getElementById('campoConferenciaRotulo').style.display = mat === 'rotulo' ? '' : 'none';
   document.getElementById('secaoRotulo').style.display = mat === 'rotulo' ? '' : 'none';
-  // Os campos de Produto/Lote Fornecedor/Lote Interno são específicos do esquema de
-  // identidade de lote da Resina PET (código do produto + sequencial) — mesmo que outro
-  // material ganhe uma especificação cadastrada no futuro, esses campos continuam só da
-  // Resina; o que generaliza pra qualquer material com especificação é a seção de Medições.
-  document.getElementById('campoFornecedorGenerico').style.display = ehResina ? 'none' : '';
+  // Lote do fornecedor + lote interno (código + sequencial) são da Resina PET; os demais materiais
+  // usam um campo "Lote" simples.
   document.getElementById('campoLoteGenerico').style.display = ehResina ? 'none' : '';
-  document.getElementById('campoProdutoResina').style.display = ehResina ? '' : 'none';
   document.getElementById('campoLoteFornecedorResina').style.display = ehResina ? '' : 'none';
   document.getElementById('campoLoteInternoResina').style.display = ehResina ? '' : 'none';
-  document.getElementById('campoTipoResina').style.display = ehResina ? '' : 'none';
-  // A planilha só tem colunas de medição (Viscosidade, Cor, etc.) na aba de Resina PET —
-  // por isso a seção de Medições, por ora, só aparece pra Resina. Se outro material ganhar
-  // colunas de medição no futuro, esta tela e a aba correspondente precisam crescer juntas.
+  // Só a aba de Resina PET tem colunas de medição (Viscosidade, Cor etc.) — por isso a seção de
+  // Medições, por ora, só aparece pra Resina.
   document.getElementById('secaoResina').style.display = ehResina ? '' : 'none';
+  document.getElementById('fornecedorSelect').disabled = false;
+  document.getElementById('tipoSelect').disabled = false;
+  if (!recebimentoEditando) { popularFornecedoresReceb(); popularTiposReceb(); }
   if (mat === 'rotulo') { popularOpcoesModeloRotulo(); atualizarPreviaRotulo(); }
   if (ehResina) {
-    popularTiposResina();
     if (!recebimentoEditando) { document.getElementById('loteFornecedorInput').value = ''; verificarLoteExistente(); }
-  } else if (!recebimentoEditando) { selecionarStatusPorChave('analise'); }
+  } else {
+    ESPEC_PARAMS_ATUAL = [];
+    if (!recebimentoEditando) selecionarStatusPorChave('analise');
+  }
 }
-document.getElementById('materialSelect').addEventListener('change', atualizarCamposMaterial);
-document.getElementById('modeloRotuloSelect').addEventListener('change', atualizarPreviaRotulo);
 function atualizarPreviaRotulo(){
   var sel = document.getElementById('modeloRotuloSelect');
   var r = DATA.rotulosHomologados.find(function(x){ return x['ID'] === sel.value; });
@@ -1948,11 +2029,11 @@ function selecionarStatusPorChave(chave){
 function sugerirStatusRecebimento(){
   var mat = document.getElementById('materialSelect').value;
   if (mat === 'rotulo') { selecionarStatusPorChave(confereOk(document.getElementById('conferenciaRotuloSelect').value) ? 'aprovado' : 'analise'); return; }
-  if (!DATA.especificacoes[mat]) return;
+  if (mat !== 'resina') return;
   var paramsL = ESPEC_PARAMS_ATUAL.filter(function(p){ return p.criterio === 'L'; });
-  if (!paramsL.length) return;
+  if (!paramsL.length) { if (!recebimentoEditando) selecionarStatusPorChave('analise'); return; }
   var algumFora = false, algumVazio = false;
-  paramsL.forEach(function(p, i){
+  paramsL.forEach(function(p){
     var idx = ESPEC_PARAMS_ATUAL.indexOf(p);
     var el = document.getElementById('medResultado_' + idx);
     var resultado = el ? avaliarParametro(p, el.value) : null;
@@ -1966,16 +2047,19 @@ function sugerirStatusRecebimento(){
 var loteResinaExistente = null;
 function numeroDoLote(v){ var m = String(v == null ? '' : v).match(/(\d+)\s*$/); return m ? parseInt(m[1], 10) : NaN; }
 // Próximo lote interno = maior número entre (a) os lotes já lançados na planilha pra esse código e
-// (b) o "Último Lote Interno" informado no cadastro do produto (pra continuar a numeração antiga) + 1.
+// (b) o "Último Lote Interno" informado no cadastro de Fornecedores pra esse código, + 1.
 function proximoLoteInterno(codigo){
   var max = 0;
-  DATA.resina.forEach(function(r){ if (r['Código Produto'] === codigo && r['Lote Interno']) { var n = numeroDoLote(r['Lote Interno']); if (!isNaN(n) && n > max) max = n; } });
-  var prod = produtoPorCodigo(codigo), base = prod ? numeroDoLote(prod[COL_ULTIMO_LOTE]) : NaN;
-  if (!isNaN(base) && base > max) max = base;
+  DATA.resina.forEach(function(r){ if (String(r['Código Produto']).toUpperCase() === codigo && r['Lote Interno']) { var n = numeroDoLote(r['Lote Interno']); if (!isNaN(n) && n > max) max = n; } });
+  itensFornecedores().forEach(function(i){ if (i.cod === codigo) { var n = numeroDoLote(i.ult); if (!isNaN(n) && n > max) max = n; } });
   return codigo + '-' + (max + 1);
 }
 function buscarLoteExistente(codigo, loteForn){
-  return DATA.resina.find(function(r){ return r['Código Produto'] === codigo && String(r['Lote Fornecedor']).trim() === String(loteForn).trim(); });
+  return DATA.resina.find(function(r){ return String(r['Código Produto']).toUpperCase() === codigo && String(r['Lote Fornecedor']).trim() === String(loteForn).trim(); });
+}
+function codigoResinaAtual(){
+  var it = itemFornecedor(document.getElementById('fornecedorSelect').value, 'resina', document.getElementById('tipoSelect').value);
+  return it ? it.cod : '';
 }
 function medicoesDeLinha(row){
   var m = {};
@@ -1988,33 +2072,41 @@ function verificarLoteExistente(){
   // por preencherEdicaoRecebimento() e não devem ser refeitos/zerados só porque o usuário
   // tocou no campo Lote do fornecedor pra corrigir um valor.
   if (recebimentoEditando && recebimentoEditando.mat === 'resina') return;
-  var codigo = document.getElementById('produtoResinaSelect').value, loteForn = document.getElementById('loteFornecedorInput').value.trim();
-  var display = document.getElementById('loteInternoDisplay'), nota = document.getElementById('loteInternoNota'), tipoSel = document.getElementById('tipoResinaSelect');
+  var fSel = document.getElementById('fornecedorSelect'), tSel = document.getElementById('tipoSelect');
+  var loteForn = document.getElementById('loteFornecedorInput').value.trim();
+  var display = document.getElementById('loteInternoDisplay'), nota = document.getElementById('loteInternoNota');
+  fSel.disabled = false; tSel.disabled = false;
+  var codigo = codigoResinaAtual();
+  if (!codigo){
+    loteResinaExistente = null; display.value = '—'; nota.className = 'med-note';
+    nota.textContent = tSel.value ? 'O tipo escolhido não tem código cadastrado — informe o código em Cadastros › Fornecedores.' : 'Escolha o fornecedor e o tipo da resina.';
+    renderMedicoes(null); habilitarMedicoes(true); sugerirStatusRecebimento(); return;
+  }
   if (!loteForn){
     loteResinaExistente = null; display.value = '—';
     nota.textContent = 'Informe o lote do fornecedor pra ver o lote interno.'; nota.className = 'med-note';
-    tipoSel.disabled = false; renderMedicoes(null); habilitarMedicoes(true); return;
+    renderMedicoes(null); habilitarMedicoes(true); sugerirStatusRecebimento(); return;
   }
   var existente = buscarLoteExistente(codigo, loteForn);
   if (existente){
     loteResinaExistente = existente; display.value = existente['Lote Interno'];
     nota.textContent = 'Lote já cadastrado (primeira entrada em ' + existente['Data Recebimento'] + ') — resultado da análise herdado, não precisa lançar de novo.';
     nota.className = 'med-note ok-note';
-    popularTiposResina();
-    var tipoId = slugify(existente['Tipo/Grade']);
-    if (Array.prototype.some.call(tipoSel.options, function(o){ return o.value === tipoId; })) tipoSel.value = tipoId;
-    tipoSel.disabled = true; renderMedicoes(existente); habilitarMedicoes(false);
+    // Trava fornecedor/tipo no que foi lançado na primeira entrada desse lote.
+    if (existente['Fornecedor']) { popularFornecedoresReceb(existente['Fornecedor']); popularTiposReceb(existente['Tipo'] || tSel.value); }
+    fSel.disabled = true; tSel.disabled = true;
+    renderMedicoes(existente); habilitarMedicoes(false);
   } else {
     loteResinaExistente = null; display.value = proximoLoteInterno(codigo) + ' (novo — gerado ao salvar)';
-    nota.textContent = 'Lote novo pra esse produto — o lote interno é gerado automaticamente ao salvar, e a análise completa é obrigatória.'; nota.className = 'med-note';
-    tipoSel.disabled = false; renderMedicoes(null); habilitarMedicoes(true);
+    nota.textContent = 'Lote novo pra esse produto — o lote interno é gerado automaticamente ao salvar.'; nota.className = 'med-note';
+    renderMedicoes(null); habilitarMedicoes(true);
   }
   sugerirStatusRecebimento();
 }
 
 /* ---- medições (L / C / QA) ---- */
 var ESPEC_PARAMS_ATUAL = [];
-function parseNum(v){ if (v === undefined || v === null || v === '') return NaN; return parseFloat(String(v).replace(',', '.')); }
+function parseNum(v){ var n = numeroBR(v, false); return n === null ? NaN : n; }
 function avaliarParametro(p, valorRaw){
   if (p.tipoResultado === 'visual') { if (valorRaw === 'conforme') return 'dentro'; if (valorRaw === 'nao-conforme') return 'fora'; return null; }
   if (p.tipoResultado === 'na') return null;
@@ -2024,29 +2116,32 @@ function avaliarParametro(p, valorRaw){
   return 'dentro';
 }
 function renderMedicoes(entradaExistente){
-  var mat = document.getElementById('materialSelect').value, espec = DATA.especificacoes[mat];
-  if (!espec) { document.getElementById('tbodyMedicoes').innerHTML = ''; ESPEC_PARAMS_ATUAL = []; return; }
-  // Só a Resina tem seletor de tipo/grade na tela; pros demais materiais usa a primeira
-  // (única, por ora) ficha cadastrada pra esse material.
-  var tipo;
-  if (mat === 'resina') { var tipoSel = document.getElementById('tipoResinaSelect'); tipo = espec.tipos.find(function(t){ return t.id === tipoSel.value; }) || espec.tipos[0]; }
-  else { tipo = espec.tipos[0]; }
-  if (!tipo) { document.getElementById('tbodyMedicoes').innerHTML = '<tr><td class="empty-note" colspan="5">Nenhuma especificação cadastrada pra esse material ainda.</td></tr>'; ESPEC_PARAMS_ATUAL = []; return; }
-  ESPEC_PARAMS_ATUAL = tipo.parametros.filter(function(p){ return p.criterio !== '-'; });
-  document.getElementById('medicoesFichaLabel').textContent = (espec.doc || '') + ' · ' + tipo.nome;
-  document.getElementById('tbodyMedicoes').innerHTML = ESPEC_PARAMS_ATUAL.map(function(p, idx){
+  var mat = document.getElementById('materialSelect').value;
+  var forn = document.getElementById('fornecedorSelect').value, tipo = document.getElementById('tipoSelect').value;
+  var ficha = mat === 'resina' ? fichaDe(mat, forn, tipo) : null;
+  var tb = document.getElementById('tbodyMedicoes'), label = document.getElementById('medicoesFichaLabel');
+  if (!ficha) {
+    ESPEC_PARAMS_ATUAL = []; label.textContent = '—';
+    tb.innerHTML = (forn && tipo) ? '<tr><td colspan="5" style="white-space:normal;"><div class="aviso-ficha">Nenhuma especificação cadastrada para <b>' + escHtml(forn) + ' — ' + escHtml(tipo) +
+      '</b>. O recebimento pode ser salvo normalmente, só sem as medições; elas aparecem aqui quando a ficha for cadastrada em <a href="#" onclick="fecharModalCadastro(); abrirCadastro(\'especificacoes\'); return false;">Especificações</a>.</div></td></tr>' : '';
+    return;
+  }
+  ESPEC_PARAMS_ATUAL = ficha.parametros.filter(function(p){ return p.criterio !== '-'; });
+  label.textContent = (ficha.doc || '') + (ficha.rev ? ' · ' + ficha.rev : '') + ' · ' + ficha.forn + ' — ' + ficha.tipo;
+  tb.innerHTML = ESPEC_PARAMS_ATUAL.map(function(p, idx){
     var valorPrevio = (entradaExistente ? medicoesDeLinha(entradaExistente)[p.teste] : '') || '';
     var inputHtml;
     if (p.tipoResultado === 'visual'){
+      var vp = String(valorPrevio).toLowerCase();
       inputHtml = '<select id="medResultado_'+idx+'" onchange="atualizarStatusMedicao('+idx+')">'+
         '<option value="">—</option>'+
-        '<option value="conforme"'+(valorPrevio==='conforme'?' selected':'')+'>Conforme</option>'+
-        '<option value="nao-conforme"'+(valorPrevio==='nao-conforme'?' selected':'')+'>Não conforme</option></select>';
+        '<option value="conforme"'+(vp==='conforme'?' selected':'')+'>Conforme</option>'+
+        '<option value="nao-conforme"'+((vp==='nao-conforme'||vp==='não conforme')?' selected':'')+'>Não conforme</option></select>';
     } else {
-      inputHtml = '<input id="medResultado_'+idx+'" type="text" inputmode="decimal" value="'+valorPrevio+'" placeholder="'+(p.criterio==='QA'?'Valor do laudo':'Resultado')+'" oninput="atualizarStatusMedicao('+idx+')">';
+      inputHtml = '<input id="medResultado_'+idx+'" type="text" inputmode="decimal" value="'+escHtml(valorPrevio)+'" placeholder="'+(p.criterio==='QA'?'Valor do laudo':'Resultado')+'" oninput="atualizarStatusMedicao('+idx+')">';
     }
-    return '<tr><td><span class="badge-crit '+p.criterio+'">'+p.criterio+'</span></td><td>'+p.teste+' <span class="cell-dim">('+(p.unidade||'')+')</span></td>'+
-      '<td class="cell-dim">'+(p.especTexto||'')+'</td><td>'+inputHtml+'</td><td><span id="medStatus_'+idx+'" class="badge nd">—</span></td></tr>';
+    return '<tr><td><span class="badge-crit '+p.criterio+'">'+p.criterio+'</span></td><td>'+escHtml(p.teste)+' <span class="cell-dim">('+escHtml(p.unidade||'')+')</span></td>'+
+      '<td class="cell-dim">'+escHtml(p.especTexto||'')+'</td><td>'+inputHtml+'</td><td><span id="medStatus_'+idx+'" class="badge nd">—</span></td></tr>';
   }).join('');
   ESPEC_PARAMS_ATUAL.forEach(function(p, idx){ atualizarStatusMedicao(idx); });
 }
@@ -2064,6 +2159,9 @@ async function salvarRecebimento(){
   var btn = document.getElementById('btnSalvarRecebimento'), msg = document.getElementById('saveMsgRecebimento');
   var dataISO = document.getElementById('dataRecebimentoInput').value;
   if (!dataISO) { msg.className = 'save-msg err'; msg.textContent = 'Informe a data do recebimento.'; return; }
+  var forn = document.getElementById('fornecedorSelect').value, tipo = document.getElementById('tipoSelect').value;
+  if (!forn) { msg.className = 'save-msg err'; msg.textContent = 'Escolha o fornecedor (se não aparecer, cadastre em Cadastros › Fornecedores).'; return; }
+  if (!tipo) { msg.className = 'save-msg err'; msg.textContent = 'Escolha o tipo (se não aparecer, cadastre no fornecedor).'; return; }
   btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
   var editando = recebimentoEditando;
   var rowOriginal = editando ? DATA[editando.mat].find(function(x){ return x.__index === editando.index; }) : null;
@@ -2078,54 +2176,57 @@ async function salvarRecebimento(){
     var dataBR = formatarDataBR(dataISO);
     var obs = document.getElementById('observacoesInput').value.trim();
     var statusTexto = document.getElementById('statusRecebimentoSelect').value;
+    // Na edição, parte da linha original — assim nenhuma coluna que não está na tela é apagada.
+    var base = rowOriginal ? Object.assign({}, rowOriginal) : {};
 
     if (mat === 'resina') {
-      var codigo = document.getElementById('produtoResinaSelect').value;
-      var produto = produtoPorCodigo(codigo);
       var loteForn = document.getElementById('loteFornecedorInput').value.trim();
       if (!loteForn) { throw new Error('Informe o lote do fornecedor.'); }
-      var loteInterno = editando ? document.getElementById('loteInternoDisplay').value : (loteResinaExistente ? loteResinaExistente['Lote Interno'] : proximoLoteInterno(codigo));
+      var item = itemFornecedor(forn, 'resina', tipo);
+      var codigo = loteResinaExistente ? String(loteResinaExistente['Código Produto']).toUpperCase() : ((item && item.cod) || (rowOriginal ? rowOriginal['Código Produto'] : ''));
+      if (!codigo) throw new Error('O tipo "' + tipo + '" não tem código cadastrado — informe o código em Cadastros › Fornecedores.');
+      var loteInterno = editando ? (rowOriginal['Lote Interno'] || document.getElementById('loteInternoDisplay').value) : (loteResinaExistente ? loteResinaExistente['Lote Interno'] : proximoLoteInterno(codigo));
       var medicoes = {}, extras = [];
       ESPEC_PARAMS_ATUAL.forEach(function(p, idx){
         var el = document.getElementById('medResultado_' + idx);
         var val = el ? el.value : '';
+        if (p.tipoResultado === 'visual') val = ({ 'conforme': 'Conforme', 'nao-conforme': 'Não conforme' })[val] || val;
         if (PARAM_COL_MAP[p.teste]) medicoes[PARAM_COL_MAP[p.teste]] = val;
         else if (val) extras.push(p.teste + ': ' + val);
       });
-      var row = {
-        'Lote Interno': loteInterno, 'Data Recebimento': dataBR, 'Código Produto': codigo,
-        'Descrição Produto': produto ? produto['Descrição'] : '', 'Lote Fornecedor': loteForn,
-        'Tipo/Grade': (function(){ var sel=document.getElementById('tipoResinaSelect'); return sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].textContent : sel.value; })(),
-        'Fornecedor': produto ? produto['Fornecedor'] : '', 'Nota Fiscal': document.getElementById('notaFiscalInput').value.trim(),
+      var row = Object.assign(base, {
+        'Lote Interno': loteInterno, 'Data Recebimento': dataBR, 'Fornecedor': forn, 'Tipo': tipo, 'Código Produto': codigo,
+        'Lote Fornecedor': loteForn, 'Nota Fiscal': document.getElementById('notaFiscalInput').value.trim(),
         'Quantidade': document.getElementById('quantidadeInput').value.trim(), 'Unidade': document.getElementById('unidadeSelect').value,
         'Laudo Anexado': laudoUrl ? 'Sim' : 'Não', 'Arquivo do Laudo': laudoUrl, 'Status': statusTexto,
         'Responsável': document.getElementById('responsavelInput').value.trim(), 'Observações': obs + (extras.length ? (' | ' + extras.join('; ')) : '')
-      };
+      });
       Object.keys(medicoes).forEach(function(col){ row[col] = medicoes[col]; });
       if (editando) { await atualizarLinha('resina', editando.index, row); mostrarToast('Recebimento ' + loteInterno + ' atualizado com sucesso.'); }
       else { await adicionarLinha('resina', row); mostrarToast('Recebimento ' + loteInterno + ' salvo com sucesso.'); }
       DATA.resina = linhasParaObjetos('resina', await lerLinhasBrutas(TABELAS.resina));
     } else {
       var tableKey = mat;
-      var row2 = {
+      var row2 = Object.assign(base, {
         'Data': dataBR, 'Nota Fiscal': document.getElementById('notaFiscalInput').value.trim(),
-        'Fornecedor': document.getElementById('fornecedorGenericoInput').value.trim(), 'Lote': document.getElementById('loteGenericoInput').value.trim(),
+        'Fornecedor': forn, 'Tipo': tipo, 'Lote': document.getElementById('loteGenericoInput').value.trim(),
         'Quantidade': document.getElementById('quantidadeInput').value.trim(), 'Unidade': document.getElementById('unidadeSelect').value,
         'Laudo Anexado': laudoUrl ? 'Sim' : 'Não', 'Arquivo do Laudo': laudoUrl, 'Status': statusTexto,
         'Responsável': document.getElementById('responsavelInput').value.trim(), 'Observações': obs
-      };
+      });
       if (mat === 'rotulo') {
         var modeloSel = document.getElementById('modeloRotuloSelect');
         var modeloNome = modeloSel.options[modeloSel.selectedIndex] ? modeloSel.options[modeloSel.selectedIndex].textContent : '';
         row2['Modelo do Rótulo'] = modeloNome;
-        row2['Conferência Visual'] = document.getElementById('conferenciaRotuloSelect').value;
+        var confSel = document.getElementById('conferenciaRotuloSelect');
+        row2['Conferência Visual'] = confSel.options[confSel.selectedIndex] ? confSel.options[confSel.selectedIndex].textContent : confSel.value;
       }
       if (editando) { await atualizarLinha(tableKey, editando.index, row2); mostrarToast('Recebimento atualizado com sucesso.'); }
       else { await adicionarLinha(tableKey, row2); mostrarToast('Recebimento salvo com sucesso.'); }
       DATA[tableKey] = linhasParaObjetos(tableKey, await lerLinhasBrutas(TABELAS[tableKey]));
     }
     document.getElementById('ct' + mat.charAt(0).toUpperCase() + mat.slice(1)).textContent = DATA[mat].length;
-    if (matAtual === mat) renderRecebimento();
+    if (matAtual === mat) { atualizarFornecedoresFiltro(); renderRecebimento(); }
     renderHome();
     fecharModalCadastro();
   } catch (e) {
@@ -2135,107 +2236,128 @@ async function salvarRecebimento(){
 
 /* ====================== ESPECIFICAÇÕES ====================== */
 function renderEspecificacoes(){
-  var cards = [];
-  Object.keys(DATA.especificacoes).forEach(function(mat){
-    var espec = DATA.especificacoes[mat];
-    espec.tipos.forEach(function(tipo){
-      var contagem = { L:0, C:0, QA:0 };
-      tipo.parametros.forEach(function(p){ if (contagem[p.criterio] !== undefined) contagem[p.criterio]++; });
-      var linhas = tipo.parametros.map(function(p){
-        return '<tr><td>'+p.teste+'</td><td class="cell-dim">'+(p.especTexto||'')+'</td><td class="cell-dim">'+(p.unidade||'')+'</td><td class="cell-dim mono">'+(p.nt||'')+'</td>'+
-          '<td>'+(p.criterio === '-' ? '<span class="cell-dim">—</span>' : '<span class="badge-crit '+p.criterio+'">'+p.criterio+'</span>')+'</td></tr>';
-      }).join('');
-      cards.push(
-        '<div class="spec-card"><div class="head"><div><div class="title">'+tipo.nome+'</div>'+
-        '<div class="doc">'+(espec.doc||'')+' · '+(espec.rev||'')+' · '+(espec.data||'')+'</div></div>'+
-        '<div class="card-actions"><div class="crit-count"><span class="L">'+contagem.L+' L</span><span class="QA">'+contagem.QA+' QA</span><span class="C">'+contagem.C+' C</span></div>'+
-        '<button type="button" class="icon-btn" onclick="abrirModalEspec(\''+mat+'\',\''+tipo.id+'\')"><svg><use href="#i-pencil"/></svg> Editar</button>'+
-        '<button type="button" class="icon-btn danger" onclick="excluirEspecificacao(\''+mat+'\',\''+tipo.id+'\')"><svg><use href="#i-trash"/></svg> Excluir</button></div></div>'+
-        '<div class="table-scroll"><table class="occ"><thead><tr><th>Teste</th><th>Especificação</th><th>Unidade</th><th>NT</th><th>Critério</th></tr></thead><tbody>'+linhas+'</tbody></table></div></div>'
-      );
-    });
+  var q = cadAtual === 'especificacoes' ? termoBuscaCadastro() : '';
+  var lista = DATA.especificacoes.filter(function(f){
+    return !q || (tituloFicha(f) + ' ' + (f.doc || '') + ' ' + f.parametros.map(function(p){ return p.teste; }).join(' ')).toLowerCase().indexOf(q) > -1;
   });
-  document.getElementById('gridEspecificacoes').innerHTML = cards.length ? cards.join('') : '<div class="empty-note">Nenhuma especificação cadastrada ainda.</div>';
+  var cards = lista.map(function(f){
+    var contagem = { L:0, C:0, QA:0 };
+    f.parametros.forEach(function(p){ if (contagem[p.criterio] !== undefined) contagem[p.criterio]++; });
+    var linhas = f.parametros.map(function(p){
+      return '<tr><td>'+escHtml(p.teste)+'</td><td class="cell-dim">'+escHtml(p.especTexto||'')+'</td><td class="cell-dim">'+escHtml(p.unidade||'')+'</td><td class="cell-dim mono">'+escHtml(p.nt||'')+'</td>'+
+        '<td>'+(p.criterio === '-' ? '<span class="cell-dim">—</span>' : '<span class="badge-crit '+p.criterio+'">'+p.criterio+'</span>')+'</td></tr>';
+    }).join('');
+    var semCadastro = !itemFornecedor(f.forn, f.mat, f.tipo);
+    return '<div class="spec-card"><div class="head"><div><div class="title">'+escHtml(tituloFicha(f))+'</div>'+
+      '<div class="doc">'+[f.doc, f.rev, f.data].filter(function(x){ return x; }).map(escHtml).join(' · ')+
+      (semCadastro ? ' · <span style="color:var(--warn);">fornecedor/tipo não está no cadastro de Fornecedores</span>' : '')+'</div></div>'+
+      '<div class="card-actions"><div class="crit-count"><span class="L">'+contagem.L+' L</span><span class="QA">'+contagem.QA+' QA</span><span class="C">'+contagem.C+' C</span></div>'+
+      '<button type="button" class="icon-btn" onclick="abrirModalEspec(\''+f.id+'\')"><svg><use href="#i-pencil"/></svg> Editar</button>'+
+      '<button type="button" class="icon-btn danger" onclick="excluirEspecificacao(\''+f.id+'\')"><svg><use href="#i-trash"/></svg> Excluir</button></div></div>'+
+      '<div class="table-scroll"><table class="occ"><thead><tr><th>Teste</th><th>Especificação</th><th>Unidade</th><th>NT</th><th>Critério</th></tr></thead><tbody>'+linhas+'</tbody></table></div></div>';
+  });
+  document.getElementById('gridEspecificacoes').innerHTML = cards.length ? cards.join('') : '<div class="empty-note">' + (q ? 'Nenhuma especificação encontrada.' : 'Nenhuma especificação cadastrada ainda.') + '</div>';
 }
 function adicionarLinhaEspec(p){
   var tr = document.createElement('tr');
   tr.innerHTML =
-    '<td><input class="mini-input espec-teste" placeholder="Nome do teste" value="'+(p?p.teste:'')+'"></td>'+
-    '<td><input class="mini-input espec-tolerancia" placeholder="Ex: 0,790 – 0,890" value="'+(p?(p.especTexto||''):'')+'"></td>'+
-    '<td><input class="mini-input espec-unidade" placeholder="Ex: dl/g" value="'+(p?(p.unidade||''):'')+'"></td>'+
-    '<td><input class="mini-input espec-nt" placeholder="NT" value="'+(p&&p.nt!=='—'?p.nt:'')+'"></td>'+
+    '<td><input class="mini-input espec-teste" placeholder="Nome do teste" value="'+escHtml(p?p.teste:'')+'"></td>'+
+    '<td><input class="mini-input espec-tolerancia" placeholder="Ex: 0,790 – 0,890" value="'+escHtml(p?(p.especTexto||''):'')+'"></td>'+
+    '<td><input class="mini-input espec-unidade" placeholder="Ex: dl/g" value="'+escHtml(p?(p.unidade||''):'')+'"></td>'+
+    '<td><input class="mini-input espec-nt" placeholder="NT" value="'+escHtml(p&&p.nt!=='—'?p.nt:'')+'"></td>'+
     '<td><select class="mini-input espec-criterio"><option value="L"'+(p&&p.criterio==='L'?' selected':'')+'>L</option><option value="C"'+(p&&p.criterio==='C'?' selected':'')+'>C</option><option value="QA"'+(p&&p.criterio==='QA'?' selected':'')+'>QA</option><option value="-"'+(p&&p.criterio==='-'?' selected':'')+'>—</option></select></td>'+
     '<td><button type="button" class="remove-linha-espec" onclick="this.closest(\'tr\').remove()">✕</button></td>';
   document.getElementById('tbodyNovaEspec').appendChild(tr);
 }
+// Material → Fornecedor → Tipo, sempre a partir do cadastro de Fornecedores.
+function popularCascataEspec(fornManter, tipoManter){
+  var mat = document.getElementById('especMaterialSelect').value;
+  var fSel = document.getElementById('especFornSelect'), tSel = document.getElementById('especTipoSelect');
+  var fAtual = fornManter !== undefined ? fornManter : fSel.value;
+  var fl = fornecedoresDoMaterial(mat);
+  if (fornManter && fl.indexOf(fornManter) === -1) fl.push(fornManter);
+  fSel.innerHTML = opcoesHtml(fl, '— nenhum fornecedor deste material —');
+  if (fl.indexOf(fAtual) > -1) fSel.value = fAtual;
+  var tAtual = tipoManter !== undefined ? tipoManter : tSel.value;
+  var tl = fSel.value ? tiposDe(fSel.value, mat) : [];
+  if (tipoManter && tl.indexOf(tipoManter) === -1) tl.push(tipoManter);
+  tSel.innerHTML = opcoesHtml(tl, '—');
+  if (tl.indexOf(tAtual) > -1) tSel.value = tAtual;
+}
 var especEditando = null;
-function abrirModalEspec(mat, tipoId){
-  var tipo = (mat && DATA.especificacoes[mat]) ? DATA.especificacoes[mat].tipos.find(function(t){ return t.id === tipoId; }) : null;
-  especEditando = tipo ? { mat: mat, tipoId: tipoId } : null;
-  document.getElementById('modalEspecTitulo').textContent = tipo ? 'Editar especificação' : 'Nova especificação';
-  document.getElementById('especMaterialSelect').value = mat || 'resina';
-  document.getElementById('especMaterialSelect').disabled = !!tipo;
-  document.getElementById('especTipoNomeInput').value = tipo ? (tipo.tipoGrade || '') : '';
-  document.getElementById('especDocInput').value = tipo ? DATA.especificacoes[mat].doc : '';
-  document.getElementById('especRevInput').value = tipo ? DATA.especificacoes[mat].rev : '';
-  document.getElementById('especDataInput').value = tipo ? DATA.especificacoes[mat].data : '';
+function abrirModalEspec(id){
+  var ficha = id ? DATA.especificacoes.find(function(f){ return f.id === id; }) : null;
+  especEditando = ficha ? ficha.id : null;
+  document.getElementById('modalEspecTitulo').textContent = ficha ? 'Editar especificação' : 'Nova especificação';
+  document.getElementById('especMaterialSelect').value = ficha ? ficha.mat : 'resina';
+  document.getElementById('especMaterialSelect').disabled = !!ficha;
+  popularCascataEspec(ficha ? ficha.forn : undefined, ficha ? ficha.tipo : undefined);
+  document.getElementById('especDocInput').value = ficha ? (ficha.doc || '') : '';
+  document.getElementById('especRevInput').value = ficha ? (ficha.rev || '') : '';
+  document.getElementById('especDataInput').value = ficha ? dataBRparaISO(ficha.data) : '';
   document.getElementById('tbodyNovaEspec').innerHTML = '';
-  if (tipo) tipo.parametros.forEach(function(p){ adicionarLinhaEspec(p); }); else adicionarLinhaEspec();
+  if (ficha) ficha.parametros.forEach(function(p){ adicionarLinhaEspec(p); }); else adicionarLinhaEspec();
   document.getElementById('saveMsgEspec').textContent = '';
   document.getElementById('modalEspec').classList.remove('hidden');
 }
 function fecharModalEspec(){ document.getElementById('modalEspec').classList.add('hidden'); }
 document.getElementById('modalEspec').addEventListener('click', function(e){ if (e.target.id === 'modalEspec') fecharModalEspec(); });
+function linhasDaFicha(brutas, ficha){
+  var matLabel = MAT_LABEL_PLANO[ficha.mat] || ficha.mat;
+  return brutas.filter(function(l){ return String(l['Material']).trim() === matLabel && String(l['Fornecedor'] || '').trim() === ficha.forn && String(l['Tipo'] || '').trim() === ficha.tipo; });
+}
+async function recarregarEspecificacoes(){
+  DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes)));
+  renderEspecificacoes(); renderFornecedores(); renderHome(); atualizarContagensCadastros();
+}
 async function salvarEspecificacao(){
-  var mat = document.getElementById('especMaterialSelect').value, nomeTipo = document.getElementById('especTipoNomeInput').value.trim();
-  var doc = document.getElementById('especDocInput').value.trim(), rev = document.getElementById('especRevInput').value.trim(), dataDoc = document.getElementById('especDataInput').value.trim();
+  var msg = document.getElementById('saveMsgEspec');
+  var mat = document.getElementById('especMaterialSelect').value;
+  var forn = document.getElementById('especFornSelect').value, tipo = document.getElementById('especTipoSelect').value;
+  var doc = document.getElementById('especDocInput').value.trim(), rev = document.getElementById('especRevInput').value.trim();
+  var dataDoc = formatarDataBR(document.getElementById('especDataInput').value);
+  if (!forn || !tipo) { msg.className = 'save-msg err'; msg.textContent = 'Escolha fornecedor e tipo (se não aparecerem, cadastre em Fornecedores).'; return; }
+  var existente = fichaDe(mat, forn, tipo);
+  if (existente && existente.id !== especEditando) { msg.className = 'save-msg err'; msg.textContent = 'Já existe uma ficha para ' + forn + ' — ' + tipo + '. Edite a existente.'; return; }
   var linhas = Array.prototype.map.call(document.querySelectorAll('#tbodyNovaEspec tr'), function(tr){
     return {
       teste: tr.querySelector('.espec-teste').value.trim(), especTexto: tr.querySelector('.espec-tolerancia').value.trim(),
       unidade: tr.querySelector('.espec-unidade').value.trim(), nt: tr.querySelector('.espec-nt').value.trim(), criterio: tr.querySelector('.espec-criterio').value
     };
   }).filter(function(p){ return p.teste; });
-  if (!linhas.length) { document.getElementById('saveMsgEspec').className = 'save-msg err'; document.getElementById('saveMsgEspec').textContent = 'Adicione ao menos um parâmetro.'; return; }
-  var msg = document.getElementById('saveMsgEspec'); msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  if (!linhas.length) { msg.className = 'save-msg err'; msg.textContent = 'Adicione ao menos um parâmetro.'; return; }
+  msg.className = 'save-msg'; msg.textContent = 'Salvando…';
   try {
+    var indicesParaApagar = [];
     if (especEditando) {
-      var grupoAtual = DATA.especificacoes[especEditando.mat].tipos.find(function(t){ return t.id === especEditando.tipoId; });
-      var indicesParaApagar = [];
-      // Recalcula quais linhas brutas da tabela pertencem a esse grupo (material + tipo/grade originais).
+      var fichaAnt = DATA.especificacoes.find(function(f){ return f.id === especEditando; });
       var brutas = linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes));
-      brutas.forEach(function(l){
-        var matLabel = MAT_LABEL_PLANO[especEditando.mat];
-        if (l['Material'] === matLabel && (l['Tipo/Grade'] || '') === (grupoAtual.tipoGrade || '')) indicesParaApagar.push(l.__index);
-      });
+      if (fichaAnt) indicesParaApagar = linhasDaFicha(brutas, fichaAnt).map(function(l){ return l.__index; });
     }
     // Grava primeiro as linhas novas (vão pro fim da tabela, sem mudar o índice das antigas) e só
     // depois apaga as antigas — assim, se algo falhar no meio, a especificação nunca some.
     for (var i = 0; i < linhas.length; i++) {
       var p = linhas[i];
       await adicionarLinha('especificacoes', {
-        'Material': MAT_LABEL_PLANO[mat], 'Tipo/Grade': nomeTipo, 'Código Documento': doc, 'Revisão': rev, 'Data Documento': dataDoc,
+        'Material': MAT_LABEL_PLANO[mat], 'Fornecedor': forn, 'Tipo': tipo, 'Código Documento': doc, 'Revisão': rev, 'Data Documento': dataDoc,
         'Teste': p.teste, 'Especificação/Tolerância': p.especTexto, 'Unidade': p.unidade, 'NT': p.nt, 'Critério': p.criterio
       });
     }
-    if (especEditando && indicesParaApagar.length) await excluirVariasLinhas('especificacoes', indicesParaApagar);
-    DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes)));
-    renderEspecificacoes(); renderHome(); popularTiposResina();
-    var qtdEspec = Object.keys(DATA.especificacoes).reduce(function(a,k){ return a + DATA.especificacoes[k].tipos.length; }, 0);
-    document.getElementById('ctEspecificacoes').textContent = qtdEspec;
+    if (indicesParaApagar.length) await excluirVariasLinhas('especificacoes', indicesParaApagar);
+    await recarregarEspecificacoes();
     mostrarToast('Especificação salva com sucesso.');
     fecharModalEspec();
   } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
 }
-async function excluirEspecificacao(mat, tipoId){
-  var tipo = DATA.especificacoes[mat].tipos.find(function(t){ return t.id === tipoId; });
-  if (!confirm('Excluir a especificação "' + (tipo ? tipo.nome : tipoId) + '"? Isso também remove as medições desse tipo/grade no Novo Recebimento.')) return;
+async function excluirEspecificacao(id){
+  var ficha = DATA.especificacoes.find(function(f){ return f.id === id; });
+  if (!ficha) return;
+  if (!confirm('Excluir a especificação "' + tituloFicha(ficha) + '"? As medições dela deixam de aparecer no Novo Recebimento.')) return;
   try {
     var brutas = linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes));
-    var matLabel = MAT_LABEL_PLANO[mat];
-    var indices = brutas.filter(function(l){ return l['Material'] === matLabel && (l['Tipo/Grade'] || '') === (tipo.tipoGrade || ''); }).map(function(l){ return l.__index; });
+    var indices = linhasDaFicha(brutas, ficha).map(function(l){ return l.__index; });
     if (indices.length) await excluirVariasLinhas('especificacoes', indices);
-    DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes)));
-    renderEspecificacoes(); renderHome(); popularTiposResina();
+    await recarregarEspecificacoes();
     mostrarToast('Especificação excluída.');
   } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
 }
@@ -2244,7 +2366,10 @@ async function excluirEspecificacao(mat, tipoId){
 function renderRotulosHomologados(){
   var el = document.getElementById('gridRotulos');
   if (!DATA.rotulosHomologados.length) { el.innerHTML = '<div class="empty-note">Nenhum rótulo homologado cadastrado ainda.</div>'; return; }
-  el.innerHTML = DATA.rotulosHomologados.map(function(r){
+  var q = cadAtual === 'rotulos' ? termoBuscaCadastro() : '';
+  var lista = DATA.rotulosHomologados.filter(function(r){ return !q || ((r['Nome do Modelo']||'') + ' ' + (r['Aplicação']||'') + ' ' + (r['Fornecedor Habitual']||'')).toLowerCase().indexOf(q) > -1; });
+  if (!lista.length) { el.innerHTML = '<div class="empty-note">Nenhum rótulo encontrado.</div>'; return; }
+  el.innerHTML = lista.map(function(r){
     return '<div class="photo-card"><div class="lbl"><span>'+r['Nome do Modelo']+'</span>'+badgeLabel(r['Status'])+'</div>'+
       (r['Arquivo da Foto'] ? ('<img class="photo-ph" src="'+r['Arquivo da Foto']+'" alt="Foto de referência">') : '<div class="empty-note" style="padding:24px 12px;">Sem foto</div>')+
       '<div class="meta">'+(r['Aplicação']||'')+
@@ -2302,88 +2427,148 @@ async function excluirRotulo(id){
   } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
 }
 
-/* ====================== PRODUTOS DE RESINA ====================== */
-function renderProdutos(){
-  var el = document.getElementById('tbodyProdutos');
-  if (!DATA.produtos.length) { el.innerHTML = '<tr><td colspan="6" class="empty-note">Nenhum produto cadastrado ainda.</td></tr>'; return; }
-  el.innerHTML = DATA.produtos.map(function(p){
-    return '<tr><td class="mono">'+p['Código']+'</td><td>'+p['Descrição']+'</td><td class="cell-dim">'+(p['Tipo']||'—')+'</td><td class="cell-dim">'+(p['Fornecedor']||'')+'</td>'+
-      '<td class="mono cell-dim">'+(p[COL_ULTIMO_LOTE] ? (p['Código']+'-'+p[COL_ULTIMO_LOTE]) : '—')+'</td>'+
-      '<td><div class="card-actions"><button type="button" class="icon-btn" onclick="abrirModalProduto(\''+p['Código']+'\')"><svg><use href="#i-pencil"/></svg> Editar</button>'+
-      '<button type="button" class="icon-btn danger" onclick="excluirProduto(\''+p['Código']+'\')"><svg><use href="#i-trash"/></svg> Excluir</button></div></td></tr>';
+/* ====================== FORNECEDORES ====================== */
+const MAT_ICONE = { resina:'i-flask', rotulo:'i-tag', pigmento:'i-droplet', cinta:'i-package', tampa:'i-package-lid' };
+function renderFornecedores(){
+  var q = cadAtual === 'fornecedores' ? termoBuscaCadastro() : '';
+  var grupos = grupoFornecedores();
+  var html = grupos.map(function(g, gi){
+    if (q && (g.nome + ' ' + g.itens.map(function(i){ return i.tipo + ' ' + i.cod + ' ' + i.matLabel; }).join(' ')).toLowerCase().indexOf(q) === -1) return '';
+    var mats = unicos(g.itens.map(function(i){ return i.matLabel; }));
+    var linhas = g.itens.map(function(i){
+      var ficha = fichaDe(i.mat, g.nome, i.tipo);
+      return '<tr><td><span class="mat-chip"><svg><use href="#' + (MAT_ICONE[i.mat] || 'i-package') + '"/></svg>' + escHtml(i.matLabel || '—') + '</span></td>' +
+        '<td>' + escHtml(i.tipo) + '</td>' +
+        '<td class="mono">' + (i.mat === 'resina' && i.cod ? escHtml(i.cod) : '<span class="cell-dim">—</span>') + '</td>' +
+        '<td class="mono cell-dim">' + (i.mat === 'resina' && i.cod ? proximoLoteInterno(i.cod) : '—') + '</td>' +
+        '<td>' + (ficha ? '<span class="ficha-ok"><svg><use href="#i-check"/></svg>' + escHtml([ficha.doc, ficha.rev].filter(function(x){ return x; }).join(' · ') || 'cadastrada') + '</span>' : '<span class="ficha-no">sem ficha</span>') + '</td></tr>';
+    }).join('');
+    return '<div class="spec-card"><div class="head"><div><div class="title">' + escHtml(g.nome) + '</div>' +
+      '<div class="forn-sub">' + g.itens.length + (g.itens.length === 1 ? ' item' : ' itens') + ' · ' + mats.map(escHtml).join(', ') + '</div></div>' +
+      '<div class="card-actions"><button type="button" class="icon-btn" onclick="abrirModalFornecedor(' + gi + ')"><svg><use href="#i-pencil"/></svg> Editar</button>' +
+      '<button type="button" class="icon-btn danger" onclick="excluirFornecedor(' + gi + ')"><svg><use href="#i-trash"/></svg> Excluir</button></div></div>' +
+      '<div class="table-scroll" style="border:none; border-radius:0;"><table class="occ"><thead><tr><th>Matéria-prima / insumo</th><th>Tipo</th><th>Código</th><th>Próximo lote interno</th><th>Ficha de especificação</th></tr></thead><tbody>' + linhas + '</tbody></table></div></div>';
   }).join('');
+  document.getElementById('listaFornecedoresCad').innerHTML = html || '<div class="empty-note">' + (q ? 'Nenhum fornecedor encontrado.' : 'Nenhum fornecedor cadastrado ainda.') + '</div>';
 }
-var produtoEditando = null;
-function abrirModalProduto(codigo){
-  produtoEditando = codigo || null;
-  var p = codigo ? produtoPorCodigo(codigo) : null;
-  document.getElementById('modalProdutoTitulo').textContent = p ? 'Editar produto de resina' : 'Novo produto de resina';
-  document.getElementById('produtoCodigoInput').value = p ? p['Código'] : '';
-  document.getElementById('produtoCodigoInput').disabled = !!p;
-  document.getElementById('produtoDescricaoInput').value = p ? p['Descrição'] : '';
-  document.getElementById('produtoFornecedorInput').value = p ? p['Fornecedor'] : '';
-  document.getElementById('produtoTipoInput').value = p ? p['Tipo'] : 'Prime';
-  var temCol = temColunaUltimoLote();
-  document.getElementById('produtoUltimoLoteInput').value = (p && temCol) ? (p[COL_ULTIMO_LOTE] || '') : '';
-  document.getElementById('produtoUltimoLoteInput').disabled = !temCol;
-  document.getElementById('notaUltimoLote').textContent = temCol
-    ? 'Se a numeração já vem de antes do sistema, informe o último número usado — o próximo lote continua a partir dele (ou do maior lote já lançado, o que for maior).'
-    : 'Pra usar este campo, crie a coluna "Último Lote Interno" na aba Produtos_Resina da planilha (ao lado de "Tipo") e recarregue o sistema.';
-  document.getElementById('saveMsgProduto').textContent = '';
-  document.getElementById('modalProduto').classList.remove('hidden');
+var fornEditando = null; // nome original do fornecedor em edição
+function abrirModalFornecedor(gi){
+  var g = (gi === undefined || gi === null) ? null : grupoFornecedores()[gi];
+  fornEditando = g ? g.nome : null;
+  document.getElementById('modalFornecedorTitulo').textContent = g ? 'Editar fornecedor' : 'Novo fornecedor';
+  document.getElementById('fornNomeInput').value = g ? g.nome : '';
+  document.getElementById('tbodyItensForn').innerHTML = '';
+  (g ? g.itens : [{ mat: 'resina', tipo: '', cod: '', ult: '' }]).forEach(function(i){ adicionarItemForn(i, !!g); });
+  document.getElementById('saveMsgForn').textContent = '';
+  document.getElementById('modalFornecedor').classList.remove('hidden');
 }
-function fecharModalProduto(){ document.getElementById('modalProduto').classList.add('hidden'); }
-document.getElementById('modalProduto').addEventListener('click', function(e){ if (e.target.id === 'modalProduto') fecharModalProduto(); });
-async function salvarProduto(){
-  var codigo = document.getElementById('produtoCodigoInput').value.trim().toUpperCase(), descricao = document.getElementById('produtoDescricaoInput').value.trim();
-  if (!codigo || !descricao) { document.getElementById('saveMsgProduto').className = 'save-msg err'; document.getElementById('saveMsgProduto').textContent = 'Informe código e descrição.'; return; }
-  var msg = document.getElementById('saveMsgProduto'); msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+function fecharModalFornecedor(){ document.getElementById('modalFornecedor').classList.add('hidden'); }
+document.getElementById('modalFornecedor').addEventListener('click', function(e){ if (e.target.id === 'modalFornecedor') fecharModalFornecedor(); });
+function adicionarItemForn(i, existente){
+  i = i || { mat: 'resina', tipo: '', cod: '', ult: '' };
+  var tr = document.createElement('tr');
+  if (existente) { tr.dataset.origTipo = i.tipo; tr.dataset.origMat = i.mat; }
+  tr.innerHTML = '<td><select class="it-mat">' + Object.keys(MAT_LABEL_PLANO).map(function(k){ return '<option value="' + k + '"' + (k === i.mat ? ' selected' : '') + '>' + MAT_LABEL_PLANO[k] + '</option>'; }).join('') + '</select></td>' +
+    '<td><input class="it-tipo" placeholder="Ex: Indorama Max Prime" value="' + escHtml(i.tipo) + '"></td>' +
+    '<td><input class="it-cod mono" placeholder="Ex: J02" value="' + escHtml(i.cod) + '"></td>' +
+    '<td><input class="it-ult mono" placeholder="Ex: 270" inputmode="numeric" value="' + escHtml(i.ult) + '"></td>' +
+    '<td><button type="button" class="remove-linha-espec" title="Remover item" onclick="this.closest(\'tr\').remove()">✕</button></td>';
+  var sel = tr.querySelector('.it-mat');
+  function sync(){ var r = sel.value === 'resina'; tr.querySelector('.it-cod').disabled = !r; tr.querySelector('.it-ult').disabled = !r; }
+  sel.addEventListener('change', sync); sync();
+  document.getElementById('tbodyItensForn').appendChild(tr);
+}
+async function recarregarFornecedores(){
+  DATA.fornecedores = linhasParaObjetos('fornecedores', await lerLinhasBrutas(TABELAS.fornecedores));
+  renderFornecedores(); renderEspecificacoes(); renderHome(); popularDatalists(); atualizarContagensCadastros();
+}
+async function salvarFornecedor(){
+  var msg = document.getElementById('saveMsgForn'), btn = document.getElementById('btnSalvarForn');
+  function erro(t){ msg.className = 'save-msg err'; msg.textContent = t; }
+  var nome = document.getElementById('fornNomeInput').value.trim();
+  var itens = Array.prototype.map.call(document.querySelectorAll('#tbodyItensForn tr'), function(tr){
+    var m = tr.querySelector('.it-mat').value;
+    return { mat: m, tipo: tr.querySelector('.it-tipo').value.trim(), cod: m === 'resina' ? tr.querySelector('.it-cod').value.trim().toUpperCase() : '',
+             ult: m === 'resina' ? tr.querySelector('.it-ult').value.trim() : '', origTipo: tr.dataset.origTipo, origMat: tr.dataset.origMat };
+  }).filter(function(i){ return i.tipo; });
+  if (!nome) return erro('Informe o nome do fornecedor.');
+  if (!itens.length) return erro('Adicione ao menos um item com o tipo preenchido.');
+  if (itens.some(function(i){ return i.mat === 'resina' && !i.cod; })) return erro('Resina PET precisa do código (ele forma o lote interno).');
+  if (itens.some(function(i){ return i.ult && isNaN(numeroDoLote(i.ult)); })) return erro('Último lote usado: informe só o número (ex.: 270).');
+  var chaves = itens.map(function(i){ return i.mat + '|' + i.tipo.toLowerCase(); });
+  if (chaves.some(function(c, k){ return chaves.indexOf(c) !== k; })) return erro('Há itens repetidos (mesmo material e tipo).');
+  var conflito = grupoFornecedores().find(function(g){ return g.nome.toLowerCase() === nome.toLowerCase() && g.nome !== fornEditando; });
+  if (conflito) return erro('Já existe um fornecedor chamado "' + conflito.nome + '".');
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
   try {
-    var obj = { 'Código': codigo, 'Descrição': descricao, 'Fornecedor': document.getElementById('produtoFornecedorInput').value.trim(), 'Tipo': document.getElementById('produtoTipoInput').value };
-    if (temColunaUltimoLote()) {
-      var ult = document.getElementById('produtoUltimoLoteInput').value.trim();
-      if (ult && isNaN(numeroDoLote(ult))) throw new Error('Último lote interno: informe só o número (ex.: 270).');
-      obj[COL_ULTIMO_LOTE] = ult ? String(numeroDoLote(ult)) : '';
+    var indicesAntigos = [];
+    if (fornEditando) {
+      var brutas = linhasParaObjetos('fornecedores', await lerLinhasBrutas(TABELAS.fornecedores));
+      indicesAntigos = brutas.filter(function(l){ return String(l['Fornecedor']).trim() === fornEditando; }).map(function(l){ return l.__index; });
     }
-    if (produtoEditando) { var p = produtoPorCodigo(produtoEditando); await atualizarLinha('produtos', p.__index, obj); }
-    else { if (produtoPorCodigo(codigo)) throw new Error('Já existe um produto com esse código.'); await adicionarLinha('produtos', obj); }
-    DATA.produtos = linhasParaObjetos('produtos', await lerLinhasBrutas(TABELAS.produtos));
-    renderProdutos(); renderHome(); popularOpcoesProdutoResina();
-    document.getElementById('ctProdutos').textContent = DATA.produtos.length;
-    mostrarToast('Produto salvo.');
-    fecharModalProduto();
-  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+    for (var k = 0; k < itens.length; k++) {
+      var it = itens[k];
+      await adicionarLinha('fornecedores', { 'Fornecedor': nome, 'Material': MAT_LABEL_PLANO[it.mat], 'Tipo': it.tipo, 'Código': it.cod,
+        'Último Lote Interno': it.ult ? String(numeroDoLote(it.ult)) : '' });
+    }
+    if (indicesAntigos.length) await excluirVariasLinhas('fornecedores', indicesAntigos);
+    // Renomeou o fornecedor ou um tipo? Atualiza as fichas de especificação ligadas a eles.
+    var renomes = fornEditando ? itens.filter(function(i){ return i.origTipo && i.origMat === i.mat && (nome !== fornEditando || i.tipo !== i.origTipo); }) : [];
+    if (renomes.length) {
+      var brutasE = linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes));
+      for (var b = 0; b < brutasE.length; b++) {
+        var l = brutasE[b];
+        var r = renomes.find(function(x){ return MAT_LABEL_PLANO[x.mat] === String(l['Material']).trim() && String(l['Fornecedor']).trim() === fornEditando && String(l['Tipo']).trim() === x.origTipo; });
+        if (r) await atualizarLinha('especificacoes', l.__index, Object.assign({}, l, { 'Fornecedor': nome, 'Tipo': r.tipo }));
+      }
+      DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes)));
+    }
+    await recarregarFornecedores();
+    mostrarToast('Fornecedor salvo.');
+    fecharModalFornecedor();
+  } catch (e) { erro('Erro: ' + e.message); }
+  finally { btn.disabled = false; }
 }
-async function excluirProduto(codigo){
-  var p = produtoPorCodigo(codigo);
-  if (!confirm('Excluir o produto "' + (p ? p['Descrição'] : codigo) + ' — ' + codigo + '"? Lotes já recebidos com esse código continuam no histórico.')) return;
+async function excluirFornecedor(gi){
+  var g = grupoFornecedores()[gi]; if (!g) return;
+  var fichas = DATA.especificacoes.filter(function(f){ return f.forn === g.nome; }).length;
+  if (!confirm('Excluir o fornecedor "' + g.nome + '" e os ' + g.itens.length + ' item(ns) dele?' + (fichas ? ' As ' + fichas + ' ficha(s) de especificação dele continuam cadastradas, mas deixam de aparecer no recebimento.' : '') + ' Recebimentos já lançados não são alterados.')) return;
   try {
-    await excluirLinhaPorIndice('produtos', p.__index);
-    DATA.produtos = linhasParaObjetos('produtos', await lerLinhasBrutas(TABELAS.produtos));
-    renderProdutos(); renderHome(); popularOpcoesProdutoResina();
-    document.getElementById('ctProdutos').textContent = DATA.produtos.length;
-    mostrarToast('Produto excluído.');
+    var brutas = linhasParaObjetos('fornecedores', await lerLinhasBrutas(TABELAS.fornecedores));
+    var indices = brutas.filter(function(l){ return String(l['Fornecedor']).trim() === g.nome; }).map(function(l){ return l.__index; });
+    if (indices.length) await excluirVariasLinhas('fornecedores', indices);
+    await recarregarFornecedores();
+    mostrarToast('Fornecedor excluído.');
   } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
 }
 
 /* ====================== CADASTROS (navegação entre sub-telas) ====================== */
 var CAD_INFO = {
-  rotulos: { titulo:'Rótulos Homologados', busca:'Nome do modelo…', botao:'Novo rótulo homologado', acao:'abrirModalRotulo()' },
-  especificacoes: { titulo:'Especificações', busca:'Material, tipo, teste…', botao:'Nova especificação', acao:'abrirModalEspec()' },
-  produtos: { titulo:'Produtos de Resina', busca:'Código ou descrição…', botao:'Novo produto', acao:'abrirModalProduto()' }
+  fornecedores: { titulo:'Fornecedores', busca:'Fornecedor, tipo, código…', botao:'Novo fornecedor', acao:'abrirModalFornecedor()' },
+  especificacoes: { titulo:'Especificações', busca:'Fornecedor, tipo, teste…', botao:'Nova especificação', acao:'abrirModalEspec()' },
+  rotulos: { titulo:'Rótulos Homologados', busca:'Nome do modelo…', botao:'Novo rótulo homologado', acao:'abrirModalRotulo()' }
 };
+var cadAtual = 'fornecedores';
+function termoBuscaCadastro(){ return document.getElementById('cadBusca').value.trim().toLowerCase(); }
 function escolherCadastro(cad){
-  var info = CAD_INFO[cad];
+  var info = CAD_INFO[cad]; if (!info) return;
+  cadAtual = cad;
   document.querySelectorAll('.cad-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.cad === cad); });
   document.getElementById('cadTitle').textContent = info.titulo;
-  document.getElementById('cadBusca').placeholder = info.busca;
+  var busca = document.getElementById('cadBusca'); busca.placeholder = info.busca; busca.value = '';
   var btnNovo = document.getElementById('cadBtnNovo'); btnNovo.innerHTML = '<svg><use href="#i-plus"/></svg> ' + info.botao; btnNovo.setAttribute('onclick', info.acao);
-  document.getElementById('painelRotulos').style.display = cad === 'rotulos' ? '' : 'none';
+  document.getElementById('painelFornecedores').style.display = cad === 'fornecedores' ? '' : 'none';
   document.getElementById('painelEspecificacoes').style.display = cad === 'especificacoes' ? '' : 'none';
-  document.getElementById('painelProdutos').style.display = cad === 'produtos' ? '' : 'none';
+  document.getElementById('painelRotulos').style.display = cad === 'rotulos' ? '' : 'none';
+  renderCadastroAtual();
+}
+function renderCadastroAtual(){
+  if (cadAtual === 'fornecedores') renderFornecedores(); else if (cadAtual === 'especificacoes') renderEspecificacoes(); else renderRotulosHomologados();
 }
 function abrirCadastro(cad){ if (!document.getElementById('tela-cadastros').classList.contains('active')) irPara('cadastros'); escolherCadastro(cad); }
 document.querySelectorAll('.cad-btn').forEach(function(btn){ btn.addEventListener('click', function(){ abrirCadastro(btn.dataset.cad); }); });
+document.getElementById('cadBusca').addEventListener('input', renderCadastroAtual);
+escolherCadastro('fornecedores');
 
 /* ====================== CONFIGURAÇÕES ====================== */
 function abrirConfiguracoes(){ document.getElementById('modalConfig').classList.remove('hidden'); }
