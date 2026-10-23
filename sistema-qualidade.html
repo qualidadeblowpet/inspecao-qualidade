@@ -256,6 +256,17 @@ table.occ tr:hover td{background:var(--surface-2);}
 .file-btn .ic{opacity:.85; flex-shrink:0; display:inline-flex;}
 .file-btn .ic svg{width:16px; height:16px;}
 .file-btn span:last-child{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.laudo-btns{display:flex; gap:8px;}
+.laudo-btns .file-btn{flex:1 1 0; min-width:0; justify-content:center;}
+/* No computador (mouse), "Tirar foto" abriria a mesma janela de arquivos — então só aparece em celular/tablet. */
+@media (hover:hover) and (pointer:fine){ .laudo-cam{display:none !important;} }
+.laudo-preview{display:flex; align-items:center; gap:10px; background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:6px 8px 6px 6px;}
+.laudo-preview .thumb{width:44px; height:44px; border-radius:6px; object-fit:cover; background:var(--surface-3); flex-shrink:0; cursor:zoom-in; display:flex; align-items:center; justify-content:center; color:var(--fg-dim);}
+.laudo-preview .thumb svg{width:20px; height:20px;}
+.laudo-preview .info{flex:1; min-width:0;}
+.laudo-preview .nome{font-size:12.5px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.laudo-preview .det{font-size:11px; color:var(--fg-faint);}
+.laudo-existente{font-size:11.5px; color:var(--fg-dim); margin-top:6px;}
 .upload{
   border:1.5px dashed var(--border); border-radius:10px; padding:18px 14px; display:flex; flex-direction:column;
   align-items:center; justify-content:center; gap:7px; text-align:center; color:var(--fg-dim); font-size:12px; cursor:pointer;
@@ -382,6 +393,8 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
 <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="m15 5 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
 <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v4a2 2 0 0 0 2 2h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 13H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 17H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
 </defs>
 </svg>
@@ -654,7 +667,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
           <div id="painelProdutos" style="display:none;">
             <div class="table-scroll">
               <table class="occ">
-                <thead><tr><th>Código</th><th>Descrição</th><th>Tipo</th><th>Fornecedor</th><th></th></tr></thead>
+                <thead><tr><th>Código</th><th>Descrição</th><th>Tipo</th><th>Fornecedor</th><th>Último lote</th><th></th></tr></thead>
                 <tbody id="tbodyProdutos"></tbody>
               </table>
             </div>
@@ -724,8 +737,18 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
           <div class="field"><label>Status</label><select id="statusRecebimentoSelect"></select></div>
           <div class="field">
             <label>Foto do laudo</label>
-            <button type="button" class="file-btn" onclick="document.getElementById('laudoFile').click()"><span class="ic"><svg><use href="#i-file-text"/></svg></span><span id="laudoFileLabel">Anexar laudo</span></button>
-            <input type="file" id="laudoFile" accept="image/*,.pdf" hidden onchange="document.getElementById('laudoFileLabel').textContent = this.files[0] ? this.files[0].name : 'Anexar laudo'">
+            <div class="laudo-btns" id="laudoBtns">
+              <button type="button" class="file-btn laudo-cam" onclick="document.getElementById('laudoCamera').click()"><span class="ic"><svg><use href="#i-camera"/></svg></span><span>Tirar foto</span></button>
+              <button type="button" class="file-btn" onclick="document.getElementById('laudoFile').click()"><span class="ic"><svg><use href="#i-paperclip"/></svg></span><span>Anexar arquivo</span></button>
+            </div>
+            <div class="laudo-preview hidden" id="laudoPreview">
+              <div class="thumb" id="laudoPreviewThumb" title="Ver em tamanho maior" onclick="verLaudoSelecionado()"></div>
+              <div class="info"><div class="nome" id="laudoPreviewNome"></div><div class="det" id="laudoPreviewDet"></div></div>
+              <button type="button" class="icon-btn icon-only danger" title="Remover (pra trocar, remova e escolha de novo)" onclick="limparLaudoSelecionado()"><svg><use href="#i-trash"/></svg></button>
+            </div>
+            <div class="laudo-existente hidden" id="laudoExistente"></div>
+            <input type="file" id="laudoCamera" accept="image/*" capture="environment" hidden onchange="laudoEscolhido(this)">
+            <input type="file" id="laudoFile" accept="image/*,.pdf" hidden onchange="laudoEscolhido(this)">
           </div>
         </div>
 
@@ -819,7 +842,9 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
               <option value="-">—</option>
             </select>
           </div>
+          <div class="field" id="campoUltimoLote"><label>Último lote interno usado</label><input class="mono" id="produtoUltimoLoteInput" inputmode="numeric" placeholder="Ex: 270 (opcional)"></div>
         </div>
+        <p class="med-note" id="notaUltimoLote" style="margin:10px 0 0;"></p>
         <div class="form-actions">
           <span class="save-msg" id="saveMsgProduto"></span>
           <button class="btn btn-ghost" onclick="fecharModalProduto()">Cancelar</button>
@@ -1280,7 +1305,21 @@ async function uploadArquivo(file, nomeArquivo){
 }
 
 /* ====================== CARREGAR TUDO ====================== */
+// A coluna "Último Lote Interno" na aba Produtos_Resina é opcional: o app lê o cabeçalho real da
+// Tabela e só usa/grava essa coluna se ela existir (planilhas antigas sem ela continuam funcionando).
+var COL_ULTIMO_LOTE = 'Último Lote Interno';
+async function lerCabecalhoProdutos(){
+  try {
+    var token = await getToken();
+    var resp = await fetch(urlTabela(TABELAS.produtos) + '/headerRowRange', { headers: { Authorization: 'Bearer ' + token } });
+    var json = await resp.json();
+    var cab = (resp.ok && json.values && json.values[0]) ? json.values[0].map(function(h){ return String(h).trim(); }) : null;
+    if (cab && ['Código','Descrição','Fornecedor','Tipo'].every(function(h){ return cab.indexOf(h) > -1; })) TABLE_COLS.produtos = cab;
+  } catch (e) { /* mantém as 4 colunas padrão */ }
+}
+function temColunaUltimoLote(){ return TABLE_COLS.produtos.indexOf(COL_ULTIMO_LOTE) > -1; }
 async function carregarTudo(){
+  await lerCabecalhoProdutos();
   var brutos = await Promise.all([
     lerLinhasBrutas(TABELAS.resina), lerLinhasBrutas(TABELAS.rotulo), lerLinhasBrutas(TABELAS.pigmento),
     lerLinhasBrutas(TABELAS.cinta), lerLinhasBrutas(TABELAS.tampa), lerLinhasBrutas(TABELAS.produtos),
@@ -1705,6 +1744,71 @@ async function salvarLiberacao(){
   } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
 }
 
+/* ====================== FOTO DO LAUDO (câmera ou arquivo) ====================== */
+var laudoArquivoPronto = null, laudoPreviewUrl = null;
+function formatarTamanho(bytes){ return bytes >= 1048576 ? (bytes/1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(bytes/1024)) + ' KB'; }
+// Reduz a foto pra no máximo 1600 px no lado maior (JPEG ~82%) — foto de celular tem 3–8 MB e fica
+// em ~300–500 KB, com o texto do laudo ainda legível. PDF e imagens já pequenas vão sem alteração.
+// Se o navegador não conseguir abrir a imagem (ex.: formato raro), envia o arquivo original.
+function reduzirImagem(file, maxLado, qualidade){
+  return new Promise(function(resolve){
+    if (!file.type || file.type.indexOf('image/') !== 0) { resolve(file); return; }
+    var url = URL.createObjectURL(file), img = new Image();
+    img.onload = function(){
+      var w = img.naturalWidth, h = img.naturalHeight, maior = Math.max(w, h);
+      if (maior <= maxLado && file.size <= 700 * 1024) { URL.revokeObjectURL(url); resolve(file); return; }
+      var escala = Math.min(1, maxLado / maior), cw = Math.round(w * escala), ch = Math.round(h * escala);
+      var canvas = document.createElement('canvas'); canvas.width = cw; canvas.height = ch;
+      var ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cw, ch); ctx.drawImage(img, 0, 0, cw, ch);
+      URL.revokeObjectURL(url);
+      canvas.toBlob(function(blob){
+        if (!blob || blob.size >= file.size) { resolve(file); return; }
+        var base = (file.name || 'laudo').replace(/\.[^.]+$/, '');
+        resolve(new File([blob], base + '.jpg', { type: 'image/jpeg' }));
+      }, 'image/jpeg', qualidade);
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); resolve(file); };
+    img.src = url;
+  });
+}
+async function laudoEscolhido(input){
+  var original = input.files && input.files[0]; input.value = '';
+  if (!original) return;
+  var det = document.getElementById('laudoPreviewDet');
+  mostrarPreviewLaudo(original, 'Preparando…');
+  var pronto = await reduzirImagem(original, 1600, 0.82);
+  laudoArquivoPronto = pronto;
+  mostrarPreviewLaudo(pronto, pronto === original ? formatarTamanho(pronto.size)
+    : formatarTamanho(pronto.size) + ' (reduzida de ' + formatarTamanho(original.size) + ')');
+}
+function mostrarPreviewLaudo(file, detalhe){
+  if (laudoPreviewUrl) { URL.revokeObjectURL(laudoPreviewUrl); laudoPreviewUrl = null; }
+  var thumb = document.getElementById('laudoPreviewThumb');
+  if (file.type && file.type.indexOf('image/') === 0) {
+    laudoPreviewUrl = URL.createObjectURL(file);
+    thumb.innerHTML = '<img src="' + laudoPreviewUrl + '" alt="" style="width:44px;height:44px;object-fit:cover;border-radius:6px;">';
+  } else {
+    thumb.innerHTML = '<svg><use href="#i-file-text"/></svg>';
+  }
+  document.getElementById('laudoPreviewNome').textContent = file.name || 'Laudo';
+  document.getElementById('laudoPreviewDet').textContent = detalhe || '';
+  document.getElementById('laudoBtns').classList.add('hidden');
+  document.getElementById('laudoPreview').classList.remove('hidden');
+}
+function verLaudoSelecionado(){ if (laudoPreviewUrl) window.open(laudoPreviewUrl, '_blank'); }
+function limparLaudoSelecionado(){
+  laudoArquivoPronto = null;
+  if (laudoPreviewUrl) { URL.revokeObjectURL(laudoPreviewUrl); laudoPreviewUrl = null; }
+  document.getElementById('laudoCamera').value = ''; document.getElementById('laudoFile').value = '';
+  document.getElementById('laudoPreview').classList.add('hidden');
+  document.getElementById('laudoBtns').classList.remove('hidden');
+}
+function mostrarLaudoExistente(url){
+  var el = document.getElementById('laudoExistente');
+  if (url) { el.innerHTML = 'Já tem laudo anexado — <a href="' + url + '" target="_blank">abrir</a>. Tirar/anexar outro substitui.'; el.classList.remove('hidden'); }
+  else { el.innerHTML = ''; el.classList.add('hidden'); }
+}
+
 /* ====================== NOVO RECEBIMENTO ====================== */
 // recebimentoEditando guarda {mat, index} quando a janela está editando um recebimento já
 // salvo (reaberto pelo botão de lápis na lista/cards), e fica null numa abertura normal de
@@ -1718,7 +1822,8 @@ function abrirModalCadastro(matEdit, indexEdit){
   document.getElementById('modalCadastroTitulo').textContent = recebimentoEditando ? 'Editar recebimento' : 'Novo recebimento';
   document.getElementById('btnSalvarRecebimento').textContent = recebimentoEditando ? 'Salvar alterações' : 'Salvar recebimento';
   document.getElementById('materialSelect').disabled = !!recebimentoEditando;
-  document.getElementById('laudoFile').value = '';
+  limparLaudoSelecionado();
+  mostrarLaudoExistente(recebimentoEditando ? row['Arquivo do Laudo'] : '');
   document.getElementById('saveMsgRecebimento').textContent = '';
   if (recebimentoEditando) {
     document.getElementById('materialSelect').value = matEdit;
@@ -1727,7 +1832,6 @@ function abrirModalCadastro(matEdit, indexEdit){
     document.getElementById('responsavelInput').value = row['Responsável'] || '';
     document.getElementById('observacoesInput').value = row['Observações'] || '';
     document.getElementById('dataRecebimentoInput').value = dataBRparaISO(row['Data Recebimento'] || row['Data'] || '');
-    document.getElementById('laudoFileLabel').textContent = row['Arquivo do Laudo'] ? 'Laudo já anexado — escolher outro substitui' : 'Anexar laudo';
   } else {
     document.getElementById('dataRecebimentoInput').value = hojeISO();
     document.getElementById('notaFiscalInput').value = '';
@@ -1736,7 +1840,6 @@ function abrirModalCadastro(matEdit, indexEdit){
     document.getElementById('fornecedorGenericoInput').value = '';
     document.getElementById('responsavelInput').value = '';
     document.getElementById('observacoesInput').value = '';
-    document.getElementById('laudoFileLabel').textContent = 'Anexar laudo';
   }
   document.getElementById('modalCadastro').classList.remove('hidden');
   atualizarCamposMaterial();
@@ -1861,9 +1964,14 @@ function sugerirStatusRecebimento(){
 
 /* ---- lote interno x entrada (resina) ---- */
 var loteResinaExistente = null;
+function numeroDoLote(v){ var m = String(v == null ? '' : v).match(/(\d+)\s*$/); return m ? parseInt(m[1], 10) : NaN; }
+// Próximo lote interno = maior número entre (a) os lotes já lançados na planilha pra esse código e
+// (b) o "Último Lote Interno" informado no cadastro do produto (pra continuar a numeração antiga) + 1.
 function proximoLoteInterno(codigo){
   var max = 0;
-  DATA.resina.forEach(function(r){ if (r['Código Produto'] === codigo && r['Lote Interno']) { var n = parseInt(String(r['Lote Interno']).split('-')[1], 10); if (!isNaN(n) && n > max) max = n; } });
+  DATA.resina.forEach(function(r){ if (r['Código Produto'] === codigo && r['Lote Interno']) { var n = numeroDoLote(r['Lote Interno']); if (!isNaN(n) && n > max) max = n; } });
+  var prod = produtoPorCodigo(codigo), base = prod ? numeroDoLote(prod[COL_ULTIMO_LOTE]) : NaN;
+  if (!isNaN(base) && base > max) max = base;
   return codigo + '-' + (max + 1);
 }
 function buscarLoteExistente(codigo, loteForn){
@@ -1961,7 +2069,7 @@ async function salvarRecebimento(){
   var rowOriginal = editando ? DATA[editando.mat].find(function(x){ return x.__index === editando.index; }) : null;
   try {
     var laudoUrl = rowOriginal ? (rowOriginal['Arquivo do Laudo'] || '') : '';
-    var laudoFile = document.getElementById('laudoFile').files[0];
+    var laudoFile = laudoArquivoPronto;
     if (laudoFile) {
       msg.textContent = 'Enviando foto do laudo…';
       var nomeBase = 'Laudo_' + mat + '_' + Date.now();
@@ -2197,9 +2305,10 @@ async function excluirRotulo(id){
 /* ====================== PRODUTOS DE RESINA ====================== */
 function renderProdutos(){
   var el = document.getElementById('tbodyProdutos');
-  if (!DATA.produtos.length) { el.innerHTML = '<tr><td colspan="5" class="empty-note">Nenhum produto cadastrado ainda.</td></tr>'; return; }
+  if (!DATA.produtos.length) { el.innerHTML = '<tr><td colspan="6" class="empty-note">Nenhum produto cadastrado ainda.</td></tr>'; return; }
   el.innerHTML = DATA.produtos.map(function(p){
     return '<tr><td class="mono">'+p['Código']+'</td><td>'+p['Descrição']+'</td><td class="cell-dim">'+(p['Tipo']||'—')+'</td><td class="cell-dim">'+(p['Fornecedor']||'')+'</td>'+
+      '<td class="mono cell-dim">'+(p[COL_ULTIMO_LOTE] ? (p['Código']+'-'+p[COL_ULTIMO_LOTE]) : '—')+'</td>'+
       '<td><div class="card-actions"><button type="button" class="icon-btn" onclick="abrirModalProduto(\''+p['Código']+'\')"><svg><use href="#i-pencil"/></svg> Editar</button>'+
       '<button type="button" class="icon-btn danger" onclick="excluirProduto(\''+p['Código']+'\')"><svg><use href="#i-trash"/></svg> Excluir</button></div></td></tr>';
   }).join('');
@@ -2214,6 +2323,12 @@ function abrirModalProduto(codigo){
   document.getElementById('produtoDescricaoInput').value = p ? p['Descrição'] : '';
   document.getElementById('produtoFornecedorInput').value = p ? p['Fornecedor'] : '';
   document.getElementById('produtoTipoInput').value = p ? p['Tipo'] : 'Prime';
+  var temCol = temColunaUltimoLote();
+  document.getElementById('produtoUltimoLoteInput').value = (p && temCol) ? (p[COL_ULTIMO_LOTE] || '') : '';
+  document.getElementById('produtoUltimoLoteInput').disabled = !temCol;
+  document.getElementById('notaUltimoLote').textContent = temCol
+    ? 'Se a numeração já vem de antes do sistema, informe o último número usado — o próximo lote continua a partir dele (ou do maior lote já lançado, o que for maior).'
+    : 'Pra usar este campo, crie a coluna "Último Lote Interno" na aba Produtos_Resina da planilha (ao lado de "Tipo") e recarregue o sistema.';
   document.getElementById('saveMsgProduto').textContent = '';
   document.getElementById('modalProduto').classList.remove('hidden');
 }
@@ -2225,6 +2340,11 @@ async function salvarProduto(){
   var msg = document.getElementById('saveMsgProduto'); msg.className = 'save-msg'; msg.textContent = 'Salvando…';
   try {
     var obj = { 'Código': codigo, 'Descrição': descricao, 'Fornecedor': document.getElementById('produtoFornecedorInput').value.trim(), 'Tipo': document.getElementById('produtoTipoInput').value };
+    if (temColunaUltimoLote()) {
+      var ult = document.getElementById('produtoUltimoLoteInput').value.trim();
+      if (ult && isNaN(numeroDoLote(ult))) throw new Error('Último lote interno: informe só o número (ex.: 270).');
+      obj[COL_ULTIMO_LOTE] = ult ? String(numeroDoLote(ult)) : '';
+    }
     if (produtoEditando) { var p = produtoPorCodigo(produtoEditando); await atualizarLinha('produtos', p.__index, obj); }
     else { if (produtoPorCodigo(codigo)) throw new Error('Já existe um produto com esse código.'); await adicionarLinha('produtos', obj); }
     DATA.produtos = linhasParaObjetos('produtos', await lerLinhasBrutas(TABELAS.produtos));
