@@ -1203,20 +1203,52 @@ async function adicionarLinha(chaveTabela, obj){
   if (!resp.ok) throw new Error((json.error && json.error.message) || 'erro ao gravar linha');
   return json;
 }
-async function atualizarLinha(chaveTabela, index, obj){
+// Editar e excluir linhas são feitos pelo ENDEREÇO da linha na aba (ex.: A5:X5), e não pela
+// rota rows/itemAt(...) da Tabela — essa rota é instável na API do Excel Online (a de excluir
+// devolve "Resource not found for the segment 'delete'"). O endereço é calculado a partir do
+// intervalo atual da Tabela: linha da planilha = linha do cabeçalho + 1 + índice da linha.
+async function localizarLinhaTabela(chaveTabela, index){
   var token = await getToken();
-  var valores = objetoParaValores(chaveTabela, obj);
-  var resp = await fetch(urlTabela(TABELAS[chaveTabela]) + '/rows/itemAt(index=' + index + ')', {
-    method: 'PATCH', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+  var resp = await fetch(urlTabela(TABELAS[chaveTabela]) + '/range', { headers: { Authorization: 'Bearer ' + token } });
+  var json = await resp.json().catch(function(){ return {}; });
+  if (!resp.ok || !json.address) throw new Error((json.error && json.error.message) || 'não consegui localizar a tabela na planilha');
+  var addr = json.address, bang = addr.lastIndexOf('!');
+  var aba = addr.slice(0, bang).replace(/^'|'$/g, '').replace(/''/g, "'");
+  var m = addr.slice(bang + 1).replace(/\$/g, '').match(/^([A-Z]+)(\d+):([A-Z]+)(\d+)$/);
+  if (!m) throw new Error('endereço da tabela inesperado: ' + addr);
+  var linhaCab = parseInt(m[2], 10), ultima = parseInt(m[4], 10);
+  var linha = linhaCab + 1 + index;
+  if (index < 0 || linha > ultima) throw new Error('linha não encontrada na tabela (talvez já tenha sido alterada) — clique em Atualizar e tente de novo');
+  return {
+    token: token,
+    url: 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + encodeURIComponent(aba) +
+         "/range(address='" + m[1] + linha + ':' + m[3] + linha + "')",
+    linhasDeDados: ultima - linhaCab
+  };
+}
+async function gravarValoresLinha(loc, valores){
+  var resp = await fetch(loc.url, {
+    method: 'PATCH', headers: { Authorization: 'Bearer ' + loc.token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ values: [valores] })
   });
   var json = await resp.json().catch(function(){ return {}; });
-  if (!resp.ok) throw new Error((json.error && json.error.message) || 'erro ao atualizar linha');
+  if (!resp.ok) throw new Error((json.error && json.error.message) || 'erro ao gravar a linha');
+}
+async function atualizarLinha(chaveTabela, index, obj){
+  var loc = await localizarLinhaTabela(chaveTabela, index);
+  await gravarValoresLinha(loc, objetoParaValores(chaveTabela, obj));
 }
 async function excluirLinhaPorIndice(chaveTabela, index){
-  var token = await getToken();
-  var resp = await fetch(urlTabela(TABELAS[chaveTabela]) + '/rows/itemAt(index=' + index + ')/delete', {
-    method: 'POST', headers: { Authorization: 'Bearer ' + token }
+  var loc = await localizarLinhaTabela(chaveTabela, index);
+  if (loc.linhasDeDados <= 1) {
+    // Uma Tabela do Excel não pode ficar sem nenhuma linha de dados (o arquivo passa a ser
+    // tratado como danificado). Se é a última, só limpa os valores — o app ignora linha vazia.
+    await gravarValoresLinha(loc, TABLE_COLS[chaveTabela].map(function(){ return ''; }));
+    return;
+  }
+  var resp = await fetch(loc.url + '/delete', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + loc.token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ shift: 'Up' })
   });
   if (!resp.ok) { var json = await resp.json().catch(function(){ return {}; }); throw new Error((json.error && json.error.message) || 'erro ao excluir linha'); }
 }
@@ -2067,8 +2099,9 @@ async function salvarEspecificacao(){
         var matLabel = MAT_LABEL_PLANO[especEditando.mat];
         if (l['Material'] === matLabel && (l['Tipo/Grade'] || '') === (grupoAtual.tipoGrade || '')) indicesParaApagar.push(l.__index);
       });
-      if (indicesParaApagar.length) await excluirVariasLinhas('especificacoes', indicesParaApagar);
     }
+    // Grava primeiro as linhas novas (vão pro fim da tabela, sem mudar o índice das antigas) e só
+    // depois apaga as antigas — assim, se algo falhar no meio, a especificação nunca some.
     for (var i = 0; i < linhas.length; i++) {
       var p = linhas[i];
       await adicionarLinha('especificacoes', {
@@ -2076,6 +2109,7 @@ async function salvarEspecificacao(){
         'Teste': p.teste, 'Especificação/Tolerância': p.especTexto, 'Unidade': p.unidade, 'NT': p.nt, 'Critério': p.criterio
       });
     }
+    if (especEditando && indicesParaApagar.length) await excluirVariasLinhas('especificacoes', indicesParaApagar);
     DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes)));
     renderEspecificacoes(); renderHome(); popularTiposResina();
     var qtdEspec = Object.keys(DATA.especificacoes).reduce(function(a,k){ return a + DATA.especificacoes[k].tipos.length; }, 0);
