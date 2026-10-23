@@ -405,6 +405,8 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
 .a-crumb b{color:var(--fg); font-weight:600;}
 .a-burger{display:none;}
 .a-content{flex:1; overflow-y:auto; padding:22px 24px 40px; padding-right:max(24px, env(safe-area-inset-right,0px)); padding-bottom:calc(40px + env(safe-area-inset-bottom,0px));}
+/* Conteúdo com largura máxima, encostado no menu (o que sobra em monitor grande fica à direita). */
+.a-content > .tela, .a-content > footer{max-width:1280px;}
 .a-content .tela-head{margin-bottom:4px;} .a-content .tela-head h2{font-size:20px;}
 .a-content .app-shell{min-height:calc(100vh - 210px); min-height:calc(100dvh - 210px);}
 .a-scrim{display:none;}
