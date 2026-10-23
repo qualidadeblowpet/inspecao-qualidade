@@ -1045,7 +1045,11 @@ const graphScopes = ["Files.ReadWrite", "User.Read"];
 // arquivo sistema_qualidade_blowpet_base.xlsx, igual à variável LINK_PLANILHA_PADRAO dos
 // outros apps. Pegue em: abrir o arquivo no OneDrive > Compartilhar > Copiar link
 // (com acesso de edição para a organização) e cole aqui no lugar deste texto.
-const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/inspetor_qualidade_blowpet_com_br/IQCJ1ry7Sg2nRq8c5Klpb7vkAcnaBL88A_FdRLyDizCbFNk?e=BxYyto";
+const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/inspetor_qualidade_blowpet_com_br/IQCJ1ry7Sg2nRq8c5Klpb7vkASRQ35vK--e6KZfjy6cof_4?e=P5CI7A";
+
+// Plano B: se o link acima deixar de valer (arquivo reenviado, compartilhamento refeito), o app
+// procura a planilha por este caminho no OneDrive da conta logada (a dona do arquivo).
+const CAMINHO_PLANILHA = "Aplicativos/sistema_qualidade_blowpet_base.xlsx";
 
 // Pasta no OneDrive (mesmo drive da planilha) onde as fotos de laudo e de rótulo
 // homologado são salvas. A Graph API cria as pastas do caminho automaticamente no
@@ -1204,10 +1208,22 @@ async function conectarPlanilha(){
       return;
     }
     var token = await getToken();
-    var base64 = btoa(LINK_PLANILHA_PADRAO).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
-    var sharingId = 'u!' + base64;
-    var resp = await fetch('https://graph.microsoft.com/v1.0/shares/' + sharingId + '/driveItem', { headers: { Authorization: 'Bearer ' + token } });
-    var json = await resp.json();
+    var json = {};
+    try {
+      var base64 = btoa(LINK_PLANILHA_PADRAO).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+      var resp = await fetch('https://graph.microsoft.com/v1.0/shares/u!' + base64 + '/driveItem', { headers: { Authorization: 'Bearer ' + token } });
+      json = await resp.json().catch(function(){ return {}; });
+    } catch (e) { json = {}; }
+    if (!json.id && CAMINHO_PLANILHA) {
+      // Link não funcionou: tenta achar pelo caminho no OneDrive da conta logada.
+      var caminho = CAMINHO_PLANILHA.split('/').map(encodeURIComponent).join('/');
+      var resp2 = await fetch('https://graph.microsoft.com/v1.0/me/drive/root:/' + caminho, { headers: { Authorization: 'Bearer ' + token } });
+      var json2 = await resp2.json().catch(function(){ return {}; });
+      if (json2.id) {
+        json = json2;
+        mostrarToast('Planilha encontrada pelo caminho no OneDrive (o link de compartilhamento gravado no sistema está desatualizado).');
+      }
+    }
     if (json.id) {
       itemId = json.id; driveId = json.parentReference.driveId;
       dot.className = 'status-dot online'; label.textContent = 'carregando dados…';
@@ -1216,7 +1232,7 @@ async function conectarPlanilha(){
       label.textContent = 'conectado';
     } else {
       dot.className = 'status-dot offline'; label.textContent = 'erro na planilha';
-      mostrarToast('Não foi possível localizar a planilha. Confira o link em LINK_PLANILHA_PADRAO e se a conta logada tem acesso de edição ao arquivo.', true);
+      mostrarToast('Não foi possível localizar a planilha nem pelo link nem pelo caminho ' + CAMINHO_PLANILHA + '. Confira se o arquivo está nessa pasta, com esse nome, e se a conta logada é a dona dele.', true);
     }
   } catch (err) {
     dot.className = 'status-dot offline'; label.textContent = 'offline';
