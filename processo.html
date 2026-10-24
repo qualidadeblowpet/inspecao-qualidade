@@ -1694,7 +1694,18 @@ function iqrAnalisaGrupo(valores){
   var sorted = valores.slice().sort(function(a,b){ return a - b; });
   var q1 = iqrPercentil(sorted, 25), q3 = iqrPercentil(sorted, 75);
   var iqr = q3 - q1;
-  var dentro = iqr === 0 ? sorted : sorted.filter(function(v){ return v >= q1 - 1.5*iqr && v <= q3 + 1.5*iqr; });
+  // Quando a maioria das leituras é igual (ou quase), Q1=Q3 e o IQR fica 0 — a cerca de Tukey
+  // (Q1-1,5*IQR a Q3+1,5*IQR) também fica em 0, então não tem como usá-la pra filtrar sem excluir
+  // até os valores "normais". Sem filtro nenhum nesse caso (como era antes), um único valor digitado
+  // errado (ex.: 292 no meio de leituras de ~287-290) passava direto e virava faixa sugerida absurda
+  // (ex.: "29 – 292"). Nesse caso especial, descarta quem foge mais de 50% da mediana — o mesmo
+  // critério adotado na skill de referência (criterios-processo-blowpet) depois de achar esse mesmo
+  // problema nos dados reais.
+  var mediana = iqrPercentil(sorted, 50);
+  var limiarMediana = Math.abs(mediana) * 0.5;
+  var dentro = iqr === 0
+    ? sorted.filter(function(v){ return Math.abs(v - mediana) <= limiarMediana; })
+    : sorted.filter(function(v){ return v >= q1 - 1.5*iqr && v <= q3 + 1.5*iqr; });
   var nUsado = dentro.length;
   return {
     n_total: n, n_outliers: n - nUsado,
