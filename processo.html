@@ -1245,32 +1245,39 @@ function parseChecklist(ws){
 // =============================================================================
 // Tolerâncias — busca por Máquina + Gramatura + Cor + Resina + Parâmetro
 // =============================================================================
+// Cor é opcional no cadastro de critério (ver Página Critérios): uma linha com Cor em branco
+// vale pra QUALQUER cor daquela Máquina+Gramatura+Resina, a não ser que exista uma linha mais
+// específica (mesma Máquina+Gramatura+Resina, mas com a Cor da leitura preenchida também) — essa
+// específica tem prioridade. Por isso a busca não para no primeiro que bater: guarda o genérico
+// (Cor em branco) como alternativa e só o devolve se não achar nenhum específico pra essa cor.
 function buscarTolerancia(maquina, gramatura, cor, resina, parametro){
   var chaveM = norm(maquina), chaveG = norm(gramatura), chaveC = norm(cor), chaveR = norm(resina), chaveP = norm(parametro);
+  var generico = null;
   for (var i = 0; i < tolerancias.length; i++){
     var t = tolerancias[i];
     if (t.ativoFalso) continue;
     if (t.processo && t.processo !== 'Injeção') continue; // ignora linhas de outro processo (ex.: Sopro)
-    if (t._maquina === chaveM && t._gramatura === chaveG && t._cor === chaveC && t._resina === chaveR && t._parametro === chaveP){
-      return t;
-    }
+    if (t._maquina !== chaveM || t._gramatura !== chaveG || t._resina !== chaveR || t._parametro !== chaveP) continue;
+    if (t._cor === chaveC) return t; // específico pra essa cor (ou genérico batendo direto, se a própria leitura não tem cor) — prioridade máxima
+    if (t._cor === '' && !generico) generico = t;
   }
-  return null;
+  return generico;
 }
 
 // Tolerância do Sopro — tabela própria (TabelaTolerancias_Sopro, aba Tolerancias_App_Sopro),
 // separada da TabelaTolerancias da Injeção. Identificação por Máquina + Gramatura + Cor + Frasco
-// (mesma lógica/4 campos da Injeção).
+// (mesma lógica/4 campos da Injeção, Cor também opcional do mesmo jeito — ver comentário acima).
 function buscarToleranciaSopro(maquina, gramatura, cor, frasco, parametro){
   var chaveM = norm(maquina), chaveG = norm(gramatura), chaveC = norm(cor), chaveF = norm(frasco), chaveP = norm(parametro);
+  var generico = null;
   for (var i = 0; i < toleranciasSopro.length; i++){
     var t = toleranciasSopro[i];
     if (t.ativoFalso) continue;
-    if (t._maquina === chaveM && t._gramatura === chaveG && t._cor === chaveC && t._resina === chaveF && t._parametro === chaveP){
-      return t;
-    }
+    if (t._maquina !== chaveM || t._gramatura !== chaveG || t._resina !== chaveF || t._parametro !== chaveP) continue;
+    if (t._cor === chaveC) return t;
+    if (t._cor === '' && !generico) generico = t;
   }
-  return null;
+  return generico;
 }
 
 // status: 'warn' (baixa confiança, precisa conferir antes de tudo) > 'bad'/'ok' (comparação com tolerância) > 'none' (sem tolerância cadastrada ou valor não numérico)
@@ -3470,7 +3477,7 @@ function renderCriterios(){
     return '<tr>' +
       '<td>'+escHtml(g.maquina)+'</td>' +
       '<td>'+escHtml(g.gramatura)+'</td>' +
-      '<td>'+escHtml(g.cor)+'</td>' +
+      '<td>'+escHtml(corLabelCriterio(g.cor))+'</td>' +
       '<td>'+escHtml(g.resina)+'</td>' +
       '<td>'+g.itens.length+' de '+PARAMETROS_INJECAO.length+' parâmetros</td>' +
       '<td><span class="critpill '+statusCls+'">'+statusTxt+'</span></td>' +
@@ -3486,10 +3493,18 @@ function renderCriterios(){
 var critModoAtual = null; // 'novo' | 'editar'
 var critGrupoOriginal = null; // grupo sendo editado (referência de criteriosGruposAtuais), null em modo 'novo'
 
-function popularSelectLista(selectId, chave, selecionado){
+// Sentinela pro valor do <select> de Cor quando o critério não define cor (vale pra todas —
+// ver buscarTolerancia/buscarToleranciaSopro). Nunca vai pra planilha com esse valor: é só o
+// <option> interno que representa "deixar em branco"; na hora de salvar isso é convertido pra
+// string vazia de verdade (ver salvarCriterioLote/salvarCriterioLoteSopro).
+var CRIT_COR_TODAS = '__TODAS_CORES__';
+function corLabelCriterio(cor){ return cor === '' ? 'Todas as cores' : cor; }
+
+function popularSelectLista(selectId, chave, selecionado, opcaoTodosTexto){
   var sel = document.getElementById(selectId);
   var itens = listas[chave].slice().sort(function(a,b){ return a.valor.localeCompare(b.valor, 'pt-BR'); });
-  sel.innerHTML = '<option value="" disabled'+(selecionado?'':' selected')+'>Selecione…</option>' +
+  var extra = opcaoTodosTexto ? '<option value="'+CRIT_COR_TODAS+'"'+(selecionado===CRIT_COR_TODAS?' selected':'')+'>'+escHtml(opcaoTodosTexto)+'</option>' : '';
+  sel.innerHTML = '<option value="" disabled'+(selecionado?'':' selected')+'>Selecione…</option>' + extra +
     itens.map(function(i){ return '<option value="'+escHtml(i.valor)+'"'+(i.valor===selecionado?' selected':'')+'>'+escHtml(i.valor)+'</option>'; }).join('');
 }
 
@@ -3510,7 +3525,9 @@ function abrirFormularioCriterio(){
   document.getElementById('criteriosListaSecao').hidden = true;
   document.getElementById('critFormSecao').hidden = false;
   document.getElementById('critErro').style.display = 'none';
-  var listasVazias = !listas.maquinas.length || !listas.gramaturas.length || !listas.cores.length || !listas.resinas.length;
+  // Cor não entra aqui: agora é opcional (dá pra salvar um critério em "Todas as cores" mesmo
+  // sem nenhuma cor cadastrada na lista de apoio) — só Máquina/Gramatura/Resina são obrigatórios.
+  var listasVazias = !listas.maquinas.length || !listas.gramaturas.length || !listas.resinas.length;
   document.getElementById('critAvisoListaVazia').style.display = listasVazias ? 'block' : 'none';
   document.getElementById('critBtnSalvar').disabled = listasVazias;
 }
@@ -3519,11 +3536,11 @@ function abrirFormNovoCriterio(){
   critModoAtual = 'novo';
   critGrupoOriginal = null;
   document.getElementById('critFormTitulo').textContent = 'Novo critério';
-  document.getElementById('critFormDesc').textContent = 'Escolha a combinação de Máquina + Gramatura + Cor + Resina e preencha o Mínimo/Máximo só dos parâmetros que precisam de limite.';
+  document.getElementById('critFormDesc').textContent = 'Escolha a combinação de Máquina + Gramatura + Cor + Resina e preencha o Mínimo/Máximo só dos parâmetros que precisam de limite. Deixar Cor em "Todas as cores" faz o critério valer pra qualquer cor dessa Gramatura+Resina+Máquina, a não ser que exista um critério específico cadastrado pra uma cor em particular — esse específico tem prioridade.';
   ['critMaquina','critGramatura','critCor','critResina'].forEach(function(id){ document.getElementById(id).disabled = false; });
   popularSelectLista('critMaquina', 'maquinas', '');
   popularSelectLista('critGramatura', 'gramaturas', '');
-  popularSelectLista('critCor', 'cores', '');
+  popularSelectLista('critCor', 'cores', CRIT_COR_TODAS, 'Todas as cores (sem definir)');
   popularSelectLista('critResina', 'resinas', '');
   renderCritParamRows({});
   abrirFormularioCriterio();
@@ -3534,12 +3551,12 @@ function abrirFormEditarGrupo(i){
   if (!g) return;
   critModoAtual = 'editar';
   critGrupoOriginal = g;
-  document.getElementById('critFormTitulo').textContent = 'Editar critério — ' + g.maquina + ' · ' + g.gramatura + ' · ' + g.cor + ' · ' + g.resina;
-  document.getElementById('critFormDesc').textContent = 'Pode ajustar também Máquina/Gramatura/Cor/Resina — se a combinação nova já tiver outro critério cadastrado, o salvamento é bloqueado com aviso. Ajuste o Mínimo/Máximo de cada parâmetro; deixar os dois em branco remove o critério daquele parâmetro.';
+  document.getElementById('critFormTitulo').textContent = 'Editar critério — ' + g.maquina + ' · ' + g.gramatura + ' · ' + corLabelCriterio(g.cor) + ' · ' + g.resina;
+  document.getElementById('critFormDesc').textContent = 'Pode ajustar também Máquina/Gramatura/Cor/Resina — se a combinação nova já tiver outro critério cadastrado, o salvamento é bloqueado com aviso. Deixar Cor em "Todas as cores" faz o critério valer pra qualquer cor dessa combinação, a não ser que exista um critério específico cadastrado pra uma cor em particular. Ajuste o Mínimo/Máximo de cada parâmetro; deixar os dois em branco remove o critério daquele parâmetro.';
   ['critMaquina','critGramatura','critCor','critResina'].forEach(function(id){ document.getElementById(id).disabled = false; });
   popularSelectLista('critMaquina', 'maquinas', g.maquina);
   popularSelectLista('critGramatura', 'gramaturas', g.gramatura);
-  popularSelectLista('critCor', 'cores', g.cor);
+  popularSelectLista('critCor', 'cores', (g.cor === '' ? CRIT_COR_TODAS : g.cor), 'Todas as cores (sem definir)');
   popularSelectLista('critResina', 'resinas', g.resina);
   var preenchidos = {};
   g.itens.forEach(function(t){ preenchidos[t.parametro] = { min: t.valor_min, max: t.valor_max }; });
@@ -3558,15 +3575,18 @@ function fecharFormCriterio(){
 async function salvarCriterioLote(){
   var maquina = document.getElementById('critMaquina').value;
   var gramatura = document.getElementById('critGramatura').value;
-  var cor = document.getElementById('critCor').value;
+  var corSel = document.getElementById('critCor').value;
   var resina = document.getElementById('critResina').value;
   var erroEl = document.getElementById('critErro');
   function erro(msg){ erroEl.textContent = msg; erroEl.style.display = 'block'; }
   erroEl.style.display = 'none';
 
-  if (!maquina || !gramatura || !cor || !resina){
-    erro('Selecione Máquina, Gramatura, Cor e Resina.'); return;
+  if (!maquina || !gramatura || !corSel || !resina){
+    erro('Selecione Máquina, Gramatura, Cor (ou "Todas as cores") e Resina.'); return;
   }
+  // Sentinela de "Todas as cores" (ver CRIT_COR_TODAS) vira string vazia de verdade na planilha —
+  // é isso que buscarTolerancia() reconhece como "vale pra qualquer cor dessa combinação".
+  var cor = (corSel === CRIT_COR_TODAS) ? '' : corSel;
 
   // monta o que precisa ser criado/atualizado/removido, comparando com o que já existe
   // pra essa combinação (em modo "editar", os itens do grupo original; em "novo", o que
@@ -3586,7 +3606,7 @@ async function salvarCriterioLote(){
       return t._maquina===chaveM && t._gramatura===chaveG && t._cor===chaveC && t._resina===chaveR;
     });
     if (colideComOutroGrupo){
-      erro('Já existe um critério cadastrado para "' + maquina + ' · ' + gramatura + ' · ' + cor + ' · ' + resina + '". Escolha outra combinação, ou exclua esse grupo existente antes de mudar pra essa.');
+      erro('Já existe um critério cadastrado para "' + maquina + ' · ' + gramatura + ' · ' + corLabelCriterio(cor) + ' · ' + resina + '". Escolha outra combinação, ou exclua esse grupo existente antes de mudar pra essa.');
       return;
     }
   }
@@ -3756,7 +3776,7 @@ function renderCriteriosSopro(){
     return '<tr>' +
       '<td>'+escHtml(g.maquina)+'</td>' +
       '<td>'+escHtml(g.gramatura)+'</td>' +
-      '<td>'+escHtml(g.cor)+'</td>' +
+      '<td>'+escHtml(corLabelCriterio(g.cor))+'</td>' +
       '<td>'+escHtml(g.frasco)+'</td>' +
       '<td>'+g.itens.length+' de '+(totalParams!==null?totalParams:'?')+' parâmetros</td>' +
       '<td><span class="critpill '+statusCls+'">'+statusTxt+'</span></td>' +
@@ -3809,7 +3829,9 @@ function abrirFormularioCriterioSopro(){
   document.getElementById('criteriosListaSecaoSopro').hidden = true;
   document.getElementById('critFormSecaoSopro').hidden = false;
   document.getElementById('critErroSopro').style.display = 'none';
-  var listasVazias = !listas.maquinasSopro.length || !listas.gramaturasSopro.length || !listas.coresSopro.length || !listas.frascos.length;
+  // Cor não entra aqui: agora é opcional, do mesmo jeito que na Injeção (ver abaixo) — só
+  // Máquina/Gramatura/Frasco são obrigatórios.
+  var listasVazias = !listas.maquinasSopro.length || !listas.gramaturasSopro.length || !listas.frascos.length;
   document.getElementById('critAvisoListaVaziaSopro').style.display = listasVazias ? 'block' : 'none';
   document.getElementById('critBtnSalvarSopro').disabled = listasVazias;
 }
@@ -3818,11 +3840,11 @@ function abrirFormNovoCriterioSopro(){
   critModoAtualSopro = 'novo';
   critGrupoOriginalSopro = null;
   document.getElementById('critFormTituloSopro').textContent = 'Novo critério';
-  document.getElementById('critFormDescSopro').textContent = 'Escolha a combinação de Máquina + Gramatura + Cor + Frasco e preencha o Mínimo/Máximo só dos parâmetros que precisam de limite.';
+  document.getElementById('critFormDescSopro').textContent = 'Escolha a combinação de Máquina + Gramatura + Cor + Frasco e preencha o Mínimo/Máximo só dos parâmetros que precisam de limite. Deixar Cor em "Todas as cores" faz o critério valer pra qualquer cor dessa Gramatura+Frasco+Máquina, a não ser que exista um critério específico cadastrado pra uma cor em particular — esse específico tem prioridade.';
   ['critMaquinaSopro','critGramaturaSopro','critCorSopro','critFrascoSopro'].forEach(function(id){ document.getElementById(id).disabled = false; });
   popularSelectLista('critMaquinaSopro', 'maquinasSopro', '');
   popularSelectLista('critGramaturaSopro', 'gramaturasSopro', '');
-  popularSelectLista('critCorSopro', 'coresSopro', '');
+  popularSelectLista('critCorSopro', 'coresSopro', CRIT_COR_TODAS, 'Todas as cores (sem definir)');
   popularSelectLista('critFrascoSopro', 'frascos', '');
   renderCritParamRowsSopro('', {});
   abrirFormularioCriterioSopro();
@@ -3833,12 +3855,12 @@ function abrirFormEditarGrupoSopro(i){
   if (!g) return;
   critModoAtualSopro = 'editar';
   critGrupoOriginalSopro = g;
-  document.getElementById('critFormTituloSopro').textContent = 'Editar critério — ' + g.maquina + ' · ' + g.gramatura + ' · ' + g.cor + ' · ' + g.frasco;
-  document.getElementById('critFormDescSopro').textContent = 'Pode ajustar também Máquina/Gramatura/Cor/Frasco — se a combinação nova já tiver outro critério cadastrado, o salvamento é bloqueado com aviso. Trocar a Máquina reinicia a lista de parâmetros abaixo (cada máquina do Sopro tem os seus). Ajuste o Mínimo/Máximo de cada parâmetro; deixar os dois em branco remove o critério daquele parâmetro.';
+  document.getElementById('critFormTituloSopro').textContent = 'Editar critério — ' + g.maquina + ' · ' + g.gramatura + ' · ' + corLabelCriterio(g.cor) + ' · ' + g.frasco;
+  document.getElementById('critFormDescSopro').textContent = 'Pode ajustar também Máquina/Gramatura/Cor/Frasco — se a combinação nova já tiver outro critério cadastrado, o salvamento é bloqueado com aviso. Trocar a Máquina reinicia a lista de parâmetros abaixo (cada máquina do Sopro tem os seus). Deixar Cor em "Todas as cores" faz o critério valer pra qualquer cor dessa combinação, a não ser que exista um critério específico cadastrado pra uma cor em particular. Ajuste o Mínimo/Máximo de cada parâmetro; deixar os dois em branco remove o critério daquele parâmetro.';
   ['critMaquinaSopro','critGramaturaSopro','critCorSopro','critFrascoSopro'].forEach(function(id){ document.getElementById(id).disabled = false; });
   popularSelectLista('critMaquinaSopro', 'maquinasSopro', g.maquina);
   popularSelectLista('critGramaturaSopro', 'gramaturasSopro', g.gramatura);
-  popularSelectLista('critCorSopro', 'coresSopro', g.cor);
+  popularSelectLista('critCorSopro', 'coresSopro', (g.cor === '' ? CRIT_COR_TODAS : g.cor), 'Todas as cores (sem definir)');
   popularSelectLista('critFrascoSopro', 'frascos', g.frasco);
   var preenchidos = {};
   g.itens.forEach(function(t){ preenchidos[t.parametro] = { min: t.valor_min, max: t.valor_max }; });
@@ -3857,15 +3879,17 @@ function fecharFormCriterioSopro(){
 async function salvarCriterioLoteSopro(){
   var maquina = document.getElementById('critMaquinaSopro').value;
   var gramatura = document.getElementById('critGramaturaSopro').value;
-  var cor = document.getElementById('critCorSopro').value;
+  var corSel = document.getElementById('critCorSopro').value;
   var frasco = document.getElementById('critFrascoSopro').value;
   var erroEl = document.getElementById('critErroSopro');
   function erro(msg){ erroEl.textContent = msg; erroEl.style.display = 'block'; }
   erroEl.style.display = 'none';
 
-  if (!maquina || !gramatura || !cor || !frasco){
-    erro('Selecione Máquina, Gramatura, Cor e Frasco.'); return;
+  if (!maquina || !gramatura || !corSel || !frasco){
+    erro('Selecione Máquina, Gramatura, Cor (ou "Todas as cores") e Frasco.'); return;
   }
+  // Sentinela de "Todas as cores" vira string vazia de verdade na planilha (ver CRIT_COR_TODAS).
+  var cor = (corSel === CRIT_COR_TODAS) ? '' : corSel;
   if (!critParamListSoproAtual.length){
     erro('Essa máquina não tem parâmetros de Sopro cadastrados no sistema — confira o nome (Multipet 1, Multipet 2, SB01 ou Unipet 1).'); return;
   }
@@ -3884,7 +3908,7 @@ async function salvarCriterioLoteSopro(){
       return t._maquina===chaveM && t._gramatura===chaveG && t._cor===chaveC && t._resina===chaveF;
     });
     if (colideComOutroGrupoSopro){
-      erro('Já existe um critério cadastrado para "' + maquina + ' · ' + gramatura + ' · ' + cor + ' · ' + frasco + '". Escolha outra combinação, ou exclua esse grupo existente antes de mudar pra essa.');
+      erro('Já existe um critério cadastrado para "' + maquina + ' · ' + gramatura + ' · ' + corLabelCriterio(cor) + ' · ' + frasco + '". Escolha outra combinação, ou exclua esse grupo existente antes de mudar pra essa.');
       return;
     }
   }
