@@ -3372,6 +3372,31 @@ async function atualizarLinhaTabela(worksheet, tabela, idx, valores, token){
   }
 }
 
+// Depois de um PATCH via API de Range (atualizarLinhaTabela), o recarregamento (GET) às vezes
+// volta com os valores de ANTES da escrita por um instante — um atraso de consistência ocasional
+// do Excel Online nessa planilha específica (gerada por script, não pelo Excel de verdade), não
+// um erro de verdade do nosso lado. Sem essa checagem, a tela de Critérios parecia "esquecer" a
+// edição que o usuário tinha acabado de salvar (o Mínimo/Máximo voltava pro valor anterior depois
+// de salvar). Confere pela IDENTIDADE da linha (Máquina+Gramatura+Cor+Resina/Frasco+Parâmetro —
+// não pelo índice, que pode mudar dentro da mesma gravação se também houve alguma exclusão) se
+// cada PATCH já aparece no array recarregado; se não bater, espera um pouco e recarrega de novo
+// (até 3 vezes) antes de desistir e deixar o que a planilha tiver nesse momento.
+async function confirmarPatchesRecarregados(toPatch, obterArr, recarregarFn, token){
+  if (!toPatch.length) return;
+  for (var t = 0; t < 4; t++){
+    var arr = obterArr();
+    var bateTudo = toPatch.every(function(p){
+      var atual = arr.filter(function(x){
+        return x._maquina===p.chaveM && x._gramatura===p.chaveG && x._cor===p.chaveC && x._resina===p.chaveX && x._parametro===p.chaveP;
+      })[0];
+      return atual && atual.valor_min === p.min && atual.valor_max === p.max;
+    });
+    if (bateTudo || t === 3) return;
+    await new Promise(function(r){ setTimeout(r, 500 + t*500); });
+    await recarregarFn(token);
+  }
+}
+
 // Garante que a Tabela do Excel exista na aba de Sopro (Tolerancias_App_Sopro / Listas_App_Sopro)
 // antes do primeiro cadastro — o Cleber criou as abas vazias, sem tabela ainda ("pode ser criado
 // no primeiro cadastro"). Se a tabela já existe (checagem simples por GET), não faz nada. Se não
@@ -3673,7 +3698,7 @@ async function salvarCriterioLote(){
     var existente = existentePorParam[param];
     var linha = ['Injeção', maquina, gramatura, cor, resina, param, min || null, max || null, true];
     if (min || max){
-      if (existente) toPatch.push({ index: existente._index, linha: linha });
+      if (existente) toPatch.push({ index: existente._index, linha: linha, min: min, max: max, chaveM: chaveM, chaveG: chaveG, chaveC: chaveC, chaveX: chaveR, chaveP: norm(param) });
       else toAdd.push(linha);
     } else if (existente){
       toDelete.push(existente._index);
@@ -3703,6 +3728,7 @@ async function salvarCriterioLote(){
       await excluirLinhaTabela('Tolerancias_App', 'TabelaTolerancias', toDelete[d], token);
     }
     await carregarTolerancias(token);
+    await confirmarPatchesRecarregados(toPatch, function(){ return tolerancias; }, carregarTolerancias, token);
     fecharFormCriterio();
     mostrarToast('Critérios salvos: ' + toAdd.length + ' criado(s), ' + toPatch.length + ' atualizado(s), ' + toDelete.length + ' removido(s).');
   } catch (err) {
@@ -3976,7 +4002,7 @@ async function salvarCriterioLoteSopro(){
     // ['maquina','gramatura','cor','frasco','parametro','valor_min','valor_max','ativo'] — tabela própria do Sopro, sem "processo".
     var linha = [maquina, gramatura, cor, frasco, param, min || null, max || null, true];
     if (min || max){
-      if (existente) toPatch.push({ index: existente._index, linha: linha });
+      if (existente) toPatch.push({ index: existente._index, linha: linha, min: min, max: max, chaveM: chaveM, chaveG: chaveG, chaveC: chaveC, chaveX: chaveF, chaveP: norm(param) });
       else toAdd.push(linha);
     } else if (existente){
       toDelete.push(existente._index);
@@ -4004,6 +4030,7 @@ async function salvarCriterioLoteSopro(){
       await excluirLinhaTabela(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, toDelete[d], token);
     }
     await carregarToleranciasSopro(token);
+    await confirmarPatchesRecarregados(toPatch, function(){ return toleranciasSopro; }, carregarToleranciasSopro, token);
     fecharFormCriterioSopro();
     mostrarToast('Critérios salvos: ' + toAdd.length + ' criado(s), ' + toPatch.length + ' atualizado(s), ' + toDelete.length + ' removido(s).');
   } catch (err) {
