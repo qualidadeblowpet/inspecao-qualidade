@@ -333,6 +333,58 @@
     .listas-grid{grid-template-columns:1fr;}
     .grid-4{grid-template-columns:1fr 1fr;}
   }
+
+  /* ===== Página IQR / Intervalo Interquartil ===== */
+  .page-sub{font-size:13px;color:var(--text-dim);margin:0 0 18px;max-width:760px;line-height:1.55;}
+  .statscards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+  .statcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;}
+  .statcard .sv{font-family:var(--font-display);font-size:26px;font-weight:700;line-height:1;}
+  .statcard .sl{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.4px;margin-top:6px;}
+  .statcard.warn .sv{color:var(--warn);}
+  .statcard.danger .sv{color:var(--danger);}
+  .critpill.aviso{background:var(--warn-bg);color:var(--warn);}
+  .critpill.azul{background:var(--blue-bg);color:var(--blue);}
+  .detailtable{width:100%;border-collapse:collapse;font-size:11.5px;}
+  .detailtable th{text-align:left;color:var(--text-dim);text-transform:uppercase;font-size:9.5px;letter-spacing:.3px;
+    padding:7px 14px;border-bottom:1px solid var(--border);}
+  .detailtable td{padding:7px 14px;border-bottom:1px solid var(--border);font-family:var(--font-mono);}
+  .detailtable tbody tr:last-child td{border-bottom:none;}
+  .detailtable .pname{font-family:var(--font-body);font-size:12px;}
+  .chipclusters{font-size:10.5px;color:var(--text-dim);font-family:var(--font-mono);}
+  .achado-card{background:var(--warn-bg);border:1px solid var(--warn);border-radius:12px;padding:16px 18px;margin-bottom:16px;}
+  .achado-card h3{color:var(--warn);font-family:var(--font-display);font-size:17px;font-weight:700;letter-spacing:.3px;margin:0 0 6px;text-transform:uppercase;}
+  .achado-item{border-top:1px solid rgba(242,169,59,.3);padding:10px 0;font-size:12.5px;}
+  .achado-item:first-of-type{border-top:none;padding-top:4px;}
+  .achado-item b{font-family:var(--font-mono);}
+  .legendpills{display:flex;gap:16px;flex-wrap:wrap;font-size:11.5px;color:var(--text-dim);margin:0 0 14px;align-items:center;}
+  .legendpills span{display:inline-flex;align-items:center;gap:6px;}
+  .filtrobar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;}
+  .filtrobar input[type=text]{background:var(--surface-2);border:1px solid var(--border);color:var(--text);
+    border-radius:8px;padding:8px 12px;font-size:12.5px;min-width:260px;}
+  .filtrobar label{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);cursor:pointer;}
+  .filtrobar input[type=checkbox]{accent-color:var(--accent);width:14px;height:14px;}
+  .expand-caret{display:inline-block;transition:transform .15s;color:var(--text-dim);width:12px;}
+  .widetable tbody tr.prow-prod{cursor:pointer;}
+  .widetable tbody tr.prow-prod:hover td{background:var(--surface-2);}
+  .widetable tbody tr.prow-prod.aberto .expand-caret{transform:rotate(90deg);}
+  .widetable tbody tr.prow-detail td{background:var(--surface-2);padding:0;}
+  .viewtoggle{display:inline-flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:4px;margin-bottom:16px;}
+  .viewtoggle button{appearance:none;border:none;background:transparent;color:var(--text-dim);font-family:var(--font-body);
+    font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:7px;cursor:pointer;transition:background .12s,color .12s;}
+  .viewtoggle button:hover{color:var(--text);}
+  .viewtoggle button.ativo{background:var(--accent);color:#1a1200;}
+  .colorswatch{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:middle;border:1px solid rgba(255,255,255,.25);}
+  .corcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px;}
+  .corcard-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:12.5px;color:var(--text-dim);margin-bottom:6px;}
+  .corcard-head b{color:var(--text);font-family:var(--font-mono);}
+  .cordetail-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:4px;}
+  .cordetail-table th{text-align:left;color:var(--text-dim);text-transform:uppercase;font-size:9.5px;letter-spacing:.3px;
+    padding:6px 10px;border-bottom:1px solid var(--border);}
+  .cordetail-table td{padding:6px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);}
+  .cordetail-table tr.corref td{color:var(--text);font-weight:600;}
+  .iqr-aviso-recalculo{background:var(--blue-bg);border:1px solid var(--blue);border-radius:10px;padding:10px 14px;font-size:12px;
+    color:var(--text-dim);margin-bottom:16px;}
+  .iqr-aviso-recalculo b{color:var(--blue);}
 </style>
 </head>
 <body>
@@ -366,6 +418,7 @@
       <button class="nav-item" data-page="criterios" onclick="mudarPagina('criterios')"><span class="ic">☑</span> Critérios</button>
       <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><span class="ic">⇧</span> Carregar Dados</button>
       <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('injecao')"><span class="ic">✏</span> Lançar Manual</button>
+      <button class="nav-item" data-page="iqr" onclick="mudarPagina('iqr')"><span class="ic">∑</span> IQR / Intervalo Interquartil</button>
       <div class="nav-section-label">Sopro</div>
       <button class="nav-item" data-page="dashboardSopro" onclick="mudarPagina('dashboardSopro')"><span class="ic">▦</span> Dashboard</button>
       <button class="nav-item" data-page="dadosCadastradosSopro" onclick="mudarPagina('dadosCadastradosSopro')"><span class="ic">▤</span> Dados Cadastrados</button>
@@ -643,6 +696,107 @@
 
   </div><!-- /.wrap -->
   </div><!-- /#pageCarregarDados -->
+
+  <!-- ===== PÁGINA: IQR / INTERVALO INTERQUARTIL (só Injeção) =====
+       Faixa sugerida (mínimo-máximo) calculada automaticamente em cima de registrosCarregados
+       (Registros_Injecao), seguindo a mesma lógica da skill criterios-processo-blowpet, comparada
+       com o que está cadastrado em Critérios. Recalcula sozinha toda vez que a página abre. -->
+  <div id="pageIqr" hidden>
+    <h1 class="page-title">IQR / Intervalo Interquartil</h1>
+    <p class="page-sub">Faixa estatística (mínimo–máximo) observada em cada produto já registrado na Injeção, calculada automaticamente a partir dos lançamentos reais — e comparada com o critério hoje cadastrado em Critérios, quando existir. Só nesta seção da Injeção (o Sopro não entra aqui).</p>
+
+    <div class="viewtoggle">
+      <button id="btnViewSemCor" class="ativo" onclick="iqrTrocarView('semCor')">Sem Cor (padrão)</button>
+      <button id="btnViewComCor" onclick="iqrTrocarView('comCor')">Comparar por Cor</button>
+    </div>
+
+    <div id="viewSemCor">
+
+    <div class="statscards" id="statscards"></div>
+
+    <div id="achadosEscalaWrap"></div>
+
+    <div class="card">
+      <div class="sectiontitle" style="margin-top:0;">Metodologia</div>
+      <p class="note" style="margin-top:0;">
+        Agrupamento por <b>Máquina + Gramatura + Resina</b> (sem Cor). Range sugerido = <b>1,5× IQR (regra de Tukey)</b>: calcula o 1º e 3º quartil de cada parâmetro dentro do produto, remove como outlier o que fica fora de <code>[Q1 − 1,5×IQR, Q3 + 1,5×IQR]</code>, e o sugerido é o mínimo–máximo do que sobrou. Combinação com <b>menos de 10 leituras</b> aparece marcada como <span class="critpill aviso" style="vertical-align:middle;">amostra insuficiente</span> (mostra mesmo assim, mas com ressalva). Linhas sem Máquina, Gramatura ou Resina preenchidas são descartadas do cálculo. Antes de qualquer range, cada parâmetro passa por uma checagem de escala/unidade (ex.: parte em Bar, parte em PSI) — quando isso aparece, a faixa não é misturada: os grupos ficam separados, destacados em <span class="critpill azul" style="vertical-align:middle;">inconsistência de escala</span>, pra você decidir o que fazer.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="crit-toolbar" style="margin-bottom:4px;">
+        <div class="sectiontitle" style="margin:0;">Produtos analisados</div>
+        <button class="btn btn-outline" id="btnAtualizarIqr" onclick="iqrAtualizar()">↻ Atualizar</button>
+      </div>
+      <div class="filtrobar">
+        <input type="text" id="filtroTexto" placeholder="Filtrar por máquina, gramatura ou resina…" oninput="renderTabelaIqr()">
+        <label><input type="checkbox" id="filtroSoProblema" onchange="renderTabelaIqr()"> Mostrar só produtos com algo fora do sugerido ou inconsistência</label>
+      </div>
+      <div class="legendpills">
+        <span><span class="critpill sim">cobre</span> critério cadastrado já cobre a faixa observada</span>
+        <span><span class="critpill nao">fora do sugerido</span> parte dos dados reais cai fora do critério cadastrado</span>
+        <span><span class="critpill vazio">sem critério</span> parâmetro sem critério cadastrado ainda</span>
+        <span><span class="critpill aviso">amostra insuficiente</span> menos de 10 leituras</span>
+        <span><span class="critpill azul">inconsistência de escala</span> ver detalhe por clusters</span>
+      </div>
+      <p class="note" id="contagemProdutos" style="margin:0 0 10px;"></p>
+      <div class="widetablewrap">
+        <table class="widetable">
+          <thead><tr>
+            <th></th><th>Máquina</th><th>Gramatura</th><th>Resina</th><th>Sessões</th>
+            <th>Com critério cadastrado</th><th>Fora do sugerido</th><th>Inconsistência</th>
+          </tr></thead>
+          <tbody id="tabelaProdutosBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    </div>
+
+    <div id="viewComCor" style="display:none;">
+
+      <div class="iqr-aviso-recalculo">
+        Mesma base de dados, agora separando por <b>Cor</b> dentro de cada Máquina + Gramatura + Resina, pra avaliar se a cor muda algum parâmetro de verdade antes de incluí-la (ou não) num critério oficial. Importante: isso é <b>correlação observada nos dados existentes</b>, não um teste controlado — a cor pode estar misturada com outras coisas que variam junto (época do ano, turno, lote de resina). Trate como um indício pra investigar, não como prova.
+      </div>
+
+      <div class="statscards" id="statscardsCor"></div>
+
+      <div class="card">
+        <div class="sectiontitle" style="margin-top:0;">Como ler essa comparação</div>
+        <p class="note" style="margin-top:0;">
+          Pra cada produto com 2+ cores registradas, a cor com mais sessões é a <b>referência</b>. Cada outra cor é comparada contra a faixa observada (mín–máx, já com o mesmo corte de outlier do IQR) dessa referência. Se a faixa da cor cabe inteira dentro da faixa da referência, não há evidência de diferença (<span class="critpill sim" style="vertical-align:middle;">parecido</span>) — mesmo que a faixa da cor seja mais estreita, isso por si só não quer dizer que ela "precisa" de outro valor. Só conta como diferença o que sobra fora da faixa da referência: pouco sobrando é <span class="critpill aviso" style="vertical-align:middle;">diferença parcial</span>, e sobra grande (ou nenhuma sobreposição) é <span class="critpill nao" style="vertical-align:middle;">diferença forte</span>. Comparação com qualquer lado tendo menos de 10 leituras não entra no veredito — fica como <span class="critpill vazio" style="vertical-align:middle;">amostra pequena</span>, mostrada mas sem peso na conclusão.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="crit-toolbar" style="margin-bottom:4px;">
+          <div class="sectiontitle" style="margin:0;">Produtos com mais de uma cor registrada</div>
+        </div>
+        <div class="filtrobar">
+          <input type="text" id="filtroTextoCor" placeholder="Filtrar por máquina, gramatura ou resina…" oninput="renderTabelaCor()">
+          <label><input type="checkbox" id="filtroSoDivergeCor" onchange="renderTabelaCor()"> Mostrar só produtos com alguma diferença encontrada</label>
+        </div>
+        <div class="legendpills">
+          <span><span class="critpill sim">parecido</span> faixa da cor cabe dentro da faixa da referência</span>
+          <span><span class="critpill aviso">diferença parcial</span> parte da faixa da cor sobra pra fora</span>
+          <span><span class="critpill nao">diferença forte</span> faixa bem diferente / sem sobreposição relevante</span>
+          <span><span class="critpill vazio">amostra pequena</span> menos de 10 leituras de algum lado — sem conclusão</span>
+        </div>
+        <p class="note" id="contagemProdutosCor" style="margin:0 0 10px;"></p>
+        <div class="widetablewrap">
+          <table class="widetable">
+            <thead><tr>
+              <th></th><th>Máquina</th><th>Gramatura</th><th>Resina</th><th>Cor referência</th><th>Outras cores</th><th>Sessões</th>
+              <th>Parâmetros com diferença</th>
+            </tr></thead>
+            <tbody id="tabelaProdutosBodyCor"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /#pageIqr -->
 
   <!-- ===== PÁGINAS: SOPRO (Dashboard/Dados Cadastrados/Critérios/Carregar Dados) =====
        Ainda não construídas — por enquanto só o Lançar Manual do Sopro está em funcionamento.
@@ -1434,7 +1588,7 @@ var dashPX_PER_PONTO = 56; // espaçamento fixo entre horários consecutivos no 
 var dashSTART = null, dashEND = null, dashAXIS_W = 0, dashPONTO_INDEX = {};
 
 var PAGINAS_IDS = {
-  dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', criterios:'pageCriterios', carregarDados:'pageCarregarDados',
+  dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', criterios:'pageCriterios', carregarDados:'pageCarregarDados', iqr:'pageIqr',
   dashboardSopro:'pageDashboardSopro', dadosCadastradosSopro:'pageDadosCadastradosSopro', criteriosSopro:'pageCriteriosSopro', carregarDadosSopro:'pageCarregarDadosSopro',
   configuracoes:'pageConfiguracoes'
 };
@@ -1474,6 +1628,7 @@ function mudarPagina(pagina){
   if ((pagina === 'dashboard' || pagina === 'dadosCadastrados') && registrosCarregados === null) carregarRegistrosInjecao();
   if (pagina === 'criterios') renderCriterios();
   if (pagina === 'criteriosSopro') renderCriteriosSopro();
+  if (pagina === 'iqr') iqrAbrirPagina();
   if (pagina === 'configuracoes') atualizarBotoesTema();
   fecharMenuMobile();
 }
@@ -1485,6 +1640,505 @@ function alternarMenuMobile(){
 function fecharMenuMobile(){
   document.getElementById('sidebar').classList.remove('aberta');
   document.getElementById('sidebarOverlay').classList.remove('ativa');
+}
+
+// =============================================================================
+// Página "IQR / Intervalo Interquartil" (só Injeção) — faixa sugerida (mín-máx)
+// calculada em cima de registrosCarregados (Registros_Injecao), seguindo a mesma
+// lógica da skill criterios-processo-blowpet: agrupamento por Máquina+Gramatura+
+// Resina (sem Cor), range = 1,5x IQR (Tukey), checagem de inconsistência de
+// escala/unidade, e comparação com o que já está cadastrado em Critérios. A
+// segunda view ("Comparar por Cor") reagrupa os mesmos dados por Cor dentro de
+// cada produto, comparando cada cor contra a de referência (mais sessões).
+// Recalcula tudo no cliente, a partir dos dados já carregados — não grava nada.
+// =============================================================================
+var IQR_DADOS = null, IQR_DADOS_COR = null;
+var IQR_ABERTOS = {}, IQR_ABERTOS_COR = {};
+
+function iqrNormId(v){
+  var n = norm(v);
+  if (n === '—' || n === '-' || n === '--') return '';
+  return n;
+}
+function iqrNormMaquinaId(v){
+  var n = normMaquina(v);
+  if (n === '—' || n === '-' || n === '--') return '';
+  return n;
+}
+function iqrModaLabel(cont){
+  var melhor = null, melhorN = -1;
+  Object.keys(cont).forEach(function(k){ if (cont[k] > melhorN){ melhor = k; melhorN = cont[k]; } });
+  return melhor;
+}
+function iqrR2(x){ return x === null || x === undefined ? null : Math.round(x * 100) / 100; }
+function iqrPercentil(sortedArr, p){
+  if (sortedArr.length === 1) return sortedArr[0];
+  var idx = (p / 100) * (sortedArr.length - 1);
+  var lo = Math.floor(idx), hi = Math.ceil(idx);
+  if (lo === hi) return sortedArr[lo];
+  return sortedArr[lo] + (sortedArr[hi] - sortedArr[lo]) * (idx - lo);
+}
+function iqrAnalisaGrupo(valores){
+  var n = valores.length;
+  if (n === 0) return { n_total:0, n_outliers:0, minimo:null, maximo:null, amostra_insuf:true };
+  if (n < 4){
+    return { n_total:n, n_outliers:0, minimo:Math.min.apply(null, valores), maximo:Math.max.apply(null, valores), amostra_insuf:true };
+  }
+  var sorted = valores.slice().sort(function(a,b){ return a - b; });
+  var q1 = iqrPercentil(sorted, 25), q3 = iqrPercentil(sorted, 75);
+  var iqr = q3 - q1;
+  var dentro = iqr === 0 ? sorted : sorted.filter(function(v){ return v >= q1 - 1.5*iqr && v <= q3 + 1.5*iqr; });
+  var nUsado = dentro.length;
+  return {
+    n_total: n, n_outliers: n - nUsado,
+    minimo: nUsado ? Math.min.apply(null, dentro) : null,
+    maximo: nUsado ? Math.max.apply(null, dentro) : null,
+    amostra_insuf: n < 10
+  };
+}
+function iqrClustersLog(vals, limiarGap){
+  limiarGap = limiarGap || 0.6;
+  var v = vals.filter(function(x){ return !isNaN(x); }).slice().sort(function(a,b){ return a - b; });
+  if (v.length < 2 || v[0] <= 0) return [v];
+  var segs = [], inicio = 0;
+  for (var i = 1; i < v.length; i++){
+    var gap = Math.log10(v[i]) - Math.log10(v[i-1]);
+    if (gap > limiarGap){ segs.push(v.slice(inicio, i)); inicio = i; }
+  }
+  segs.push(v.slice(inicio));
+  return segs;
+}
+function iqrContaForaCriterio(vals, cmin, cmax){
+  if (cmin === null && cmax === null) return null;
+  var v = vals.filter(function(x){ return !isNaN(x); });
+  if (v.length === 0) return null;
+  var n = 0;
+  for (var i = 0; i < v.length; i++){
+    if ((cmin !== null && v[i] < cmin) || (cmax !== null && v[i] > cmax)) n++;
+  }
+  return n;
+}
+function iqrCompararFaixasCor(aMin, aMax, bMin, bMax){
+  if (aMin === null || aMax === null || bMin === null || bMax === null) return null;
+  var sobra = Math.max(0, aMin - bMin) + Math.max(0, bMax - aMax);
+  var larguraB = Math.max(bMax - bMin, 1e-9);
+  var fracFora = Math.min(1, sobra / larguraB);
+  var status = fracFora <= 0 ? 'parecido' : (fracFora < 0.5 ? 'diverge_parcial' : 'diverge_forte');
+  return { status: status, sobra: Math.round(sobra * 1000) / 1000 };
+}
+
+function iqrRecalcular(){
+  if (!registrosCarregados) return;
+  var grupos = {}, ordemGrupos = [];
+  var excluidas = 0;
+  registrosCarregados.forEach(function(r){
+    var m = iqrNormMaquinaId(r.maquina), g = iqrNormId(r.gramatura), res = iqrNormId(r.resina);
+    if (!m || !g || !res){ excluidas++; return; }
+    var key = m + '|' + g + '|' + res;
+    if (!grupos[key]){ grupos[key] = { _maquina:m, _gramatura:g, _resina:res, contM:{}, contG:{}, contR:{}, sessoes:{}, params:{} }; ordemGrupos.push(key); }
+    var grp = grupos[key];
+    grp.contM[r.maquina] = (grp.contM[r.maquina]||0) + 1;
+    grp.contG[r.gramatura] = (grp.contG[r.gramatura]||0) + 1;
+    grp.contR[r.resina] = (grp.contR[r.resina]||0) + 1;
+    if (r.id_sessao) grp.sessoes[r.id_sessao] = true;
+    if (!grp.params[r.parametro]) grp.params[r.parametro] = [];
+    grp.params[r.parametro].push(r);
+  });
+
+  // índice de tolerâncias por Máquina+Gramatura+Resina+Parâmetro (sem Cor, mesma regra da skill)
+  var tolIdx = {};
+  (tolerancias || []).forEach(function(t){
+    if (t.ativoFalso) return;
+    if (t.processo && t.processo !== 'Injeção') return;
+    var m = iqrNormMaquinaId(t.maquina), g = iqrNormId(t.gramatura), res = iqrNormId(t.resina);
+    if (!m || !g || !res) return;
+    var k = m + '|' + g + '|' + res + '|' + String(t.parametro||'').trim();
+    var cmin = paraNumero(t.valor_min), cmax = paraNumero(t.valor_max);
+    tolIdx[k] = { min: isNaN(cmin)?null:cmin, max: isNaN(cmax)?null:cmax };
+  });
+
+  var produtos = [], achadosEscala = [];
+  var ordemStatus = { escala:0, nao_cobre:1, sem_criterio:2, amostra_insuf:3, cobre:4, sem_dado:5 };
+  ordemGrupos.forEach(function(key){
+    var grp = grupos[key];
+    var maquinaLabel = iqrModaLabel(grp.contM), gramaturaLabel = iqrModaLabel(grp.contG), resinaLabel = iqrModaLabel(grp.contR);
+    var nSessoes = Object.keys(grp.sessoes).length;
+    var paramsOut = [], nComCriterio = 0, nNaoCobre = 0, nEscala = 0, nAmostraInsuf = 0;
+    Object.keys(grp.params).forEach(function(param){
+      var rows = grp.params[param];
+      var valsnum = [];
+      rows.forEach(function(r){ var x = paraNumero(r.valor_medido); if (!isNaN(x)) valsnum.push(x); });
+      var res = iqrAnalisaGrupo(valsnum);
+      var tkey = grp._maquina + '|' + grp._gramatura + '|' + grp._resina + '|' + String(param||'').trim();
+      var tcrit = tolIdx[tkey];
+      var nForaCriterio = tcrit ? iqrContaForaCriterio(valsnum, tcrit.min, tcrit.max) : null;
+
+      var segs = valsnum.length >= 2 ? iqrClustersLog(valsnum, 0.6) : [valsnum.slice()];
+      segs = segs.filter(function(s){ return s.length > 0; });
+      var escalaInfo = null;
+      if (segs.length > 1){
+        var total = segs.reduce(function(s,a){ return s + a.length; }, 0);
+        var fracoes = segs.map(function(s){ return s.length / total; });
+        var minFrac = Math.min.apply(null, fracoes);
+        if (minFrac >= 0.2 && valsnum.length >= 5){
+          escalaInfo = segs.map(function(s){ return { n:s.length, min:s[0], max:s[s.length-1] }; });
+          achadosEscala.push({ maquina:maquinaLabel, gramatura:gramaturaLabel, resina:resinaLabel, parametro:param, clusters:escalaInfo });
+        }
+      }
+
+      var status;
+      if (escalaInfo){ status = 'escala'; nEscala++; }
+      else if (res.minimo === null){ status = 'sem_dado'; }
+      else if (res.amostra_insuf){ status = 'amostra_insuf'; nAmostraInsuf++; }
+      else if (!tcrit){ status = 'sem_criterio'; }
+      else {
+        var cobre = (tcrit.min !== null && tcrit.max !== null && tcrit.min <= res.minimo && tcrit.max >= res.maximo);
+        status = cobre ? 'cobre' : 'nao_cobre';
+        if (!cobre) nNaoCobre++;
+      }
+      if (tcrit) nComCriterio++;
+
+      paramsOut.push({
+        parametro: param,
+        criterio_min: tcrit ? tcrit.min : null, criterio_max: tcrit ? tcrit.max : null,
+        iqr_min: iqrR2(res.minimo), iqr_max: iqrR2(res.maximo),
+        n_total: res.n_total, n_outliers: res.n_outliers,
+        n_fora_criterio: nForaCriterio,
+        status: status, clusters: escalaInfo
+      });
+    });
+    paramsOut.sort(function(a,b){ return (ordemStatus[a.status]||9) - (ordemStatus[b.status]||9); });
+    produtos.push({
+      maquina: maquinaLabel, gramatura: gramaturaLabel, resina: resinaLabel,
+      n_sessoes: nSessoes, n_parametros: paramsOut.length,
+      n_com_criterio: nComCriterio, n_nao_cobre: nNaoCobre, n_escala: nEscala, n_amostra_insuf: nAmostraInsuf,
+      parametros: paramsOut
+    });
+  });
+  produtos.sort(function(a,b){ return b.n_sessoes - a.n_sessoes; });
+
+  IQR_DADOS = {
+    produtos: produtos, achados_escala: achadosEscala, excluidas: excluidas,
+    total_sessoes: produtos.reduce(function(s,p){ return s + p.n_sessoes; }, 0)
+  };
+
+  iqrRecalcularCor(grupos, ordemGrupos);
+}
+
+function iqrRecalcularCor(grupos, ordemGrupos){
+  var produtosCor = [];
+  var ordemStatusCor = { diverge_forte:0, diverge_parcial:1, amostra_pequena:2, sem_dado:3, parecido:4 };
+  ordemGrupos.forEach(function(key){
+    var grp = grupos[key];
+    var coresMap = {};
+    Object.keys(grp.params).forEach(function(param){
+      grp.params[param].forEach(function(r){
+        var c = iqrNormId(r.cor);
+        if (!c) return;
+        if (!coresMap[c]) coresMap[c] = { contLabel:{}, sessoes:{}, params:{} };
+        coresMap[c].contLabel[r.cor] = (coresMap[c].contLabel[r.cor]||0) + 1;
+        if (r.id_sessao) coresMap[c].sessoes[r.id_sessao] = true;
+        if (!coresMap[c].params[param]) coresMap[c].params[param] = [];
+        var x = paraNumero(r.valor_medido);
+        if (!isNaN(x)) coresMap[c].params[param].push(x);
+      });
+    });
+    var coresChaves = Object.keys(coresMap);
+    if (coresChaves.length < 2) return;
+
+    var coresOrdenadas = coresChaves.map(function(c){
+      return { chave:c, label: iqrModaLabel(coresMap[c].contLabel), nSessoes: Object.keys(coresMap[c].sessoes).length };
+    }).sort(function(a,b){ return b.nSessoes - a.nSessoes; });
+    var corRef = coresOrdenadas[0];
+    var outras = coresOrdenadas.slice(1);
+
+    var todosParams = {};
+    coresChaves.forEach(function(c){ Object.keys(coresMap[c].params).forEach(function(p){ todosParams[p] = true; }); });
+
+    var paramsOut = [];
+    Object.keys(todosParams).forEach(function(param){
+      var porCor = {};
+      coresOrdenadas.forEach(function(co){
+        var vals = coresMap[co.chave].params[param] || [];
+        var res = iqrAnalisaGrupo(vals);
+        porCor[co.label] = { min: iqrR2(res.minimo), max: iqrR2(res.maximo), n: res.n_total, amostra_insuf: res.amostra_insuf };
+      });
+      var refInfo = porCor[corRef.label];
+      var comparacoes = {};
+      outras.forEach(function(co){
+        var info = porCor[co.label];
+        if (refInfo.min === null || info.min === null) return;
+        if (refInfo.amostra_insuf || info.amostra_insuf) return;
+        var cmp = iqrCompararFaixasCor(refInfo.min, refInfo.max, info.min, info.max);
+        if (cmp) comparacoes[co.label] = cmp;
+      });
+      var status;
+      var valoresComp = Object.keys(comparacoes).map(function(k){ return comparacoes[k]; });
+      if (valoresComp.length){
+        var pior = valoresComp.reduce(function(a,b){ return ordemStatusCor[b.status] < ordemStatusCor[a.status] ? b : a; });
+        status = pior.status;
+      } else if (refInfo.min === null){
+        status = 'sem_dado';
+      } else {
+        status = 'amostra_pequena';
+      }
+      paramsOut.push({ parametro: param, por_cor: porCor, comparacoes: comparacoes, status: status, cor_referencia: corRef.label });
+    });
+    paramsOut.sort(function(a,b){ return (ordemStatusCor[a.status]||9) - (ordemStatusCor[b.status]||9); });
+    var nDiverge = paramsOut.filter(function(p){ return p.status === 'diverge_forte' || p.status === 'diverge_parcial'; }).length;
+    var nParecido = paramsOut.filter(function(p){ return p.status === 'parecido'; }).length;
+    var nSessoesPorCor = {};
+    coresOrdenadas.forEach(function(co){ nSessoesPorCor[co.label] = co.nSessoes; });
+
+    produtosCor.push({
+      maquina: iqrModaLabel(grp.contM), gramatura: iqrModaLabel(grp.contG), resina: iqrModaLabel(grp.contR),
+      cores: coresOrdenadas.map(function(co){ return co.label; }), cor_referencia: corRef.label,
+      n_sessoes_por_cor: nSessoesPorCor, n_sessoes_total: Object.keys(grp.sessoes).length,
+      n_diverge: nDiverge, n_parecido: nParecido, parametros: paramsOut
+    });
+  });
+  produtosCor.sort(function(a,b){ return b.n_sessoes_total - a.n_sessoes_total; });
+  IQR_DADOS_COR = { produtos_cor: produtosCor };
+}
+
+function iqrAbrirPagina(){
+  if (registrosCarregados === null){
+    var nota = document.getElementById('contagemProdutos');
+    if (nota) nota.textContent = 'Carregando registros…';
+    carregarRegistrosInjecao().then(function(){ iqrRecalcular(); iqrRenderViewAtual(); });
+  } else {
+    iqrRecalcular();
+    iqrRenderViewAtual();
+  }
+}
+function iqrRenderViewAtual(){
+  iqrRenderStats(); iqrRenderAchadosEscala(); renderTabelaIqr();
+  iqrRenderStatsCor(); renderTabelaCor();
+}
+function iqrTrocarView(v){
+  var semCor = v === 'semCor';
+  document.getElementById('viewSemCor').style.display = semCor ? '' : 'none';
+  document.getElementById('viewComCor').style.display = semCor ? 'none' : '';
+  document.getElementById('btnViewSemCor').classList.toggle('ativo', semCor);
+  document.getElementById('btnViewComCor').classList.toggle('ativo', !semCor);
+}
+async function iqrAtualizar(){
+  var btn = document.getElementById('btnAtualizarIqr');
+  if (btn){ btn.disabled = true; btn.textContent = 'Atualizando…'; }
+  try {
+    await carregarRegistrosInjecao();
+    var token = await getToken();
+    await carregarTolerancias(token);
+    iqrRecalcular();
+    iqrRenderViewAtual();
+  } catch (e) {
+    mostrarToast('Falha ao atualizar o IQR: ' + e.message, true);
+  } finally {
+    if (btn){ btn.disabled = false; btn.textContent = '↻ Atualizar'; }
+  }
+}
+
+function iqrFmtNum(n){
+  if (n === null || n === undefined) return '—';
+  return String(n).replace('.', ',');
+}
+function iqrFmtFaixa(min, max){
+  if (min === null || max === null || min === undefined || max === undefined) return '—';
+  return iqrFmtNum(min) + ' – ' + iqrFmtNum(max);
+}
+function iqrStatusBadge(st){
+  if (st === 'cobre') return '<span class="critpill sim">cobre</span>';
+  if (st === 'nao_cobre') return '<span class="critpill nao">fora do sugerido</span>';
+  if (st === 'sem_criterio') return '<span class="critpill vazio">sem critério</span>';
+  if (st === 'amostra_insuf') return '<span class="critpill aviso">amostra insuficiente</span>';
+  if (st === 'escala') return '<span class="critpill azul">inconsistência de escala</span>';
+  return '<span class="critpill vazio">sem leitura</span>';
+}
+
+function iqrRenderStats(){
+  if (!IQR_DADOS) return;
+  var totalNaoCobre = IQR_DADOS.produtos.reduce(function(s,p){ return s + p.n_nao_cobre; }, 0);
+  var html = '' +
+    '<div class="statcard"><div class="sv">' + IQR_DADOS.produtos.length + '</div><div class="sl">Produtos analisados</div></div>' +
+    '<div class="statcard"><div class="sv">' + IQR_DADOS.total_sessoes.toLocaleString('pt-BR') + '</div><div class="sl">Sessões consideradas</div></div>' +
+    '<div class="statcard' + (totalNaoCobre ? ' warn' : '') + '"><div class="sv">' + totalNaoCobre + '</div><div class="sl">Parâmetros fora do critério cadastrado</div></div>' +
+    '<div class="statcard' + (IQR_DADOS.achados_escala.length ? ' danger' : '') + '"><div class="sv">' + IQR_DADOS.achados_escala.length + '</div><div class="sl">Achados de inconsistência de escala</div></div>';
+  document.getElementById('statscards').innerHTML = html;
+}
+function iqrRenderAchadosEscala(){
+  if (!IQR_DADOS) return;
+  var wrap = document.getElementById('achadosEscalaWrap');
+  if (!IQR_DADOS.achados_escala.length){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = '<div class="achado-card">' +
+    '<h3>⚠ Inconsistência de escala/unidade encontrada — não entrou no cálculo sem revisão</h3>' +
+    '<p class="desc" style="color:var(--text);margin-bottom:4px;">Nestes parâmetros, uma parte relevante das leituras está numa escala bem diferente do resto (ex.: uma faixa ~50–65 e outra ~700–900 dentro do mesmo produto) — o IQR sozinho não detecta isso, então a faixa abaixo está separada por cluster em vez de misturada. Confira se é unidade diferente (ex.: Bar × PSI) ou erro de digitação antes de usar como critério oficial.</p>' +
+    IQR_DADOS.achados_escala.map(function(a){
+      return '<div class="achado-item"><b>' + escHtml(a.maquina) + ' · ' + escHtml(a.gramatura) + ' · ' + escHtml(a.resina) + '</b> — ' + escHtml(a.parametro) + '<br>' +
+        a.clusters.map(function(c){ return c.n + ' leituras entre ' + iqrFmtNum(c.min) + ' e ' + iqrFmtNum(c.max); }).join('&nbsp;&nbsp;|&nbsp;&nbsp;') +
+      '</div>';
+    }).join('') +
+  '</div>';
+}
+function iqrLinhaDetalhe(p, i){
+  var corpo = p.parametros.map(function(pa){
+    var sugerido = pa.status === 'escala'
+      ? '<span class="chipclusters">' + pa.clusters.map(function(c){ return c.n+'× '+iqrFmtNum(c.min)+'–'+iqrFmtNum(c.max); }).join(' / ') + '</span>'
+      : iqrFmtFaixa(pa.iqr_min, pa.iqr_max);
+    var foraCriterio = (pa.status === 'nao_cobre' && pa.n_fora_criterio !== null && pa.n_fora_criterio !== undefined)
+      ? pa.n_fora_criterio + ' de ' + pa.n_total + ' <span style="color:var(--text-dim);">(' + Math.round(100 * pa.n_fora_criterio / pa.n_total) + '%)</span>'
+      : '—';
+    return '<tr>' +
+      '<td class="pname">' + escHtml(pa.parametro) + '</td>' +
+      '<td>' + iqrFmtFaixa(pa.criterio_min, pa.criterio_max) + '</td>' +
+      '<td>' + sugerido + '</td>' +
+      '<td>' + (pa.n_total || 0) + (pa.n_outliers ? ' <span style="color:var(--text-dim);">(' + pa.n_outliers + ' outlier' + (pa.n_outliers>1?'s':'') + ' removido' + (pa.n_outliers>1?'s':'') + ')</span>' : '') + '</td>' +
+      '<td>' + foraCriterio + '</td>' +
+      '<td>' + iqrStatusBadge(pa.status) + '</td>' +
+    '</tr>';
+  }).join('');
+  return '<table class="detailtable" style="margin:10px 14px 14px;width:calc(100% - 28px);">' +
+    '<thead><tr><th>Parâmetro</th><th>Critério cadastrado</th><th>Sugerido (IQR)</th><th>Leituras</th><th>Fora do critério cadastrado</th><th>Status</th></tr></thead>' +
+    '<tbody>' + corpo + '</tbody>' +
+  '</table>';
+}
+function iqrAlternarDetalhe(i){
+  IQR_ABERTOS[i] = !IQR_ABERTOS[i];
+  renderTabelaIqr();
+}
+function renderTabelaIqr(){
+  if (!IQR_DADOS) return;
+  var filtroEl = document.getElementById('filtroTexto'), soProblemaEl = document.getElementById('filtroSoProblema');
+  var filtro = (filtroEl.value || '').toLowerCase().trim();
+  var soProblema = soProblemaEl.checked;
+  var visiveis = IQR_DADOS.produtos.map(function(p, i){ return { p:p, i:i }; }).filter(function(x){
+    var p = x.p;
+    if (filtro){
+      var alvo = (p.maquina + ' ' + p.gramatura + ' ' + p.resina).toLowerCase();
+      if (alvo.indexOf(filtro) === -1) return false;
+    }
+    if (soProblema && p.n_nao_cobre === 0 && p.n_escala === 0) return false;
+    return true;
+  });
+
+  document.getElementById('contagemProdutos').textContent = visiveis.length + ' de ' + IQR_DADOS.produtos.length + ' produto(s) exibido(s) — ' + IQR_DADOS.excluidas + ' leitura(s) excluída(s) do cálculo por identificação incompleta (máquina/gramatura/resina em branco).';
+
+  document.getElementById('tabelaProdutosBody').innerHTML = visiveis.map(function(x){
+    var p = x.p, i = x.i;
+    var linhas = '<tr class="prow-prod' + (IQR_ABERTOS[i] ? ' aberto' : '') + '" onclick="iqrAlternarDetalhe(' + i + ')">' +
+      '<td><span class="expand-caret">▸</span></td>' +
+      '<td>' + escHtml(p.maquina) + '</td>' +
+      '<td>' + escHtml(p.gramatura) + '</td>' +
+      '<td>' + escHtml(p.resina) + '</td>' +
+      '<td>' + p.n_sessoes + '</td>' +
+      '<td>' + p.n_com_criterio + ' de ' + p.n_parametros + '</td>' +
+      '<td>' + (p.n_nao_cobre ? '<span class="critpill nao">' + p.n_nao_cobre + '</span>' : '<span class="critpill sim">0</span>') + '</td>' +
+      '<td>' + (p.n_escala ? '<span class="critpill azul">' + p.n_escala + '</span>' : '—') + '</td>' +
+    '</tr>';
+    if (IQR_ABERTOS[i]){
+      linhas += '<tr class="prow-detail"><td colspan="8">' + iqrLinhaDetalhe(p, i) + '</td></tr>';
+    }
+    return linhas;
+  }).join('');
+}
+
+var IQR_CORES_SWATCH = {
+  'cristal':'#d8dce0','verde':'#4caf6b','âmbar':'#d98a2b','ambar':'#d98a2b','preto':'#2b2d31',
+  'caramelo':'#a56a3a','azul':'#3b7fd9','vermelho':'#c0392b','branco':'#eceff1','natural':'#cfd4da'
+};
+function iqrCorDot(nome){
+  var k = String(nome||'').toLowerCase().trim();
+  var hex = IQR_CORES_SWATCH[k] || '#8a8f98';
+  return '<span class="colorswatch" style="background:' + hex + ';"></span>';
+}
+function iqrStatusBadgeCor(st){
+  if (st === 'parecido') return '<span class="critpill sim">parecido</span>';
+  if (st === 'diverge_parcial') return '<span class="critpill aviso">diferença parcial</span>';
+  if (st === 'diverge_forte') return '<span class="critpill nao">diferença forte</span>';
+  if (st === 'amostra_pequena') return '<span class="critpill vazio">amostra pequena</span>';
+  return '<span class="critpill vazio">sem leitura</span>';
+}
+function iqrRenderStatsCor(){
+  if (!IQR_DADOS_COR) return;
+  var totalSessoes = IQR_DADOS_COR.produtos_cor.reduce(function(s,p){ return s + p.n_sessoes_total; }, 0);
+  var totalDiverge = IQR_DADOS_COR.produtos_cor.reduce(function(s,p){ return s + p.n_diverge; }, 0);
+  var totalParecido = IQR_DADOS_COR.produtos_cor.reduce(function(s,p){ return s + p.n_parecido; }, 0);
+  var html = '' +
+    '<div class="statcard"><div class="sv">' + IQR_DADOS_COR.produtos_cor.length + '</div><div class="sl">Produtos com 2+ cores</div></div>' +
+    '<div class="statcard"><div class="sv">' + totalSessoes.toLocaleString('pt-BR') + '</div><div class="sl">Sessões consideradas</div></div>' +
+    '<div class="statcard' + (totalDiverge ? ' warn' : '') + '"><div class="sv">' + totalDiverge + '</div><div class="sl">Parâmetro × produto com diferença (parcial ou forte)</div></div>' +
+    '<div class="statcard"><div class="sv">' + totalParecido + '</div><div class="sl">Parâmetro × produto sem diferença (parecido)</div></div>';
+  document.getElementById('statscardsCor').innerHTML = html;
+}
+function iqrLinhaDetalheCor(p, i){
+  var corpo = p.parametros.map(function(pa){
+    var cores = Object.keys(pa.por_cor);
+    var linhasCor = cores.map(function(c){
+      var d = pa.por_cor[c];
+      var ehRef = (c === pa.cor_referencia);
+      var faixa = iqrFmtFaixa(d.min, d.max);
+      var coluna;
+      if (ehRef){
+        coluna = '<span style="color:var(--text-dim);">cor de referência</span>';
+      } else if (pa.comparacoes && pa.comparacoes[c]){
+        var cp = pa.comparacoes[c];
+        coluna = iqrStatusBadgeCor(cp.status) + (cp.sobra > 0 ? ' <span style="color:var(--text-dim);">(sobra ' + iqrFmtNum(cp.sobra) + ')</span>' : '');
+      } else {
+        coluna = '<span style="color:var(--text-dim);">amostra pequena — sem conclusão</span>';
+      }
+      return '<tr' + (ehRef ? ' class="corref"' : '') + '>' +
+        '<td>' + iqrCorDot(c) + escHtml(c) + '</td>' +
+        '<td>' + d.n + (d.amostra_insuf ? ' <span style="color:var(--text-dim);">(insuf.)</span>' : '') + '</td>' +
+        '<td>' + faixa + '</td>' +
+        '<td>' + coluna + '</td>' +
+      '</tr>';
+    }).join('');
+    return '<div class="corcard">' +
+      '<div class="corcard-head"><b>' + escHtml(pa.parametro) + '</b>' + iqrStatusBadgeCor(pa.status) + '</div>' +
+      '<table class="cordetail-table"><thead><tr><th>Cor</th><th>Leituras</th><th>Faixa observada</th><th>Comparação vs. referência</th></tr></thead>' +
+      '<tbody>' + linhasCor + '</tbody></table>' +
+    '</div>';
+  }).join('');
+  return '<div style="padding:12px 14px;">' + corpo + '</div>';
+}
+function iqrAlternarDetalheCor(i){
+  IQR_ABERTOS_COR[i] = !IQR_ABERTOS_COR[i];
+  renderTabelaCor();
+}
+function renderTabelaCor(){
+  if (!IQR_DADOS_COR) return;
+  var filtroEl = document.getElementById('filtroTextoCor'), soDivergeEl = document.getElementById('filtroSoDivergeCor');
+  var filtro = (filtroEl.value || '').toLowerCase().trim();
+  var soDiverge = soDivergeEl.checked;
+  var visiveis = IQR_DADOS_COR.produtos_cor.map(function(p, i){ return { p:p, i:i }; }).filter(function(x){
+    var p = x.p;
+    if (filtro){
+      var alvo = (p.maquina + ' ' + p.gramatura + ' ' + p.resina).toLowerCase();
+      if (alvo.indexOf(filtro) === -1) return false;
+    }
+    if (soDiverge && p.n_diverge === 0) return false;
+    return true;
+  });
+
+  document.getElementById('contagemProdutosCor').textContent = visiveis.length + ' de ' + IQR_DADOS_COR.produtos_cor.length + ' produto(s) exibido(s).';
+
+  document.getElementById('tabelaProdutosBodyCor').innerHTML = visiveis.map(function(x){
+    var p = x.p, i = x.i;
+    var outrasCores = p.cores.filter(function(c){ return c !== p.cor_referencia; });
+    var linhas = '<tr class="prow-prod' + (IQR_ABERTOS_COR[i] ? ' aberto' : '') + '" onclick="iqrAlternarDetalheCor(' + i + ')">' +
+      '<td><span class="expand-caret">▸</span></td>' +
+      '<td>' + escHtml(p.maquina) + '</td>' +
+      '<td>' + escHtml(p.gramatura) + '</td>' +
+      '<td>' + escHtml(p.resina) + '</td>' +
+      '<td>' + iqrCorDot(p.cor_referencia) + escHtml(p.cor_referencia) + ' (' + p.n_sessoes_por_cor[p.cor_referencia] + ')</td>' +
+      '<td>' + outrasCores.map(function(c){ return iqrCorDot(c) + escHtml(c) + ' (' + p.n_sessoes_por_cor[c] + ')'; }).join(', ') + '</td>' +
+      '<td>' + p.n_sessoes_total + '</td>' +
+      '<td>' + (p.n_diverge ? '<span class="critpill nao">' + p.n_diverge + '</span>' : '<span class="critpill sim">0</span>') + ' de ' + p.parametros.length + '</td>' +
+    '</tr>';
+    if (IQR_ABERTOS_COR[i]){
+      linhas += '<tr class="prow-detail"><td colspan="8">' + iqrLinhaDetalheCor(p, i) + '</td></tr>';
+    }
+    return linhas;
+  }).join('');
 }
 
 // Corrige valores que o Excel converteu automaticamente em data/hora (serial),
