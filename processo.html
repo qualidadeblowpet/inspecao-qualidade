@@ -3535,8 +3535,8 @@ function abrirFormEditarGrupo(i){
   critModoAtual = 'editar';
   critGrupoOriginal = g;
   document.getElementById('critFormTitulo').textContent = 'Editar critério — ' + g.maquina + ' · ' + g.gramatura + ' · ' + g.cor + ' · ' + g.resina;
-  document.getElementById('critFormDesc').textContent = 'Identificação bloqueada nesta edição (pra mudar a combinação, exclua e cadastre de novo). Ajuste o Mínimo/Máximo de cada parâmetro; deixar os dois em branco remove o critério daquele parâmetro.';
-  ['critMaquina','critGramatura','critCor','critResina'].forEach(function(id){ document.getElementById(id).disabled = true; });
+  document.getElementById('critFormDesc').textContent = 'Pode ajustar também Máquina/Gramatura/Cor/Resina — se a combinação nova já tiver outro critério cadastrado, o salvamento é bloqueado com aviso. Ajuste o Mínimo/Máximo de cada parâmetro; deixar os dois em branco remove o critério daquele parâmetro.';
+  ['critMaquina','critGramatura','critCor','critResina'].forEach(function(id){ document.getElementById(id).disabled = false; });
   popularSelectLista('critMaquina', 'maquinas', g.maquina);
   popularSelectLista('critGramatura', 'gramaturas', g.gramatura);
   popularSelectLista('critCor', 'cores', g.cor);
@@ -3572,6 +3572,25 @@ async function salvarCriterioLote(){
   // pra essa combinação (em modo "editar", os itens do grupo original; em "novo", o que
   // já existir pra essa combinação — permite reaproveitar o formulário como edição também).
   var chaveM = norm(maquina), chaveG = norm(gramatura), chaveC = norm(cor), chaveR = norm(resina);
+
+  // Trava pedida pelo Cleber: em modo "editar", se a Identificação foi alterada pra uma
+  // combinação que já tem outro grupo cadastrado (diferente do que está sendo editado),
+  // bloqueia o salvamento em vez de misturar os dois grupos sem avisar.
+  if (critGrupoOriginal){
+    var indicesGrupoOriginal = {};
+    critGrupoOriginal.itens.forEach(function(t){ indicesGrupoOriginal[t._index] = true; });
+    var colideComOutroGrupo = tolerancias.some(function(t){
+      if (indicesGrupoOriginal[t._index]) return false; // é o próprio grupo sendo editado
+      if (t.ativoFalso) return false;
+      if (t.processo && t.processo !== 'Injeção') return false;
+      return t._maquina===chaveM && t._gramatura===chaveG && t._cor===chaveC && t._resina===chaveR;
+    });
+    if (colideComOutroGrupo){
+      erro('Já existe um critério cadastrado para "' + maquina + ' · ' + gramatura + ' · ' + cor + ' · ' + resina + '". Escolha outra combinação, ou exclua esse grupo existente antes de mudar pra essa.');
+      return;
+    }
+  }
+
   var existentePorParam = {};
   (critGrupoOriginal ? critGrupoOriginal.itens : tolerancias.filter(function(t){
     return t._maquina===chaveM && t._gramatura===chaveG && t._cor===chaveC && t._resina===chaveR;
@@ -3815,8 +3834,8 @@ function abrirFormEditarGrupoSopro(i){
   critModoAtualSopro = 'editar';
   critGrupoOriginalSopro = g;
   document.getElementById('critFormTituloSopro').textContent = 'Editar critério — ' + g.maquina + ' · ' + g.gramatura + ' · ' + g.cor + ' · ' + g.frasco;
-  document.getElementById('critFormDescSopro').textContent = 'Identificação bloqueada nesta edição (pra mudar a combinação, exclua e cadastre de novo). Ajuste o Mínimo/Máximo de cada parâmetro; deixar os dois em branco remove o critério daquele parâmetro.';
-  ['critMaquinaSopro','critGramaturaSopro','critCorSopro','critFrascoSopro'].forEach(function(id){ document.getElementById(id).disabled = true; });
+  document.getElementById('critFormDescSopro').textContent = 'Pode ajustar também Máquina/Gramatura/Cor/Frasco — se a combinação nova já tiver outro critério cadastrado, o salvamento é bloqueado com aviso. Trocar a Máquina reinicia a lista de parâmetros abaixo (cada máquina do Sopro tem os seus). Ajuste o Mínimo/Máximo de cada parâmetro; deixar os dois em branco remove o critério daquele parâmetro.';
+  ['critMaquinaSopro','critGramaturaSopro','critCorSopro','critFrascoSopro'].forEach(function(id){ document.getElementById(id).disabled = false; });
   popularSelectLista('critMaquinaSopro', 'maquinasSopro', g.maquina);
   popularSelectLista('critGramaturaSopro', 'gramaturasSopro', g.gramatura);
   popularSelectLista('critCorSopro', 'coresSopro', g.cor);
@@ -3852,6 +3871,24 @@ async function salvarCriterioLoteSopro(){
   }
 
   var chaveM = norm(maquina), chaveG = norm(gramatura), chaveC = norm(cor), chaveF = norm(frasco);
+
+  // Mesma trava da Injeção: em modo "editar", se a Identificação foi alterada pra uma
+  // combinação que já tem outro grupo cadastrado (diferente do que está sendo editado),
+  // bloqueia o salvamento em vez de misturar os dois grupos sem avisar.
+  if (critGrupoOriginalSopro){
+    var indicesGrupoOriginalSopro = {};
+    critGrupoOriginalSopro.itens.forEach(function(t){ indicesGrupoOriginalSopro[t._index] = true; });
+    var colideComOutroGrupoSopro = toleranciasSopro.some(function(t){
+      if (indicesGrupoOriginalSopro[t._index]) return false; // é o próprio grupo sendo editado
+      if (t.ativoFalso) return false;
+      return t._maquina===chaveM && t._gramatura===chaveG && t._cor===chaveC && t._resina===chaveF;
+    });
+    if (colideComOutroGrupoSopro){
+      erro('Já existe um critério cadastrado para "' + maquina + ' · ' + gramatura + ' · ' + cor + ' · ' + frasco + '". Escolha outra combinação, ou exclua esse grupo existente antes de mudar pra essa.');
+      return;
+    }
+  }
+
   var existentePorParam = {};
   (critGrupoOriginalSopro ? critGrupoOriginalSopro.itens : toleranciasSopro.filter(function(t){
     return t._maquina===chaveM && t._gramatura===chaveG && t._cor===chaveC && t._resina===chaveF;
