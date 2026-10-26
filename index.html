@@ -245,6 +245,16 @@
   #fotoNivelPopover .fn-ttl b { color: var(--text); font-size: 12px; }
   #fotoNivelPopover .fn-img { width: 100%; height: min(370px, 52vh); border-radius: 6px; background: #101113; display: flex; align-items: center; justify-content: center; overflow: hidden; color: var(--text-dim); text-align: center; padding: 0 10px; }
   #fotoNivelPopover .fn-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  /* Foto clicável: abre o arquivo original numa nova aba */
+  #fotoNivelPopover .fn-abrir { position: relative; display: block; width: 100%; height: 100%; cursor: zoom-in; border-radius: 4px; }
+  #fotoNivelPopover .fn-abrir:hover, #fotoNivelPopover .fn-abrir:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  #fotoNivelPopover .fn-icone { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border-radius: 7px; background: rgba(0,0,0,.6); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px; opacity: .85; pointer-events: none; }
+  #fotoNivelPopover .fn-dica { position: absolute; left: 0; right: 0; bottom: 0; padding: 22px 8px 8px; background: linear-gradient(transparent, rgba(0,0,0,.78)); color: #fff; font-size: 12px; text-align: center; opacity: 0; transition: opacity .15s; pointer-events: none; }
+  #fotoNivelPopover .fn-abrir:hover .fn-dica, #fotoNivelPopover .fn-abrir:focus-visible .fn-dica { opacity: 1; }
+  /* "ponte" invisível entre o selo e o quadro: o mouse consegue atravessar o espaço sem o quadro fechar */
+  #fotoNivelPopover::before, #fotoNivelPopover::after { content: ''; position: absolute; left: 0; right: 0; height: 14px; }
+  #fotoNivelPopover::before { top: -14px; }
+  #fotoNivelPopover::after { top: 100%; }
   #fotoNivelPopover .fn-leg { margin-top: 8px; line-height: 1.45; }
   #fotoNivelPopover .fn-leg small { display: block; color: var(--text-dim); font-size: 11px; margin-top: 2px; }
   #fotoNivelPopover .fn-leg a { color: var(--accent); }
@@ -4484,7 +4494,7 @@ async function mostrarPopoverFotoNivel(selo) {
   if (!pop) {
     pop = document.createElement('div'); pop.id = 'fotoNivelPopover';
     pop.addEventListener('mouseenter', function() { clearTimeout(fotoNivelTimerFechar); });
-    pop.addEventListener('mouseleave', function() { fotoNivelTimerFechar = setTimeout(fecharPopoverFotoNivel, 150); });
+    pop.addEventListener('mouseleave', function() { fotoNivelTimerFechar = setTimeout(fecharPopoverFotoNivel, 250); });
     document.body.appendChild(pop);
   }
   const meu = ++fotoNivelSeq; fotoNivelSeloAtual = selo;
@@ -4509,7 +4519,18 @@ async function mostrarPopoverFotoNivel(selo) {
   const linkAbrir = '<a href="' + escaparHtmlFoto(reg.comFoto.foto_url) + '" target="_blank" rel="noopener">Abrir foto</a>';
   if (!miniatura) { caixa.innerHTML = '<span>Não consegui carregar a prévia.<br>' + linkAbrir + '</span>'; posicionarPopoverFotoNivel(selo, pop); return; }
   const img = new Image();
-  img.onload = function() { if (meu === fotoNivelSeq) { caixa.innerHTML = ''; caixa.appendChild(img); } };
+  img.onload = function() {
+    if (meu !== fotoNivelSeq) return;
+    // A foto vira um link pro arquivo original (mesmo link do botão "📷 Ver" da tabela), em nova aba.
+    caixa.innerHTML = '';
+    const abrir = document.createElement('a');
+    abrir.className = 'fn-abrir'; abrir.href = reg.comFoto.foto_url; abrir.target = '_blank'; abrir.rel = 'noopener';
+    abrir.setAttribute('aria-label', 'Abrir a foto original em uma nova aba');
+    abrir.appendChild(img);
+    abrir.insertAdjacentHTML('beforeend', '<span class="fn-icone">↗</span><span class="fn-dica">🔍 Clique para abrir a foto original</span>');
+    abrir.addEventListener('click', function() { setTimeout(fecharPopoverFotoNivel, 0); });
+    caixa.appendChild(abrir);
+  };
   img.onerror = function() { delete fotoNivelMiniaturaCache[reg.comFoto.foto_url]; if (meu === fotoNivelSeq) caixa.innerHTML = '<span>Não consegui carregar a prévia.<br>' + linkAbrir + '</span>'; };
   img.alt = 'Foto da última ocorrência'; img.src = miniatura;
 }
@@ -4527,7 +4548,7 @@ document.addEventListener('mouseout', function(ev) {
   const selo = ev.target.closest && ev.target.closest('.badge[data-foto-key]');
   if (!selo) return;
   clearTimeout(fotoNivelTimerAbrir);
-  fotoNivelTimerFechar = setTimeout(fecharPopoverFotoNivel, 150);
+  fotoNivelTimerFechar = setTimeout(fecharPopoverFotoNivel, 250);
 });
 document.addEventListener('click', function(ev) {
   const selo = ev.target.closest && ev.target.closest('.badge[data-foto-key]');
