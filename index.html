@@ -3657,11 +3657,32 @@ function normalizarValorDataHora(campo, valor) {
   return valor;
 }
 
+function textoDaCelulaExcel(v) {
+  if (v === null || v === undefined) return '';
+  if (typeof v === 'string') return v;
+  if (typeof v === 'boolean') return v ? 'TRUE' : 'FALSE';
+  return String(v);
+}
+
+// Monta o HTML das linhas de uma tabela de Ocorrência, linha a linha: se UMA linha tiver algum dado
+// inesperado, só ela é pulada (e o usuário é avisado) — o resto da tabela aparece normalmente, em vez
+// de a tabela inteira ficar travada em "carregando".
+function montarLinhasSeguro(linhas, montarLinha) {
+  let falhas = 0;
+  const html = linhas.map(function(l) {
+    try { return montarLinha(l); } catch (e) { falhas++; console.error('Linha da ocorrência não exibida:', e, l); return ''; }
+  }).join('');
+  if (falhas) mostrarToast(falhas + ' linha(s) não puderam ser exibidas por dado inválido na planilha.', true);
+  return html;
+}
+
 function linhasArrayParaObjeto(linhasArray, cabecalho, processo) {
   return linhasArray.map(function(row) {
     const valores = row.values[0];
     const obj = { processo: processo };
-    cabecalho.forEach(function(campo, i) { obj[campo] = normalizarValorDataHora(campo, valores[i]); });
+    // Tudo que vem do Excel vira TEXTO: ele devolve "123" digitado como número 123, e o app (que só
+    // trabalha com texto nesses campos) quebrava ao montar a tabela — ver textoDaCelulaExcel().
+    cabecalho.forEach(function(campo, i) { obj[campo] = textoDaCelulaExcel(normalizarValorDataHora(campo, valores[i])); });
     return obj;
   });
 }
@@ -4673,7 +4694,7 @@ function renderTabelaSopro() {
   if (!itemId) return;
   const loading = document.getElementById('loadingSopro');
   loading.classList.remove('hidden');
-  setTimeout(function() {
+  setTimeout(function() { try {
     let linhas = linhasFiltradasPorProcesso('sopro');
     const limiteValorSopro = document.getElementById('tLimiteSopro').value;
     const limite = limiteValorSopro === 'todos' ? Infinity : parseInt(limiteValorSopro, 10);
@@ -4683,7 +4704,7 @@ function renderTabelaSopro() {
     const vazio = document.getElementById('tabelaSoproVazia');
     vazio.classList.toggle('hidden', linhas.length > 0);
 
-    corpo.innerHTML = linhas.map(function(l) {
+    corpo.innerHTML = montarLinhasSeguro(linhas, function(l) {
       const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
       const statusUpper = (l.status_correcao||'').toUpperCase();
       const statusClasse = statusUpper.indexOf('PENDENTE') > -1 ? 'pendente' : statusUpper.indexOf('SEM DESVIO') > -1 ? 'semdesvio' : 'corrigido';
@@ -4699,8 +4720,8 @@ function renderTabelaSopro() {
         '<td class="col-obs" title="'+(l.observacao||'').replace(/"/g,'&quot;')+'">'+(l.observacao||'')+'</td>' +
         '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
       '</tr>';
-    }).join('');
-    loading.classList.add('hidden');
+    });
+    } finally { loading.classList.add('hidden'); }
   }, 20);
 }
 
@@ -4708,7 +4729,7 @@ function renderTabelaInjecao() {
   if (!itemId) return;
   const loading = document.getElementById('loadingInjecao');
   loading.classList.remove('hidden');
-  setTimeout(function() {
+  setTimeout(function() { try {
   let linhas = linhasFiltradasPorProcesso('injecao');
   const limiteValorInjecao = document.getElementById('tLimiteInjecao').value;
   const limite = limiteValorInjecao === 'todos' ? Infinity : parseInt(limiteValorInjecao, 10);
@@ -4718,7 +4739,7 @@ function renderTabelaInjecao() {
   const vazio = document.getElementById('tabelaInjecaoVazia');
   vazio.classList.toggle('hidden', linhas.length > 0);
 
-  corpo.innerHTML = linhas.map(function(l) {
+  corpo.innerHTML = montarLinhasSeguro(linhas, function(l) {
     const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
     const statusUpper = (l.status_correcao||'').toUpperCase();
       const statusClasse = statusUpper.indexOf('PENDENTE') > -1 ? 'pendente' : statusUpper.indexOf('SEM DESVIO') > -1 ? 'semdesvio' : 'corrigido';
@@ -4736,8 +4757,8 @@ function renderTabelaInjecao() {
       '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
       '<td class="col-obs" title="'+(l.observacao||'').replace(/"/g,'&quot;')+'">'+(l.observacao||'')+'</td>' +
     '</tr>';
-  }).join('');
-  loading.classList.add('hidden');
+  });
+  } finally { loading.classList.add('hidden'); }
   }, 20);
 }
 
