@@ -191,8 +191,12 @@ a{color:var(--accent);}
 .view-toggle button.active{background:var(--accent); color:var(--accent-ink);}
 
 .table-scroll{overflow-x:auto; border:1px solid var(--border); border-radius:10px; flex:1;}
+/* lista de recebimentos: rola dentro da tabela, o cabeçalho das colunas fica fixo */
+#viewTabela{overflow:auto; max-height:max(360px, calc(100dvh - 290px)); overscroll-behavior:contain;}
+.visc-ok{color:var(--ok); font-weight:600;}
+.visc-fora{color:var(--danger); font-weight:600;}
 table.occ{width:100%; border-collapse:collapse; font-size:13.5px; min-width:760px;}
-table.occ th{position:sticky; top:0; background:var(--surface-2); text-align:left; padding:9px 11px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--fg-faint); white-space:nowrap; border-bottom:1px solid var(--border);}
+table.occ th{position:sticky; top:0; z-index:1; background:var(--surface-2); text-align:left; padding:9px 11px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--fg-faint); white-space:nowrap; border-bottom:1px solid var(--border);}
 table.occ td{padding:10px 11px; white-space:nowrap; border-bottom:1px solid var(--border); color:var(--fg);}
 table.occ tr:last-child td{border-bottom:none;}
 table.occ tr:hover td{background:var(--surface-2);}
@@ -1699,16 +1703,38 @@ function linhasFiltradas(){
       if (!alvos.some(function(v){ return v && String(v).toLowerCase().indexOf(busca) > -1; })) return false;
     }
     return true;
+  }).sort(function(a, b){
+    // último recebimento primeiro: data mais recente no topo; mesma data (ou sem data) → o lançado por último primeiro; sem data vai pro fim
+    var da = dataParaOrdenar(a['Data Recebimento'] || a['Data']), db = dataParaOrdenar(b['Data Recebimento'] || b['Data']);
+    if (da !== db) { if (!da) return 1; if (!db) return -1; return db - da; }
+    return b.__index - a.__index;
   });
+}
+function viscosidade3(v){
+  // mostra a viscosidade sempre com 3 casas depois da vírgula (0,88 → 0,880)
+  if (v === undefined || v === null || String(v).trim() === '') return '—';
+  var n = parseFloat(String(v).trim().replace(',', '.'));
+  return isNaN(n) ? escHtml(String(v)) : n.toFixed(3).replace('.', ',');
+}
+function viscosidadeCor(r){
+  // verde = dentro do critério da ficha (fornecedor + tipo); vermelho = fora; sem ficha/sem valor = cor normal
+  var v = r['Viscosidade IV Blowpet (dl/g)'], txt = viscosidade3(v);
+  if (txt === '—') return txt;
+  var ficha = fichaDe('resina', String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim());
+  var p = ficha && ficha.parametros.find(function(x){ return PARAM_COL_MAP[x.teste] === 'Viscosidade IV Blowpet (dl/g)'; });
+  var aval = p ? avaliarParametro(p, v) : null;
+  if (aval === 'dentro') return '<span class="visc-ok" title="Dentro do critério: ' + escHtml(p.especTexto || '') + '">' + txt + '</span>';
+  if (aval === 'fora') return '<span class="visc-fora" title="Fora do critério: ' + escHtml(p.especTexto || '') + '">' + txt + '</span>';
+  return txt;
 }
 function linhaResina(r){
   return '<tr class="clicavel" onclick="abrirDetalhe(\'resina\','+r.__index+')">'+
     '<td class="cell-dim tabular">'+(r['Data Recebimento']||'')+'</td>'+
     '<td class="mono">'+(r['Lote Interno']||'')+'</td>'+
-    '<td class="mono cell-dim">'+(r['Lote Fornecedor']||'')+'</td>'+
+    '<td class="mono cell-dim" style="white-space:normal; max-width:150px;">'+escHtml(r['Lote Fornecedor']||'')+'</td>'+
     '<td>'+escHtml(r['Tipo']||r['Código Produto']||'')+'<div class="cell-dim" style="font-size:11px;">'+escHtml(r['Código Produto']||'')+' · '+escHtml(r['Fornecedor']||'')+'</div></td>'+
     '<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'+
-    '<td class="mono tabular">'+(r['Viscosidade IV Blowpet (dl/g)']||'—')+'</td>'+
+    '<td class="mono tabular">'+viscosidadeCor(r)+'</td>'+
     '<td class="mono">'+(r['Nota Fiscal']||'')+'</td>'+
     '<td>'+laudoIc(r['Arquivo do Laudo'])+'</td>'+
     '<td>'+badgeLabel(r['Status'])+'</td>'+
@@ -1720,7 +1746,7 @@ function cardResina(r){
   return '<div class="rcard clicavel" onclick="abrirDetalhe(\'resina\','+r.__index+')">'+
     '<div class="top"><div><div class="fornecedor">'+escHtml(r['Tipo']||r['Código Produto']||'')+'</div><div class="cell-dim" style="font-size:11.5px; margin:1px 0 2px;">'+escHtml(r['Fornecedor']||'')+'</div><div class="lote mono">'+(r['Lote Interno']||'')+' · lote forn. '+(r['Lote Fornecedor']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
     '<dl><div><dt>Data</dt><dd class="tabular">'+(r['Data Recebimento']||'')+'</dd></div><div><dt>Nota fiscal</dt><dd class="mono">'+(r['Nota Fiscal']||'')+'</dd></div>'+
-    '<div><dt>Quantidade</dt><dd class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</dd></div><div><dt>Viscosidade</dt><dd class="mono">'+(r['Viscosidade IV Blowpet (dl/g)']||'—')+' dl/g</dd></div></dl>'+
+    '<div><dt>Quantidade</dt><dd class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</dd></div><div><dt>Viscosidade</dt><dd class="mono">'+viscosidadeCor(r)+' dl/g</dd></div></dl>'+
     '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span><span class="row-actions">'+
     botoesAcaoRecebimento('resina', r.__index)+'</span></div>'+
   '</div>';
