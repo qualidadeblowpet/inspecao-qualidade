@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sistema da Qualidade — BlowPet</title>
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&display=swap">
 <style>
@@ -185,6 +186,15 @@ a{color:var(--accent);}
 .btn-accent{background:var(--accent); border-color:var(--accent); color:var(--accent-ink);}
 .btn-accent:hover{filter:brightness(1.06);}
 .btn-ghost{background:transparent;}
+.btn-danger{background:var(--danger); border-color:var(--danger); color:#fff;}
+.btn-danger:hover{filter:brightness(1.06);}
+.conc-res{display:flex; align-items:center; gap:10px; margin-top:14px; font-size:12px; text-transform:uppercase; letter-spacing:.4px;}
+@media (max-width:600px){
+  .form-actions{flex-wrap:wrap;}
+  .form-actions .save-msg{flex-basis:100%;}
+  .form-actions .btn{flex:1 1 auto; justify-content:center; height:auto; min-height:36px; white-space:normal; text-align:center;}
+}
+.conc-aviso{border:1px solid var(--warn); background:var(--warn-soft); color:var(--fg); border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.5; margin-bottom:10px;}
 .view-toggle{display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; height:32px;}
 .view-toggle button{display:inline-flex; align-items:center; gap:6px; border:none; background:var(--surface-2); color:var(--fg-dim); font-size:12px; font-weight:500; padding:0 12px; cursor:pointer; font-family:var(--font-body);}
 .view-toggle button svg{width:14px; height:14px;}
@@ -193,6 +203,18 @@ a{color:var(--accent);}
 .table-scroll{overflow-x:auto; border:1px solid var(--border); border-radius:10px; flex:1;}
 /* lista de recebimentos: rola dentro da tabela, o cabeçalho das colunas fica fixo */
 #viewTabela{overflow:auto; max-height:max(360px, calc(100dvh - 290px)); overscroll-behavior:contain;}
+table.occ th.c, table.occ td.c{text-align:center;}
+.pdf-sel-acoes{display:flex; align-items:center; gap:6px; margin-bottom:10px;}
+.pdf-sel-lista{display:flex; flex-direction:column; border:1px solid var(--border); border-radius:10px; overflow:hidden;}
+.pdf-sel-item{display:flex; align-items:center; gap:12px; padding:10px 12px; border-bottom:1px solid var(--border); cursor:pointer; background:var(--surface);}
+.pdf-sel-item:last-child{border-bottom:none;}
+.pdf-sel-item:hover{background:var(--surface-2);}
+.pdf-sel-item input{width:16px; height:16px; accent-color:var(--accent); flex-shrink:0;}
+.pdf-sel-item .cod{font-family:var(--font-mono); font-weight:600; min-width:34px;}
+.pdf-sel-item .nm{flex:1; min-width:0;}
+.pdf-sel-item .nm small{display:block; color:var(--fg-faint); font-size:11.5px;}
+.pdf-sel-item .qt{color:var(--fg-faint); font-size:12px; white-space:nowrap;}
+.pdf-sel-item.vazio, .pdf-sel-item.travado{opacity:.45; cursor:default;}
 .visc-ok{color:var(--ok); font-weight:600;}
 .visc-fora{color:var(--danger); font-weight:600;}
 table.occ{width:100%; border-collapse:collapse; font-size:13.5px; min-width:760px;}
@@ -592,6 +614,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
               </select>
             </div>
             <div class="tf"><label>Buscar</label><input type="search" id="fBusca" placeholder="NF, lote…"></div>
+            <button type="button" class="btn" id="btnExportPdf" onclick="abrirModalPdf()" title="Exportar os últimos 25 recebimentos por fornecedor em PDF"><svg><use href="#i-file-text"/></svg> Exportar PDF</button>
             <div class="view-toggle">
               <button class="active" data-view="tabela"><svg><use href="#i-rows"/></svg> Tabela</button>
               <button data-view="cards"><svg><use href="#i-grid"/></svg> Cards</button>
@@ -774,7 +797,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           <div class="field"><label>Responsável pelo recebimento</label><input id="responsavelInput" list="listaResponsaveis" placeholder="Nome do responsável"></div>
           <div class="field"><label>Quantidade</label><input id="quantidadeInput" placeholder="Ex: 24.000"></div>
           <div class="field"><label>Unidade</label><select id="unidadeSelect"></select></div>
-          <div class="field"><label>Status</label><select id="statusRecebimentoSelect"></select></div>
+          <div class="field"><label>Resultado (ao concluir)</label><select id="statusRecebimentoSelect"></select></div>
           <div class="field">
             <label>Foto do laudo</label>
             <div class="laudo-btns" id="laudoBtns">
@@ -820,7 +843,30 @@ table.occ tbody tr.clicavel{cursor:pointer;}
         <div class="form-actions">
           <span class="save-msg" id="saveMsgRecebimento"></span>
           <button class="btn btn-ghost" onclick="fecharModalCadastro()">Cancelar</button>
-          <button class="btn btn-accent" id="btnSalvarRecebimento" onclick="salvarRecebimento()">Salvar recebimento</button>
+          <button class="btn" id="btnSalvarRecebimento" onclick="salvarRecebimento()" title="Grava como Em análise, pra completar depois">Salvar recebimento</button>
+          <button class="btn btn-accent" id="btnConcluirRecebimento" onclick="concluirRecebimento()" title="Encerra o recebimento como Aprovado ou Reprovado"><svg><use href="#i-check"/></svg> Concluir recebimento</button>
+        </div>
+        <p class="med-note" style="text-align:right; margin-top:8px;">Salvar recebimento: fica <b>Em análise</b> pra completar depois · Concluir recebimento: encerra como <b>Aprovado</b> ou <b>Reprovado</b>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — CONFIRMAR CONCLUSÃO DO RECEBIMENTO ===================== -->
+  <div class="modal-overlay hidden" id="modalConcluir" style="z-index:210;">
+    <div class="modal-card" style="max-width:720px;">
+      <button class="modal-close" onclick="fecharModalConcluir()" aria-label="Fechar">✕</button>
+      <div class="modal-head">
+        <h2>Concluir recebimento?</h2>
+        <p class="tela-sub" style="margin-top:6px;">Confira o resumo. Depois de concluído, o recebimento sai de "Em análise" e fica com o resultado abaixo.</p>
+        <div class="conc-res"><span class="cell-dim">Resultado</span><span id="concResultado"></span></div>
+      </div>
+      <div class="form-wrap" style="padding-top:14px; max-width:none;">
+        <div id="concAvisos"></div>
+        <div id="concResumo"></div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgConc"></span>
+          <button class="btn btn-ghost" onclick="fecharModalConcluir()">Voltar e revisar</button>
+          <button class="btn btn-accent" id="btnConfirmarConclusao" onclick="confirmarConclusao()">Confirmar e concluir</button>
         </div>
       </div>
     </div>
@@ -891,6 +937,29 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           <span class="save-msg" id="saveMsgForn"></span>
           <button class="btn btn-ghost" onclick="fecharModalFornecedor()">Cancelar</button>
           <button class="btn btn-accent" id="btnSalvarForn" onclick="salvarFornecedor()">Salvar fornecedor</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — EXPORTAR PDF (RESINA) ===================== -->
+  <div class="modal-overlay hidden" id="modalPdf">
+    <div class="modal-card" style="max-width:560px;">
+      <button class="modal-close" onclick="fecharModalPdf()" aria-label="Fechar">✕</button>
+      <div class="modal-head">
+        <h2>Exportar PDF</h2>
+        <p class="tela-sub" style="margin-top:6px;">Escolha o produto e até 4 fornecedores. Sai uma página A4 deitada com os últimos 25 recebimentos de cada um, lado a lado.</p>
+      </div>
+      <div class="form-wrap" style="padding-top:14px; max-width:none;">
+        <div class="field" style="margin-bottom:16px;"><label>Produto</label><select id="pdfProduto" onchange="montarListaPdf()"></select></div>
+        <div class="field" style="margin-bottom:6px;"><label id="pdfListaTitulo">Fornecedores</label></div>
+        <div class="pdf-sel-acoes"><button type="button" class="btn btn-ghost" onclick="limparSelPdf()">Limpar seleção</button><span class="cell-dim" id="pdfSelInfo" style="margin-left:auto; font-size:12px;"></span></div>
+        <div class="pdf-sel-lista" id="pdfSelLista"></div>
+        <p class="med-note">Aparecem só os fornecedores com recebimento registrado do produto escolhido. Até 4 por PDF, lado a lado numa folha só. Na resina, a viscosidade sai em verde (dentro do critério da ficha) ou vermelho (fora); nos outros produtos, o status sai colorido.</p>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgPdf"></span>
+          <button class="btn btn-ghost" onclick="fecharModalPdf()">Cancelar</button>
+          <button class="btn btn-accent" id="btnGerarPdf" onclick="gerarPdfRecebimentos()"><svg><use href="#i-file-text"/></svg> Gerar PDF</button>
         </div>
       </div>
     </div>
@@ -1528,7 +1597,11 @@ function popularSelect(sel, valores, manterSeExistir){
 }
 function popularSelectsFixos(){
   popularSelect(document.getElementById('unidadeSelect'), DATA.listas['Unidades'] && DATA.listas['Unidades'].length ? DATA.listas['Unidades'] : ['kg','Unidades','Caixas'], true);
-  popularSelect(document.getElementById('statusRecebimentoSelect'), DATA.listas['Status Recebimento'] && DATA.listas['Status Recebimento'].length ? DATA.listas['Status Recebimento'] : ['Em análise','Aprovado','Reprovado','Quarentena'], true);
+  // Resultado só tem Aprovado/Reprovado: "Salvar recebimento" grava sempre como Em análise; o resultado vale ao "Concluir recebimento".
+  var stLista = DATA.listas['Status Recebimento'] && DATA.listas['Status Recebimento'].length ? DATA.listas['Status Recebimento'] : ['Em análise','Aprovado','Reprovado'];
+  var selSt = document.getElementById('statusRecebimentoSelect'), stAtual = selSt.value;
+  selSt.innerHTML = '<option value="">— definir ao concluir —</option>' + stLista.filter(function(v){ var k = statusKey(v); return k === 'aprovado' || k === 'reprovado'; }).map(function(v){ return '<option value="'+escHtml(v)+'">'+escHtml(v)+'</option>'; }).join('');
+  if (stAtual) selSt.value = stAtual;
   popularSelect(document.getElementById('conferenciaRotuloSelect'), DATA.listas['Conferencia Visual'] && DATA.listas['Conferencia Visual'].length ? DATA.listas['Conferencia Visual'] : ['Confere','Divergente'], true);
   popularOpcoesModeloRotulo();
 }
@@ -1683,7 +1756,7 @@ function montarHead(mat){
   var cols;
   if (mat === 'resina') cols = ['Data','Lote interno','Lote fornecedor','Fornecedor / tipo','Quantidade','Viscosidade (Blowpet)','Nota fiscal','Laudo','Status','Responsável',''];
   else { cols = ['Data','Nota fiscal','Fornecedor / tipo','Lote','Quantidade']; if (mat === 'rotulo') cols.push('Conferência'); cols.push('Laudo','Status','Responsável',''); }
-  document.getElementById('theadRow').innerHTML = cols.map(function(c){ return '<th>'+c+'</th>'; }).join('');
+  document.getElementById('theadRow').innerHTML = cols.map(function(c){ return '<th' + (c.indexOf('Viscosidade') === 0 ? ' class="c"' : '') + '>'+c+'</th>'; }).join('');
 }
 function botoesAcaoRecebimento(mat, idx){
   return '<button type="button" class="icon-btn icon-only" title="Editar" onclick="event.stopPropagation(); editarRecebimento(\''+mat+'\','+idx+')"><svg><use href="#i-pencil"/></svg></button>'+
@@ -1734,7 +1807,7 @@ function linhaResina(r){
     '<td class="mono cell-dim" style="white-space:normal; max-width:150px;">'+escHtml(r['Lote Fornecedor']||'')+'</td>'+
     '<td>'+escHtml(r['Tipo']||r['Código Produto']||'')+'<div class="cell-dim" style="font-size:11px;">'+escHtml(r['Código Produto']||'')+' · '+escHtml(r['Fornecedor']||'')+'</div></td>'+
     '<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'+
-    '<td class="mono tabular">'+viscosidadeCor(r)+'</td>'+
+    '<td class="mono tabular c">'+viscosidadeCor(r)+'</td>'+
     '<td class="mono">'+(r['Nota Fiscal']||'')+'</td>'+
     '<td>'+laudoIc(r['Arquivo do Laudo'])+'</td>'+
     '<td>'+badgeLabel(r['Status'])+'</td>'+
@@ -2051,7 +2124,6 @@ function abrirModalCadastro(matEdit, indexEdit){
   var row = editando ? DATA[matEdit].find(function(x){ return x.__index === indexEdit; }) : null;
   recebimentoEditando = (editando && row) ? { mat: matEdit, index: indexEdit } : null;
   document.getElementById('modalCadastroTitulo').textContent = recebimentoEditando ? 'Editar recebimento' : 'Novo recebimento';
-  document.getElementById('btnSalvarRecebimento').textContent = recebimentoEditando ? 'Salvar alterações' : 'Salvar recebimento';
   document.getElementById('materialSelect').disabled = !!recebimentoEditando;
   limparLaudoSelecionado();
   mostrarLaudoExistente(recebimentoEditando ? row['Arquivo do Laudo'] : '');
@@ -2194,7 +2266,8 @@ function atualizarPreviaRotulo(){
 
 function selecionarStatusPorChave(chave){
   var sel = document.getElementById('statusRecebimentoSelect');
-  for (var i = 0; i < sel.options.length; i++) { if (statusKey(sel.options[i].value) === chave) { sel.value = sel.options[i].value; return; } }
+  for (var i = 0; i < sel.options.length; i++) { if (sel.options[i].value && statusKey(sel.options[i].value) === chave) { sel.value = sel.options[i].value; return; } }
+  sel.value = '';
 }
 function sugerirStatusRecebimento(){
   var mat = document.getElementById('materialSelect').value;
@@ -2324,15 +2397,27 @@ function atualizarStatusMedicao(idx){
   sugerirStatusRecebimento();
 }
 
-async function salvarRecebimento(){
+function validarRecebimento(){
   var mat = document.getElementById('materialSelect').value;
-  var btn = document.getElementById('btnSalvarRecebimento'), msg = document.getElementById('saveMsgRecebimento');
+  if (!document.getElementById('dataRecebimentoInput').value) return 'Informe a data do recebimento.';
+  if (!document.getElementById('fornecedorSelect').value) return 'Escolha o fornecedor (se não aparecer, cadastre em Cadastros › Fornecedores).';
+  if (!document.getElementById('tipoSelect').value) return 'Escolha o tipo (se não aparecer, cadastre no fornecedor).';
+  if (mat === 'resina' && !document.getElementById('loteFornecedorInput').value.trim()) return 'Informe o lote do fornecedor.';
+  return '';
+}
+function statusEmAnaliseTexto(){
+  var l = (DATA.listas['Status Recebimento'] || []).find(function(v){ return statusKey(v) === 'analise'; });
+  return l || 'Em análise';
+}
+// statusFinal vem do "Confirmar e concluir" (Aprovado/Reprovado); sem ele, é "Salvar recebimento" → Em análise.
+async function salvarRecebimento(statusFinal){
+  var mat = document.getElementById('materialSelect').value;
+  var btn = document.getElementById('btnSalvarRecebimento'), btnC = document.getElementById('btnConcluirRecebimento'), msg = document.getElementById('saveMsgRecebimento');
   var dataISO = document.getElementById('dataRecebimentoInput').value;
-  if (!dataISO) { msg.className = 'save-msg err'; msg.textContent = 'Informe a data do recebimento.'; return; }
+  var erroVal = validarRecebimento();
+  if (erroVal) { msg.className = 'save-msg err'; msg.textContent = erroVal; return false; }
   var forn = document.getElementById('fornecedorSelect').value, tipo = document.getElementById('tipoSelect').value;
-  if (!forn) { msg.className = 'save-msg err'; msg.textContent = 'Escolha o fornecedor (se não aparecer, cadastre em Cadastros › Fornecedores).'; return; }
-  if (!tipo) { msg.className = 'save-msg err'; msg.textContent = 'Escolha o tipo (se não aparecer, cadastre no fornecedor).'; return; }
-  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  btn.disabled = true; btnC.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
   var editando = recebimentoEditando;
   var rowOriginal = editando ? DATA[editando.mat].find(function(x){ return x.__index === editando.index; }) : null;
   try {
@@ -2345,7 +2430,7 @@ async function salvarRecebimento(){
     }
     var dataBR = formatarDataBR(dataISO);
     var obs = document.getElementById('observacoesInput').value.trim();
-    var statusTexto = document.getElementById('statusRecebimentoSelect').value;
+    var statusTexto = statusFinal || statusEmAnaliseTexto();
     // Na edição, parte da linha original — assim nenhuma coluna que não está na tela é apagada.
     var base = rowOriginal ? Object.assign({}, rowOriginal) : {};
 
@@ -2372,8 +2457,9 @@ async function salvarRecebimento(){
         'Responsável': document.getElementById('responsavelInput').value.trim(), 'Observações': obs + (extras.length ? (' | ' + extras.join('; ')) : '')
       });
       Object.keys(medicoes).forEach(function(col){ row[col] = medicoes[col]; });
-      if (editando) { await atualizarLinha('resina', editando.index, row); mostrarToast('Recebimento ' + loteInterno + ' atualizado com sucesso.'); }
-      else { await adicionarLinha('resina', row); mostrarToast('Recebimento ' + loteInterno + ' salvo com sucesso.'); }
+      var sufixo = statusFinal ? ' concluído como ' + statusFinal + '.' : (editando ? ' atualizado (Em análise).' : ' salvo como Em análise.');
+      if (editando) await atualizarLinha('resina', editando.index, row); else await adicionarLinha('resina', row);
+      mostrarToast('Recebimento ' + loteInterno + sufixo);
       DATA.resina = linhasParaObjetos('resina', await lerLinhasBrutas(TABELAS.resina));
     } else {
       var tableKey = mat;
@@ -2391,17 +2477,81 @@ async function salvarRecebimento(){
         var confSel = document.getElementById('conferenciaRotuloSelect');
         row2['Conferência Visual'] = confSel.options[confSel.selectedIndex] ? confSel.options[confSel.selectedIndex].textContent : confSel.value;
       }
-      if (editando) { await atualizarLinha(tableKey, editando.index, row2); mostrarToast('Recebimento atualizado com sucesso.'); }
-      else { await adicionarLinha(tableKey, row2); mostrarToast('Recebimento salvo com sucesso.'); }
+      if (editando) await atualizarLinha(tableKey, editando.index, row2); else await adicionarLinha(tableKey, row2);
+      mostrarToast('Recebimento' + (statusFinal ? ' concluído como ' + statusFinal + '.' : (editando ? ' atualizado (Em análise).' : ' salvo como Em análise.')));
       DATA[tableKey] = linhasParaObjetos(tableKey, await lerLinhasBrutas(TABELAS[tableKey]));
     }
     document.getElementById('ct' + mat.charAt(0).toUpperCase() + mat.slice(1)).textContent = DATA[mat].length;
     if (matAtual === mat) { atualizarFornecedoresFiltro(); renderRecebimento(); }
     renderHome();
     fecharModalCadastro();
+    return true;
   } catch (e) {
     msg.className = 'save-msg err'; msg.textContent = 'Erro ao salvar: ' + e.message;
-  } finally { btn.disabled = false; }
+    return false;
+  } finally { btn.disabled = false; btnC.disabled = false; }
+}
+
+/* ---- Concluir recebimento: confere tudo num resumo antes de encerrar como Aprovado/Reprovado ---- */
+function concluirRecebimento(){
+  var msg = document.getElementById('saveMsgRecebimento'), erroVal = validarRecebimento();
+  if (erroVal) { msg.className = 'save-msg err'; msg.textContent = erroVal; return; }
+  var resultado = document.getElementById('statusRecebimentoSelect').value;
+  if (!resultado) { msg.className = 'save-msg err'; msg.textContent = 'Escolha o resultado (Aprovado ou Reprovado) pra concluir. Pra deixar em aberto, use "Salvar recebimento".'; document.getElementById('statusRecebimentoSelect').focus(); return; }
+  msg.textContent = '';
+  var mat = document.getElementById('materialSelect').value, k = statusKey(resultado), avisos = [];
+  function v(id){ var el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; }
+  function txtSel(id){ var el = document.getElementById(id); return el && el.options[el.selectedIndex] ? el.options[el.selectedIndex].textContent : ''; }
+  function kv(rot, val, cls){ return '<div><dt>' + rot + '</dt><dd' + (cls ? ' class="' + cls + '"' : '') + '>' + (val ? escHtml(val) : '<span class="res-pend">—</span>') + '</dd></div>'; }
+  var rowOrig = recebimentoEditando ? DATA[recebimentoEditando.mat].find(function(x){ return x.__index === recebimentoEditando.index; }) : null;
+  var laudo = laudoArquivoPronto ? 'Novo arquivo anexado' : ((rowOrig && rowOrig['Arquivo do Laudo']) ? 'Já anexado' : '');
+  var html = '<dl class="dw-kv">' + kv('Produto', MAT_LABEL[mat]) + kv('Fornecedor / tipo', v('fornecedorSelect') + ' — ' + v('tipoSelect'));
+  if (mat === 'resina') html += kv('Lote interno', v('loteInternoDisplay'), 'mono') + kv('Lote do fornecedor', v('loteFornecedorInput'), 'mono');
+  else html += kv('Lote', v('loteGenericoInput'), 'mono');
+  html += kv('Nota fiscal', v('notaFiscalInput'), 'mono') + kv('Data do recebimento', formatarDataBR(v('dataRecebimentoInput')), 'tabular') +
+    kv('Quantidade', [v('quantidadeInput'), v('unidadeSelect')].filter(function(x){ return x; }).join(' '), 'tabular') + kv('Responsável', v('responsavelInput')) +
+    kv('Laudo', laudo);
+  if (mat === 'rotulo') {
+    html += kv('Modelo do rótulo', txtSel('modeloRotuloSelect')) + kv('Conferência visual', txtSel('conferenciaRotuloSelect'));
+    if (k === 'aprovado' && !confereOk(v('conferenciaRotuloSelect'))) avisos.push('A conferência visual está como <b>Divergente</b> e o resultado é Aprovado.');
+  }
+  html += '</dl>';
+  if (!laudo) avisos.push('Nenhum laudo anexado.');
+  if (mat === 'resina') {
+    if (ESPEC_PARAMS_ATUAL.length) {
+      var foraL = 0, pendL = 0;
+      html += '<div class="section-title" style="margin-top:18px;">Medições</div><div class="table-scroll"><table class="occ" style="min-width:0;"><thead><tr><th>Crit.</th><th>Teste</th><th>Especificação</th><th>Resultado</th><th>Situação</th></tr></thead><tbody>' +
+        ESPEC_PARAMS_ATUAL.map(function(p, idx){
+          var el = document.getElementById('medResultado_' + idx), raw = el ? el.value : '', a = avaliarParametro(p, raw);
+          var mostra = p.tipoResultado === 'visual' ? ({ 'conforme': 'Conforme', 'nao-conforme': 'Não conforme' })[raw] || '' : String(raw || '').trim();
+          if (p.criterio === 'L') { if (a === 'fora') foraL++; else if (a === null) pendL++; }
+          var sit = a === 'dentro' ? '<span class="badge aprovado">Dentro</span>' : a === 'fora' ? '<span class="badge reprovado">Fora</span>' : '<span class="badge nd">' + (mostra ? '—' : 'Pendente') + '</span>';
+          return '<tr><td><span class="badge-crit ' + p.criterio + '">' + p.criterio + '</span></td><td style="white-space:normal;">' + escHtml(p.teste) + '</td><td class="cell-dim" style="white-space:normal;">' + escHtml(p.especTexto || '') + '</td><td class="mono">' + (mostra ? escHtml(mostra) : '<span class="res-pend">—</span>') + '</td><td>' + sit + '</td></tr>';
+        }).join('') + '</tbody></table></div>';
+      if (k === 'aprovado' && foraL) avisos.push('<b>' + foraL + (foraL === 1 ? ' medição liberativa (L) está' : ' medições liberativas (L) estão') + ' fora</b> da especificação e o resultado é Aprovado.');
+      if (k === 'aprovado' && pendL) avisos.push(pendL + (pendL === 1 ? ' medição liberativa (L) está' : ' medições liberativas (L) estão') + ' sem resultado.');
+      if (k === 'reprovado' && !foraL && !pendL) avisos.push('Todas as medições liberativas (L) estão dentro da especificação e o resultado é Reprovado — confira o motivo nas observações.');
+    } else avisos.push('Sem ficha de especificação para esse fornecedor/tipo — o recebimento será concluído sem medições.');
+  }
+  var obs = v('observacoesInput');
+  html += '<div class="section-title" style="margin-top:18px;">Observações</div><p class="dw-obs" style="margin:0;">' + (obs ? escHtml(obs) : '<span class="res-pend">Sem observações.</span>') + '</p>';
+  document.getElementById('concResultado').innerHTML = '<span class="badge ' + k + '" style="font-size:13px; padding:6px 14px;">' + escHtml(resultado) + '</span>';
+  document.getElementById('concAvisos').innerHTML = avisos.map(function(a){ return '<div class="conc-aviso">' + a + '</div>'; }).join('');
+  document.getElementById('concResumo').innerHTML = html;
+  var b = document.getElementById('btnConfirmarConclusao');
+  b.className = 'btn ' + (k === 'reprovado' ? 'btn-danger' : 'btn-accent'); b.disabled = false;
+  b.innerHTML = '<svg><use href="#i-check"/></svg> Confirmar e concluir como ' + escHtml(resultado);
+  document.getElementById('saveMsgConc').textContent = '';
+  document.getElementById('modalConcluir').classList.remove('hidden');
+}
+function fecharModalConcluir(){ document.getElementById('modalConcluir').classList.add('hidden'); }
+async function confirmarConclusao(){
+  var b = document.getElementById('btnConfirmarConclusao'), m = document.getElementById('saveMsgConc');
+  b.disabled = true; m.className = 'save-msg'; m.textContent = 'Concluindo…';
+  var ok = await salvarRecebimento(document.getElementById('statusRecebimentoSelect').value);
+  b.disabled = false;
+  if (ok) fecharModalConcluir();
+  else { m.className = 'save-msg err'; m.textContent = document.getElementById('saveMsgRecebimento').textContent || 'Não foi possível concluir.'; }
 }
 
 /* ====================== ESPECIFICAÇÕES ====================== */
@@ -2745,6 +2895,182 @@ escolherCadastro('fornecedores');
 function abrirConfiguracoes(){ document.getElementById('modalConfig').classList.remove('hidden'); }
 function fecharConfiguracoes(){ document.getElementById('modalConfig').classList.add('hidden'); }
 document.getElementById('modalConfig').addEventListener('click', function(e){ if (e.target.id === 'modalConfig') fecharConfiguracoes(); });
+
+/* ====================== EXPORTAR PDF — últimos 25 recebimentos por fornecedor ====================== */
+var PDF_QTD_LOTES = 25, PDF_MAX_GRUPOS = 4, PDF_CHAVE_SEL = 'pdf_selecao_';
+var PDF_MATS = ['resina', 'rotulo', 'pigmento', 'cinta', 'tampa'];
+function palavrasComuns(lista){
+  if (!lista.length) return '';
+  var base = lista[0].split(/\s+/), n = base.length;
+  lista.forEach(function(t){ var w = t.split(/\s+/), i = 0; while (i < n && i < w.length && w[i].toLowerCase() === base[i].toLowerCase()) i++; n = i; });
+  return base.slice(0, n).join(' ');
+}
+function colDataPdf(mat){ return mat === 'resina' ? 'Data Recebimento' : 'Data'; }
+// Resina: um grupo por código (J02, J34, L21…), que é o que forma o lote interno — igual à planilha antiga.
+// Demais produtos: um grupo por fornecedor. Só entram grupos com recebimento registrado.
+function gruposPdf(mat){
+  var mapa = {}, lista = [];
+  DATA[mat].forEach(function(r){
+    var forn = String(r['Fornecedor'] || '').trim(), tipo = String(r['Tipo'] || '').trim();
+    var chave = mat === 'resina' ? (String(r['Código Produto'] || '').trim().toUpperCase() || '—') : (forn || '—');
+    if (!mapa[chave]) { mapa[chave] = { chave: chave, linhas: [], forns: {}, tipos: {} }; lista.push(mapa[chave]); }
+    var g = mapa[chave]; g.linhas.push(r);
+    if (forn) g.forns[forn] = 1;
+    if (tipo) g.tipos[tipo] = 1;
+  });
+  if (mat === 'resina') itensFornecedores().forEach(function(i){ var g = mapa[i.cod]; if (i.mat === 'resina' && g && i.tipo) g.tipos[i.tipo] = 1; });
+  lista.forEach(function(g){
+    g.fornecedores = Object.keys(g.forns); g.tiposLista = Object.keys(g.tipos);
+    if (mat === 'resina') { g.rotulo = g.chave; g.nome = palavrasComuns(g.tiposLista) || g.tiposLista[0] || g.fornecedores[0] || g.chave; g.sub = g.fornecedores.join(', '); g.titulo = g.chave + ' - ' + g.nome; }
+    else { g.rotulo = ''; g.nome = g.chave; g.sub = g.tiposLista.join(', '); g.titulo = g.chave; }
+  });
+  return lista.sort(function(a, b){ return a.chave.localeCompare(b.chave, 'pt-BR'); });
+}
+function ultimosRecebimentos(mat, linhas, qtd){
+  // mesma ordem da lista (mais recente primeiro), pega os N últimos e devolve do mais antigo pro mais novo
+  var col = colDataPdf(mat);
+  return linhas.slice().sort(function(a, b){
+    var da = dataParaOrdenar(a[col]), db = dataParaOrdenar(b[col]);
+    if (da !== db) { if (!da) return 1; if (!db) return -1; return db - da; }
+    return b.__index - a.__index;
+  }).slice(0, qtd).reverse();
+}
+function lerSelecaoPdf(mat){ try { return JSON.parse(localStorage.getItem(PDF_CHAVE_SEL + mat) || '[]').slice(0, PDF_MAX_GRUPOS); } catch (e) { return []; } }
+function abrirModalPdf(){
+  var sel = document.getElementById('pdfProduto');
+  sel.innerHTML = PDF_MATS.map(function(m){ var n = DATA[m].length; return '<option value="' + m + '">' + MAT_LABEL[m] + (n ? ' (' + n + ')' : ' (sem registros)') + '</option>'; }).join('');
+  sel.value = PDF_MATS.indexOf(matAtual) > -1 ? matAtual : 'resina';
+  document.getElementById('saveMsgPdf').textContent = '';
+  montarListaPdf();
+  document.getElementById('modalPdf').classList.remove('hidden');
+}
+function montarListaPdf(){
+  var mat = document.getElementById('pdfProduto').value, sel = lerSelecaoPdf(mat), grupos = gruposPdf(mat);
+  document.getElementById('pdfListaTitulo').textContent = mat === 'resina' ? 'Fornecedores (por código de resina)' : 'Fornecedores';
+  document.getElementById('pdfSelLista').innerHTML = grupos.map(function(g){
+    var n = g.linhas.length;
+    return '<label class="pdf-sel-item"><input type="checkbox" value="' + escHtml(g.chave) + '"' + (sel.indexOf(g.chave) > -1 ? ' checked' : '') + ' onchange="atualizarSelPdf()">' +
+      (g.rotulo ? '<span class="cod">' + escHtml(g.rotulo) + '</span>' : '') + '<span class="nm">' + escHtml(g.nome) + (g.sub ? '<small>' + escHtml(g.sub) + '</small>' : '') + '</span>' +
+      '<span class="qt">' + n + (n === 1 ? ' registro' : ' registros') + '</span></label>';
+  }).join('') || '<div class="empty-note" style="padding:18px;">Nenhum recebimento de ' + MAT_LABEL[mat] + ' registrado ainda.</div>';
+  atualizarSelPdf();
+}
+function fecharModalPdf(){ document.getElementById('modalPdf').classList.add('hidden'); }
+document.getElementById('modalPdf').addEventListener('click', function(e){ if (e.target.id === 'modalPdf') fecharModalPdf(); });
+function codigosSelecionadosPdf(){ return Array.prototype.map.call(document.querySelectorAll('#pdfSelLista input:checked'), function(i){ return i.value; }); }
+function limparSelPdf(){ document.querySelectorAll('#pdfSelLista input').forEach(function(i){ i.checked = false; }); atualizarSelPdf(); }
+function atualizarSelPdf(){
+  var n = codigosSelecionadosPdf().length, info = document.getElementById('pdfSelInfo'), btn = document.getElementById('btnGerarPdf');
+  info.textContent = (n ? n + (n === 1 ? ' selecionado' : ' selecionados') : 'nenhum selecionado') + ' · máximo ' + PDF_MAX_GRUPOS;
+  // limite de fornecedores pra caber numa folha: ao chegar no máximo, os outros ficam travados
+  var cheio = n >= PDF_MAX_GRUPOS;
+  document.querySelectorAll('#pdfSelLista .pdf-sel-item').forEach(function(l){
+    var i = l.querySelector('input'); i.disabled = cheio && !i.checked; l.classList.toggle('travado', i.disabled);
+  });
+  btn.disabled = !n || n > PDF_MAX_GRUPOS;
+}
+function ajustarTexto(doc, txt, larg, tamMax, tamMin){
+  // diminui a letra até caber na célula; se nem assim couber, corta com reticências
+  var t = String(txt == null ? '' : txt), tam = tamMax;
+  doc.setFontSize(tam);
+  while (tam > tamMin && doc.getTextWidth(t) > larg) { tam -= 0.25; doc.setFontSize(tam); }
+  if (doc.getTextWidth(t) > larg) { while (t.length > 1 && doc.getTextWidth(t + '…') > larg) t = t.slice(0, -1); t += '…'; }
+  return t;
+}
+function corIvPdf(r, cache){
+  var v = r['Viscosidade IV Blowpet (dl/g)'], chave = (r['Fornecedor'] || '') + '|' + (r['Tipo'] || '');
+  if (!(chave in cache)) { var f = fichaDe('resina', String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim()); cache[chave] = f && f.parametros.find(function(x){ return PARAM_COL_MAP[x.teste] === 'Viscosidade IV Blowpet (dl/g)'; }); }
+  var aval = cache[chave] ? avaliarParametro(cache[chave], v) : null;
+  return aval === 'dentro' ? [0, 128, 0] : aval === 'fora' ? [200, 0, 0] : [30, 30, 30];
+}
+function colunasPdf(mat, g){
+  var prefixo = palavrasComuns(g.tiposLista), multi = g.tiposLista.length > 1, cache = {};
+  function restoTipo(r){ var t = String(r['Tipo'] || '').trim(); return (prefixo && t.toLowerCase().indexOf(prefixo.toLowerCase()) === 0 ? t.slice(prefixo.length).trim() : t) || t; }
+  var c;
+  if (mat === 'resina') {
+    c = [{ t: 'LOTE INTERNO', p: 1.15, v: function(r){ return r['Lote Interno']; } },
+         { t: 'DATA', p: 1.15, v: function(r){ return r['Data Recebimento']; } },
+         { t: 'LOTE FORNECEDOR', p: 1.6, v: function(r){ return r['Lote Fornecedor']; } }];
+    if (multi) c.push({ t: 'PRIME ou OFF', p: 1.2, v: function(r){ return restoTipo(r).toUpperCase(); }, cor: function(r){ return /off/i.test(restoTipo(r)) ? [200, 0, 0] : null; } });
+    c.push({ t: 'IV', p: 0.8, negrito: true, v: function(r){ var x = viscosidade3(r['Viscosidade IV Blowpet (dl/g)']); return x === '—' ? '' : x; }, cor: function(r){ return corIvPdf(r, cache); } });
+  } else {
+    c = [{ t: 'DATA', p: 1.15, v: function(r){ return r['Data']; } },
+         { t: 'NOTA FISCAL', p: 1.1, v: function(r){ return r['Nota Fiscal']; } },
+         { t: 'LOTE', p: 1.5, v: function(r){ return r['Lote']; } }];
+    if (multi) c.push({ t: 'TIPO', p: 1.4, v: function(r){ return restoTipo(r); } });
+    if (mat === 'rotulo') c.push({ t: 'CONFERÊNCIA', p: 1.15, v: function(r){ return r['Conferência Visual']; }, cor: function(r){ return r['Conferência Visual'] ? (confereOk(r['Conferência Visual']) ? [0, 128, 0] : [200, 0, 0]) : null; } });
+    c.push({ t: 'QUANTIDADE', p: 1.25, v: function(r){ return [r['Quantidade'], r['Unidade']].filter(function(x){ return x; }).join(' '); } });
+    c.push({ t: 'STATUS', p: 1.2, negrito: true, v: function(r){ return String(r['Status'] || '').toUpperCase(); }, cor: function(r){ var k = statusKey(r['Status']); return k === 'aprovado' ? [0, 128, 0] : k === 'reprovado' ? [200, 0, 0] : [180, 120, 0]; } });
+  }
+  return c;
+}
+function entregarPdf(doc, nomeArquivo){ doc.save(nomeArquivo); }
+function gerarPdfRecebimentos(){
+  var mat = document.getElementById('pdfProduto').value, sel = codigosSelecionadosPdf();
+  if (!sel.length) return;
+  try { localStorage.setItem(PDF_CHAVE_SEL + mat, JSON.stringify(sel)); } catch (e) {}
+  var Ctor = window.jspdf && window.jspdf.jsPDF;
+  if (!Ctor) { document.getElementById('saveMsgPdf').textContent = 'A biblioteca de PDF não carregou (rede bloqueando cdn.jsdelivr.net?). Atualize a página e tente de novo.'; return; }
+  var grupos = gruposPdf(mat).filter(function(g){ return sel.indexOf(g.chave) > -1; });
+  var doc = new Ctor({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  var W = 297, H = 210, M = 10, agora = new Date();
+  function dd(n){ return (n < 10 ? '0' : '') + n; }
+  var emitido = dd(agora.getDate()) + '/' + dd(agora.getMonth() + 1) + '/' + agora.getFullYear() + ' ' + dd(agora.getHours()) + ':' + dd(agora.getMinutes());
+
+  // cabeçalho da página
+  doc.setFont('helvetica', 'bold'); doc.setTextColor(25, 25, 25);
+  doc.text(ajustarTexto(doc, 'Recebimento de ' + MAT_LABEL[mat] + ' — últimos ' + PDF_QTD_LOTES + ' lotes por fornecedor', 190, 13, 9), M, M + 4);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(110, 110, 110);
+  doc.text('BlowPet · Qualidade · emitido em ' + emitido, W - M, M + 4, { align: 'right' });
+  doc.setDrawColor(200, 200, 200); doc.setLineWidth(0.3); doc.line(M, M + 7, W - M, M + 7);
+
+  // largura de cada bloco proporcional às colunas dele (o bloco com mais colunas fica um pouco mais largo)
+  var n = grupos.length, topo = M + 11, base = H - M - 6, gapX = n === 4 ? 5 : 7;
+  grupos.forEach(function(g){ g.colunas = colunasPdf(mat, g); g.peso = g.colunas.reduce(function(a, c){ return a + c.p; }, 0); });
+  var pesoTotal = grupos.reduce(function(a, g){ return a + g.peso; }, 0);
+  var unid = Math.min((W - 2 * M - gapX * (n - 1)) / pesoTotal, 23);
+  var xAcum = (W - (pesoTotal * unid + gapX * (n - 1))) / 2;
+  var tituloH = 10.5, headH = 7, rowH = Math.min(5.6, (base - topo - tituloH - headH) / PDF_QTD_LOTES), fs = Math.min(8, rowH * 1.55);
+
+  grupos.forEach(function(g){
+    var x = xAcum, blocoW = g.peso * unid, y = topo; xAcum += blocoW + gapX;
+    var linhas = ultimosRecebimentos(mat, g.linhas, PDF_QTD_LOTES), colunas = g.colunas, cx = x;
+    colunas.forEach(function(c){ c.x = cx; c.w = blocoW * c.p / g.peso; cx += c.w; });
+    // título do bloco (vermelho, como na planilha antiga) + fornecedor/tipos
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(192, 0, 0);
+    doc.text(ajustarTexto(doc, g.titulo.toUpperCase(), blocoW, 12.5, 7), x + blocoW / 2, y + 5, { align: 'center' });
+    doc.setFont('helvetica', 'normal'); doc.setTextColor(120, 120, 120);
+    if (g.sub) doc.text(ajustarTexto(doc, g.sub, blocoW, 7.5, 5), x + blocoW / 2, y + tituloH - 1.8, { align: 'center' });
+    var yh = y + tituloH;
+    doc.setFillColor(15, 15, 15); doc.rect(x, yh, blocoW, headH, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(255, 255, 255);
+    colunas.forEach(function(c){ doc.text(ajustarTexto(doc, c.t, c.w - 1.5, 7, 4.5), c.x + c.w / 2, yh + headH / 2 + 1, { align: 'center' }); });
+    // linhas (sempre 25, as vazias ficam pontilhadas como na planilha)
+    var y0 = yh + headH;
+    doc.setDrawColor(185, 185, 185); doc.setLineWidth(0.15); doc.setLineDashPattern([0.5, 0.6], 0);
+    for (var i = 0; i <= PDF_QTD_LOTES; i++) doc.line(x, y0 + i * rowH, x + blocoW, y0 + i * rowH);
+    colunas.forEach(function(c, ci){ if (ci) doc.line(c.x, y0, c.x, y0 + PDF_QTD_LOTES * rowH); });
+    doc.line(x, y0, x, y0 + PDF_QTD_LOTES * rowH); doc.line(x + blocoW, y0, x + blocoW, y0 + PDF_QTD_LOTES * rowH);
+    doc.setLineDashPattern([], 0);
+    linhas.forEach(function(r, ri){
+      var yt = y0 + ri * rowH + rowH / 2 + fs * 0.13;
+      colunas.forEach(function(c){
+        var cor = (c.cor && c.cor(r)) || [30, 30, 30];
+        doc.setFont('helvetica', c.negrito ? 'bold' : 'normal'); doc.setTextColor(cor[0], cor[1], cor[2]);
+        doc.text(ajustarTexto(doc, c.v(r) || '', c.w - 1.5, fs, Math.max(4, fs - 2.5)), c.x + c.w / 2, yt, { align: 'center' });
+      });
+    });
+  });
+  // rodapé
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(120, 120, 120);
+  doc.text(mat === 'resina' ? 'IV = viscosidade intrínseca medida na BlowPet (dl/g). Verde: dentro do critério da ficha de especificação · Vermelho: fora · Preto: sem ficha cadastrada.'
+                            : 'Status: verde = aprovado · vermelho = reprovado · amarelo = em análise / quarentena.', M, H - M + 1);
+  doc.text('Sistema da Qualidade', W - M, H - M + 1, { align: 'right' });
+  var hoje = agora.getFullYear() + '-' + dd(agora.getMonth() + 1) + '-' + dd(agora.getDate());
+  var nomeMat = { resina: 'Resina', rotulo: 'Rotulo', pigmento: 'Pigmento', cinta: 'Caixa_Cinta', tampa: 'Caixa_Tampa' }[mat];
+  entregarPdf(doc, 'Recebimentos_' + nomeMat + '_' + hoje + '.pdf');
+  fecharModalPdf();
+}
 </script>
 </body>
 </html>
