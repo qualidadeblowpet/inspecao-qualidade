@@ -863,13 +863,13 @@ table.occ tbody tr.clicavel{cursor:pointer;}
               <tbody id="tbodyMedicoes"></tbody>
             </table>
           </div>
-          <p class="med-note">L = liberativa, obrigatória pra aprovar o lote · QA = valor transcrito do laudo do fornecedor · C = complementar, não decide a aprovação. Parâmetros cadastrados em <a href="#" onclick="fecharModalCadastro(); abrirCadastro('especificacoes'); return false;">Especificações</a>.</p>
+          <p class="med-note">L = liberativa, obrigatória pra aprovar o lote · QA = valor transcrito do laudo do fornecedor; se lançado e fora, reprova (obrigatório quando a ficha só tem QA) · C = complementar, não decide a aprovação. Parâmetros cadastrados em <a href="#" onclick="fecharModalCadastro(); abrirCadastro('especificacoes'); return false;">Especificações</a>.</p>
         </div>
 
-        <div class="section-title">Resultado <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">calculado pelos critérios liberativos</span></div>
+        <div class="section-title">Resultado <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">calculado pela especificação (L e QA)</span></div>
         <div class="res-box">
           <div class="res-linha"><span id="resBadge" class="badge nd">—</span><span id="resMotivo" class="res-motivo"></span></div>
-          <div class="res-manual hidden" id="resManual"><label>Sem critério liberativo para este material — defina o resultado</label><select id="statusRecebimentoSelect" onchange="sugerirStatusRecebimento()"></select></div>
+          <div class="res-manual hidden" id="resManual"><label>Sem ficha de especificação — defina o resultado</label><select id="statusRecebimentoSelect" onchange="sugerirStatusRecebimento()"></select></div>
           <div class="res-restricao hidden" id="boxRestricao">
             <label class="res-chk"><input type="checkbox" id="chkRestricao" onchange="sugerirStatusRecebimento()"> <span><b>Aprovar com restrição</b> — liberar o lote mesmo fora do especificado</span></label>
             <div class="field hidden" id="campoRespRestricao"><label>Responsável pela liberação (obrigatório)</label><input id="respRestricaoInput" placeholder="Nome de quem autorizou a liberação"></div>
@@ -1191,11 +1191,11 @@ const TABELAS = {
 // planilha (lerCabecalhos) e passa a usar a ordem/nomes de lá — assim, acrescentar uma coluna na
 // planilha não quebra a gravação. Se faltar alguma coluna esperada, aparece um aviso.
 const TABLE_COLS = {
-  resina: ['Lote Interno','Data Recebimento','Fornecedor','Tipo','Código Produto','Lote Fornecedor','Nota Fiscal','Quantidade','Unidade','Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Análise de Impureza','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  resina: ['Lote Interno','Data Recebimento','Fornecedor','Tipo','Código Produto','Lote Fornecedor','Nota Fiscal','Quantidade','Unidade','Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Análise de Impureza','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições'],
   rotulo: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Modelo do Rótulo','Quantidade','Unidade','Conferência Visual','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições'],
-  pigmento: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
-  cinta: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
-  tampa: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  pigmento: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições'],
+  cinta: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições'],
+  tampa: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições'],
   fornecedores: ['Fornecedor','Material','Tipo','Código','Último Lote Interno'],
   especificacoes: ['Material','Fornecedor','Tipo','Código Documento','Revisão','Data Documento','Teste','Especificação/Tolerância','Unidade','NT','Critério'],
   rotulosHomologados: ['ID','Nome do Modelo','Aplicação','Fornecedor Habitual','Arquivo da Foto','Status','Observações'],
@@ -1575,6 +1575,8 @@ function parseEspecTexto(texto, unidade, criterio){
     var partes = texto.split('–').map(function(p){ return parseFloat(p.trim().replace(',', '.')); });
     if (partes.length === 2 && !isNaN(partes[0]) && !isNaN(partes[1])) return { tipoResultado: 'faixa', min: partes[0], max: partes[1] };
   }
+  var mPm = texto.match(/^([\-\d.,]+)\s*±\s*([\d.,]+)$/);
+  if (mPm) { var c0 = parseFloat(mPm[1].replace(',', '.')), t0 = parseFloat(mPm[2].replace(',', '.')); if (!isNaN(c0) && !isNaN(t0)) return { tipoResultado: 'faixa', min: +(c0 - t0).toFixed(6), max: +(c0 + t0).toFixed(6) }; }
   var mGe = texto.match(/^(?:≥|>=)\s*([\-\d.,]+)/);
   if (mGe) { var g = parseFloat(mGe[1].replace(',', '.')); if (!isNaN(g)) return { tipoResultado: 'min', min: g }; }
   var mLe = texto.match(/^(?:≤|<=)\s*([\-\d.,]+)/);
@@ -2348,29 +2350,35 @@ function textoStatus(chave, padrao){
   return l || padrao;
 }
 function calcularResultado(escolhas){
+  // L (liberativo): todos precisam estar lançados e dentro.
+  // QA (laudo do fornecedor): se lançado e fora, reprova; em branco não trava — exceto quando a ficha não tem
+  //   nenhum L (ex.: pigmentos, só QA): aí os QA viram obrigatórios.
+  // C (complementar): nunca decide. Rótulo: a conferência visual também é liberativa.
   var mat = document.getElementById('materialSelect').value;
-  var paramsL = ESPEC_PARAMS_ATUAL.map(function(p, idx){ return { p: p, idx: idx }; }).filter(function(x){ return x.p.criterio === 'L'; });
+  var todos = ESPEC_PARAMS_ATUAL.map(function(p, idx){ return { p: p, idx: idx }; });
+  var paramsL = todos.filter(function(x){ return x.p.criterio === 'L'; }), paramsQA = todos.filter(function(x){ return x.p.criterio === 'QA'; });
+  var qaObrig = !paramsL.length && paramsQA.length > 0;
   var fora = [], pend = [];
-  // Rótulo: a conferência visual com o rótulo homologado também é critério liberativo
   if (mat === 'rotulo') {
     var conf = document.getElementById('conferenciaRotuloSelect');
     if (!confereOk(conf.value)) fora.push('Conferência visual (' + (conf.options[conf.selectedIndex] ? conf.options[conf.selectedIndex].textContent : 'Divergente') + ')');
-  } else if (!paramsL.length) return { chave: 'manual', motivo: '' };
-  paramsL.forEach(function(x){
-    var raw = analiseVigente(x.idx, escolhas), r = avaliarParametro(x.p, raw);
-    if (r === 'fora') fora.push(x.p.teste + ' (' + mostrarValorAnalise(x.p, raw) + ')');
-    else if (r === null) pend.push(x.p.teste);
+  } else if (!paramsL.length && !paramsQA.length) return { chave: 'manual', motivo: '' };
+  paramsL.concat(paramsQA).forEach(function(x){
+    var raw = analiseVigente(x.idx, escolhas), r = avaliarParametro(x.p, raw), ehQA = x.p.criterio === 'QA';
+    if (r === 'fora') fora.push(x.p.teste + ' (' + mostrarValorAnalise(x.p, raw) + (ehQA ? ', QA' : '') + ')');
+    else if (r === null && x.p.tipoResultado !== 'na' && (!ehQA || qaObrig)) pend.push(x.p.teste);
   });
   if (fora.length) return { chave: 'reprovado', motivo: 'Fora do especificado: ' + fora.join(', ') + '.', fora: fora };
   if (pend.length) return { chave: 'pendente', motivo: 'Falta lançar: ' + pend.join(', ') + '.', pend: pend };
-  return { chave: 'aprovado', motivo: mat === 'rotulo' ? (paramsL.length ? 'Conferência visual ok e todos os critérios liberativos (L) dentro do especificado.' : 'Conferência visual: confere.') : 'Todos os critérios liberativos (L) dentro do especificado.' };
+  var txt = qaObrig ? 'Todos os valores do laudo (QA) dentro do especificado.' : 'Critérios liberativos (L) dentro do especificado' + (paramsQA.length ? ' e nenhum valor de laudo (QA) fora.' : '.');
+  return { chave: 'aprovado', motivo: mat === 'rotulo' ? 'Conferência visual ok. ' + (paramsL.length ? txt : '') : txt };
 }
 // Status final a gravar ao concluir: { texto, chave } ou { erro }
 function statusFinalRecebimento(escolhas){
   var r = calcularResultado(escolhas), chave = r.chave;
   if (chave === 'manual') {
     var m = document.getElementById('statusRecebimentoSelect').value;
-    if (!m) return { erro: 'Escolha o resultado (Aprovado ou Reprovado) — este material não tem critério liberativo cadastrado.', r: r };
+    if (!m) return { erro: 'Escolha o resultado (Aprovado ou Reprovado) — não há ficha de especificação para este material.', r: r };
     chave = statusKey(m);
   }
   if (chave === 'pendente') return { erro: 'Ainda não dá pra concluir. ' + r.motivo + ' Use "Salvar recebimento" pra deixar Em análise.', r: r };
@@ -2660,15 +2668,17 @@ async function salvarRecebimento(statusFinal){
         if (PARAM_COL_MAP[p.teste]) medicoes[PARAM_COL_MAP[p.teste]] = val;
         else if (val) extras.push(p.teste + ': ' + val);
       });
+      var temColMedR = (TABLE_COLS.resina || []).indexOf('Medições') > -1;
       var row = Object.assign(base, {
         'Lote Interno': loteInterno, 'Data Recebimento': dataBR, 'Fornecedor': forn, 'Tipo': tipo, 'Código Produto': codigo,
         'Lote Fornecedor': loteForn, 'Nota Fiscal': document.getElementById('notaFiscalInput').value.trim(),
         'Quantidade': document.getElementById('quantidadeInput').value.trim(), 'Unidade': document.getElementById('unidadeSelect').value,
         'Laudo Anexado': laudoUrl ? 'Sim' : 'Não', 'Arquivo do Laudo': laudoUrl, 'Status': statusTexto,
         'Responsável': document.getElementById('responsavelInput').value.trim(),
-        'Observações': [obs + (extras.length ? ((obs ? ' | ' : '') + extras.join('; ')) : '')].concat(linhasReanalise, [linhaRestricao(statusTexto)]).filter(function(x){ return x; }).join('\n')
+        'Observações': [obs, (extras.length && !temColMedR) ? MARCA_MEDICOES + extras.join('; ') : ''].concat(linhasReanalise, [linhaRestricao(statusTexto)]).filter(function(x){ return x; }).join('\n')
       });
       Object.keys(medicoes).forEach(function(col){ row[col] = medicoes[col]; });
+      if (temColMedR) row['Medições'] = extras.join('\n');
       var sufixo = statusFinal ? ' concluído como ' + statusFinal + '.' : (editando ? ' atualizado (Em análise).' : ' salvo como Em análise.');
       if (editando) await atualizarLinha('resina', editando.index, row); else await adicionarLinha('resina', row);
       mostrarToast('Recebimento ' + loteInterno + sufixo);
