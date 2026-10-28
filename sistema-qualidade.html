@@ -194,6 +194,18 @@ a{color:var(--accent);}
   .form-actions .save-msg{flex-basis:100%;}
   .form-actions .btn{flex:1 1 auto; justify-content:center; height:auto; min-height:36px; white-space:normal; text-align:center;}
 }
+.res-box{display:flex; flex-direction:column; gap:10px; border:1px solid var(--border); border-radius:10px; padding:12px 14px; background:var(--surface);}
+.res-linha{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.res-linha .badge{font-size:12px; padding:5px 12px;}
+.res-motivo{font-size:12.5px; color:var(--fg-dim);}
+.res-manual{display:flex; flex-direction:column; gap:5px; max-width:340px;}
+.res-manual label, .res-restricao .field label{font-size:10.5px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.4px;}
+.res-manual select{background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:8px; padding:9px 11px; font-size:13.5px; font-family:var(--font-body);}
+.res-restricao{border-top:1px dashed var(--border); padding-top:10px; display:flex; flex-direction:column; gap:8px;}
+.res-chk{display:flex; align-items:flex-start; gap:9px; font-size:13px; cursor:pointer; line-height:1.4;}
+.res-chk input{width:16px; height:16px; accent-color:var(--accent); margin-top:1px; flex-shrink:0;}
+.res-restricao .field{max-width:420px;}
+.conc-aviso.ok{border-color:var(--ok); background:var(--ok-soft);}
 .conc-aviso{border:1px solid var(--warn); background:var(--warn-soft); color:var(--fg); border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.5; margin-bottom:10px;}
 .view-toggle{display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; height:32px;}
 .view-toggle button{display:inline-flex; align-items:center; gap:6px; border:none; background:var(--surface-2); color:var(--fg-dim); font-size:12px; font-weight:500; padding:0 12px; cursor:pointer; font-family:var(--font-body);}
@@ -233,6 +245,8 @@ table.occ tr:hover td{background:var(--surface-2);}
 .badge.analise{background:var(--warn-soft); color:var(--warn);}
 .badge.reprovado{background:var(--danger-soft); color:var(--danger);}
 .badge.quarentena{background:var(--quar-soft); color:var(--quar);}
+.badge.restricao{background:var(--accent-soft); color:var(--accent);}
+.badge.pendente{background:var(--warn-soft); color:var(--warn);}
 .badge.aberta{background:var(--warn-soft); color:var(--warn);}
 .badge.tratativa{background:var(--quar-soft); color:var(--quar);}
 .badge.encerrada{background:var(--ok-soft); color:var(--ok);}
@@ -324,12 +338,28 @@ table.occ tr:hover td{background:var(--surface-2);}
 .badge-crit.L{background:var(--accent-soft); color:var(--accent);}
 .badge-crit.QA{background:var(--quar-soft); color:var(--quar);}
 .badge-crit.C{background:var(--surface-3); color:var(--fg-dim);}
-.med-table td{white-space:normal; vertical-align:middle;}
+table.occ.med-table{min-width:620px;}
+table.occ.med-table td{white-space:normal; vertical-align:middle;}
 .med-table td:first-child{width:1%;}
 .med-table input, .med-table select{
   background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:7px;
-  padding:7px 9px; font-size:12.5px; font-family:var(--font-body); width:100%; min-width:110px;
+  padding:7px 9px; font-size:12.5px; font-family:var(--font-body); width:100%; min-width:84px;
 }
+.med-res{display:flex; align-items:center; gap:6px;}
+.med-n{font-size:10.5px; font-weight:600; color:var(--fg-faint); min-width:18px;}
+.med-sit{display:flex; align-items:center; gap:6px; justify-content:space-between;}
+.med-add svg, .med-sit .icon-btn svg{width:14px; height:14px;}
+.med-table tr.med-sub td{background:var(--surface-2); border-top:none; padding-top:6px; padding-bottom:6px;}
+.med-sub-rot{font-size:11.5px; padding-left:18px !important;}
+.esc-analise{border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:12px;}
+.esc-analise .t{font-size:13px; font-weight:600; margin-bottom:2px;}
+.esc-analise .e{font-size:11.5px; color:var(--fg-faint); margin-bottom:8px;}
+.esc-analise label{display:flex; align-items:center; gap:10px; padding:7px 9px; border-radius:8px; cursor:pointer; font-size:13px;}
+.esc-analise label:hover{background:var(--surface-2);}
+.esc-analise label.sel{background:var(--accent-soft);}
+.esc-analise input{accent-color:var(--accent); width:15px; height:15px;}
+.esc-analise .n{font-weight:600; min-width:70px; color:var(--fg-dim);}
+.esc-analise .v{font-family:var(--font-mono); min-width:70px;}
 .med-note{font-size:11.5px; color:var(--fg-faint); margin:10px 0 0; line-height:1.6;}
 .med-note.ok-note{color:var(--ok);}
 
@@ -609,6 +639,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
                 <option value="">Todos</option>
                 <option value="aprovado">Aprovado</option>
                 <option value="analise">Em análise</option>
+                <option value="restricao">Aprovado com restrição</option>
                 <option value="reprovado">Reprovado</option>
                 <option value="quarentena">Quarentena</option>
               </select>
@@ -744,10 +775,6 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <button class="a-ic-btn" onclick="fecharDetalhe()" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
     </div>
     <div class="drawer-b" id="dwBody"></div>
-    <div class="drawer-f">
-      <button class="btn" id="dwExcluir"><svg><use href="#i-trash"/></svg> Excluir</button>
-      <button class="btn btn-accent" id="dwEditar"><svg><use href="#i-pencil"/></svg> Editar</button>
-    </div>
   </aside>
 
   <!-- ===================== JANELA — NOVO RECEBIMENTO ===================== -->
@@ -797,7 +824,6 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           <div class="field"><label>Responsável pelo recebimento</label><input id="responsavelInput" list="listaResponsaveis" placeholder="Nome do responsável"></div>
           <div class="field"><label>Quantidade</label><input id="quantidadeInput" placeholder="Ex: 24.000"></div>
           <div class="field"><label>Unidade</label><select id="unidadeSelect"></select></div>
-          <div class="field"><label>Resultado (ao concluir)</label><select id="statusRecebimentoSelect"></select></div>
           <div class="field">
             <label>Foto do laudo</label>
             <div class="laudo-btns" id="laudoBtns">
@@ -837,6 +863,16 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           <p class="med-note">L = liberativa, obrigatória pra aprovar o lote · QA = valor transcrito do laudo do fornecedor · C = complementar, não decide a aprovação. Parâmetros cadastrados em <a href="#" onclick="fecharModalCadastro(); abrirCadastro('especificacoes'); return false;">Especificações</a>.</p>
         </div>
 
+        <div class="section-title">Resultado <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">calculado pelos critérios liberativos</span></div>
+        <div class="res-box">
+          <div class="res-linha"><span id="resBadge" class="badge nd">—</span><span id="resMotivo" class="res-motivo"></span></div>
+          <div class="res-manual hidden" id="resManual"><label>Sem critério liberativo para este material — defina o resultado</label><select id="statusRecebimentoSelect" onchange="sugerirStatusRecebimento()"></select></div>
+          <div class="res-restricao hidden" id="boxRestricao">
+            <label class="res-chk"><input type="checkbox" id="chkRestricao" onchange="sugerirStatusRecebimento()"> <span><b>Aprovar com restrição</b> — liberar o lote mesmo fora do especificado</span></label>
+            <div class="field hidden" id="campoRespRestricao"><label>Responsável pela liberação (obrigatório)</label><input id="respRestricaoInput" placeholder="Nome de quem autorizou a liberação"></div>
+          </div>
+        </div>
+
         <div class="section-title">Observações</div>
         <div class="field full"><textarea id="observacoesInput" placeholder="Alguma divergência, avaria na embalagem, etc."></textarea></div>
 
@@ -846,7 +882,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           <button class="btn" id="btnSalvarRecebimento" onclick="salvarRecebimento()" title="Grava como Em análise, pra completar depois">Salvar recebimento</button>
           <button class="btn btn-accent" id="btnConcluirRecebimento" onclick="concluirRecebimento()" title="Encerra o recebimento como Aprovado ou Reprovado"><svg><use href="#i-check"/></svg> Concluir recebimento</button>
         </div>
-        <p class="med-note" style="text-align:right; margin-top:8px;">Salvar recebimento: fica <b>Em análise</b> pra completar depois · Concluir recebimento: encerra como <b>Aprovado</b> ou <b>Reprovado</b>.</p>
+        <p class="med-note" style="text-align:right; margin-top:8px;">Salvar recebimento: fica <b>Em análise</b> pra completar depois · Concluir recebimento: encerra com o resultado acima.</p>
       </div>
     </div>
   </div>
@@ -858,9 +894,11 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <div class="modal-head">
         <h2>Concluir recebimento?</h2>
         <p class="tela-sub" style="margin-top:6px;">Confira o resumo. Depois de concluído, o recebimento sai de "Em análise" e fica com o resultado abaixo.</p>
-        <div class="conc-res"><span class="cell-dim">Resultado</span><span id="concResultado"></span></div>
+        <div class="conc-res"><span class="cell-dim">Resultado</span><span id="concResultado"></span><span id="concMotivo" class="cell-dim" style="text-transform:none; letter-spacing:0;"></span></div>
       </div>
       <div class="form-wrap" style="padding-top:14px; max-width:none;">
+        <div id="concEscolhas"></div>
+        <div id="concRestricao"></div>
         <div id="concAvisos"></div>
         <div id="concResumo"></div>
         <div class="form-actions">
@@ -1600,7 +1638,7 @@ function popularSelectsFixos(){
   // Resultado só tem Aprovado/Reprovado: "Salvar recebimento" grava sempre como Em análise; o resultado vale ao "Concluir recebimento".
   var stLista = DATA.listas['Status Recebimento'] && DATA.listas['Status Recebimento'].length ? DATA.listas['Status Recebimento'] : ['Em análise','Aprovado','Reprovado'];
   var selSt = document.getElementById('statusRecebimentoSelect'), stAtual = selSt.value;
-  selSt.innerHTML = '<option value="">— definir ao concluir —</option>' + stLista.filter(function(v){ var k = statusKey(v); return k === 'aprovado' || k === 'reprovado'; }).map(function(v){ return '<option value="'+escHtml(v)+'">'+escHtml(v)+'</option>'; }).join('');
+  selSt.innerHTML = '<option value="">— escolher —</option>' + stLista.filter(function(v){ var k = statusKey(v); return k === 'aprovado' || k === 'reprovado'; }).map(function(v){ return '<option value="'+escHtml(v)+'">'+escHtml(v)+'</option>'; }).join('');
   if (stAtual) selSt.value = stAtual;
   popularSelect(document.getElementById('conferenciaRotuloSelect'), DATA.listas['Conferencia Visual'] && DATA.listas['Conferencia Visual'].length ? DATA.listas['Conferencia Visual'] : ['Confere','Divergente'], true);
   popularOpcoesModeloRotulo();
@@ -1610,6 +1648,7 @@ function popularSelectsFixos(){
 function statusKey(label){
   var l = String(label || '').toLowerCase();
   if (l.indexOf('reprov') > -1) return 'reprovado';
+  if (l.indexOf('restri') > -1) return 'restricao';
   if (l.indexOf('aprov') > -1) return 'aprovado';
   if (l.indexOf('quarent') > -1) return 'quarentena';
   if (l.indexOf('anal') > -1 || l.indexOf('anál') > -1) return 'analise';
@@ -1877,7 +1916,7 @@ function abrirDetalhe(mat, index){
     var ficha = fichaDe('resina', String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim());
     html += '<div class="section-title">Medições' + (ficha ? ' <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">' + escHtml([ficha.doc, ficha.rev].filter(function(x){ return x; }).join(' · ')) + '</span>' : '') + '</div>';
     if (ficha) {
-      var med = medicoesDeLinha(r), params = ficha.parametros.filter(function(p){ return p.criterio !== '-'; });
+      var med = medicoesDeLinha(r), params = ficha.parametros.filter(function(p){ return p.criterio !== '-'; }), rean = lerReanalises(r['Observações']);
       var prog = progressoAnalises('resina', r);
       if (prog) html += '<div class="dw-prog"><span class="bar"><i style="width:' + Math.round(prog.feitas / prog.total * 100) + '%"></i></span>' + prog.feitas + ' de ' + prog.total + ' análises lançadas</div>';
       html += '<div class="table-scroll"><table class="occ" style="min-width:0;"><thead><tr><th>Crit.</th><th>Teste</th><th>Especificação</th><th>Resultado</th></tr></thead><tbody>' +
@@ -1885,7 +1924,7 @@ function abrirDetalhe(mat, index){
           var v = med[p.teste], vv = String(v == null ? '' : v).toLowerCase(), aval = avaliarParametro(p, vv === 'não conforme' ? 'nao-conforme' : (vv === 'conforme' ? 'conforme' : v));
           var cor = aval === 'dentro' ? 'var(--ok)' : aval === 'fora' ? 'var(--danger)' : 'var(--fg)';
           return '<tr><td><span class="badge-crit ' + p.criterio + '">' + p.criterio + '</span></td><td style="white-space:normal;">' + escHtml(p.teste) + '</td><td class="cell-dim" style="white-space:normal;">' + escHtml(p.especTexto || '') + '</td>' +
-            '<td>' + (v ? '<span style="color:' + cor + '; font-weight:500;">' + escHtml(v) + '</span>' : '<span class="res-pend">pendente</span>') + '</td></tr>';
+            '<td>' + (v ? '<span style="color:' + cor + '; font-weight:500;">' + (/Viscosidade/.test(PARAM_COL_MAP[p.teste] || '') ? viscosidade3(v) : escHtml(v)) + '</span>' : '<span class="res-pend">pendente</span>') + rotuloReanalise(rean[p.teste]) + '</td></tr>';
         }).join('') + '</tbody></table></div>';
     } else {
       html += '<p class="dw-obs">Sem ficha de especificação cadastrada para esse fornecedor/tipo.</p>';
@@ -1893,10 +1932,6 @@ function abrirDetalhe(mat, index){
   }
   if (r['Observações']) html += '<div class="section-title">Observações</div><p class="dw-obs">' + escHtml(r['Observações']) + '</p>';
   document.getElementById('dwBody').innerHTML = html;
-  var bEd = document.getElementById('dwEditar');
-  bEd.innerHTML = '<svg><use href="#i-pencil"/></svg> ' + (statusKey(r['Status']) === 'analise' ? 'Completar análise' : 'Editar');
-  bEd.onclick = function(){ fecharDetalhe(); editarRecebimento(mat, index); };
-  document.getElementById('dwExcluir').onclick = async function(){ await excluirRecebimento(mat, index); if (!DATA[mat].some(function(x){ return x.__index === index && x === r; })) fecharDetalhe(); };
   document.getElementById('drawerScrim').classList.remove('hidden');
   document.getElementById('drawer').classList.remove('hidden');
 }
@@ -2128,12 +2163,14 @@ function abrirModalCadastro(matEdit, indexEdit){
   limparLaudoSelecionado();
   mostrarLaudoExistente(recebimentoEditando ? row['Arquivo do Laudo'] : '');
   document.getElementById('saveMsgRecebimento').textContent = '';
+  document.getElementById('chkRestricao').checked = false;
+  document.getElementById('respRestricaoInput').value = '';
   if (recebimentoEditando) {
     document.getElementById('materialSelect').value = matEdit;
     document.getElementById('notaFiscalInput').value = row['Nota Fiscal'] || '';
     document.getElementById('quantidadeInput').value = row['Quantidade'] || '';
     document.getElementById('responsavelInput').value = row['Responsável'] || '';
-    document.getElementById('observacoesInput').value = row['Observações'] || '';
+    document.getElementById('observacoesInput').value = obsSemReanalise(row['Observações']);
     document.getElementById('dataRecebimentoInput').value = dataBRparaISO(row['Data Recebimento'] || row['Data'] || '');
   } else {
     // Abre já no material da tela em que a pessoa está (Resina, Rótulo…).
@@ -2171,7 +2208,11 @@ function preencherEdicaoRecebimento(mat, row){
       for (var oi = 0; oi < confSel.options.length; oi++) { if (confereOk(confSel.options[oi].value) === alvoOk) { confSel.value = confSel.options[oi].value; break; } }
     }
   }
-  selecionarStatusPorChave(statusKey(row['Status']));
+  selecionarStatusPorChave(statusKey(row['Status']) === 'restricao' ? 'reprovado' : statusKey(row['Status']));
+  var respR = lerRestricao(row['Observações']);
+  document.getElementById('chkRestricao').checked = statusKey(row['Status']) === 'restricao';
+  document.getElementById('respRestricaoInput').value = respR;
+  sugerirStatusRecebimento();
 }
 async function excluirRecebimento(mat, index){
   var row = DATA[mat].find(function(x){ return x.__index === index; });
@@ -2255,6 +2296,7 @@ function atualizarCamposMaterial(){
     ESPEC_PARAMS_ATUAL = [];
     if (!recebimentoEditando) selecionarStatusPorChave('analise');
   }
+  sugerirStatusRecebimento();
 }
 function atualizarPreviaRotulo(){
   var sel = document.getElementById('modeloRotuloSelect');
@@ -2269,23 +2311,61 @@ function selecionarStatusPorChave(chave){
   for (var i = 0; i < sel.options.length; i++) { if (sel.options[i].value && statusKey(sel.options[i].value) === chave) { sel.value = sel.options[i].value; return; } }
   sel.value = '';
 }
-function sugerirStatusRecebimento(){
-  var mat = document.getElementById('materialSelect').value;
-  if (mat === 'rotulo') { selecionarStatusPorChave(confereOk(document.getElementById('conferenciaRotuloSelect').value) ? 'aprovado' : 'analise'); return; }
-  if (mat !== 'resina') return;
-  var paramsL = ESPEC_PARAMS_ATUAL.filter(function(p){ return p.criterio === 'L'; });
-  if (!paramsL.length) { if (!recebimentoEditando) selecionarStatusPorChave('analise'); return; }
-  var algumFora = false, algumVazio = false;
-  paramsL.forEach(function(p){
-    var idx = ESPEC_PARAMS_ATUAL.indexOf(p);
-    var el = document.getElementById('medResultado_' + idx);
-    var resultado = el ? avaliarParametro(p, el.value) : null;
-    if (resultado === 'fora') algumFora = true;
-    if (resultado === null) algumVazio = true;
-  });
-  selecionarStatusPorChave(algumFora ? 'reprovado' : (algumVazio ? 'analise' : 'aprovado'));
+// Resultado automático: Aprovado quando todos os critérios liberativos (L) estão dentro; Reprovado se algum
+// estiver fora (com a opção "Aprovar com restrição", que exige o responsável pela liberação); Pendente se
+// faltar lançar algum L. Rótulo usa a conferência visual como critério liberativo. Sem critério
+// liberativo (sem ficha, pigmento, caixas), o usuário escolhe Aprovado/Reprovado.
+function textoStatus(chave, padrao){
+  var l = (DATA.listas['Status Recebimento'] || []).find(function(v){ return statusKey(v) === chave; });
+  return l || padrao;
 }
-
+function calcularResultado(escolhas){
+  var mat = document.getElementById('materialSelect').value;
+  if (mat === 'rotulo') {
+    var conf = document.getElementById('conferenciaRotuloSelect');
+    var txtConf = conf.options[conf.selectedIndex] ? conf.options[conf.selectedIndex].textContent : '';
+    return confereOk(conf.value) ? { chave: 'aprovado', motivo: 'Conferência visual: ' + txtConf + '.' } : { chave: 'reprovado', motivo: 'Conferência visual: ' + txtConf + '.', fora: ['Conferência visual'] };
+  }
+  var paramsL = mat === 'resina' ? ESPEC_PARAMS_ATUAL.map(function(p, idx){ return { p: p, idx: idx }; }).filter(function(x){ return x.p.criterio === 'L'; }) : [];
+  if (!paramsL.length) return { chave: 'manual', motivo: '' };
+  var fora = [], pend = [];
+  paramsL.forEach(function(x){
+    var raw = analiseVigente(x.idx, escolhas), r = avaliarParametro(x.p, raw);
+    if (r === 'fora') fora.push(x.p.teste + ' (' + mostrarValorAnalise(x.p, raw) + ')');
+    else if (r === null) pend.push(x.p.teste);
+  });
+  if (fora.length) return { chave: 'reprovado', motivo: 'Fora do especificado: ' + fora.join(', ') + '.', fora: fora };
+  if (pend.length) return { chave: 'pendente', motivo: 'Falta lançar: ' + pend.join(', ') + '.', pend: pend };
+  return { chave: 'aprovado', motivo: 'Todos os critérios liberativos (L) dentro do especificado.' };
+}
+// Status final a gravar ao concluir: { texto, chave } ou { erro }
+function statusFinalRecebimento(escolhas){
+  var r = calcularResultado(escolhas), chave = r.chave;
+  if (chave === 'manual') {
+    var m = document.getElementById('statusRecebimentoSelect').value;
+    if (!m) return { erro: 'Escolha o resultado (Aprovado ou Reprovado) — este material não tem critério liberativo cadastrado.', r: r };
+    chave = statusKey(m);
+  }
+  if (chave === 'pendente') return { erro: 'Ainda não dá pra concluir. ' + r.motivo + ' Use "Salvar recebimento" pra deixar Em análise.', r: r };
+  if (chave === 'reprovado' && document.getElementById('chkRestricao').checked) {
+    if (!document.getElementById('respRestricaoInput').value.trim()) return { erro: 'Informe o responsável pela liberação com restrição.', r: r, faltaResp: true };
+    return { texto: textoStatus('restricao', 'Aprovado com restrição'), chave: 'restricao', r: r };
+  }
+  return chave === 'aprovado' ? { texto: textoStatus('aprovado', 'Aprovado'), chave: 'aprovado', r: r } : { texto: textoStatus('reprovado', 'Reprovado'), chave: 'reprovado', r: r };
+}
+function sugerirStatusRecebimento(){
+  var r = calcularResultado(), badge = document.getElementById('resBadge'), mot = document.getElementById('resMotivo');
+  var manual = r.chave === 'manual', chave = r.chave;
+  document.getElementById('resManual').classList.toggle('hidden', !manual);
+  if (manual) { var m = document.getElementById('statusRecebimentoSelect').value; chave = m ? statusKey(m) : 'nd'; }
+  var reprov = chave === 'reprovado', restr = reprov && document.getElementById('chkRestricao').checked;
+  document.getElementById('boxRestricao').classList.toggle('hidden', !reprov);
+  document.getElementById('campoRespRestricao').classList.toggle('hidden', !restr);
+  var rot = { aprovado: 'Aprovado', reprovado: 'Reprovado', pendente: 'Pendente', nd: 'A definir' };
+  badge.className = 'badge ' + (restr ? 'restricao' : chave);
+  badge.textContent = restr ? 'Aprovado com restrição' : (rot[chave] || '—');
+  mot.textContent = manual ? '' : r.motivo;
+}
 /* ---- lote interno x entrada (resina) ---- */
 var loteResinaExistente = null;
 function numeroDoLote(v){ var m = String(v == null ? '' : v).match(/(\d+)\s*$/); return m ? parseInt(m[1], 10) : NaN; }
@@ -2309,7 +2389,7 @@ function medicoesDeLinha(row){
   Object.keys(PARAM_COL_MAP).forEach(function(teste){ var col = PARAM_COL_MAP[teste]; if (row[col] !== undefined && row[col] !== '') m[teste] = row[col]; });
   return m;
 }
-function habilitarMedicoes(editavel){ document.querySelectorAll('#tbodyMedicoes input, #tbodyMedicoes select').forEach(function(el){ el.disabled = !editavel; }); }
+function habilitarMedicoes(editavel){ document.querySelectorAll('#tbodyMedicoes input, #tbodyMedicoes select, #tbodyMedicoes button').forEach(function(el){ el.disabled = !editavel; }); }
 function verificarLoteExistente(){
   // Em edição de um recebimento já salvo, o lote interno e as medições já foram carregados
   // por preencherEdicaoRecebimento() e não devem ser refeitos/zerados só porque o usuário
@@ -2367,29 +2447,116 @@ function renderMedicoes(entradaExistente){
     ESPEC_PARAMS_ATUAL = []; label.textContent = '—';
     tb.innerHTML = (forn && tipo) ? '<tr><td colspan="5" style="white-space:normal;"><div class="aviso-ficha">Nenhuma especificação cadastrada para <b>' + escHtml(forn) + ' — ' + escHtml(tipo) +
       '</b>. O recebimento pode ser salvo normalmente, só sem as medições; elas aparecem aqui quando a ficha for cadastrada em <a href="#" onclick="fecharModalCadastro(); abrirCadastro(\'especificacoes\'); return false;">Especificações</a>.</div></td></tr>' : '';
+    sugerirStatusRecebimento();
     return;
   }
   ESPEC_PARAMS_ATUAL = ficha.parametros.filter(function(p){ return p.criterio !== '-'; });
   label.textContent = (ficha.doc || '') + (ficha.rev ? ' · ' + ficha.rev : '') + ' · ' + ficha.forn + ' — ' + ficha.tipo;
+  var reanalises = entradaExistente ? lerReanalises(entradaExistente['Observações']) : {};
   tb.innerHTML = ESPEC_PARAMS_ATUAL.map(function(p, idx){
-    var valorPrevio = (entradaExistente ? medicoesDeLinha(entradaExistente)[p.teste] : '') || '';
-    var inputHtml;
-    if (p.tipoResultado === 'visual'){
-      var vp = String(valorPrevio).toLowerCase();
-      inputHtml = '<select id="medResultado_'+idx+'" onchange="atualizarStatusMedicao('+idx+')">'+
-        '<option value="">—</option>'+
-        '<option value="conforme"'+(vp==='conforme'?' selected':'')+'>Conforme</option>'+
-        '<option value="nao-conforme"'+((vp==='nao-conforme'||vp==='não conforme')?' selected':'')+'>Não conforme</option></select>';
-    } else {
-      inputHtml = '<input id="medResultado_'+idx+'" type="text" inputmode="decimal" value="'+escHtml(valorPrevio)+'" placeholder="'+(p.criterio==='QA'?'Valor do laudo':'Resultado')+'" oninput="atualizarStatusMedicao('+idx+')">';
-    }
-    return '<tr><td><span class="badge-crit '+p.criterio+'">'+p.criterio+'</span></td><td>'+escHtml(p.teste)+' <span class="cell-dim">('+escHtml(p.unidade||'')+')</span></td>'+
-      '<td class="cell-dim">'+escHtml(p.especTexto||'')+'</td><td>'+inputHtml+'</td><td><span id="medStatus_'+idx+'" class="badge nd">—</span></td></tr>';
+    var lista = reanalises[p.teste];
+    var valorPrevio = lista && lista.length ? lista[0].raw : ((entradaExistente ? medicoesDeLinha(entradaExistente)[p.teste] : '') || '');
+    var podeRepetir = p.criterio !== 'QA' && p.tipoResultado !== 'na';
+    return '<tr class="med-main" data-idx="'+idx+'"><td><span class="badge-crit '+p.criterio+'">'+p.criterio+'</span></td><td>'+escHtml(p.teste)+' <span class="cell-dim">('+escHtml(p.unidade||'')+')</span></td>'+
+      '<td class="cell-dim">'+escHtml(p.especTexto||'')+'</td><td><div class="med-res"><span class="med-n hidden">1ª</span>'+campoResultadoHtml(p, idx, 'medResultado_'+idx, valorPrevio)+'</div></td>'+
+      '<td><div class="med-sit"><span id="medStatus_'+idx+'" class="badge nd">—</span>'+
+      (podeRepetir ? '<button type="button" class="icon-btn icon-only med-add" title="Cadastrar mais uma análise deste teste" onclick="adicionarAnalise('+idx+')"><svg><use href="#i-plus"/></svg></button>' : '')+
+      '</div></td></tr>';
   }).join('');
+  ESPEC_PARAMS_ATUAL.forEach(function(p, idx){
+    var lista = reanalises[p.teste];
+    if (lista && lista.length > 1) lista.slice(1).forEach(function(a){ adicionarAnalise(idx, a.raw, true); });
+  });
   ESPEC_PARAMS_ATUAL.forEach(function(p, idx){ atualizarStatusMedicao(idx); });
+}
+/* ---- Reanálise: mais de uma análise do mesmo teste no mesmo recebimento ----
+   A coluna da planilha guarda só UM resultado por teste. As demais análises ficam numa linha própria
+   das Observações, no formato:
+   [Reanálise] Viscosidade Intrínseca (IV) — Blowpet: 1ª 0,891 (fora); 2ª 0,872 (dentro, considerada)
+   Enquanto está Em análise, a coluna recebe a última análise lançada; ao concluir, a escolhida. */
+var MARCA_REANALISE = '[Reanálise] ';
+function campoResultadoHtml(p, idx, id, valor){
+  if (p.tipoResultado === 'visual'){
+    var vp = String(valor || '').toLowerCase();
+    return '<select id="'+id+'" data-idx="'+idx+'" onchange="atualizarStatusMedicao('+idx+')">'+
+      '<option value="">—</option>'+
+      '<option value="conforme"'+(vp==='conforme'?' selected':'')+'>Conforme</option>'+
+      '<option value="nao-conforme"'+((vp==='nao-conforme'||vp==='não conforme')?' selected':'')+'>Não conforme</option></select>';
+  }
+  return '<input id="'+id+'" data-idx="'+idx+'" type="text" inputmode="decimal" value="'+escHtml(valor || '')+'" placeholder="'+(p.criterio==='QA'?'Valor do laudo':'Resultado')+'" oninput="atualizarStatusMedicao('+idx+')">';
+}
+function rotuloReanalise(lista){
+  if (!lista || lista.length < 2) return '';
+  var k = lista.findIndex(function(a){ return a.considerada; });
+  return '<div class="cell-dim" style="font-size:11px; font-weight:400;">' + (k > -1 ? (k + 1) + 'ª de ' + lista.length + ' análises' : lista.length + ' análises · em aberto') + '</div>';
+}
+var MARCA_RESTRICAO = '[Aprovado com restrição] Liberado por: ';
+function obsSemReanalise(obs){ return String(obs || '').split('\n').filter(function(l){ return l.indexOf(MARCA_REANALISE) !== 0 && l.indexOf(MARCA_RESTRICAO) !== 0; }).join('\n').trim(); }
+function lerRestricao(obs){ var l = String(obs || '').split('\n').find(function(x){ return x.indexOf(MARCA_RESTRICAO) === 0; }); return l ? l.slice(MARCA_RESTRICAO.length).trim() : ''; }
+function linhaRestricao(statusTexto){ return statusKey(statusTexto) === 'restricao' ? MARCA_RESTRICAO + document.getElementById('respRestricaoInput').value.trim() : ''; }
+function lerReanalises(obs){
+  var out = {};
+  String(obs || '').split('\n').forEach(function(l){
+    if (l.indexOf(MARCA_REANALISE) !== 0) return;
+    var corpo = l.slice(MARCA_REANALISE.length), i = corpo.lastIndexOf(': ');
+    if (i < 0) return;
+    var teste = corpo.slice(0, i), itens = corpo.slice(i + 2).split('; ');
+    out[teste] = itens.map(function(it){
+      var m = it.match(/^(\d+)ª\s+(.+?)(?:\s+\(([^)]*)\))?$/); if (!m) return null;
+      var txt = m[2].trim(), low = txt.toLowerCase();
+      var raw = low === 'conforme' ? 'conforme' : (low === 'não conforme' || low === 'nao conforme') ? 'nao-conforme' : txt;
+      return { raw: raw, considerada: /considerada/i.test(m[3] || '') };
+    }).filter(function(x){ return x; });
+  });
+  return out;
+}
+function mostrarValorAnalise(p, raw){ return p.tipoResultado === 'visual' ? (({ 'conforme': 'Conforme', 'nao-conforme': 'Não conforme' })[raw] || '') : String(raw || '').trim(); }
+// Todas as análises de um teste (1ª = campo principal), na ordem, só as preenchidas
+function analisesDe(idx){
+  var els = [document.getElementById('medResultado_' + idx)].concat(Array.prototype.slice.call(document.querySelectorAll('#tbodyMedicoes tr.med-sub[data-idx="' + idx + '"] [data-idx]')));
+  return els.filter(function(el){ return el; }).map(function(el, k){ return { n: k + 1, raw: el.value }; }).filter(function(a){ return String(a.raw || '').trim() !== ''; });
+}
+function analiseVigente(idx, escolhas){
+  var lista = analisesDe(idx);
+  if (!lista.length) return '';
+  if (escolhas && escolhas[idx] !== undefined) { var e = lista.find(function(a){ return a.n === escolhas[idx]; }); if (e) return e.raw; }
+  return lista[lista.length - 1].raw;
+}
+function adicionarAnalise(idx, valor, silencioso){
+  var p = ESPEC_PARAMS_ATUAL[idx]; if (!p) return;
+  var linhas = document.querySelectorAll('#tbodyMedicoes tr[data-idx="' + idx + '"]'), ultima = linhas[linhas.length - 1];
+  var n = linhas.length + 1, uid = 'medExtra_' + idx + '_' + Date.now() + '_' + n;
+  var tr = document.createElement('tr');
+  tr.className = 'med-sub'; tr.setAttribute('data-idx', idx);
+  tr.innerHTML = '<td></td><td class="cell-dim med-sub-rot">↳ nova análise</td><td></td><td><div class="med-res"><span class="med-n">' + n + 'ª</span>' + campoResultadoHtml(p, idx, uid, valor || '') + '</div></td>' +
+    '<td><div class="med-sit"><span class="badge nd med-sub-status">—</span><button type="button" class="icon-btn icon-only danger" title="Remover esta análise" onclick="removerAnalise(this, ' + idx + ')"><svg><use href="#i-x"/></svg></button></div></td>';
+  ultima.parentNode.insertBefore(tr, ultima.nextSibling);
+  renumerarAnalises(idx);
+  atualizarStatusMedicao(idx);
+  if (!silencioso) { var campo = tr.querySelector('[data-idx]'); if (campo) campo.focus(); }
+}
+function removerAnalise(btn, idx){ var tr = btn.closest('tr'); tr.parentNode.removeChild(tr); renumerarAnalises(idx); atualizarStatusMedicao(idx); }
+function renumerarAnalises(idx){
+  var subs = document.querySelectorAll('#tbodyMedicoes tr.med-sub[data-idx="' + idx + '"]');
+  subs.forEach(function(tr, k){ tr.querySelector('.med-n').textContent = (k + 2) + 'ª'; });
+  var principal = document.querySelector('#tbodyMedicoes tr.med-main[data-idx="' + idx + '"] .med-n');
+  if (principal) principal.classList.toggle('hidden', !subs.length);
+}
+function linhaReanalise(p, idx, nEscolhida){
+  var lista = analisesDe(idx);
+  if (lista.length < 2) return '';
+  return MARCA_REANALISE + p.teste + ': ' + lista.map(function(a){
+    var av = avaliarParametro(p, a.raw), sit = av === 'dentro' ? 'dentro' : av === 'fora' ? 'fora' : '';
+    var extra = [sit, a.n === nEscolhida ? 'considerada' : ''].filter(function(x){ return x; }).join(', ');
+    return a.n + 'ª ' + mostrarValorAnalise(p, a.raw) + (extra ? ' (' + extra + ')' : '');
+  }).join('; ');
 }
 function atualizarStatusMedicao(idx){
   var p = ESPEC_PARAMS_ATUAL[idx], el = document.getElementById('medResultado_'+idx); if (!el) return;
+  document.querySelectorAll('#tbodyMedicoes tr.med-sub[data-idx="' + idx + '"]').forEach(function(tr){
+    var c = tr.querySelector('[data-idx]'), b = tr.querySelector('.med-sub-status'), r = avaliarParametro(p, c.value);
+    b.className = 'badge med-sub-status ' + (r === 'dentro' ? 'aprovado' : r === 'fora' ? 'reprovado' : 'nd'); b.textContent = r === 'dentro' ? 'Dentro' : r === 'fora' ? 'Fora' : '—';
+  });
   var resultado = avaliarParametro(p, el.value), statusEl = document.getElementById('medStatus_'+idx);
   if (resultado === 'dentro') { statusEl.className = 'badge aprovado'; statusEl.textContent = 'Dentro'; }
   else if (resultado === 'fora') { statusEl.className = 'badge reprovado'; statusEl.textContent = 'Fora'; }
@@ -2429,7 +2596,7 @@ async function salvarRecebimento(statusFinal){
       laudoUrl = await uploadArquivo(laudoFile, nomeBase);
     }
     var dataBR = formatarDataBR(dataISO);
-    var obs = document.getElementById('observacoesInput').value.trim();
+    var obs = obsSemReanalise(document.getElementById('observacoesInput').value);
     var statusTexto = statusFinal || statusEmAnaliseTexto();
     // Na edição, parte da linha original — assim nenhuma coluna que não está na tela é apagada.
     var base = rowOriginal ? Object.assign({}, rowOriginal) : {};
@@ -2441,10 +2608,11 @@ async function salvarRecebimento(statusFinal){
       var codigo = loteResinaExistente ? String(loteResinaExistente['Código Produto']).toUpperCase() : ((item && item.cod) || (rowOriginal ? rowOriginal['Código Produto'] : ''));
       if (!codigo) throw new Error('O tipo "' + tipo + '" não tem código cadastrado — informe o código em Cadastros › Fornecedores.');
       var loteInterno = editando ? (rowOriginal['Lote Interno'] || document.getElementById('loteInternoDisplay').value) : (loteResinaExistente ? loteResinaExistente['Lote Interno'] : proximoLoteInterno(codigo));
-      var medicoes = {}, extras = [];
+      var medicoes = {}, extras = [], linhasReanalise = [], escolhas = statusFinal ? (escolhasAnaliseConclusao || {}) : null;
       ESPEC_PARAMS_ATUAL.forEach(function(p, idx){
-        var el = document.getElementById('medResultado_' + idx);
-        var val = el ? el.value : '';
+        var val = analiseVigente(idx, escolhas);
+        var todas = analisesDe(idx), nVig = escolhas && escolhas[idx] !== undefined ? escolhas[idx] : (todas.length ? todas[todas.length - 1].n : 0);
+        var lr = linhaReanalise(p, idx, statusFinal ? nVig : 0); if (lr) linhasReanalise.push(lr);
         if (p.tipoResultado === 'visual') val = ({ 'conforme': 'Conforme', 'nao-conforme': 'Não conforme' })[val] || val;
         if (PARAM_COL_MAP[p.teste]) medicoes[PARAM_COL_MAP[p.teste]] = val;
         else if (val) extras.push(p.teste + ': ' + val);
@@ -2454,7 +2622,8 @@ async function salvarRecebimento(statusFinal){
         'Lote Fornecedor': loteForn, 'Nota Fiscal': document.getElementById('notaFiscalInput').value.trim(),
         'Quantidade': document.getElementById('quantidadeInput').value.trim(), 'Unidade': document.getElementById('unidadeSelect').value,
         'Laudo Anexado': laudoUrl ? 'Sim' : 'Não', 'Arquivo do Laudo': laudoUrl, 'Status': statusTexto,
-        'Responsável': document.getElementById('responsavelInput').value.trim(), 'Observações': obs + (extras.length ? (' | ' + extras.join('; ')) : '')
+        'Responsável': document.getElementById('responsavelInput').value.trim(),
+        'Observações': [obs + (extras.length ? ((obs ? ' | ' : '') + extras.join('; ')) : '')].concat(linhasReanalise, [linhaRestricao(statusTexto)]).filter(function(x){ return x; }).join('\n')
       });
       Object.keys(medicoes).forEach(function(col){ row[col] = medicoes[col]; });
       var sufixo = statusFinal ? ' concluído como ' + statusFinal + '.' : (editando ? ' atualizado (Em análise).' : ' salvo como Em análise.');
@@ -2468,7 +2637,7 @@ async function salvarRecebimento(statusFinal){
         'Fornecedor': forn, 'Tipo': tipo, 'Lote': document.getElementById('loteGenericoInput').value.trim(),
         'Quantidade': document.getElementById('quantidadeInput').value.trim(), 'Unidade': document.getElementById('unidadeSelect').value,
         'Laudo Anexado': laudoUrl ? 'Sim' : 'Não', 'Arquivo do Laudo': laudoUrl, 'Status': statusTexto,
-        'Responsável': document.getElementById('responsavelInput').value.trim(), 'Observações': obs
+        'Responsável': document.getElementById('responsavelInput').value.trim(), 'Observações': [obs, linhaRestricao(statusTexto)].filter(function(x){ return x; }).join('\n')
       });
       if (mat === 'rotulo') {
         var modeloSel = document.getElementById('modeloRotuloSelect');
@@ -2493,18 +2662,45 @@ async function salvarRecebimento(statusFinal){
 }
 
 /* ---- Concluir recebimento: confere tudo num resumo antes de encerrar como Aprovado/Reprovado ---- */
-function concluirRecebimento(){
+var escolhasAnaliseConclusao = {};
+function escolherAnaliseConclusao(idx, n){ escolhasAnaliseConclusao[idx] = n; concluirRecebimento(true); }
+function concluirRecebimento(manterEscolhas){
   var msg = document.getElementById('saveMsgRecebimento'), erroVal = validarRecebimento();
   if (erroVal) { msg.className = 'save-msg err'; msg.textContent = erroVal; return; }
-  var resultado = document.getElementById('statusRecebimentoSelect').value;
-  if (!resultado) { msg.className = 'save-msg err'; msg.textContent = 'Escolha o resultado (Aprovado ou Reprovado) pra concluir. Pra deixar em aberto, use "Salvar recebimento".'; document.getElementById('statusRecebimentoSelect').focus(); return; }
-  msg.textContent = '';
-  var mat = document.getElementById('materialSelect').value, k = statusKey(resultado), avisos = [];
+  var mat = document.getElementById('materialSelect').value, avisos = [];
   function v(id){ var el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; }
   function txtSel(id){ var el = document.getElementById(id); return el && el.options[el.selectedIndex] ? el.options[el.selectedIndex].textContent : ''; }
   function kv(rot, val, cls){ return '<div><dt>' + rot + '</dt><dd' + (cls ? ' class="' + cls + '"' : '') + '>' + (val ? escHtml(val) : '<span class="res-pend">—</span>') + '</dd></div>'; }
   var rowOrig = recebimentoEditando ? DATA[recebimentoEditando.mat].find(function(x){ return x.__index === recebimentoEditando.index; }) : null;
   var laudo = laudoArquivoPronto ? 'Novo arquivo anexado' : ((rowOrig && rowOrig['Arquivo do Laudo']) ? 'Já anexado' : '');
+  // testes com mais de uma análise: escolher qual vale pra aprovação (padrão = a última lançada)
+  if (!manterEscolhas) escolhasAnaliseConclusao = {};
+  var escHtmlBlocos = '';
+  if (mat === 'resina') ESPEC_PARAMS_ATUAL.forEach(function(p, idx){
+    var lista = analisesDe(idx); if (lista.length < 2) return;
+    if (escolhasAnaliseConclusao[idx] === undefined || !lista.some(function(a){ return a.n === escolhasAnaliseConclusao[idx]; })) escolhasAnaliseConclusao[idx] = lista[lista.length - 1].n;
+    escHtmlBlocos += '<div class="esc-analise"><div class="t">' + escHtml(p.teste) + '</div><div class="e">Especificação: ' + escHtml(p.especTexto || '—') + ' · qual análise vale para a aprovação? As outras ficam registradas nas observações.</div>' +
+      lista.map(function(a){
+        var av = avaliarParametro(p, a.raw), sel = escolhasAnaliseConclusao[idx] === a.n;
+        return '<label class="' + (sel ? 'sel' : '') + '"><input type="radio" name="escAn_' + idx + '"' + (sel ? ' checked' : '') + ' onchange="escolherAnaliseConclusao(' + idx + ',' + a.n + ')">' +
+          '<span class="n">' + a.n + 'ª análise</span><span class="v">' + escHtml(mostrarValorAnalise(p, a.raw)) + '</span>' +
+          (av === 'dentro' ? '<span class="badge aprovado">Dentro</span>' : av === 'fora' ? '<span class="badge reprovado">Fora</span>' : '') + '</label>';
+      }).join('') + '</div>';
+  });
+  document.getElementById('concEscolhas').innerHTML = escHtmlBlocos ? '<div class="section-title" style="margin-top:0;">Mais de uma análise lançada</div>' + escHtmlBlocos : '';
+  var st = statusFinalRecebimento(escolhasAnaliseConclusao);
+  if (st.erro && !st.faltaResp) {
+    if (!manterEscolhas) { msg.className = 'save-msg err'; msg.textContent = st.erro; return; }
+  }
+  msg.textContent = '';
+  var k = st.faltaResp ? 'restricao' : (st.chave || 'nd'), resultado = st.faltaResp ? textoStatus('restricao', 'Aprovado com restrição') : (st.texto || '—');
+  // reprovado: opção de aprovar com restrição também aqui (espelha os campos do formulário)
+  var podeRestr = st.r && (st.r.chave === 'reprovado' || (st.r.chave === 'manual' && statusKey(document.getElementById('statusRecebimentoSelect').value) === 'reprovado'));
+  var chk = document.getElementById('chkRestricao').checked;
+  document.getElementById('concRestricao').innerHTML = podeRestr ?
+    '<div class="res-restricao" style="margin-bottom:12px;"><label class="res-chk"><input type="checkbox"' + (chk ? ' checked' : '') + ' onchange="document.getElementById(\'chkRestricao\').checked = this.checked; sugerirStatusRecebimento(); concluirRecebimento(true);"> <span><b>Aprovar com restrição</b> — liberar o lote mesmo fora do especificado</span></label>' +
+    (chk ? '<div class="field" style="margin-top:8px;"><label>Responsável pela liberação (obrigatório)</label><input id="concRespRestr" value="' + escHtml(document.getElementById('respRestricaoInput').value) + '" placeholder="Nome de quem autorizou a liberação" oninput="document.getElementById(\'respRestricaoInput\').value = this.value; atualizarBotaoConclusao();"></div>' : '') + '</div>' : '';
+  if (st.r && st.r.motivo) avisos.push((k === 'aprovado' ? '' : '') + escHtml(st.r.motivo));
   var html = '<dl class="dw-kv">' + kv('Produto', MAT_LABEL[mat]) + kv('Fornecedor / tipo', v('fornecedorSelect') + ' — ' + v('tipoSelect'));
   if (mat === 'resina') html += kv('Lote interno', v('loteInternoDisplay'), 'mono') + kv('Lote do fornecedor', v('loteFornecedorInput'), 'mono');
   else html += kv('Lote', v('loteGenericoInput'), 'mono');
@@ -2513,7 +2709,6 @@ function concluirRecebimento(){
     kv('Laudo', laudo);
   if (mat === 'rotulo') {
     html += kv('Modelo do rótulo', txtSel('modeloRotuloSelect')) + kv('Conferência visual', txtSel('conferenciaRotuloSelect'));
-    if (k === 'aprovado' && !confereOk(v('conferenciaRotuloSelect'))) avisos.push('A conferência visual está como <b>Divergente</b> e o resultado é Aprovado.');
   }
   html += '</dl>';
   if (!laudo) avisos.push('Nenhum laudo anexado.');
@@ -2522,33 +2717,42 @@ function concluirRecebimento(){
       var foraL = 0, pendL = 0;
       html += '<div class="section-title" style="margin-top:18px;">Medições</div><div class="table-scroll"><table class="occ" style="min-width:0;"><thead><tr><th>Crit.</th><th>Teste</th><th>Especificação</th><th>Resultado</th><th>Situação</th></tr></thead><tbody>' +
         ESPEC_PARAMS_ATUAL.map(function(p, idx){
-          var el = document.getElementById('medResultado_' + idx), raw = el ? el.value : '', a = avaliarParametro(p, raw);
+          var raw = analiseVigente(idx, escolhasAnaliseConclusao), a = avaliarParametro(p, raw), nAn = analisesDe(idx).length;
           var mostra = p.tipoResultado === 'visual' ? ({ 'conforme': 'Conforme', 'nao-conforme': 'Não conforme' })[raw] || '' : String(raw || '').trim();
           if (p.criterio === 'L') { if (a === 'fora') foraL++; else if (a === null) pendL++; }
           var sit = a === 'dentro' ? '<span class="badge aprovado">Dentro</span>' : a === 'fora' ? '<span class="badge reprovado">Fora</span>' : '<span class="badge nd">' + (mostra ? '—' : 'Pendente') + '</span>';
-          return '<tr><td><span class="badge-crit ' + p.criterio + '">' + p.criterio + '</span></td><td style="white-space:normal;">' + escHtml(p.teste) + '</td><td class="cell-dim" style="white-space:normal;">' + escHtml(p.especTexto || '') + '</td><td class="mono">' + (mostra ? escHtml(mostra) : '<span class="res-pend">—</span>') + '</td><td>' + sit + '</td></tr>';
+          return '<tr><td><span class="badge-crit ' + p.criterio + '">' + p.criterio + '</span></td><td style="white-space:normal;">' + escHtml(p.teste) + '</td><td class="cell-dim" style="white-space:normal;">' + escHtml(p.especTexto || '') + '</td><td class="mono">' + (mostra ? escHtml(mostra) : '<span class="res-pend">—</span>') + (nAn > 1 ? '<div class="cell-dim" style="font-size:11px; font-family:var(--font-body);">' + escolhasAnaliseConclusao[idx] + 'ª de ' + nAn + ' análises</div>' : '') + '</td><td>' + sit + '</td></tr>';
         }).join('') + '</tbody></table></div>';
-      if (k === 'aprovado' && foraL) avisos.push('<b>' + foraL + (foraL === 1 ? ' medição liberativa (L) está' : ' medições liberativas (L) estão') + ' fora</b> da especificação e o resultado é Aprovado.');
-      if (k === 'aprovado' && pendL) avisos.push(pendL + (pendL === 1 ? ' medição liberativa (L) está' : ' medições liberativas (L) estão') + ' sem resultado.');
-      if (k === 'reprovado' && !foraL && !pendL) avisos.push('Todas as medições liberativas (L) estão dentro da especificação e o resultado é Reprovado — confira o motivo nas observações.');
     } else avisos.push('Sem ficha de especificação para esse fornecedor/tipo — o recebimento será concluído sem medições.');
   }
-  var obs = v('observacoesInput');
-  html += '<div class="section-title" style="margin-top:18px;">Observações</div><p class="dw-obs" style="margin:0;">' + (obs ? escHtml(obs) : '<span class="res-pend">Sem observações.</span>') + '</p>';
+  var obs = obsSemReanalise(v('observacoesInput'));
+  if (mat === 'resina') ESPEC_PARAMS_ATUAL.forEach(function(p, idx){ var lr = linhaReanalise(p, idx, escolhasAnaliseConclusao[idx]); if (lr) obs += (obs ? '\n' : '') + lr; });
+  if (k === 'restricao') obs += (obs ? '\n' : '') + MARCA_RESTRICAO + (document.getElementById('respRestricaoInput').value.trim() || '…');
+  html += '<div class="section-title" style="margin-top:18px;">Observações <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">como vão ficar gravadas</span></div><p class="dw-obs" style="margin:0;">' + (obs ? escHtml(obs) : '<span class="res-pend">Sem observações.</span>') + '</p>';
   document.getElementById('concResultado').innerHTML = '<span class="badge ' + k + '" style="font-size:13px; padding:6px 14px;">' + escHtml(resultado) + '</span>';
-  document.getElementById('concAvisos').innerHTML = avisos.map(function(a){ return '<div class="conc-aviso">' + a + '</div>'; }).join('');
+  document.getElementById('concMotivo').textContent = '';
+  document.getElementById('concAvisos').innerHTML = avisos.map(function(a, i){ return '<div class="conc-aviso' + (i === 0 && st.r && st.r.motivo && k === 'aprovado' ? ' ok' : '') + '">' + a + '</div>'; }).join('');
   document.getElementById('concResumo').innerHTML = html;
   var b = document.getElementById('btnConfirmarConclusao');
-  b.className = 'btn ' + (k === 'reprovado' ? 'btn-danger' : 'btn-accent'); b.disabled = false;
+  b.className = 'btn ' + (k === 'reprovado' ? 'btn-danger' : 'btn-accent');
   b.innerHTML = '<svg><use href="#i-check"/></svg> Confirmar e concluir como ' + escHtml(resultado);
   document.getElementById('saveMsgConc').textContent = '';
+  atualizarBotaoConclusao();
   document.getElementById('modalConcluir').classList.remove('hidden');
+}
+function atualizarBotaoConclusao(){
+  var st = statusFinalRecebimento(escolhasAnaliseConclusao);
+  document.getElementById('btnConfirmarConclusao').disabled = !!st.erro;
+  document.getElementById('saveMsgConc').className = 'save-msg err';
+  document.getElementById('saveMsgConc').textContent = st.faltaResp ? 'Informe o responsável pela liberação.' : (st.erro || '');
 }
 function fecharModalConcluir(){ document.getElementById('modalConcluir').classList.add('hidden'); }
 async function confirmarConclusao(){
   var b = document.getElementById('btnConfirmarConclusao'), m = document.getElementById('saveMsgConc');
   b.disabled = true; m.className = 'save-msg'; m.textContent = 'Concluindo…';
-  var ok = await salvarRecebimento(document.getElementById('statusRecebimentoSelect').value);
+  var st = statusFinalRecebimento(escolhasAnaliseConclusao);
+  if (st.erro) { b.disabled = false; m.className = 'save-msg err'; m.textContent = st.erro; return; }
+  var ok = await salvarRecebimento(st.texto);
   b.disabled = false;
   if (ok) fecharModalConcluir();
   else { m.className = 'save-msg err'; m.textContent = document.getElementById('saveMsgRecebimento').textContent || 'Não foi possível concluir.'; }
@@ -3000,7 +3204,7 @@ function colunasPdf(mat, g){
     if (multi) c.push({ t: 'TIPO', p: 1.4, v: function(r){ return restoTipo(r); } });
     if (mat === 'rotulo') c.push({ t: 'CONFERÊNCIA', p: 1.15, v: function(r){ return r['Conferência Visual']; }, cor: function(r){ return r['Conferência Visual'] ? (confereOk(r['Conferência Visual']) ? [0, 128, 0] : [200, 0, 0]) : null; } });
     c.push({ t: 'QUANTIDADE', p: 1.25, v: function(r){ return [r['Quantidade'], r['Unidade']].filter(function(x){ return x; }).join(' '); } });
-    c.push({ t: 'STATUS', p: 1.2, negrito: true, v: function(r){ return String(r['Status'] || '').toUpperCase(); }, cor: function(r){ var k = statusKey(r['Status']); return k === 'aprovado' ? [0, 128, 0] : k === 'reprovado' ? [200, 0, 0] : [180, 120, 0]; } });
+    c.push({ t: 'STATUS', p: 1.2, negrito: true, v: function(r){ return String(r['Status'] || '').toUpperCase(); }, cor: function(r){ var k = statusKey(r['Status']); return k === 'aprovado' ? [0, 128, 0] : k === 'restricao' ? [21, 110, 140] : k === 'reprovado' ? [200, 0, 0] : [180, 120, 0]; } });
   }
   return c;
 }
@@ -3064,7 +3268,7 @@ function gerarPdfRecebimentos(){
   // rodapé
   doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(120, 120, 120);
   doc.text(mat === 'resina' ? 'IV = viscosidade intrínseca medida na BlowPet (dl/g). Verde: dentro do critério da ficha de especificação · Vermelho: fora · Preto: sem ficha cadastrada.'
-                            : 'Status: verde = aprovado · vermelho = reprovado · amarelo = em análise / quarentena.', M, H - M + 1);
+                            : 'Status: verde = aprovado · azul = aprovado com restrição · vermelho = reprovado · amarelo = em análise / quarentena.', M, H - M + 1);
   doc.text('Sistema da Qualidade', W - M, H - M + 1, { align: 'right' });
   var hoje = agora.getFullYear() + '-' + dd(agora.getMonth() + 1) + '-' + dd(agora.getDate());
   var nomeMat = { resina: 'Resina', rotulo: 'Rotulo', pigmento: 'Pigmento', cinta: 'Caixa_Cinta', tampa: 'Caixa_Tampa' }[mat];
