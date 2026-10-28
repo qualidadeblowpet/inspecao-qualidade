@@ -819,6 +819,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
             </select>
           </div>
           <div class="field"><label>Nota fiscal</label><input class="mono" id="notaFiscalInput" placeholder="Nº da NF"></div>
+          <div class="field" id="campoCodigoProduto"><label>Código do produto</label><input class="mono" id="codigoProdutoDisplay" value="—" disabled></div>
           <div class="field" id="campoLoteGenerico"><label>Lote</label><input class="mono" id="loteGenericoInput" placeholder="Código do lote"></div>
           <div class="field"><label>Data do recebimento</label><input type="date" id="dataRecebimentoInput"></div>
           <div class="field"><label>Responsável pelo recebimento</label><input id="responsavelInput" list="listaResponsaveis" placeholder="Nome do responsável"></div>
@@ -853,6 +854,8 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 
         <div id="secaoResina">
           <p class="med-note" id="loteInternoNota" style="margin:0 0 14px;">Informe o lote do fornecedor pra ver o lote interno.</p>
+        </div>
+        <div id="secaoMedicoes">
           <div class="section-title" style="margin-top:0;">Medições <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;" id="medicoesFichaLabel">—</span></div>
           <div class="table-scroll">
             <table class="occ med-table">
@@ -928,7 +931,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           <div class="field"><label>Revisão</label><input id="especRevInput" placeholder="Ex: Rev.000"></div>
           <div class="field"><label>Data do documento</label><input type="date" id="especDataInput"></div>
         </div>
-        <p class="med-note" id="notaEspecForn">Fornecedor e Tipo vêm do cadastro de Fornecedores. Se faltar um tipo, cadastre-o primeiro no fornecedor.</p>
+        <p class="med-note" id="notaEspecForn">Fornecedor e Tipo vêm do cadastro de Fornecedores. Se faltar um tipo, cadastre-o primeiro no fornecedor. Escolha "Todos os fornecedores" pra uma ficha que vale pra todo recebimento do material (ex.: EMP-016 Rótulos); uma ficha de fornecedor+tipo específico tem prioridade sobre a geral.</p>
 
         <div class="section-title">Parâmetros</div>
         <div class="table-scroll">
@@ -938,7 +941,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           </table>
         </div>
         <button type="button" class="btn" style="margin-top:10px;" onclick="adicionarLinhaEspec()">+ Adicionar parâmetro</button>
-        <p class="med-note">Dica pra faixa (mín.–máx.): use o travessão "–" (ex.: <span class="mono">0,790 – 0,890</span>). Pra mínimo/máximo isolado: <span class="mono">Mínimo 70,0</span> ou <span class="mono">Máximo 1,60</span>. Pra teste visual, coloque "Visual" na Unidade.</p>
+        <p class="med-note">Dica pra faixa (mín.–máx.): use o travessão "–" (ex.: <span class="mono">0,790 – 0,890</span>). Pra mínimo/máximo isolado: <span class="mono">Mínimo 70,0</span> ou <span class="mono">Máximo 1,60</span>. Também vale <span class="mono">≥ 150</span> ou <span class="mono">≤ 500</span>. Pra teste visual (Conforme/Não conforme), coloque "Visual" na Unidade.</p>
 
         <div class="form-actions">
           <span class="save-msg" id="saveMsgEspec"></span>
@@ -965,12 +968,12 @@ table.occ tbody tr.clicavel{cursor:pointer;}
         <div class="section-title">O que ele fornece</div>
         <div class="table-scroll">
           <table class="occ itens-table">
-            <thead><tr><th>Matéria-prima / insumo</th><th>Tipo</th><th>Código (lote interno)</th><th>Último lote usado</th><th></th></tr></thead>
+            <thead><tr><th>Matéria-prima / insumo</th><th>Tipo</th><th>Código</th><th>Último lote (só resina)</th><th></th></tr></thead>
             <tbody id="tbodyItensForn"></tbody>
           </table>
         </div>
         <button type="button" class="btn" style="margin-top:10px;" onclick="adicionarItemForn()"><svg><use href="#i-plus"/></svg> Adicionar item</button>
-        <p class="med-note">Código e último lote só existem pra Resina PET: o código forma o lote interno (ex.: J02-271), e itens com o mesmo código (ex.: Max Prime e Max Off Grade) usam a mesma numeração. "Último lote usado" é opcional — serve pra continuar a numeração de antes do sistema. Renomear o fornecedor ou um tipo atualiza também as fichas de especificação ligadas a ele.</p>
+        <p class="med-note">Código: na Resina PET ele forma o lote interno (ex.: J02-271) e é obrigatório — itens com o mesmo código (ex.: Max Prime e Max Off Grade) usam a mesma numeração. Nos demais materiais é só o código do produto no fornecedor (ex.: pigmento Preto = KL433-12), opcional e sem lote interno. "Último lote" existe só pra resina e é opcional — serve pra continuar a numeração de antes do sistema. Renomear o fornecedor ou um tipo atualiza também as fichas de especificação ligadas a ele.</p>
         <div class="form-actions">
           <span class="save-msg" id="saveMsgForn"></span>
           <button class="btn btn-ghost" onclick="fecharModalFornecedor()">Cancelar</button>
@@ -1189,7 +1192,7 @@ const TABELAS = {
 // planilha não quebra a gravação. Se faltar alguma coluna esperada, aparece um aviso.
 const TABLE_COLS = {
   resina: ['Lote Interno','Data Recebimento','Fornecedor','Tipo','Código Produto','Lote Fornecedor','Nota Fiscal','Quantidade','Unidade','Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Análise de Impureza','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
-  rotulo: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Modelo do Rótulo','Quantidade','Unidade','Conferência Visual','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
+  rotulo: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Modelo do Rótulo','Quantidade','Unidade','Conferência Visual','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições'],
   pigmento: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
   cinta: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
   tampa: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações'],
@@ -1572,6 +1575,10 @@ function parseEspecTexto(texto, unidade, criterio){
     var partes = texto.split('–').map(function(p){ return parseFloat(p.trim().replace(',', '.')); });
     if (partes.length === 2 && !isNaN(partes[0]) && !isNaN(partes[1])) return { tipoResultado: 'faixa', min: partes[0], max: partes[1] };
   }
+  var mGe = texto.match(/^(?:≥|>=)\s*([\-\d.,]+)/);
+  if (mGe) { var g = parseFloat(mGe[1].replace(',', '.')); if (!isNaN(g)) return { tipoResultado: 'min', min: g }; }
+  var mLe = texto.match(/^(?:≤|<=)\s*([\-\d.,]+)/);
+  if (mLe) { var le = parseFloat(mLe[1].replace(',', '.')); if (!isNaN(le)) return { tipoResultado: 'max', max: le }; }
   var mMin = texto.match(/m[ií]nimo\s*([\-\d.,]+)/i);
   if (mMin) { var v = parseFloat(mMin[1].replace(',', '.')); if (!isNaN(v)) return { tipoResultado: 'min', min: v }; }
   var mMax = texto.match(/m[áa]ximo\s*([\-\d.,]+)/i);
@@ -1598,8 +1605,12 @@ function montarEspecificacoes(linhas){
   });
   return lista;
 }
-function fichaDe(mat, forn, tipo){ return DATA.especificacoes.find(function(f){ return f.mat === mat && f.forn === forn && f.tipo === tipo; }); }
-function tituloFicha(f){ return (MAT_LABEL_PLANO[f.mat] || f.mat) + ' · ' + (f.forn || '—') + ' — ' + (f.tipo || '—'); }
+// Ficha geral: Fornecedor e Tipo = "(Todos)" vale pra todos os recebimentos do material (ex.: EMP-016 Rótulos).
+// Uma ficha específica do fornecedor+tipo, se existir, tem prioridade sobre a geral.
+var TODOS = '(Todos)';
+function fichaExata(mat, forn, tipo){ return DATA.especificacoes.find(function(f){ return f.mat === mat && f.forn === forn && f.tipo === tipo; }); }
+function fichaDe(mat, forn, tipo){ return fichaExata(mat, forn, tipo) || DATA.especificacoes.find(function(f){ return f.mat === mat && f.forn === TODOS; }); }
+function tituloFicha(f){ return (MAT_LABEL_PLANO[f.mat] || f.mat) + ' · ' + (f.forn === TODOS ? 'todos os fornecedores e tipos' : (f.forn || '—') + ' — ' + (f.tipo || '—')); }
 
 /* ---- cadastro de fornecedores: cada linha da planilha = um item (fornecedor + material + tipo) ---- */
 function itensFornecedores(){
@@ -1750,8 +1761,7 @@ function renderHome(){
 }
 // Quantas medições da ficha (critérios L/QA/C) já têm resultado — só Resina, que tem ficha.
 function progressoAnalises(mat, r){
-  if (mat !== 'resina') return null;
-  var ficha = fichaDe('resina', String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim());
+  var ficha = fichaDe(mat, String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim());
   if (!ficha) return null;
   var params = ficha.parametros.filter(function(p){ return p.criterio !== '-'; });
   if (!params.length) return null;
@@ -1868,7 +1878,7 @@ function renderRecebimentoTabela(){
   if (!rows.length) { document.getElementById('tbody').innerHTML = '<tr><td colspan="12" class="empty-note">Nenhum recebimento encontrado com esses filtros.</td></tr>'; return; }
   if (mat === 'resina') { document.getElementById('tbody').innerHTML = rows.map(linhaResina).join(''); return; }
   document.getElementById('tbody').innerHTML = rows.map(function(r){
-    var cells = ['<td class="cell-dim tabular">'+(r['Data']||'')+'</td>','<td class="mono">'+(r['Nota Fiscal']||'')+'</td>','<td>'+escHtml(r['Fornecedor']||'')+'<div class="cell-dim" style="font-size:11px;">'+escHtml(r['Tipo']||'')+'</div></td>','<td class="mono cell-dim">'+(r['Lote']||'')+'</td>','<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'];
+    var cells = ['<td class="cell-dim tabular">'+(r['Data']||'')+'</td>','<td class="mono">'+(r['Nota Fiscal']||'')+'</td>','<td>'+escHtml(r['Fornecedor']||'')+'<div class="cell-dim" style="font-size:11px;">'+escHtml([r['Tipo'], codigoProdutoDe(mat, r['Fornecedor'], r['Tipo'])].filter(function(x){ return x; }).join(' · '))+'</div></td>','<td class="mono cell-dim">'+(r['Lote']||'')+'</td>','<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'];
     if (mat === 'rotulo') cells.push('<td class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</td>');
     cells.push('<td>'+laudoIc(r['Arquivo do Laudo'])+'</td>','<td>'+badgeLabel(r['Status'])+'</td>','<td class="cell-dim">'+(r['Responsável']||'')+'</td>');
     return '<tr class="clicavel" onclick="abrirDetalhe(\''+mat+'\','+r.__index+')">'+cells.join('')+acoesRecebimentoHtml(mat, r.__index)+'</tr>';
@@ -1908,20 +1918,22 @@ function abrirDetalhe(mat, index){
   var html = '<div class="section-title">Dados</div><dl class="dw-kv">' +
     kv('Data', r['Data Recebimento'] || r['Data'], 'tabular') + kv('Nota fiscal', r['Nota Fiscal'], 'mono') +
     kv('Fornecedor', r['Fornecedor']) + kv('Tipo', r['Tipo']) +
-    (ehResina ? kv('Lote do fornecedor', r['Lote Fornecedor'], 'mono') + kv('Código', r['Código Produto'], 'mono') : kv('Lote', r['Lote'], 'mono')) +
+    (ehResina ? kv('Lote do fornecedor', r['Lote Fornecedor'], 'mono') + kv('Código', r['Código Produto'], 'mono') : kv('Lote', r['Lote'], 'mono') + kv('Código do produto', codigoProdutoDe(mat, r['Fornecedor'], r['Tipo']), 'mono')) +
     kv('Quantidade', [r['Quantidade'], r['Unidade']].filter(function(x){ return x; }).join(' '), 'tabular') + kv('Responsável', r['Responsável']) +
     (mat === 'rotulo' ? kv('Modelo do rótulo', r['Modelo do Rótulo']) + kv('Conferência visual', r['Conferência Visual']) : '') +
     '<div><dt>Laudo</dt><dd>' + (r['Arquivo do Laudo'] ? '<a href="' + escHtml(r['Arquivo do Laudo']) + '" target="_blank">abrir laudo</a>' : '<span class="res-pend">sem laudo</span>') + '</dd></div></dl>';
-  if (ehResina) {
-    var ficha = fichaDe('resina', String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim());
+  var fichaDw = fichaDe(mat, String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim());
+  if (ehResina || fichaDw) {
+    var ficha = fichaDw;
     html += '<div class="section-title">Medições' + (ficha ? ' <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">' + escHtml([ficha.doc, ficha.rev].filter(function(x){ return x; }).join(' · ')) + '</span>' : '') + '</div>';
     if (ficha) {
       var med = medicoesDeLinha(r), params = ficha.parametros.filter(function(p){ return p.criterio !== '-'; }), rean = lerReanalises(r['Observações']);
-      var prog = progressoAnalises('resina', r);
+      var prog = progressoAnalises(mat, r);
       if (prog) html += '<div class="dw-prog"><span class="bar"><i style="width:' + Math.round(prog.feitas / prog.total * 100) + '%"></i></span>' + prog.feitas + ' de ' + prog.total + ' análises lançadas</div>';
       html += '<div class="table-scroll"><table class="occ" style="min-width:0;"><thead><tr><th>Crit.</th><th>Teste</th><th>Especificação</th><th>Resultado</th></tr></thead><tbody>' +
         params.map(function(p){
-          var v = med[p.teste], vv = String(v == null ? '' : v).toLowerCase(), aval = avaliarParametro(p, vv === 'não conforme' ? 'nao-conforme' : (vv === 'conforme' ? 'conforme' : v));
+          var v = med[p.teste], vv = String(v == null ? '' : v).toLowerCase(), rawN = vv === 'não conforme' || vv === 'nao-conforme' ? 'nao-conforme' : (vv === 'conforme' ? 'conforme' : v), aval = avaliarParametro(p, rawN);
+          if (p.tipoResultado === 'visual' && v) v = mostrarValorAnalise(p, rawN) || v;
           var cor = aval === 'dentro' ? 'var(--ok)' : aval === 'fora' ? 'var(--danger)' : 'var(--fg)';
           return '<tr><td><span class="badge-crit ' + p.criterio + '">' + p.criterio + '</span></td><td style="white-space:normal;">' + escHtml(p.teste) + '</td><td class="cell-dim" style="white-space:normal;">' + escHtml(p.especTexto || '') + '</td>' +
             '<td>' + (v ? '<span style="color:' + cor + '; font-weight:500;">' + (/Viscosidade/.test(PARAM_COL_MAP[p.teste] || '') ? viscosidade3(v) : escHtml(v)) + '</span>' : '<span class="res-pend">pendente</span>') + rotuloReanalise(rean[p.teste]) + '</td></tr>';
@@ -2169,6 +2181,8 @@ function abrirModalCadastro(matEdit, indexEdit){
     document.getElementById('materialSelect').value = matEdit;
     document.getElementById('notaFiscalInput').value = row['Nota Fiscal'] || '';
     document.getElementById('quantidadeInput').value = row['Quantidade'] || '';
+    var uSel = document.getElementById('unidadeSelect'), uVal = String(row['Unidade'] || '').trim();
+    if (uVal) { if (!Array.prototype.some.call(uSel.options, function(o){ return o.value === uVal; })) uSel.insertAdjacentHTML('beforeend', '<option value="' + escHtml(uVal) + '">' + escHtml(uVal) + '</option>'); uSel.value = uVal; }
     document.getElementById('responsavelInput').value = row['Responsável'] || '';
     document.getElementById('observacoesInput').value = obsSemReanalise(row['Observações']);
     document.getElementById('dataRecebimentoInput').value = dataBRparaISO(row['Data Recebimento'] || row['Data'] || '');
@@ -2181,6 +2195,8 @@ function abrirModalCadastro(matEdit, indexEdit){
     document.getElementById('quantidadeInput').value = '';
     document.getElementById('responsavelInput').value = '';
     document.getElementById('observacoesInput').value = '';
+    var cSel = document.getElementById('conferenciaRotuloSelect');
+    for (var ci = 0; ci < cSel.options.length; ci++) { if (confereOk(cSel.options[ci].value)) { cSel.selectedIndex = ci; break; } }
   }
   document.getElementById('modalCadastro').classList.remove('hidden');
   atualizarCamposMaterial();
@@ -2199,6 +2215,7 @@ function preencherEdicaoRecebimento(mat, row){
     renderMedicoes(row); habilitarMedicoes(true);
   } else {
     document.getElementById('loteGenericoInput').value = row['Lote'] || '';
+    renderMedicoes(row); habilitarMedicoes(true);
     if (mat === 'rotulo') {
       var modeloSel = document.getElementById('modeloRotuloSelect');
       var modeloMatch = DATA.rotulosHomologados.find(function(r){ return r['Nome do Modelo'] === row['Modelo do Rótulo']; });
@@ -2209,6 +2226,7 @@ function preencherEdicaoRecebimento(mat, row){
     }
   }
   selecionarStatusPorChave(statusKey(row['Status']) === 'restricao' ? 'reprovado' : statusKey(row['Status']));
+  atualizarCodigoProduto();
   var respR = lerRestricao(row['Observações']);
   document.getElementById('chkRestricao').checked = statusKey(row['Status']) === 'restricao';
   document.getElementById('respRestricaoInput').value = respR;
@@ -2255,8 +2273,14 @@ function popularTiposReceb(manter){
   if (lista.indexOf(atual) > -1) sel.value = atual;
 }
 function aoMudarFornecedorReceb(){ popularTiposReceb(); aoMudarTipoReceb(); }
+function codigoProdutoDe(mat, forn, tipo){ var it = itemFornecedor(String(forn || '').trim(), mat, String(tipo || '').trim()); return it ? it.cod : ''; }
+function atualizarCodigoProduto(){
+  var mat = document.getElementById('materialSelect').value;
+  document.getElementById('codigoProdutoDisplay').value = codigoProdutoDe(mat, document.getElementById('fornecedorSelect').value, document.getElementById('tipoSelect').value) || '—';
+}
 function aoMudarTipoReceb(){
-  if (document.getElementById('materialSelect').value !== 'resina') return;
+  atualizarCodigoProduto();
+  if (document.getElementById('materialSelect').value !== 'resina') { renderMedicoes(medicoesDigitadasComoLinha()); habilitarMedicoes(true); return; }
   if (recebimentoEditando) renderMedicoes(medicoesDigitadasComoLinha()); else verificarLoteExistente();
 }
 // Valores já digitados nas medições, no formato de uma linha da planilha (pra não perder o que foi
@@ -2264,6 +2288,7 @@ function aoMudarTipoReceb(){
 function medicoesDigitadasComoLinha(){
   var linha = {};
   ESPEC_PARAMS_ATUAL.forEach(function(p, idx){ var el = document.getElementById('medResultado_' + idx); if (el && PARAM_COL_MAP[p.teste]) linha[PARAM_COL_MAP[p.teste]] = el.value; });
+  if (document.getElementById('materialSelect').value !== 'resina') linha['Medições'] = textoMedicoes().join('\n');
   return linha;
 }
 
@@ -2281,11 +2306,13 @@ function atualizarCamposMaterial(){
   // Lote do fornecedor + lote interno (código + sequencial) são da Resina PET; os demais materiais
   // usam um campo "Lote" simples.
   document.getElementById('campoLoteGenerico').style.display = ehResina ? 'none' : '';
+  document.getElementById('campoCodigoProduto').style.display = ehResina ? 'none' : '';
   document.getElementById('campoLoteFornecedorResina').style.display = ehResina ? '' : 'none';
   document.getElementById('campoLoteInternoResina').style.display = ehResina ? '' : 'none';
   // Só a aba de Resina PET tem colunas de medição (Viscosidade, Cor etc.) — por isso a seção de
   // Medições, por ora, só aparece pra Resina.
   document.getElementById('secaoResina').style.display = ehResina ? '' : 'none';
+  document.getElementById('secaoMedicoes').style.display = ehResina ? '' : 'none';
   document.getElementById('fornecedorSelect').disabled = false;
   document.getElementById('tipoSelect').disabled = false;
   if (!recebimentoEditando) { popularFornecedoresReceb(); popularTiposReceb(); }
@@ -2294,8 +2321,9 @@ function atualizarCamposMaterial(){
     if (!recebimentoEditando) { document.getElementById('loteFornecedorInput').value = ''; verificarLoteExistente(); }
   } else {
     ESPEC_PARAMS_ATUAL = [];
-    if (!recebimentoEditando) selecionarStatusPorChave('analise');
+    if (!recebimentoEditando) { selecionarStatusPorChave('analise'); renderMedicoes(null); habilitarMedicoes(true); }
   }
+  atualizarCodigoProduto();
   sugerirStatusRecebimento();
 }
 function atualizarPreviaRotulo(){
@@ -2321,14 +2349,13 @@ function textoStatus(chave, padrao){
 }
 function calcularResultado(escolhas){
   var mat = document.getElementById('materialSelect').value;
+  var paramsL = ESPEC_PARAMS_ATUAL.map(function(p, idx){ return { p: p, idx: idx }; }).filter(function(x){ return x.p.criterio === 'L'; });
+  var fora = [], pend = [];
+  // Rótulo: a conferência visual com o rótulo homologado também é critério liberativo
   if (mat === 'rotulo') {
     var conf = document.getElementById('conferenciaRotuloSelect');
-    var txtConf = conf.options[conf.selectedIndex] ? conf.options[conf.selectedIndex].textContent : '';
-    return confereOk(conf.value) ? { chave: 'aprovado', motivo: 'Conferência visual: ' + txtConf + '.' } : { chave: 'reprovado', motivo: 'Conferência visual: ' + txtConf + '.', fora: ['Conferência visual'] };
-  }
-  var paramsL = mat === 'resina' ? ESPEC_PARAMS_ATUAL.map(function(p, idx){ return { p: p, idx: idx }; }).filter(function(x){ return x.p.criterio === 'L'; }) : [];
-  if (!paramsL.length) return { chave: 'manual', motivo: '' };
-  var fora = [], pend = [];
+    if (!confereOk(conf.value)) fora.push('Conferência visual (' + (conf.options[conf.selectedIndex] ? conf.options[conf.selectedIndex].textContent : 'Divergente') + ')');
+  } else if (!paramsL.length) return { chave: 'manual', motivo: '' };
   paramsL.forEach(function(x){
     var raw = analiseVigente(x.idx, escolhas), r = avaliarParametro(x.p, raw);
     if (r === 'fora') fora.push(x.p.teste + ' (' + mostrarValorAnalise(x.p, raw) + ')');
@@ -2336,7 +2363,7 @@ function calcularResultado(escolhas){
   });
   if (fora.length) return { chave: 'reprovado', motivo: 'Fora do especificado: ' + fora.join(', ') + '.', fora: fora };
   if (pend.length) return { chave: 'pendente', motivo: 'Falta lançar: ' + pend.join(', ') + '.', pend: pend };
-  return { chave: 'aprovado', motivo: 'Todos os critérios liberativos (L) dentro do especificado.' };
+  return { chave: 'aprovado', motivo: mat === 'rotulo' ? (paramsL.length ? 'Conferência visual ok e todos os critérios liberativos (L) dentro do especificado.' : 'Conferência visual: confere.') : 'Todos os critérios liberativos (L) dentro do especificado.' };
 }
 // Status final a gravar ao concluir: { texto, chave } ou { erro }
 function statusFinalRecebimento(escolhas){
@@ -2374,7 +2401,7 @@ function numeroDoLote(v){ var m = String(v == null ? '' : v).match(/(\d+)\s*$/);
 function proximoLoteInterno(codigo){
   var max = 0;
   DATA.resina.forEach(function(r){ if (String(r['Código Produto']).toUpperCase() === codigo && r['Lote Interno']) { var n = numeroDoLote(r['Lote Interno']); if (!isNaN(n) && n > max) max = n; } });
-  itensFornecedores().forEach(function(i){ if (i.cod === codigo) { var n = numeroDoLote(i.ult); if (!isNaN(n) && n > max) max = n; } });
+  itensFornecedores().forEach(function(i){ if (i.mat === 'resina' && i.cod === codigo) { var n = numeroDoLote(i.ult); if (!isNaN(n) && n > max) max = n; } });
   return codigo + '-' + (max + 1);
 }
 function buscarLoteExistente(codigo, loteForn){
@@ -2387,7 +2414,21 @@ function codigoResinaAtual(){
 function medicoesDeLinha(row){
   var m = {};
   Object.keys(PARAM_COL_MAP).forEach(function(teste){ var col = PARAM_COL_MAP[teste]; if (row[col] !== undefined && row[col] !== '') m[teste] = row[col]; });
+  // Demais materiais: texto "Teste: valor" por linha na coluna Medições (ou, sem a coluna, numa linha [Medições] das observações)
+  var txt = String(row['Medições'] || '');
+  var lm = String(row['Observações'] || '').split('\n').find(function(l){ return l.indexOf(MARCA_MEDICOES) === 0; });
+  if (lm) txt += (txt ? '\n' : '') + lm.slice(MARCA_MEDICOES.length).split('; ').join('\n');
+  txt.split('\n').forEach(function(l){
+    var i = l.lastIndexOf(': '); if (i < 0) return;
+    var teste = l.slice(0, i).trim(), v = l.slice(i + 2).trim(), low = v.toLowerCase();
+    if (teste && v) m[teste] = low === 'conforme' ? 'conforme' : (low === 'não conforme' || low === 'nao conforme') ? 'nao-conforme' : v;
+  });
   return m;
+}
+var MARCA_MEDICOES = '[Medições] ';
+// Texto das medições (análise vigente de cada teste) pra gravar nos materiais que não são resina
+function textoMedicoes(escolhas){
+  return ESPEC_PARAMS_ATUAL.map(function(p, idx){ var v = analiseVigente(idx, escolhas); return v ? p.teste + ': ' + mostrarValorAnalise(p, v) : ''; }).filter(function(x){ return x; });
 }
 function habilitarMedicoes(editavel){ document.querySelectorAll('#tbodyMedicoes input, #tbodyMedicoes select, #tbodyMedicoes button').forEach(function(el){ el.disabled = !editavel; }); }
 function verificarLoteExistente(){
@@ -2441,8 +2482,10 @@ function avaliarParametro(p, valorRaw){
 function renderMedicoes(entradaExistente){
   var mat = document.getElementById('materialSelect').value;
   var forn = document.getElementById('fornecedorSelect').value, tipo = document.getElementById('tipoSelect').value;
-  var ficha = mat === 'resina' ? fichaDe(mat, forn, tipo) : null;
+  var ficha = fichaDe(mat, forn, tipo);
   var tb = document.getElementById('tbodyMedicoes'), label = document.getElementById('medicoesFichaLabel');
+  // Resina sempre mostra a seção (com aviso quando não há ficha); os demais materiais só quando há ficha.
+  document.getElementById('secaoMedicoes').style.display = (mat === 'resina' || ficha) ? '' : 'none';
   if (!ficha) {
     ESPEC_PARAMS_ATUAL = []; label.textContent = '—';
     tb.innerHTML = (forn && tipo) ? '<tr><td colspan="5" style="white-space:normal;"><div class="aviso-ficha">Nenhuma especificação cadastrada para <b>' + escHtml(forn) + ' — ' + escHtml(tipo) +
@@ -2451,7 +2494,7 @@ function renderMedicoes(entradaExistente){
     return;
   }
   ESPEC_PARAMS_ATUAL = ficha.parametros.filter(function(p){ return p.criterio !== '-'; });
-  label.textContent = (ficha.doc || '') + (ficha.rev ? ' · ' + ficha.rev : '') + ' · ' + ficha.forn + ' — ' + ficha.tipo;
+  label.textContent = (ficha.doc || '') + (ficha.rev ? ' · ' + ficha.rev : '') + ' · ' + (ficha.forn === TODOS ? 'ficha geral de ' + (MAT_LABEL_PLANO[mat] || mat) : ficha.forn + ' — ' + ficha.tipo);
   var reanalises = entradaExistente ? lerReanalises(entradaExistente['Observações']) : {};
   tb.innerHTML = ESPEC_PARAMS_ATUAL.map(function(p, idx){
     var lista = reanalises[p.teste];
@@ -2491,7 +2534,7 @@ function rotuloReanalise(lista){
   return '<div class="cell-dim" style="font-size:11px; font-weight:400;">' + (k > -1 ? (k + 1) + 'ª de ' + lista.length + ' análises' : lista.length + ' análises · em aberto') + '</div>';
 }
 var MARCA_RESTRICAO = '[Aprovado com restrição] Liberado por: ';
-function obsSemReanalise(obs){ return String(obs || '').split('\n').filter(function(l){ return l.indexOf(MARCA_REANALISE) !== 0 && l.indexOf(MARCA_RESTRICAO) !== 0; }).join('\n').trim(); }
+function obsSemReanalise(obs){ return String(obs || '').split('\n').filter(function(l){ return l.indexOf(MARCA_REANALISE) !== 0 && l.indexOf(MARCA_RESTRICAO) !== 0 && l.indexOf(MARCA_MEDICOES) !== 0; }).join('\n').trim(); }
 function lerRestricao(obs){ var l = String(obs || '').split('\n').find(function(x){ return x.indexOf(MARCA_RESTRICAO) === 0; }); return l ? l.slice(MARCA_RESTRICAO.length).trim() : ''; }
 function linhaRestricao(statusTexto){ return statusKey(statusTexto) === 'restricao' ? MARCA_RESTRICAO + document.getElementById('respRestricaoInput').value.trim() : ''; }
 function lerReanalises(obs){
@@ -2632,13 +2675,21 @@ async function salvarRecebimento(statusFinal){
       DATA.resina = linhasParaObjetos('resina', await lerLinhasBrutas(TABELAS.resina));
     } else {
       var tableKey = mat;
+      var escolhas2 = statusFinal ? (escolhasAnaliseConclusao || {}) : null, linhasRe2 = [];
+      ESPEC_PARAMS_ATUAL.forEach(function(p, idx){
+        var todas2 = analisesDe(idx), nV = escolhas2 && escolhas2[idx] !== undefined ? escolhas2[idx] : (todas2.length ? todas2[todas2.length - 1].n : 0);
+        var lr2 = linhaReanalise(p, idx, statusFinal ? nV : 0); if (lr2) linhasRe2.push(lr2);
+      });
+      var meds = textoMedicoes(escolhas2), temColMed = (TABLE_COLS[tableKey] || []).indexOf('Medições') > -1;
       var row2 = Object.assign(base, {
         'Data': dataBR, 'Nota Fiscal': document.getElementById('notaFiscalInput').value.trim(),
         'Fornecedor': forn, 'Tipo': tipo, 'Lote': document.getElementById('loteGenericoInput').value.trim(),
         'Quantidade': document.getElementById('quantidadeInput').value.trim(), 'Unidade': document.getElementById('unidadeSelect').value,
         'Laudo Anexado': laudoUrl ? 'Sim' : 'Não', 'Arquivo do Laudo': laudoUrl, 'Status': statusTexto,
-        'Responsável': document.getElementById('responsavelInput').value.trim(), 'Observações': [obs, linhaRestricao(statusTexto)].filter(function(x){ return x; }).join('\n')
+        'Responsável': document.getElementById('responsavelInput').value.trim(),
+        'Observações': [obs, (!temColMed && meds.length) ? MARCA_MEDICOES + meds.join('; ') : ''].concat(linhasRe2, [linhaRestricao(statusTexto)]).filter(function(x){ return x; }).join('\n')
       });
+      if (temColMed) row2['Medições'] = meds.join('\n');
       if (mat === 'rotulo') {
         var modeloSel = document.getElementById('modeloRotuloSelect');
         var modeloNome = modeloSel.options[modeloSel.selectedIndex] ? modeloSel.options[modeloSel.selectedIndex].textContent : '';
@@ -2676,7 +2727,7 @@ function concluirRecebimento(manterEscolhas){
   // testes com mais de uma análise: escolher qual vale pra aprovação (padrão = a última lançada)
   if (!manterEscolhas) escolhasAnaliseConclusao = {};
   var escHtmlBlocos = '';
-  if (mat === 'resina') ESPEC_PARAMS_ATUAL.forEach(function(p, idx){
+  ESPEC_PARAMS_ATUAL.forEach(function(p, idx){
     var lista = analisesDe(idx); if (lista.length < 2) return;
     if (escolhasAnaliseConclusao[idx] === undefined || !lista.some(function(a){ return a.n === escolhasAnaliseConclusao[idx]; })) escolhasAnaliseConclusao[idx] = lista[lista.length - 1].n;
     escHtmlBlocos += '<div class="esc-analise"><div class="t">' + escHtml(p.teste) + '</div><div class="e">Especificação: ' + escHtml(p.especTexto || '—') + ' · qual análise vale para a aprovação? As outras ficam registradas nas observações.</div>' +
@@ -2712,7 +2763,7 @@ function concluirRecebimento(manterEscolhas){
   }
   html += '</dl>';
   if (!laudo) avisos.push('Nenhum laudo anexado.');
-  if (mat === 'resina') {
+  if (mat === 'resina' || ESPEC_PARAMS_ATUAL.length) {
     if (ESPEC_PARAMS_ATUAL.length) {
       var foraL = 0, pendL = 0;
       html += '<div class="section-title" style="margin-top:18px;">Medições</div><div class="table-scroll"><table class="occ" style="min-width:0;"><thead><tr><th>Crit.</th><th>Teste</th><th>Especificação</th><th>Resultado</th><th>Situação</th></tr></thead><tbody>' +
@@ -2726,7 +2777,8 @@ function concluirRecebimento(manterEscolhas){
     } else avisos.push('Sem ficha de especificação para esse fornecedor/tipo — o recebimento será concluído sem medições.');
   }
   var obs = obsSemReanalise(v('observacoesInput'));
-  if (mat === 'resina') ESPEC_PARAMS_ATUAL.forEach(function(p, idx){ var lr = linhaReanalise(p, idx, escolhasAnaliseConclusao[idx]); if (lr) obs += (obs ? '\n' : '') + lr; });
+  if (mat !== 'resina' && ESPEC_PARAMS_ATUAL.length && (TABLE_COLS[mat] || []).indexOf('Medições') === -1) { var ms = textoMedicoes(escolhasAnaliseConclusao); if (ms.length) obs += (obs ? '\n' : '') + MARCA_MEDICOES + ms.join('; '); }
+  ESPEC_PARAMS_ATUAL.forEach(function(p, idx){ var lr = linhaReanalise(p, idx, escolhasAnaliseConclusao[idx]); if (lr) obs += (obs ? '\n' : '') + lr; });
   if (k === 'restricao') obs += (obs ? '\n' : '') + MARCA_RESTRICAO + (document.getElementById('respRestricaoInput').value.trim() || '…');
   html += '<div class="section-title" style="margin-top:18px;">Observações <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">como vão ficar gravadas</span></div><p class="dw-obs" style="margin:0;">' + (obs ? escHtml(obs) : '<span class="res-pend">Sem observações.</span>') + '</p>';
   document.getElementById('concResultado').innerHTML = '<span class="badge ' + k + '" style="font-size:13px; padding:6px 14px;">' + escHtml(resultado) + '</span>';
@@ -2771,7 +2823,7 @@ function renderEspecificacoes(){
       return '<tr><td>'+escHtml(p.teste)+'</td><td class="cell-dim">'+escHtml(p.especTexto||'')+'</td><td class="cell-dim">'+escHtml(p.unidade||'')+'</td><td class="cell-dim mono">'+escHtml(p.nt||'')+'</td>'+
         '<td>'+(p.criterio === '-' ? '<span class="cell-dim">—</span>' : '<span class="badge-crit '+p.criterio+'">'+p.criterio+'</span>')+'</td></tr>';
     }).join('');
-    var semCadastro = !itemFornecedor(f.forn, f.mat, f.tipo);
+    var semCadastro = f.forn !== TODOS && !itemFornecedor(f.forn, f.mat, f.tipo);
     return '<div class="spec-card"><div class="head"><div><div class="title">'+escHtml(tituloFicha(f))+'</div>'+
       '<div class="doc">'+[f.doc, f.rev, f.data].filter(function(x){ return x; }).map(escHtml).join(' · ')+
       (semCadastro ? ' · <span style="color:var(--warn);">fornecedor/tipo não está no cadastro de Fornecedores</span>' : '')+'</div></div>'+
@@ -2798,13 +2850,15 @@ function popularCascataEspec(fornManter, tipoManter){
   var mat = document.getElementById('especMaterialSelect').value;
   var fSel = document.getElementById('especFornSelect'), tSel = document.getElementById('especTipoSelect');
   var fAtual = fornManter !== undefined ? fornManter : fSel.value;
-  var fl = fornecedoresDoMaterial(mat);
-  if (fornManter && fl.indexOf(fornManter) === -1) fl.push(fornManter);
-  fSel.innerHTML = opcoesHtml(fl, '— nenhum fornecedor deste material —');
-  if (fl.indexOf(fAtual) > -1) fSel.value = fAtual;
+  var fl = fornecedoresDoMaterial(mat).filter(function(f){ return f !== TODOS; });
+  if (fornManter && fornManter !== TODOS && fl.indexOf(fornManter) === -1) fl.push(fornManter);
+  fSel.innerHTML = '<option value="' + TODOS + '">Todos os fornecedores (ficha geral do material)</option>' + (fl.length ? opcoesHtml(fl, '') : '');
+  fSel.value = fAtual === TODOS || fl.indexOf(fAtual) > -1 ? fAtual : (fl[0] || TODOS);
   var tAtual = tipoManter !== undefined ? tipoManter : tSel.value;
-  var tl = fSel.value ? tiposDe(fSel.value, mat) : [];
-  if (tipoManter && tl.indexOf(tipoManter) === -1) tl.push(tipoManter);
+  if (fSel.value === TODOS) { tSel.innerHTML = '<option value="' + TODOS + '">Todos os tipos</option>'; tSel.value = TODOS; tSel.disabled = true; return; }
+  tSel.disabled = false;
+  var tl = tiposDe(fSel.value, mat);
+  if (tipoManter && tipoManter !== TODOS && tl.indexOf(tipoManter) === -1) tl.push(tipoManter);
   tSel.innerHTML = opcoesHtml(tl, '—');
   if (tl.indexOf(tAtual) > -1) tSel.value = tAtual;
 }
@@ -2841,8 +2895,8 @@ async function salvarEspecificacao(){
   var doc = document.getElementById('especDocInput').value.trim(), rev = document.getElementById('especRevInput').value.trim();
   var dataDoc = formatarDataBR(document.getElementById('especDataInput').value);
   if (!forn || !tipo) { msg.className = 'save-msg err'; msg.textContent = 'Escolha fornecedor e tipo (se não aparecerem, cadastre em Fornecedores).'; return; }
-  var existente = fichaDe(mat, forn, tipo);
-  if (existente && existente.id !== especEditando) { msg.className = 'save-msg err'; msg.textContent = 'Já existe uma ficha para ' + forn + ' — ' + tipo + '. Edite a existente.'; return; }
+  var existente = fichaExata(mat, forn, tipo);
+  if (existente && existente.id !== especEditando) { msg.className = 'save-msg err'; msg.textContent = forn === TODOS ? 'Já existe uma ficha geral para ' + MAT_LABEL_PLANO[mat] + '. Edite a existente.' : 'Já existe uma ficha para ' + forn + ' — ' + tipo + '. Edite a existente.'; return; }
   var linhas = Array.prototype.map.call(document.querySelectorAll('#tbodyNovaEspec tr'), function(tr){
     return {
       teste: tr.querySelector('.espec-teste').value.trim(), especTexto: tr.querySelector('.espec-tolerancia').value.trim(),
@@ -2963,7 +3017,7 @@ function renderFornecedores(){
       var ficha = fichaDe(i.mat, g.nome, i.tipo);
       return '<tr><td><span class="mat-chip"><svg><use href="#' + (MAT_ICONE[i.mat] || 'i-package') + '"/></svg>' + escHtml(i.matLabel || '—') + '</span></td>' +
         '<td>' + escHtml(i.tipo) + '</td>' +
-        '<td class="mono">' + (i.mat === 'resina' && i.cod ? escHtml(i.cod) : '<span class="cell-dim">—</span>') + '</td>' +
+        '<td class="mono">' + (i.cod ? escHtml(i.cod) : '<span class="cell-dim">—</span>') + '</td>' +
         '<td class="mono cell-dim">' + (i.mat === 'resina' && i.cod ? proximoLoteInterno(i.cod) : '—') + '</td>' +
         '<td>' + (ficha ? '<span class="ficha-ok"><svg><use href="#i-check"/></svg>' + escHtml([ficha.doc, ficha.rev].filter(function(x){ return x; }).join(' · ') || 'cadastrada') + '</span>' : '<span class="ficha-no">sem ficha</span>') + '</td></tr>';
     }).join('');
@@ -2993,12 +3047,18 @@ function adicionarItemForn(i, existente){
   var tr = document.createElement('tr');
   if (existente) { tr.dataset.origTipo = i.tipo; tr.dataset.origMat = i.mat; }
   tr.innerHTML = '<td><select class="it-mat">' + Object.keys(MAT_LABEL_PLANO).map(function(k){ return '<option value="' + k + '"' + (k === i.mat ? ' selected' : '') + '>' + MAT_LABEL_PLANO[k] + '</option>'; }).join('') + '</select></td>' +
-    '<td><input class="it-tipo" placeholder="Ex: Indorama Max Prime" value="' + escHtml(i.tipo) + '"></td>' +
-    '<td><input class="it-cod mono" placeholder="Ex: J02" value="' + escHtml(i.cod) + '"></td>' +
+    '<td><input class="it-tipo" value="' + escHtml(i.tipo) + '"></td>' +
+    '<td><input class="it-cod mono" value="' + escHtml(i.cod) + '"></td>' +
     '<td><input class="it-ult mono" placeholder="Ex: 270" inputmode="numeric" value="' + escHtml(i.ult) + '"></td>' +
     '<td><button type="button" class="remove-linha-espec" title="Remover item" onclick="this.closest(\'tr\').remove()">✕</button></td>';
   var sel = tr.querySelector('.it-mat');
-  function sync(){ var r = sel.value === 'resina'; tr.querySelector('.it-cod').disabled = !r; tr.querySelector('.it-ult').disabled = !r; }
+  var EX_TIPO = { resina: 'Ex: Indorama Max Prime', rotulo: 'Ex: Rótulo 2 L', pigmento: 'Ex: Preto', cinta: 'Ex: Caixa 500 un', tampa: 'Ex: Tampa padrão' };
+  function sync(){
+    var r = sel.value === 'resina', ult = tr.querySelector('.it-ult');
+    tr.querySelector('.it-tipo').placeholder = EX_TIPO[sel.value] || 'Tipo';
+    tr.querySelector('.it-cod').placeholder = r ? 'Ex: J02 (lote interno)' : 'Ex: KL433-12';
+    ult.disabled = !r; ult.placeholder = r ? 'Ex: 270' : '—'; if (!r) ult.value = '';
+  }
   sel.addEventListener('change', sync); sync();
   document.getElementById('tbodyItensForn').appendChild(tr);
 }
@@ -3012,7 +3072,7 @@ async function salvarFornecedor(){
   var nome = document.getElementById('fornNomeInput').value.trim();
   var itens = Array.prototype.map.call(document.querySelectorAll('#tbodyItensForn tr'), function(tr){
     var m = tr.querySelector('.it-mat').value;
-    return { mat: m, tipo: tr.querySelector('.it-tipo').value.trim(), cod: m === 'resina' ? tr.querySelector('.it-cod').value.trim().toUpperCase() : '',
+    return { mat: m, tipo: tr.querySelector('.it-tipo').value.trim(), cod: tr.querySelector('.it-cod').value.trim().toUpperCase(),
              ult: m === 'resina' ? tr.querySelector('.it-ult').value.trim() : '', origTipo: tr.dataset.origTipo, origMat: tr.dataset.origMat };
   }).filter(function(i){ return i.tipo; });
   if (!nome) return erro('Informe o nome do fornecedor.');
