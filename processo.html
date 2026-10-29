@@ -566,6 +566,34 @@
         </div>
         <p class="note" id="criteriosVazio" hidden>Nenhum critério cadastrado ainda. Clique em "Novo critério" para começar.</p>
       </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="crit-toolbar" style="margin-bottom:10px;">
+          <p class="note" style="margin:0;max-width:640px;">Critérios de <strong>Percurso</strong>, <strong>Comprimento do shotpot</strong> e <strong>Número de batidas (set)</strong> — esses 3 parâmetros não têm um único Mínimo/Máximo por Máquina+Gramatura+Resina: o critério muda de acordo com quantas <strong>Cavidades ativas</strong> a máquina está usando naquele horário (mesmo valor pra qualquer Cor/Resina dessa Gramatura). Essa lista é só de leitura aqui — o cadastro é feito pelo importador dos POPs, abaixo.</p>
+        </div>
+        <div class="field" style="max-width:360px;margin-bottom:12px;">
+          <label>Máquina + Gramatura</label>
+          <select id="cavSeletorCombo" onchange="desenharTabelaCavidade()"></select>
+        </div>
+        <div class="widetablewrap">
+          <table class="widetable" id="cavTable" style="white-space:normal;width:100%;">
+            <thead><tr>
+              <th>Cavidades ativas</th><th>Percurso mín</th><th>Percurso máx</th>
+              <th>Shotpot mín</th><th>Shotpot máx</th><th>Batidas (set)</th>
+            </tr></thead>
+            <tbody id="cavBody"></tbody>
+          </table>
+        </div>
+        <p class="note" id="cavVazio" hidden>Nenhum critério por cavidade cadastrado ainda — use o importador dos POPs abaixo.</p>
+      </div>
+
+      <div class="card" style="margin-top:16px;">
+        <h4 style="margin:0 0 6px;">Importar critérios dos POPs (Injeção) — uma vez</h4>
+        <p class="note" style="margin:0 0 10px;max-width:640px;">Cadastra de uma vez os critérios padronizados dos 4 POPs de Injeção (Husky GL, Hypet, Husky 1, Husky 2): cria a coluna "cavidade_ativa" nessa planilha (se ainda não existir), atualiza/cria os critérios normais, cadastra os critérios por cavidade ativa, remove os critérios antigos de Cor específica do Hypet (41,5 · Indorama Max · Cristal/Âmbar — passam a valer pra "Todas as cores"), e adiciona a gramatura 34,0 e as resinas "Cirklo - PCR"/"Green - PCR" nas listas de apoio, se ainda não estiverem lá. Pode ser clicado mais de uma vez sem duplicar nada (compara com o que já existe antes de criar/mudar).</p>
+        <button class="btn btn-accent" id="btnImportarPOPs" onclick="executarImportacaoPOPs()">Importar critérios dos POPs ✓</button>
+        <div id="importPOPsProgresso" class="loading-row" hidden><div class="spinner"></div> <span id="importPOPsProgressoTxt">Importando…</span></div>
+        <pre id="importPOPsLog" class="note" style="display:none;white-space:pre-wrap;margin-top:10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);padding:10px;border-radius:6px;font-family:var(--font-mono);font-size:12px;"></pre>
+      </div>
     </div>
 
     <div id="critFormSecao" hidden>
@@ -1031,6 +1059,8 @@
 <div id="toast" class="toast" hidden></div>
 <div id="dv3tooltip"></div>
 
+<!-- Critérios padronizados dos POPs de Injeção (Husky GL, Hypet, Husky 1, Husky 2), usados só pelo importador executarImportacaoPOPs(). n = [máquina, gramatura, resina, parâmetro, mín, máx] (Cor sempre em branco); c = [máquina, gramatura, parâmetro, cavidades ativas, mín, máx]; l = itens a garantir nas listas de apoio. -->
+<script type="application/json" id="dadosImportPOPs">{"n":[["GL","15,6","Indorama Max","Temperatura de água gelada","","12"],["GL","15,6","Billion","Temperatura de água gelada","","12"],["GL","19,0","Indorama Max","Temperatura de água gelada","","12"],["GL","29,0","Indorama Max","Temperatura de água gelada","","12"],["GL","15,6","Indorama Max","Temperatura água da torre","","30"],["GL","15,6","Billion","Temperatura água da torre","","30"],["GL","19,0","Indorama Max","Temperatura água da torre","","30"],["GL","29,0","Indorama Max","Temperatura água da torre","","30"],["GL","15,6","Indorama Max","Temperatura PET (cone)","160","185"],["GL","15,6","Billion","Temperatura PET (cone)","160","185"],["GL","19,0","Indorama Max","Temperatura PET (cone)","160","185"],["GL","29,0","Indorama Max","Temperatura PET (cone)","160","185"],["GL","15,6","Indorama Max","Ponto de orvalho (secador)","","-20"],["GL","15,6","Billion","Ponto de orvalho (secador)","","-20"],["GL","19,0","Indorama Max","Ponto de orvalho (secador)","","-20"],["GL","29,0","Indorama Max","Ponto de orvalho (secador)","","-20"],["GL","15,6","Indorama Max","Nível do silo (%)","50",""],["GL","15,6","Billion","Nível do silo (%)","50",""],["GL","19,0","Indorama Max","Nível do silo (%)","50",""],["GL","29,0","Indorama Max","Nível do silo (%)","50",""],["GL","15,6","Indorama Max","Pressão de injeção (teórico)","115","150"],["GL","15,6","Billion","Pressão de injeção (teórico)","115","150"],["GL","19,0","Indorama Max","Pressão de injeção (teórico)","115","150"],["GL","29,0","Indorama Max","Pressão de injeção (teórico)","115","150"],["GL","15,6","Indorama Max","Pressão de injeção (real)","115","150"],["GL","15,6","Billion","Pressão de injeção (real)","115","150"],["GL","19,0","Indorama Max","Pressão de injeção (real)","115","150"],["GL","29,0","Indorama Max","Pressão de injeção (real)","115","150"],["GL","15,6","Indorama Max","Velocidade de injeção (1º perfil)","65","68"],["GL","15,6","Billion","Velocidade de injeção (1º perfil)","65","68"],["GL","19,0","Indorama Max","Velocidade de injeção (1º perfil)","65","68"],["GL","29,0","Indorama Max","Velocidade de injeção (1º perfil)","65","68"],["GL","15,6","Indorama Max","Velocidade de injeção (2º perfil)","60","68"],["GL","15,6","Billion","Velocidade de injeção (2º perfil)","60","68"],["GL","19,0","Indorama Max","Velocidade de injeção (2º perfil)","60","68"],["GL","29,0","Indorama Max","Velocidade de injeção (2º perfil)","60","68"],["GL","15,6","Indorama Max","Velocidade de injeção (3º perfil)","55","68"],["GL","15,6","Billion","Velocidade de injeção (3º perfil)","55","68"],["GL","19,0","Indorama Max","Velocidade de injeção (3º perfil)","55","68"],["GL","29,0","Indorama Max","Velocidade de injeção (3º perfil)","55","68"],["GL","15,6","Indorama Max","Tempo de injeção","1,22","1,42"],["GL","15,6","Billion","Tempo de injeção","1,22","1,42"],["GL","19,0","Indorama Max","Tempo de injeção","1,56","1,76"],["GL","29,0","Indorama Max","Tempo de injeção","2,36","2,56"],["GL","15,6","Indorama Max","Pressão de recalque (1º perfil)","70","85"],["GL","15,6","Billion","Pressão de recalque (1º perfil)","70","85"],["GL","19,0","Indorama Max","Pressão de recalque (1º perfil)","70","85"],["GL","29,0","Indorama Max","Pressão de recalque (1º perfil)","70","85"],["GL","15,6","Indorama Max","Pressão de recalque (2º perfil)","65","85"],["GL","15,6","Billion","Pressão de recalque (2º perfil)","65","85"],["GL","19,0","Indorama Max","Pressão de recalque (2º perfil)","65","85"],["GL","29,0","Indorama Max","Pressão de recalque (2º perfil)","65","85"],["GL","15,6","Indorama Max","Pressão de recalque (3º perfil)","50","85"],["GL","15,6","Billion","Pressão de recalque (3º perfil)","50","85"],["GL","19,0","Indorama Max","Pressão de recalque (3º perfil)","50","85"],["GL","29,0","Indorama Max","Pressão de recalque (3º perfil)","50","85"],["GL","15,6","Indorama Max","Tempo total de recalque","1,38","1,78"],["GL","15,6","Billion","Tempo total de recalque","1,38","1,78"],["GL","19,0","Indorama Max","Tempo total de recalque","1,45","1,85"],["GL","29,0","Indorama Max","Tempo total de recalque","2,87","3,27"],["GL","15,6","Indorama Max","Tempo de recalque (1º perfil)","0,46","0,60"],["GL","15,6","Billion","Tempo de recalque (1º perfil)","0,46","0,60"],["GL","19,0","Indorama Max","Tempo de recalque (1º perfil)","0,49","0,61"],["GL","29,0","Indorama Max","Tempo de recalque (1º perfil)","0,95","1,09"],["GL","15,6","Indorama Max","Tempo de recalque (2º perfil)","0,46","0,59"],["GL","15,6","Billion","Tempo de recalque (2º perfil)","0,46","0,59"],["GL","19,0","Indorama Max","Tempo de recalque (2º perfil)","0,48","0,62"],["GL","29,0","Indorama Max","Tempo de recalque (2º perfil)","0,96","1,09"],["GL","15,6","Indorama Max","Tempo de recalque (3º perfil)","0,46","0,59"],["GL","15,6","Billion","Tempo de recalque (3º perfil)","0,46","0,59"],["GL","19,0","Indorama Max","Tempo de recalque (3º perfil)","0,48","0,62"],["GL","29,0","Indorama Max","Tempo de recalque (3º perfil)","0,96","1,09"],["GL","15,6","Indorama Max","Tempo de abertura de agulha","0","1"],["GL","15,6","Billion","Tempo de abertura de agulha","0","1"],["GL","19,0","Indorama Max","Tempo de abertura de agulha","0","1"],["GL","29,0","Indorama Max","Tempo de abertura de agulha","0","1"],["GL","15,6","Indorama Max","Almofada de massa","5","7"],["GL","15,6","Billion","Almofada de massa","5","7"],["GL","19,0","Indorama Max","Almofada de massa","5","7"],["GL","29,0","Indorama Max","Almofada de massa","5","7"],["GL","15,6","Indorama Max","Velocidade da rosca","23","50"],["GL","15,6","Billion","Velocidade da rosca","23","50"],["GL","19,0","Indorama Max","Velocidade da rosca","23","50"],["GL","29,0","Indorama Max","Velocidade da rosca","23","50"],["GL","15,6","Indorama Max","Tempo de plastificação","4,0","11,0"],["GL","15,6","Billion","Tempo de plastificação","4,0","11,0"],["GL","19,0","Indorama Max","Tempo de plastificação","9,0","12,0"],["GL","29,0","Indorama Max","Tempo de plastificação","9,0","12,0"],["GL","15,6","Indorama Max","Contrapressão","30","40"],["GL","15,6","Billion","Contrapressão","30","40"],["GL","19,0","Indorama Max","Contrapressão","30","40"],["GL","29,0","Indorama Max","Contrapressão","30","40"],["GL","15,6","Indorama Max","Temperatura do canhão","280","290"],["GL","15,6","Billion","Temperatura do canhão","280","290"],["GL","19,0","Indorama Max","Temperatura do canhão","280","290"],["GL","29,0","Indorama Max","Temperatura do canhão","280","290"],["GL","15,6","Indorama Max","Temperatura do molde","280","295"],["GL","15,6","Billion","Temperatura do molde","280","295"],["GL","19,0","Indorama Max","Temperatura do molde","280","295"],["GL","29,0","Indorama Max","Temperatura do molde","280","295"],["GL","15,6","Indorama Max","Temperatura de agulha","55","70"],["GL","15,6","Billion","Temperatura de agulha","55","70"],["GL","19,0","Indorama Max","Temperatura de agulha","55","70"],["GL","29,0","Indorama Max","Temperatura de agulha","55","70"],["GL","15,6","Indorama Max","Temperatura do óleo","38","42"],["GL","15,6","Billion","Temperatura do óleo","38","42"],["GL","19,0","Indorama Max","Temperatura do óleo","38","42"],["GL","29,0","Indorama Max","Temperatura do óleo","38","42"],["GL","15,6","Indorama Max","Tempo de refrigeração","4,8","5,2"],["GL","15,6","Billion","Tempo de refrigeração","4,8","5,2"],["GL","19,0","Indorama Max","Tempo de refrigeração","4,8","5,2"],["GL","29,0","Indorama Max","Tempo de refrigeração","4,8","5,2"],["Hypet","41,5","Indorama Max","Temperatura de água gelada","","12"],["Hypet","41,5","Cirklo - PCR","Temperatura de água gelada","","12"],["Hypet","41,5","Green - PCR","Temperatura de água gelada","","12"],["Hypet","41,5","Indorama Max","Temperatura água da torre","","30"],["Hypet","41,5","Cirklo - PCR","Temperatura água da torre","","30"],["Hypet","41,5","Green - PCR","Temperatura água da torre","","30"],["Hypet","41,5","Indorama Max","Temperatura PET (cone)","160","185"],["Hypet","41,5","Cirklo - PCR","Temperatura PET (cone)","160","185"],["Hypet","41,5","Green - PCR","Temperatura PET (cone)","160","185"],["Hypet","41,5","Indorama Max","Ponto de orvalho (secador)","","-20"],["Hypet","41,5","Cirklo - PCR","Ponto de orvalho (secador)","","-20"],["Hypet","41,5","Green - PCR","Ponto de orvalho (secador)","","-20"],["Hypet","41,5","Indorama Max","Nível do silo (%)","50",""],["Hypet","41,5","Cirklo - PCR","Nível do silo (%)","50",""],["Hypet","41,5","Green - PCR","Nível do silo (%)","50",""],["Hypet","41,5","Indorama Max","Pressão de injeção (teórico)","148","175"],["Hypet","41,5","Cirklo - PCR","Pressão de injeção (teórico)","125","140"],["Hypet","41,5","Green - PCR","Pressão de injeção (teórico)","125","140"],["Hypet","41,5","Indorama Max","Pressão de injeção (real)","148","175"],["Hypet","41,5","Cirklo - PCR","Pressão de injeção (real)","125","140"],["Hypet","41,5","Green - PCR","Pressão de injeção (real)","125","140"],["Hypet","41,5","Indorama Max","Velocidade de injeção (1º perfil)","95","146"],["Hypet","41,5","Cirklo - PCR","Velocidade de injeção (1º perfil)","95","146"],["Hypet","41,5","Green - PCR","Velocidade de injeção (1º perfil)","95","146"],["Hypet","41,5","Indorama Max","Velocidade de injeção (2º perfil)","37","76"],["Hypet","41,5","Cirklo - PCR","Velocidade de injeção (2º perfil)","37","76"],["Hypet","41,5","Green - PCR","Velocidade de injeção (2º perfil)","37","76"],["Hypet","41,5","Indorama Max","Tempo de injeção","2,0","3,0"],["Hypet","41,5","Cirklo - PCR","Tempo de injeção","2,0","3,0"],["Hypet","41,5","Green - PCR","Tempo de injeção","2,0","3,0"],["Hypet","41,5","Indorama Max","Pressão de recalque (1º perfil)","51","63"],["Hypet","41,5","Cirklo - PCR","Pressão de recalque (1º perfil)","51","63"],["Hypet","41,5","Green - PCR","Pressão de recalque (1º perfil)","51","63"],["Hypet","41,5","Indorama Max","Pressão de recalque (2º perfil)","46","59"],["Hypet","41,5","Cirklo - PCR","Pressão de recalque (2º perfil)","46","59"],["Hypet","41,5","Green - PCR","Pressão de recalque (2º perfil)","46","59"],["Hypet","41,5","Indorama Max","Tempo total de recalque","6,0","6,2"],["Hypet","41,5","Cirklo - PCR","Tempo total de recalque","6,0","6,2"],["Hypet","41,5","Green - PCR","Tempo total de recalque","6,0","6,2"],["Hypet","41,5","Indorama Max","Tempo de recalque (1º perfil)","6,0","6,2"],["Hypet","41,5","Cirklo - PCR","Tempo de recalque (1º perfil)","6,0","6,2"],["Hypet","41,5","Green - PCR","Tempo de recalque (1º perfil)","6,0","6,2"],["Hypet","41,5","Indorama Max","Tempo de abertura de agulha","0","1"],["Hypet","41,5","Cirklo - PCR","Tempo de abertura de agulha","0","1"],["Hypet","41,5","Green - PCR","Tempo de abertura de agulha","0","1"],["Hypet","41,5","Indorama Max","Almofada de massa","3,0","6,0"],["Hypet","41,5","Cirklo - PCR","Almofada de massa","3,0","6,0"],["Hypet","41,5","Green - PCR","Almofada de massa","3,0","6,0"],["Hypet","41,5","Indorama Max","Velocidade da rosca","44","72"],["Hypet","41,5","Cirklo - PCR","Velocidade da rosca","44","72"],["Hypet","41,5","Green - PCR","Velocidade da rosca","44","72"],["Hypet","41,5","Indorama Max","Tempo de plastificação","8,5","14,5"],["Hypet","41,5","Cirklo - PCR","Tempo de plastificação","8,5","14,5"],["Hypet","41,5","Green - PCR","Tempo de plastificação","8,5","14,5"],["Hypet","41,5","Indorama Max","Contrapressão","58","60"],["Hypet","41,5","Cirklo - PCR","Contrapressão","58","60"],["Hypet","41,5","Green - PCR","Contrapressão","58","60"],["Hypet","41,5","Indorama Max","Temperatura do canhão","282","295"],["Hypet","41,5","Cirklo - PCR","Temperatura do canhão","282","295"],["Hypet","41,5","Green - PCR","Temperatura do canhão","282","295"],["Hypet","41,5","Indorama Max","Temperatura do molde","284","295"],["Hypet","41,5","Cirklo - PCR","Temperatura do molde","284","295"],["Hypet","41,5","Green - PCR","Temperatura do molde","284","295"],["Hypet","41,5","Indorama Max","Temperatura de agulha","46","56"],["Hypet","41,5","Cirklo - PCR","Temperatura de agulha","46","56"],["Hypet","41,5","Green - PCR","Temperatura de agulha","46","56"],["Hypet","41,5","Indorama Max","Temperatura do óleo","48","52"],["Hypet","41,5","Cirklo - PCR","Temperatura do óleo","48","52"],["Hypet","41,5","Green - PCR","Temperatura do óleo","48","52"],["Hypet","41,5","Indorama Max","Tempo de refrigeração","2,60","5,00"],["Hypet","41,5","Cirklo - PCR","Tempo de refrigeração","2,60","5,00"],["Hypet","41,5","Green - PCR","Tempo de refrigeração","2,60","5,00"],["Husky 1","19,0","Indorama Max","Temperatura de água gelada","","12"],["Husky 1","20,5","Indorama Max","Temperatura de água gelada","","12"],["Husky 1","29,0","Indorama Max","Temperatura de água gelada","","12"],["Husky 1","34,0","Indorama Max","Temperatura de água gelada","","12"],["Husky 1","44,0","Indorama Max","Temperatura de água gelada","","12"],["Husky 1","19,0","Indorama Max","Temperatura água da torre","","30"],["Husky 1","20,5","Indorama Max","Temperatura água da torre","","30"],["Husky 1","29,0","Indorama Max","Temperatura água da torre","","30"],["Husky 1","34,0","Indorama Max","Temperatura água da torre","","30"],["Husky 1","44,0","Indorama Max","Temperatura água da torre","","30"],["Husky 1","19,0","Indorama Max","Temperatura PET (cone)","160","185"],["Husky 1","20,5","Indorama Max","Temperatura PET (cone)","160","185"],["Husky 1","29,0","Indorama Max","Temperatura PET (cone)","160","185"],["Husky 1","34,0","Indorama Max","Temperatura PET (cone)","160","185"],["Husky 1","44,0","Indorama Max","Temperatura PET (cone)","160","185"],["Husky 1","19,0","Indorama Max","Ponto de orvalho (secador)","","-20"],["Husky 1","20,5","Indorama Max","Ponto de orvalho (secador)","","-20"],["Husky 1","29,0","Indorama Max","Ponto de orvalho (secador)","","-20"],["Husky 1","34,0","Indorama Max","Ponto de orvalho (secador)","","-20"],["Husky 1","44,0","Indorama Max","Ponto de orvalho (secador)","","-20"],["Husky 1","19,0","Indorama Max","Nível do silo (%)","50",""],["Husky 1","20,5","Indorama Max","Nível do silo (%)","50",""],["Husky 1","29,0","Indorama Max","Nível do silo (%)","50",""],["Husky 1","34,0","Indorama Max","Nível do silo (%)","50",""],["Husky 1","44,0","Indorama Max","Nível do silo (%)","50",""],["Husky 1","19,0","Indorama Max","Pressão de injeção (teórico)","140","180"],["Husky 1","20,5","Indorama Max","Pressão de injeção (teórico)","140","180"],["Husky 1","29,0","Indorama Max","Pressão de injeção (teórico)","140","180"],["Husky 1","34,0","Indorama Max","Pressão de injeção (teórico)","140","180"],["Husky 1","44,0","Indorama Max","Pressão de injeção (teórico)","140","180"],["Husky 1","19,0","Indorama Max","Pressão de injeção (real)","120","150"],["Husky 1","20,5","Indorama Max","Pressão de injeção (real)","120","150"],["Husky 1","29,0","Indorama Max","Pressão de injeção (real)","120","150"],["Husky 1","34,0","Indorama Max","Pressão de injeção (real)","120","150"],["Husky 1","44,0","Indorama Max","Pressão de injeção (real)","120","150"],["Husky 1","19,0","Indorama Max","Velocidade de injeção (1º perfil)","40","60"],["Husky 1","20,5","Indorama Max","Velocidade de injeção (1º perfil)","40","60"],["Husky 1","29,0","Indorama Max","Velocidade de injeção (1º perfil)","40","60"],["Husky 1","34,0","Indorama Max","Velocidade de injeção (1º perfil)","40","60"],["Husky 1","44,0","Indorama Max","Velocidade de injeção (1º perfil)","40","60"],["Husky 1","19,0","Indorama Max","Velocidade de injeção (2º perfil)","40","60"],["Husky 1","20,5","Indorama Max","Velocidade de injeção (2º perfil)","40","60"],["Husky 1","29,0","Indorama Max","Velocidade de injeção (2º perfil)","40","60"],["Husky 1","34,0","Indorama Max","Velocidade de injeção (2º perfil)","40","60"],["Husky 1","44,0","Indorama Max","Velocidade de injeção (2º perfil)","40","60"],["Husky 1","19,0","Indorama Max","Velocidade de injeção (3º perfil)","40","60"],["Husky 1","20,5","Indorama Max","Velocidade de injeção (3º perfil)","40","60"],["Husky 1","29,0","Indorama Max","Velocidade de injeção (3º perfil)","40","60"],["Husky 1","34,0","Indorama Max","Velocidade de injeção (3º perfil)","40","60"],["Husky 1","44,0","Indorama Max","Velocidade de injeção (3º perfil)","40","60"],["Husky 1","19,0","Indorama Max","Velocidade de injeção (4º perfil)","40","60"],["Husky 1","20,5","Indorama Max","Velocidade de injeção (4º perfil)","40","60"],["Husky 1","29,0","Indorama Max","Velocidade de injeção (4º perfil)","40","60"],["Husky 1","34,0","Indorama Max","Velocidade de injeção (4º perfil)","40","60"],["Husky 1","44,0","Indorama Max","Velocidade de injeção (4º perfil)","40","60"],["Husky 1","19,0","Indorama Max","Velocidade de injeção (5º perfil)","40","60"],["Husky 1","20,5","Indorama Max","Velocidade de injeção (5º perfil)","40","60"],["Husky 1","29,0","Indorama Max","Velocidade de injeção (5º perfil)","40","60"],["Husky 1","34,0","Indorama Max","Velocidade de injeção (5º perfil)","40","60"],["Husky 1","44,0","Indorama Max","Velocidade de injeção (5º perfil)","40","60"],["Husky 1","19,0","Indorama Max","Tempo de injeção","1,56","1,76"],["Husky 1","20,5","Indorama Max","Tempo de injeção","1,65","1,85"],["Husky 1","29,0","Indorama Max","Tempo de injeção","2,36","2,56"],["Husky 1","34,0","Indorama Max","Tempo de injeção","2,79","2,99"],["Husky 1","44,0","Indorama Max","Tempo de injeção","3,64","3,84"],["Husky 1","19,0","Indorama Max","Pressão de recalque (1º perfil)","20","40"],["Husky 1","20,5","Indorama Max","Pressão de recalque (1º perfil)","20","40"],["Husky 1","29,0","Indorama Max","Pressão de recalque (1º perfil)","20","40"],["Husky 1","34,0","Indorama Max","Pressão de recalque (1º perfil)","20","40"],["Husky 1","44,0","Indorama Max","Pressão de recalque (1º perfil)","20","40"],["Husky 1","19,0","Indorama Max","Pressão de recalque (2º perfil)","20","30"],["Husky 1","20,5","Indorama Max","Pressão de recalque (2º perfil)","20","30"],["Husky 1","29,0","Indorama Max","Pressão de recalque (2º perfil)","20","30"],["Husky 1","34,0","Indorama Max","Pressão de recalque (2º perfil)","20","30"],["Husky 1","44,0","Indorama Max","Pressão de recalque (2º perfil)","20","30"],["Husky 1","19,0","Indorama Max","Pressão de recalque (3º perfil)","20","40"],["Husky 1","20,5","Indorama Max","Pressão de recalque (3º perfil)","20","40"],["Husky 1","29,0","Indorama Max","Pressão de recalque (3º perfil)","20","40"],["Husky 1","34,0","Indorama Max","Pressão de recalque (3º perfil)","20","40"],["Husky 1","44,0","Indorama Max","Pressão de recalque (3º perfil)","20","40"],["Husky 1","19,0","Indorama Max","Tempo total de recalque","1,45","1,85"],["Husky 1","20,5","Indorama Max","Tempo total de recalque","2,51","2,91"],["Husky 1","29,0","Indorama Max","Tempo total de recalque","2,87","3,27"],["Husky 1","34,0","Indorama Max","Tempo total de recalque","4,68","5,08"],["Husky 1","44,0","Indorama Max","Tempo total de recalque","5,36","5,76"],["Husky 1","19,0","Indorama Max","Tempo de recalque (1º perfil)","0,49","0,62"],["Husky 1","20,5","Indorama Max","Tempo de recalque (1º perfil)","0,84","0,97"],["Husky 1","29,0","Indorama Max","Tempo de recalque (1º perfil)","0,95","1,09"],["Husky 1","34,0","Indorama Max","Tempo de recalque (1º perfil)","1,56","1,70"],["Husky 1","44,0","Indorama Max","Tempo de recalque (1º perfil)","1,78","1,92"],["Husky 1","19,0","Indorama Max","Tempo de recalque (2º perfil)","0,48","0,62"],["Husky 1","20,5","Indorama Max","Tempo de recalque (2º perfil)","0,84","0,97"],["Husky 1","29,0","Indorama Max","Tempo de recalque (2º perfil)","0,96","1,09"],["Husky 1","34,0","Indorama Max","Tempo de recalque (2º perfil)","1,56","1,69"],["Husky 1","44,0","Indorama Max","Tempo de recalque (2º perfil)","1,79","1,92"],["Husky 1","19,0","Indorama Max","Tempo de recalque (3º perfil)","0,48","0,61"],["Husky 1","20,5","Indorama Max","Tempo de recalque (3º perfil)","0,83","0,97"],["Husky 1","29,0","Indorama Max","Tempo de recalque (3º perfil)","0,96","1,09"],["Husky 1","34,0","Indorama Max","Tempo de recalque (3º perfil)","1,56","1,69"],["Husky 1","44,0","Indorama Max","Tempo de recalque (3º perfil)","1,79","1,92"],["Husky 1","19,0","Indorama Max","Tempo de abertura de agulha","0","1"],["Husky 1","20,5","Indorama Max","Tempo de abertura de agulha","0","1"],["Husky 1","29,0","Indorama Max","Tempo de abertura de agulha","0","1"],["Husky 1","34,0","Indorama Max","Tempo de abertura de agulha","0","1"],["Husky 1","44,0","Indorama Max","Tempo de abertura de agulha","0","1"],["Husky 1","19,0","Indorama Max","Almofada de massa","5","7"],["Husky 1","20,5","Indorama Max","Almofada de massa","5","7"],["Husky 1","29,0","Indorama Max","Almofada de massa","5","7"],["Husky 1","34,0","Indorama Max","Almofada de massa","5","7"],["Husky 1","44,0","Indorama Max","Almofada de massa","5","7"],["Husky 1","19,0","Indorama Max","Velocidade da rosca","23","50"],["Husky 1","20,5","Indorama Max","Velocidade da rosca","23","50"],["Husky 1","29,0","Indorama Max","Velocidade da rosca","23","50"],["Husky 1","34,0","Indorama Max","Velocidade da rosca","23","50"],["Husky 1","44,0","Indorama Max","Velocidade da rosca","23","50"],["Husky 1","19,0","Indorama Max","Tempo de plastificação","6","10"],["Husky 1","20,5","Indorama Max","Tempo de plastificação","6","10"],["Husky 1","29,0","Indorama Max","Tempo de plastificação","6","10"],["Husky 1","34,0","Indorama Max","Tempo de plastificação","6","10"],["Husky 1","44,0","Indorama Max","Tempo de plastificação","10","14"],["Husky 1","19,0","Indorama Max","Contrapressão","30","40"],["Husky 1","20,5","Indorama Max","Contrapressão","30","40"],["Husky 1","29,0","Indorama Max","Contrapressão","30","40"],["Husky 1","34,0","Indorama Max","Contrapressão","30","40"],["Husky 1","44,0","Indorama Max","Contrapressão","30","40"],["Husky 1","19,0","Indorama Max","Temperatura do canhão","280","290"],["Husky 1","20,5","Indorama Max","Temperatura do canhão","280","290"],["Husky 1","29,0","Indorama Max","Temperatura do canhão","280","290"],["Husky 1","34,0","Indorama Max","Temperatura do canhão","280","290"],["Husky 1","44,0","Indorama Max","Temperatura do canhão","280","290"],["Husky 1","19,0","Indorama Max","Temperatura do molde","280","295"],["Husky 1","20,5","Indorama Max","Temperatura do molde","280","295"],["Husky 1","29,0","Indorama Max","Temperatura do molde","280","295"],["Husky 1","34,0","Indorama Max","Temperatura do molde","280","295"],["Husky 1","44,0","Indorama Max","Temperatura do molde","280","295"],["Husky 1","19,0","Indorama Max","Temperatura de agulha","55","70"],["Husky 1","20,5","Indorama Max","Temperatura de agulha","55","70"],["Husky 1","29,0","Indorama Max","Temperatura de agulha","55","70"],["Husky 1","34,0","Indorama Max","Temperatura de agulha","55","70"],["Husky 1","44,0","Indorama Max","Temperatura de agulha","55","70"],["Husky 1","19,0","Indorama Max","Temperatura do óleo","38","42"],["Husky 1","20,5","Indorama Max","Temperatura do óleo","38","42"],["Husky 1","29,0","Indorama Max","Temperatura do óleo","38","42"],["Husky 1","34,0","Indorama Max","Temperatura do óleo","38","42"],["Husky 1","44,0","Indorama Max","Temperatura do óleo","38","42"],["Husky 1","19,0","Indorama Max","Tempo de refrigeração","4,8","5,2"],["Husky 1","20,5","Indorama Max","Tempo de refrigeração","4,8","5,2"],["Husky 1","29,0","Indorama Max","Tempo de refrigeração","4,8","5,2"],["Husky 1","34,0","Indorama Max","Tempo de refrigeração","4,8","5,2"],["Husky 1","44,0","Indorama Max","Tempo de refrigeração","4,8","5,2"],["Husky 2","15,6","Indorama Max","Temperatura de água gelada","","12"],["Husky 2","15,6","Billion","Temperatura de água gelada","","12"],["Husky 2","29,0","Indorama Max","Temperatura de água gelada","","12"],["Husky 2","34,0","Indorama Max","Temperatura de água gelada","","12"],["Husky 2","44,0","Indorama Max","Temperatura de água gelada","","12"],["Husky 2","44,0","Alpek","Temperatura de água gelada","","12"],["Husky 2","15,6","Indorama Max","Temperatura água da torre","","30"],["Husky 2","15,6","Billion","Temperatura água da torre","","30"],["Husky 2","29,0","Indorama Max","Temperatura água da torre","","30"],["Husky 2","34,0","Indorama Max","Temperatura água da torre","","30"],["Husky 2","44,0","Indorama Max","Temperatura água da torre","","30"],["Husky 2","44,0","Alpek","Temperatura água da torre","","30"],["Husky 2","15,6","Indorama Max","Temperatura PET (cone)","160","185"],["Husky 2","15,6","Billion","Temperatura PET (cone)","160","185"],["Husky 2","29,0","Indorama Max","Temperatura PET (cone)","160","185"],["Husky 2","34,0","Indorama Max","Temperatura PET (cone)","160","185"],["Husky 2","44,0","Indorama Max","Temperatura PET (cone)","160","185"],["Husky 2","44,0","Alpek","Temperatura PET (cone)","160","185"],["Husky 2","15,6","Indorama Max","Ponto de orvalho (secador)","","-20"],["Husky 2","15,6","Billion","Ponto de orvalho (secador)","","-20"],["Husky 2","29,0","Indorama Max","Ponto de orvalho (secador)","","-20"],["Husky 2","34,0","Indorama Max","Ponto de orvalho (secador)","","-20"],["Husky 2","44,0","Indorama Max","Ponto de orvalho (secador)","","-20"],["Husky 2","44,0","Alpek","Ponto de orvalho (secador)","","-20"],["Husky 2","15,6","Indorama Max","Nível do silo (%)","50",""],["Husky 2","15,6","Billion","Nível do silo (%)","50",""],["Husky 2","29,0","Indorama Max","Nível do silo (%)","50",""],["Husky 2","34,0","Indorama Max","Nível do silo (%)","50",""],["Husky 2","44,0","Indorama Max","Nível do silo (%)","50",""],["Husky 2","44,0","Alpek","Nível do silo (%)","50",""],["Husky 2","15,6","Indorama Max","Pressão de injeção (teórico)","140","180"],["Husky 2","15,6","Billion","Pressão de injeção (teórico)","140","180"],["Husky 2","29,0","Indorama Max","Pressão de injeção (teórico)","140","180"],["Husky 2","34,0","Indorama Max","Pressão de injeção (teórico)","140","180"],["Husky 2","44,0","Indorama Max","Pressão de injeção (teórico)","140","180"],["Husky 2","44,0","Alpek","Pressão de injeção (teórico)","140","180"],["Husky 2","15,6","Indorama Max","Pressão de injeção (real)","120","150"],["Husky 2","15,6","Billion","Pressão de injeção (real)","120","150"],["Husky 2","29,0","Indorama Max","Pressão de injeção (real)","120","150"],["Husky 2","34,0","Indorama Max","Pressão de injeção (real)","120","150"],["Husky 2","44,0","Indorama Max","Pressão de injeção (real)","120","150"],["Husky 2","44,0","Alpek","Pressão de injeção (real)","120","150"],["Husky 2","15,6","Indorama Max","Velocidade de injeção (1º perfil)","140","180"],["Husky 2","15,6","Billion","Velocidade de injeção (1º perfil)","140","180"],["Husky 2","29,0","Indorama Max","Velocidade de injeção (1º perfil)","140","180"],["Husky 2","34,0","Indorama Max","Velocidade de injeção (1º perfil)","140","180"],["Husky 2","44,0","Indorama Max","Velocidade de injeção (1º perfil)","140","180"],["Husky 2","44,0","Alpek","Velocidade de injeção (1º perfil)","140","180"],["Husky 2","15,6","Indorama Max","Velocidade de injeção (2º perfil)","120","160"],["Husky 2","15,6","Billion","Velocidade de injeção (2º perfil)","120","160"],["Husky 2","29,0","Indorama Max","Velocidade de injeção (2º perfil)","120","160"],["Husky 2","34,0","Indorama Max","Velocidade de injeção (2º perfil)","120","160"],["Husky 2","44,0","Indorama Max","Velocidade de injeção (2º perfil)","120","160"],["Husky 2","44,0","Alpek","Velocidade de injeção (2º perfil)","120","160"],["Husky 2","15,6","Indorama Max","Velocidade de injeção (3º perfil)","110","150"],["Husky 2","15,6","Billion","Velocidade de injeção (3º perfil)","110","150"],["Husky 2","29,0","Indorama Max","Velocidade de injeção (3º perfil)","110","150"],["Husky 2","34,0","Indorama Max","Velocidade de injeção (3º perfil)","110","150"],["Husky 2","44,0","Indorama Max","Velocidade de injeção (3º perfil)","110","150"],["Husky 2","44,0","Alpek","Velocidade de injeção (3º perfil)","110","150"],["Husky 2","15,6","Indorama Max","Velocidade de injeção (4º perfil)","100","130"],["Husky 2","15,6","Billion","Velocidade de injeção (4º perfil)","100","130"],["Husky 2","29,0","Indorama Max","Velocidade de injeção (4º perfil)","100","130"],["Husky 2","34,0","Indorama Max","Velocidade de injeção (4º perfil)","100","130"],["Husky 2","44,0","Indorama Max","Velocidade de injeção (4º perfil)","100","130"],["Husky 2","44,0","Alpek","Velocidade de injeção (4º perfil)","100","130"],["Husky 2","15,6","Indorama Max","Velocidade de injeção (5º perfil)","80","100"],["Husky 2","15,6","Billion","Velocidade de injeção (5º perfil)","80","100"],["Husky 2","29,0","Indorama Max","Velocidade de injeção (5º perfil)","80","100"],["Husky 2","34,0","Indorama Max","Velocidade de injeção (5º perfil)","80","100"],["Husky 2","44,0","Indorama Max","Velocidade de injeção (5º perfil)","80","100"],["Husky 2","44,0","Alpek","Velocidade de injeção (5º perfil)","80","100"],["Husky 2","15,6","Indorama Max","Tempo de injeção","1,22","1,42"],["Husky 2","15,6","Billion","Tempo de injeção","1,22","1,42"],["Husky 2","29,0","Indorama Max","Tempo de injeção","2,36","2,56"],["Husky 2","34,0","Indorama Max","Tempo de injeção","2,79","2,99"],["Husky 2","44,0","Indorama Max","Tempo de injeção","3,64","3,84"],["Husky 2","44,0","Alpek","Tempo de injeção","3,64","3,84"],["Husky 2","15,6","Indorama Max","Pressão de recalque (1º perfil)","60","80"],["Husky 2","15,6","Billion","Pressão de recalque (1º perfil)","60","80"],["Husky 2","29,0","Indorama Max","Pressão de recalque (1º perfil)","60","80"],["Husky 2","34,0","Indorama Max","Pressão de recalque (1º perfil)","60","80"],["Husky 2","44,0","Indorama Max","Pressão de recalque (1º perfil)","60","80"],["Husky 2","44,0","Alpek","Pressão de recalque (1º perfil)","60","80"],["Husky 2","15,6","Indorama Max","Pressão de recalque (2º perfil)","50","70"],["Husky 2","15,6","Billion","Pressão de recalque (2º perfil)","50","70"],["Husky 2","29,0","Indorama Max","Pressão de recalque (2º perfil)","50","70"],["Husky 2","34,0","Indorama Max","Pressão de recalque (2º perfil)","50","70"],["Husky 2","44,0","Indorama Max","Pressão de recalque (2º perfil)","50","70"],["Husky 2","44,0","Alpek","Pressão de recalque (2º perfil)","50","70"],["Husky 2","15,6","Indorama Max","Pressão de recalque (3º perfil)","40","60"],["Husky 2","15,6","Billion","Pressão de recalque (3º perfil)","40","60"],["Husky 2","29,0","Indorama Max","Pressão de recalque (3º perfil)","40","60"],["Husky 2","34,0","Indorama Max","Pressão de recalque (3º perfil)","40","60"],["Husky 2","44,0","Indorama Max","Pressão de recalque (3º perfil)","40","60"],["Husky 2","44,0","Alpek","Pressão de recalque (3º perfil)","40","60"],["Husky 2","15,6","Indorama Max","Tempo total de recalque","1,38","1,78"],["Husky 2","15,6","Billion","Tempo total de recalque","1,38","1,78"],["Husky 2","29,0","Indorama Max","Tempo total de recalque","2,87","3,27"],["Husky 2","34,0","Indorama Max","Tempo total de recalque","4,68","5,08"],["Husky 2","44,0","Indorama Max","Tempo total de recalque","5,36","5,76"],["Husky 2","44,0","Alpek","Tempo total de recalque","5,36","5,76"],["Husky 2","15,6","Indorama Max","Tempo de recalque (1º perfil)","0,46","0,59"],["Husky 2","15,6","Billion","Tempo de recalque (1º perfil)","0,46","0,59"],["Husky 2","29,0","Indorama Max","Tempo de recalque (1º perfil)","0,96","1,09"],["Husky 2","34,0","Indorama Max","Tempo de recalque (1º perfil)","1,56","1,70"],["Husky 2","44,0","Indorama Max","Tempo de recalque (1º perfil)","1,79","1,92"],["Husky 2","44,0","Alpek","Tempo de recalque (1º perfil)","1,78","1,92"],["Husky 2","15,6","Indorama Max","Tempo de recalque (2º perfil)","0,46","0,59"],["Husky 2","15,6","Billion","Tempo de recalque (2º perfil)","0,46","0,59"],["Husky 2","29,0","Indorama Max","Tempo de recalque (2º perfil)","0,96","1,09"],["Husky 2","34,0","Indorama Max","Tempo de recalque (2º perfil)","1,56","1,69"],["Husky 2","44,0","Indorama Max","Tempo de recalque (2º perfil)","1,79","1,92"],["Husky 2","44,0","Alpek","Tempo de recalque (2º perfil)","1,79","1,92"],["Husky 2","15,6","Indorama Max","Tempo de recalque (3º perfil)","0,46","0,59"],["Husky 2","15,6","Billion","Tempo de recalque (3º perfil)","0,46","0,59"],["Husky 2","29,0","Indorama Max","Tempo de recalque (3º perfil)","0,96","1,09"],["Husky 2","34,0","Indorama Max","Tempo de recalque (3º perfil)","1,56","1,69"],["Husky 2","44,0","Indorama Max","Tempo de recalque (3º perfil)","1,79","1,92"],["Husky 2","44,0","Alpek","Tempo de recalque (3º perfil)","1,79","1,92"],["Husky 2","15,6","Indorama Max","Tempo de abertura de agulha","0","1"],["Husky 2","15,6","Billion","Tempo de abertura de agulha","0","1"],["Husky 2","29,0","Indorama Max","Tempo de abertura de agulha","0","1"],["Husky 2","34,0","Indorama Max","Tempo de abertura de agulha","0","1"],["Husky 2","44,0","Indorama Max","Tempo de abertura de agulha","0","1"],["Husky 2","44,0","Alpek","Tempo de abertura de agulha","0","1"],["Husky 2","15,6","Indorama Max","Almofada de massa","5","7"],["Husky 2","15,6","Billion","Almofada de massa","5","7"],["Husky 2","29,0","Indorama Max","Almofada de massa","5","7"],["Husky 2","34,0","Indorama Max","Almofada de massa","5","7"],["Husky 2","44,0","Indorama Max","Almofada de massa","5","7"],["Husky 2","44,0","Alpek","Almofada de massa","5","7"],["Husky 2","15,6","Indorama Max","Velocidade da rosca","23","50"],["Husky 2","15,6","Billion","Velocidade da rosca","23","50"],["Husky 2","29,0","Indorama Max","Velocidade da rosca","23","50"],["Husky 2","34,0","Indorama Max","Velocidade da rosca","23","50"],["Husky 2","44,0","Indorama Max","Velocidade da rosca","50","70"],["Husky 2","44,0","Alpek","Velocidade da rosca","50","70"],["Husky 2","15,6","Indorama Max","Tempo de plastificação","6","10"],["Husky 2","15,6","Billion","Tempo de plastificação","6","10"],["Husky 2","29,0","Indorama Max","Tempo de plastificação","6","10"],["Husky 2","34,0","Indorama Max","Tempo de plastificação","6","10"],["Husky 2","44,0","Indorama Max","Tempo de plastificação","10","14"],["Husky 2","44,0","Alpek","Tempo de plastificação","10","14"],["Husky 2","15,6","Indorama Max","Contrapressão","30","40"],["Husky 2","15,6","Billion","Contrapressão","30","40"],["Husky 2","29,0","Indorama Max","Contrapressão","30","40"],["Husky 2","34,0","Indorama Max","Contrapressão","30","40"],["Husky 2","44,0","Indorama Max","Contrapressão","30","40"],["Husky 2","44,0","Alpek","Contrapressão","30","40"],["Husky 2","15,6","Indorama Max","Temperatura do canhão","280","290"],["Husky 2","15,6","Billion","Temperatura do canhão","280","290"],["Husky 2","29,0","Indorama Max","Temperatura do canhão","280","290"],["Husky 2","34,0","Indorama Max","Temperatura do canhão","280","290"],["Husky 2","44,0","Indorama Max","Temperatura do canhão","280","290"],["Husky 2","44,0","Alpek","Temperatura do canhão","280","290"],["Husky 2","15,6","Indorama Max","Temperatura do molde","280","295"],["Husky 2","15,6","Billion","Temperatura do molde","280","295"],["Husky 2","29,0","Indorama Max","Temperatura do molde","280","295"],["Husky 2","34,0","Indorama Max","Temperatura do molde","280","295"],["Husky 2","44,0","Indorama Max","Temperatura do molde","280","295"],["Husky 2","44,0","Alpek","Temperatura do molde","280","295"],["Husky 2","15,6","Indorama Max","Temperatura de agulha","55","70"],["Husky 2","15,6","Billion","Temperatura de agulha","55","70"],["Husky 2","29,0","Indorama Max","Temperatura de agulha","55","70"],["Husky 2","34,0","Indorama Max","Temperatura de agulha","55","70"],["Husky 2","44,0","Indorama Max","Temperatura de agulha","55","70"],["Husky 2","44,0","Alpek","Temperatura de agulha","55","70"],["Husky 2","15,6","Indorama Max","Temperatura do óleo","38","42"],["Husky 2","15,6","Billion","Temperatura do óleo","38","42"],["Husky 2","29,0","Indorama Max","Temperatura do óleo","38","42"],["Husky 2","34,0","Indorama Max","Temperatura do óleo","38","42"],["Husky 2","44,0","Indorama Max","Temperatura do óleo","38","42"],["Husky 2","44,0","Alpek","Temperatura do óleo","38","42"],["Husky 2","15,6","Indorama Max","Tempo de refrigeração","4,8","5,2"],["Husky 2","15,6","Billion","Tempo de refrigeração","4,8","5,2"],["Husky 2","29,0","Indorama Max","Tempo de refrigeração","4,8","5,2"],["Husky 2","34,0","Indorama Max","Tempo de refrigeração","4,8","5,2"],["Husky 2","44,0","Indorama Max","Tempo de refrigeração","4,8","5,2"],["Husky 2","44,0","Alpek","Tempo de refrigeração","4,8","5,2"]],"c":[["GL","15,6","Percurso","56","12,9","13,2"],["GL","15,6","Comprimento do shotpot","56","86,0","88,0"],["GL","15,6","Número de batidas (set)","56","340","340"],["GL","15,6","Percurso","55","12,7","13,0"],["GL","15,6","Comprimento do shotpot","55","84,6","86,6"],["GL","15,6","Número de batidas (set)","55","346","346"],["GL","15,6","Percurso","54","12,5","12,8"],["GL","15,6","Comprimento do shotpot","54","83,1","85,1"],["GL","15,6","Número de batidas (set)","54","353","353"],["GL","15,6","Percurso","53","11,5","11,5"],["GL","15,6","Comprimento do shotpot","53","76,7","76,7"],["GL","15,6","Número de batidas (set)","53","359","359"],["GL","15,6","Percurso","52","12,0","12,3"],["GL","15,6","Comprimento do shotpot","52","80,2","82,2"],["GL","15,6","Número de batidas (set)","52","366","366"],["GL","15,6","Percurso","51","11,8","12,1"],["GL","15,6","Comprimento do shotpot","51","78,8","80,8"],["GL","15,6","Número de batidas (set)","51","373","373"],["GL","15,6","Percurso","50","11,6","11,9"],["GL","15,6","Comprimento do shotpot","50","77,3","79,3"],["GL","15,6","Número de batidas (set)","50","381","381"],["GL","15,6","Percurso","49","11,4","11,7"],["GL","15,6","Comprimento do shotpot","49","75,9","77,9"],["GL","15,6","Número de batidas (set)","49","389","389"],["GL","15,6","Percurso","48","11,2","11,5"],["GL","15,6","Comprimento do shotpot","48","74,4","76,4"],["GL","15,6","Número de batidas (set)","48","397","397"],["GL","15,6","Percurso","47","10,9","11,2"],["GL","15,6","Comprimento do shotpot","47","73,0","75,0"],["GL","15,6","Número de batidas (set)","47","405","405"],["GL","19,0","Percurso","56","15,5","15,8"],["GL","19,0","Comprimento do shotpot","56","103,0","105,0"],["GL","19,0","Número de batidas (set)","56","340","340"],["GL","19,0","Percurso","55","15,2","15,5"],["GL","19,0","Comprimento do shotpot","55","101,3","103,3"],["GL","19,0","Número de batidas (set)","55","346","346"],["GL","19,0","Percurso","54","14,9","15,2"],["GL","19,0","Comprimento do shotpot","54","99,5","101,5"],["GL","19,0","Número de batidas (set)","54","353","353"],["GL","19,0","Percurso","53","13,9","13,9"],["GL","19,0","Comprimento do shotpot","53","92,8","92,8"],["GL","19,0","Número de batidas (set)","53","359","359"],["GL","19,0","Percurso","52","14,4","14,7"],["GL","19,0","Comprimento do shotpot","52","96,0","98,0"],["GL","19,0","Número de batidas (set)","52","366","366"],["GL","19,0","Percurso","51","14,1","14,4"],["GL","19,0","Comprimento do shotpot","51","94,3","96,3"],["GL","19,0","Número de batidas (set)","51","373","373"],["GL","19,0","Percurso","50","13,9","14,2"],["GL","19,0","Comprimento do shotpot","50","92,5","94,5"],["GL","19,0","Número de batidas (set)","50","381","381"],["GL","19,0","Percurso","49","13,6","13,9"],["GL","19,0","Comprimento do shotpot","49","90,8","92,8"],["GL","19,0","Número de batidas (set)","49","389","389"],["GL","19,0","Percurso","48","13,4","13,7"],["GL","19,0","Comprimento do shotpot","48","89,0","91,0"],["GL","19,0","Número de batidas (set)","48","397","397"],["GL","19,0","Percurso","47","13,1","13,4"],["GL","19,0","Comprimento do shotpot","47","87,3","89,3"],["GL","19,0","Número de batidas (set)","47","405","405"],["GL","29,0","Percurso","48","20,1","20,4"],["GL","29,0","Comprimento do shotpot","48","134,0","136,0"],["GL","29,0","Número de batidas (set)","48","230","230"],["GL","29,0","Percurso","47","19,7","20,0"],["GL","29,0","Comprimento do shotpot","47","131,3","133,3"],["GL","29,0","Número de batidas (set)","47","235","235"],["GL","29,0","Percurso","46","19,3","19,6"],["GL","29,0","Comprimento do shotpot","46","128,6","130,6"],["GL","29,0","Número de batidas (set)","46","240","240"],["GL","29,0","Percurso","45","18,1","18,1"],["GL","29,0","Comprimento do shotpot","45","120,9","120,9"],["GL","29,0","Número de batidas (set)","45","245","245"],["GL","29,0","Percurso","44","18,5","18,8"],["GL","29,0","Comprimento do shotpot","44","123,3","125,3"],["GL","29,0","Número de batidas (set)","44","251","251"],["GL","29,0","Percurso","43","18,1","18,4"],["GL","29,0","Comprimento do shotpot","43","120,6","122,6"],["GL","29,0","Número de batidas (set)","43","257","257"],["GL","29,0","Percurso","42","17,7","18,0"],["GL","29,0","Comprimento do shotpot","42","117,9","119,9"],["GL","29,0","Número de batidas (set)","42","263","263"],["GL","29,0","Percurso","41","17,3","17,6"],["GL","29,0","Comprimento do shotpot","41","115,2","117,2"],["GL","29,0","Número de batidas (set)","41","269","269"],["GL","29,0","Percurso","40","16,9","17,2"],["GL","29,0","Comprimento do shotpot","40","112,5","114,5"],["GL","29,0","Número de batidas (set)","40","276","276"],["GL","29,0","Percurso","39","16,5","16,8"],["GL","29,0","Comprimento do shotpot","39","109,8","111,8"],["GL","29,0","Número de batidas (set)","39","283","283"],["Hypet","41,5","Percurso","72","49,0","49,5"],["Hypet","41,5","Comprimento do shotpot","72","288,0","291,0"],["Hypet","41,5","Número de batidas (set)","72","116","116"],["Hypet","41,5","Percurso","71","48,3","48,8"],["Hypet","41,5","Comprimento do shotpot","71","284,0","287,0"],["Hypet","41,5","Número de batidas (set)","71","118","118"],["Hypet","41,5","Percurso","70","47,6","48,1"],["Hypet","41,5","Comprimento do shotpot","70","280,1","283,1"],["Hypet","41,5","Número de batidas (set)","70","119","119"],["Hypet","41,5","Percurso","69","46,4","46,4"],["Hypet","41,5","Comprimento do shotpot","69","273,1","273,1"],["Hypet","41,5","Número de batidas (set)","69","121","121"],["Hypet","41,5","Percurso","68","46,3","46,8"],["Hypet","41,5","Comprimento do shotpot","68","272,2","275,2"],["Hypet","41,5","Número de batidas (set)","68","123","123"],["Hypet","41,5","Percurso","67","45,6","46,1"],["Hypet","41,5","Comprimento do shotpot","67","268,2","271,2"],["Hypet","41,5","Número de batidas (set)","67","125","125"],["Hypet","41,5","Percurso","66","44,9","45,4"],["Hypet","41,5","Comprimento do shotpot","66","264,3","267,3"],["Hypet","41,5","Número de batidas (set)","66","127","127"],["Hypet","41,5","Percurso","65","44,2","44,8"],["Hypet","41,5","Comprimento do shotpot","65","260,3","263,3"],["Hypet","41,5","Número de batidas (set)","65","128","128"],["Hypet","41,5","Percurso","64","43,6","44,1"],["Hypet","41,5","Comprimento do shotpot","64","256,3","259,3"],["Hypet","41,5","Número de batidas (set)","64","131","131"],["Hypet","41,5","Percurso","63","42,9","43,4"],["Hypet","41,5","Comprimento do shotpot","63","252,4","255,4"],["Hypet","41,5","Número de batidas (set)","63","133","133"],["Husky 1","19,0","Percurso","56","13,1","13,4"],["Husky 1","19,0","Comprimento do shotpot","56","87,0","89,0"],["Husky 1","19,0","Número de batidas (set)","56","280","280"],["Husky 1","19,0","Percurso","55","12,8","13,1"],["Husky 1","19,0","Comprimento do shotpot","55","85,5","87,5"],["Husky 1","19,0","Número de batidas (set)","55","285","285"],["Husky 1","19,0","Percurso","54","12,6","12,9"],["Husky 1","19,0","Comprimento do shotpot","54","84,1","86,1"],["Husky 1","19,0","Número de batidas (set)","54","290","290"],["Husky 1","19,0","Percurso","53","11,6","11,6"],["Husky 1","19,0","Comprimento do shotpot","53","77,6","77,6"],["Husky 1","19,0","Número de batidas (set)","53","296","296"],["Husky 1","19,0","Percurso","52","12,2","12,5"],["Husky 1","19,0","Comprimento do shotpot","52","81,1","83,1"],["Husky 1","19,0","Número de batidas (set)","52","302","302"],["Husky 1","19,0","Percurso","51","12,0","12,3"],["Husky 1","19,0","Comprimento do shotpot","51","79,7","81,7"],["Husky 1","19,0","Número de batidas (set)","51","307","307"],["Husky 1","19,0","Percurso","50","11,7","12,0"],["Husky 1","19,0","Comprimento do shotpot","50","78,2","80,2"],["Husky 1","19,0","Número de batidas (set)","50","314","314"],["Husky 1","19,0","Percurso","49","11,5","11,8"],["Husky 1","19,0","Comprimento do shotpot","49","76,8","78,8"],["Husky 1","19,0","Número de batidas (set)","49","320","320"],["Husky 1","19,0","Percurso","48","11,3","11,6"],["Husky 1","19,0","Comprimento do shotpot","48","75,3","77,3"],["Husky 1","19,0","Número de batidas (set)","48","327","327"],["Husky 1","19,0","Percurso","47","11,1","11,4"],["Husky 1","19,0","Comprimento do shotpot","47","73,8","75,8"],["Husky 1","19,0","Número de batidas (set)","47","334","334"],["Husky 1","20,5","Percurso","56","13,5","13,8"],["Husky 1","20,5","Comprimento do shotpot","56","90,0","92,0"],["Husky 1","20,5","Número de batidas (set)","56","280","280"],["Husky 1","20,5","Percurso","55","13,3","13,6"],["Husky 1","20,5","Comprimento do shotpot","55","88,5","90,5"],["Husky 1","20,5","Número de batidas (set)","55","285","285"],["Husky 1","20,5","Percurso","54","13,0","13,3"],["Husky 1","20,5","Comprimento do shotpot","54","87,0","89,0"],["Husky 1","20,5","Número de batidas (set)","54","290","290"],["Husky 1","20,5","Percurso","53","12,1","12,1"],["Husky 1","20,5","Comprimento do shotpot","53","80,4","80,4"],["Husky 1","20,5","Número de batidas (set)","53","296","296"],["Husky 1","20,5","Percurso","52","12,6","12,9"],["Husky 1","20,5","Comprimento do shotpot","52","83,9","85,9"],["Husky 1","20,5","Número de batidas (set)","52","302","302"],["Husky 1","20,5","Percurso","51","12,4","12,7"],["Husky 1","20,5","Comprimento do shotpot","51","82,4","84,4"],["Husky 1","20,5","Número de batidas (set)","51","307","307"],["Husky 1","20,5","Percurso","50","12,1","12,4"],["Husky 1","20,5","Comprimento do shotpot","50","80,9","82,9"],["Husky 1","20,5","Número de batidas (set)","50","314","314"],["Husky 1","20,5","Percurso","49","11,9","12,2"],["Husky 1","20,5","Comprimento do shotpot","49","79,4","81,4"],["Husky 1","20,5","Número de batidas (set)","49","320","320"],["Husky 1","20,5","Percurso","48","11,7","12,0"],["Husky 1","20,5","Comprimento do shotpot","48","77,9","79,9"],["Husky 1","20,5","Número de batidas (set)","48","327","327"],["Husky 1","20,5","Percurso","47","11,5","11,8"],["Husky 1","20,5","Comprimento do shotpot","47","76,3","78,3"],["Husky 1","20,5","Número de batidas (set)","47","334","334"],["Husky 1","29,0","Percurso","48","16,8","17,1"],["Husky 1","29,0","Comprimento do shotpot","48","112,0","114,0"],["Husky 1","29,0","Número de batidas (set)","48","230","230"],["Husky 1","29,0","Percurso","47","16,5","16,8"],["Husky 1","29,0","Comprimento do shotpot","47","109,8","111,8"],["Husky 1","29,0","Número de batidas (set)","47","235","235"],["Husky 1","29,0","Percurso","46","16,1","16,4"],["Husky 1","29,0","Comprimento do shotpot","46","107,5","109,5"],["Husky 1","29,0","Número de batidas (set)","46","240","240"],["Husky 1","29,0","Percurso","45","15,0","15,0"],["Husky 1","29,0","Comprimento do shotpot","45","100,3","100,3"],["Husky 1","29,0","Número de batidas (set)","45","245","245"],["Husky 1","29,0","Percurso","44","15,5","15,8"],["Husky 1","29,0","Comprimento do shotpot","44","103,1","105,1"],["Husky 1","29,0","Número de batidas (set)","44","251","251"],["Husky 1","29,0","Percurso","43","15,1","15,4"],["Husky 1","29,0","Comprimento do shotpot","43","100,9","102,9"],["Husky 1","29,0","Número de batidas (set)","43","257","257"],["Husky 1","29,0","Percurso","42","14,8","15,1"],["Husky 1","29,0","Comprimento do shotpot","42","98,6","100,6"],["Husky 1","29,0","Número de batidas (set)","42","263","263"],["Husky 1","29,0","Percurso","41","14,5","14,8"],["Husky 1","29,0","Comprimento do shotpot","41","96,4","98,4"],["Husky 1","29,0","Número de batidas (set)","41","269","269"],["Husky 1","29,0","Percurso","40","14,1","14,4"],["Husky 1","29,0","Comprimento do shotpot","40","94,2","96,2"],["Husky 1","29,0","Número de batidas (set)","40","276","276"],["Husky 1","29,0","Percurso","39","13,8","14,1"],["Husky 1","29,0","Comprimento do shotpot","39","91,9","93,9"],["Husky 1","29,0","Número de batidas (set)","39","283","283"],["Husky 1","34,0","Percurso","48","19,7","20,0"],["Husky 1","34,0","Comprimento do shotpot","48","131,0","133,0"],["Husky 1","34,0","Número de batidas (set)","48","211","211"],["Husky 1","34,0","Percurso","47","19,3","19,6"],["Husky 1","34,0","Comprimento do shotpot","47","128,4","130,4"],["Husky 1","34,0","Número de batidas (set)","47","215","215"],["Husky 1","34,0","Percurso","46","18,9","19,2"],["Husky 1","34,0","Comprimento do shotpot","46","125,8","127,8"],["Husky 1","34,0","Número de batidas (set)","46","220","220"],["Husky 1","34,0","Percurso","45","17,7","17,7"],["Husky 1","34,0","Comprimento do shotpot","45","118,1","118,1"],["Husky 1","34,0","Número de batidas (set)","45","225","225"],["Husky 1","34,0","Percurso","44","18,1","18,4"],["Husky 1","34,0","Comprimento do shotpot","44","120,5","122,5"],["Husky 1","34,0","Número de batidas (set)","44","230","230"],["Husky 1","34,0","Percurso","43","17,7","18,0"],["Husky 1","34,0","Comprimento do shotpot","43","117,9","119,9"],["Husky 1","34,0","Número de batidas (set)","43","235","235"],["Husky 1","34,0","Percurso","42","17,3","17,6"],["Husky 1","34,0","Comprimento do shotpot","42","115,3","117,3"],["Husky 1","34,0","Número de batidas (set)","42","241","241"],["Husky 1","34,0","Percurso","41","16,9","17,2"],["Husky 1","34,0","Comprimento do shotpot","41","112,6","114,6"],["Husky 1","34,0","Número de batidas (set)","41","247","247"],["Husky 1","34,0","Percurso","40","16,5","16,8"],["Husky 1","34,0","Comprimento do shotpot","40","110,0","112,0"],["Husky 1","34,0","Número de batidas (set)","40","253","253"],["Husky 1","34,0","Percurso","39","16,1","16,4"],["Husky 1","34,0","Comprimento do shotpot","39","107,4","109,4"],["Husky 1","34,0","Número de batidas (set)","39","259","259"],["Husky 1","44,0","Percurso","48","25,1","25,4"],["Husky 1","44,0","Comprimento do shotpot","48","167,0","169,0"],["Husky 1","44,0","Número de batidas (set)","48","168","168"],["Husky 1","44,0","Percurso","47","24,5","24,8"],["Husky 1","44,0","Comprimento do shotpot","47","163,6","165,6"],["Husky 1","44,0","Número de batidas (set)","47","172","172"],["Husky 1","44,0","Percurso","46","24,0","24,3"],["Husky 1","44,0","Comprimento do shotpot","46","160,3","162,3"],["Husky 1","44,0","Número de batidas (set)","46","175","175"],["Husky 1","44,0","Percurso","45","22,8","22,8"],["Husky 1","44,0","Comprimento do shotpot","45","151,9","151,9"],["Husky 1","44,0","Número de batidas (set)","45","179","179"],["Husky 1","44,0","Percurso","44","23,0","23,3"],["Husky 1","44,0","Comprimento do shotpot","44","153,5","155,5"],["Husky 1","44,0","Número de batidas (set)","44","183","183"],["Husky 1","44,0","Percurso","43","22,5","22,8"],["Husky 1","44,0","Comprimento do shotpot","43","150,1","152,1"],["Husky 1","44,0","Número de batidas (set)","43","188","188"],["Husky 1","44,0","Percurso","42","22,0","22,3"],["Husky 1","44,0","Comprimento do shotpot","42","146,8","148,8"],["Husky 1","44,0","Número de batidas (set)","42","192","192"],["Husky 1","44,0","Percurso","41","21,5","21,8"],["Husky 1","44,0","Comprimento do shotpot","41","143,4","145,4"],["Husky 1","44,0","Número de batidas (set)","41","197","197"],["Husky 1","44,0","Percurso","40","21,0","21,3"],["Husky 1","44,0","Comprimento do shotpot","40","140,0","142,0"],["Husky 1","44,0","Número de batidas (set)","40","202","202"],["Husky 1","44,0","Percurso","39","20,5","20,8"],["Husky 1","44,0","Comprimento do shotpot","39","136,6","138,6"],["Husky 1","44,0","Número de batidas (set)","39","207","207"],["Husky 2","15,6","Percurso","56","10,8","11,1"],["Husky 2","15,6","Comprimento do shotpot","56","72,0","74,0"],["Husky 2","15,6","Número de batidas (set)","56","340","340"],["Husky 2","15,6","Percurso","55","10,6","10,9"],["Husky 2","15,6","Comprimento do shotpot","55","70,8","72,8"],["Husky 2","15,6","Número de batidas (set)","55","346","346"],["Husky 2","15,6","Percurso","54","10,4","10,7"],["Husky 2","15,6","Comprimento do shotpot","54","69,6","71,6"],["Husky 2","15,6","Número de batidas (set)","54","353","353"],["Husky 2","15,6","Percurso","53","9,5","9,5"],["Husky 2","15,6","Comprimento do shotpot","53","63,4","63,4"],["Husky 2","15,6","Número de batidas (set)","53","359","359"],["Husky 2","15,6","Percurso","52","10,1","10,4"],["Husky 2","15,6","Comprimento do shotpot","52","67,2","69,2"],["Husky 2","15,6","Número de batidas (set)","52","366","366"],["Husky 2","15,6","Percurso","51","9,9","10,2"],["Husky 2","15,6","Comprimento do shotpot","51","66,0","68,0"],["Husky 2","15,6","Número de batidas (set)","51","373","373"],["Husky 2","15,6","Percurso","50","9,7","10,0"],["Husky 2","15,6","Comprimento do shotpot","50","64,8","66,8"],["Husky 2","15,6","Número de batidas (set)","50","381","381"],["Husky 2","15,6","Percurso","49","9,5","9,8"],["Husky 2","15,6","Comprimento do shotpot","49","63,6","65,6"],["Husky 2","15,6","Número de batidas (set)","49","389","389"],["Husky 2","15,6","Percurso","48","9,4","9,7"],["Husky 2","15,6","Comprimento do shotpot","48","62,4","64,4"],["Husky 2","15,6","Número de batidas (set)","48","397","397"],["Husky 2","15,6","Percurso","47","9,2","9,5"],["Husky 2","15,6","Comprimento do shotpot","47","61,2","63,2"],["Husky 2","15,6","Número de batidas (set)","47","405","405"],["Husky 2","29,0","Percurso","48","16,8","17,1"],["Husky 2","29,0","Comprimento do shotpot","48","112,0","114,0"],["Husky 2","29,0","Número de batidas (set)","48","230","230"],["Husky 2","29,0","Percurso","47","16,5","16,8"],["Husky 2","29,0","Comprimento do shotpot","47","109,8","111,8"],["Husky 2","29,0","Número de batidas (set)","47","235","235"],["Husky 2","29,0","Percurso","46","16,1","16,4"],["Husky 2","29,0","Comprimento do shotpot","46","107,5","109,5"],["Husky 2","29,0","Número de batidas (set)","46","240","240"],["Husky 2","29,0","Percurso","45","15,0","15,0"],["Husky 2","29,0","Comprimento do shotpot","45","100,3","100,3"],["Husky 2","29,0","Número de batidas (set)","45","245","245"],["Husky 2","29,0","Percurso","44","15,5","15,8"],["Husky 2","29,0","Comprimento do shotpot","44","103,1","105,1"],["Husky 2","29,0","Número de batidas (set)","44","251","251"],["Husky 2","29,0","Percurso","43","15,1","15,4"],["Husky 2","29,0","Comprimento do shotpot","43","100,9","102,9"],["Husky 2","29,0","Número de batidas (set)","43","257","257"],["Husky 2","29,0","Percurso","42","14,8","15,1"],["Husky 2","29,0","Comprimento do shotpot","42","98,6","100,6"],["Husky 2","29,0","Número de batidas (set)","42","263","263"],["Husky 2","29,0","Percurso","41","14,5","14,8"],["Husky 2","29,0","Comprimento do shotpot","41","96,4","98,4"],["Husky 2","29,0","Número de batidas (set)","41","269","269"],["Husky 2","29,0","Percurso","40","14,1","14,4"],["Husky 2","29,0","Comprimento do shotpot","40","94,2","96,2"],["Husky 2","29,0","Número de batidas (set)","40","276","276"],["Husky 2","29,0","Percurso","39","13,8","14,1"],["Husky 2","29,0","Comprimento do shotpot","39","91,9","93,9"],["Husky 2","29,0","Número de batidas (set)","39","283","283"],["Husky 2","34,0","Percurso","48","19,7","20,0"],["Husky 2","34,0","Comprimento do shotpot","48","131,0","133,0"],["Husky 2","34,0","Número de batidas (set)","48","211","211"],["Husky 2","34,0","Percurso","47","19,3","19,6"],["Husky 2","34,0","Comprimento do shotpot","47","128,4","130,4"],["Husky 2","34,0","Número de batidas (set)","47","215","215"],["Husky 2","34,0","Percurso","46","18,9","19,2"],["Husky 2","34,0","Comprimento do shotpot","46","125,8","127,8"],["Husky 2","34,0","Número de batidas (set)","46","220","220"],["Husky 2","34,0","Percurso","45","17,7","17,7"],["Husky 2","34,0","Comprimento do shotpot","45","118,1","118,1"],["Husky 2","34,0","Número de batidas (set)","45","225","225"],["Husky 2","34,0","Percurso","44","18,1","18,4"],["Husky 2","34,0","Comprimento do shotpot","44","120,5","122,5"],["Husky 2","34,0","Número de batidas (set)","44","230","230"],["Husky 2","34,0","Percurso","43","17,7","18,0"],["Husky 2","34,0","Comprimento do shotpot","43","117,9","119,9"],["Husky 2","34,0","Número de batidas (set)","43","235","235"],["Husky 2","34,0","Percurso","42","17,3","17,6"],["Husky 2","34,0","Comprimento do shotpot","42","115,3","117,3"],["Husky 2","34,0","Número de batidas (set)","42","241","241"],["Husky 2","34,0","Percurso","41","16,9","17,2"],["Husky 2","34,0","Comprimento do shotpot","41","112,6","114,6"],["Husky 2","34,0","Número de batidas (set)","41","247","247"],["Husky 2","34,0","Percurso","40","16,5","16,8"],["Husky 2","34,0","Comprimento do shotpot","40","110,0","112,0"],["Husky 2","34,0","Número de batidas (set)","40","253","253"],["Husky 2","34,0","Percurso","39","16,1","16,4"],["Husky 2","34,0","Comprimento do shotpot","39","107,4","109,4"],["Husky 2","34,0","Número de batidas (set)","39","259","259"],["Husky 2","44,0","Percurso","48","25,1","25,4"],["Husky 2","44,0","Comprimento do shotpot","48","167,0","169,0"],["Husky 2","44,0","Número de batidas (set)","48","168","168"],["Husky 2","44,0","Percurso","47","24,5","24,8"],["Husky 2","44,0","Comprimento do shotpot","47","163,6","165,6"],["Husky 2","44,0","Número de batidas (set)","47","172","172"],["Husky 2","44,0","Percurso","46","24,0","24,3"],["Husky 2","44,0","Comprimento do shotpot","46","160,3","162,3"],["Husky 2","44,0","Número de batidas (set)","46","175","175"],["Husky 2","44,0","Percurso","45","22,8","22,8"],["Husky 2","44,0","Comprimento do shotpot","45","151,9","151,9"],["Husky 2","44,0","Número de batidas (set)","45","179","179"],["Husky 2","44,0","Percurso","44","23,0","23,3"],["Husky 2","44,0","Comprimento do shotpot","44","153,5","155,5"],["Husky 2","44,0","Número de batidas (set)","44","183","183"],["Husky 2","44,0","Percurso","43","22,5","22,8"],["Husky 2","44,0","Comprimento do shotpot","43","150,1","152,1"],["Husky 2","44,0","Número de batidas (set)","43","188","188"],["Husky 2","44,0","Percurso","42","22,0","22,3"],["Husky 2","44,0","Comprimento do shotpot","42","146,8","148,8"],["Husky 2","44,0","Número de batidas (set)","42","192","192"],["Husky 2","44,0","Percurso","41","21,5","21,8"],["Husky 2","44,0","Comprimento do shotpot","41","143,4","145,4"],["Husky 2","44,0","Número de batidas (set)","41","197","197"],["Husky 2","44,0","Percurso","40","21,0","21,3"],["Husky 2","44,0","Comprimento do shotpot","40","140,0","142,0"],["Husky 2","44,0","Número de batidas (set)","40","202","202"],["Husky 2","44,0","Percurso","39","20,5","20,8"],["Husky 2","44,0","Comprimento do shotpot","39","136,6","138,6"],["Husky 2","44,0","Número de batidas (set)","39","207","207"]],"l":{"gramaturas":["34,0"],"resinas":["Cirklo - PCR","Green - PCR"]}}</script>
 <script>
 // =============================================================================
 // CONFIG — login e planilha
@@ -1049,7 +1079,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 const COLS_INJ = ['id_sessao','data','hora','maquina','responsavel','gramatura','cor','resina','parametro','valor_medido','tolerancia_min_aplicada','tolerancia_max_aplicada','dentro_criterio','criado_em'];
 
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
-let tolerancias = []; // { maquina, gramatura, cor, resina, parametro, valor_min, valor_max, ativo } (chaves normalizadas)
+let tolerancias = []; // { maquina, gramatura, cor, resina, parametro, valor_min, valor_max, ativo, cavidade_ativa } (chaves normalizadas)
 // Listas de apoio (Máquinas/Gramaturas/Cores/Resinas/Operadores cadastradas) — viram <select>
 // no cadastro de Critérios e servem de referência pra destacar nome divergente no Carregar
 // Dados. Guardadas na TabelaListas (tipo/valor). Injeção e Sopro têm listas 100% separadas
@@ -1097,6 +1127,28 @@ const PARAMETROS_INJECAO = [
   'Tempo de ciclo (total)', 'Número de batidas (set)', 'Cavidades ativas',
   'Velocidade do pigmentador (RPM)', 'Tempo do pigmentador (seg.)'
 ];
+
+// Parâmetros cujo critério não é fixo por Máquina+Gramatura+Resina — depende de quantas
+// cavidades do molde estão ativas na hora da leitura (confirmado pelo Cleber: os critérios
+// padronizados de Percurso/Comprimento do shotpot/Número de batidas usam uma tabela própria,
+// por Máquina+Gramatura+Cavidades ativas, igual pra qualquer Resina/Cor). Ver
+// buscarToleranciaCavidade() e PARAMETROS_INJECAO (que já inclui "Cavidades ativas" como um
+// dos 41 parâmetros medidos — é o valor usado aqui pra escolher a linha certa da tabela).
+const PARAMETROS_CAVIDADE_DEPENDENTE = ['Percurso', 'Comprimento do shotpot', 'Número de batidas (set)'];
+function ehParametroCavidadeDependente(parametro){
+  return PARAMETROS_CAVIDADE_DEPENDENTE.indexOf(parametro) !== -1;
+}
+// Acha, numa lista de { parametro, valor } (os 41 parâmetros de UM mesmo horário/lançamento —
+// reg.valores no Carregar Dados, LM.valoresInjecao no Lançar Manual), o valor de um parâmetro
+// "irmão" do mesmo horário. Usado pra pegar "Cavidades ativas" lido junto com Percurso/Shotpot/
+// Batidas, sem precisar duplicar esse dado em outro lugar.
+function buscarValorIrmao(lista, nomeParametro){
+  if (!lista) return '';
+  for (var i = 0; i < lista.length; i++){
+    if (lista[i].parametro === nomeParametro) return lista[i].valor;
+  }
+  return '';
+}
 
 // Parâmetros do Sopro — diferentes por máquina (ao contrário da Injeção, que usa a mesma
 // lista pras 4 máquinas). Multipet 1 e 2 compartilham a mesma lista (confirmado pelo Cleber).
@@ -1264,6 +1316,27 @@ function buscarTolerancia(maquina, gramatura, cor, resina, parametro){
   return generico;
 }
 
+// Tolerância dos parâmetros dependentes de cavidade ativa (Percurso, Comprimento do shotpot,
+// Número de batidas (set)) — identificação só por Máquina + Gramatura + Parâmetro + Cavidades
+// ativas (sem Cor/Resina: os critérios padronizados valem pra qualquer Cor/Resina dessa
+// Gramatura). Essas linhas ficam na MESMA TabelaTolerancias, com Cor e Resina em branco e a
+// coluna cavidade_ativa preenchida — por isso nunca batem por acidente em buscarTolerancia()
+// (que exige Resina igual à da leitura, e aqui ela é sempre uma resina de verdade, não vazia).
+function buscarToleranciaCavidade(maquina, gramatura, parametro, cavidadeAtiva){
+  var chaveM = norm(maquina), chaveG = norm(gramatura), chaveP = norm(parametro);
+  var nCav = paraNumero(cavidadeAtiva);
+  if (isNaN(nCav)) return null;
+  for (var i = 0; i < tolerancias.length; i++){
+    var t = tolerancias[i];
+    if (t.ativoFalso) continue;
+    if (t.processo && t.processo !== 'Injeção') continue;
+    if (!t.cavidade_ativa) continue; // linha normal (não é critério por cavidade)
+    if (t._maquina !== chaveM || t._gramatura !== chaveG || t._parametro !== chaveP) continue;
+    if (paraNumero(t.cavidade_ativa) === nCav) return t;
+  }
+  return null;
+}
+
 // Tolerância do Sopro — tabela própria (TabelaTolerancias_Sopro, aba Tolerancias_App_Sopro),
 // separada da TabelaTolerancias da Injeção. Identificação por Máquina + Gramatura + Cor + Frasco
 // (mesma lógica/4 campos da Injeção, Cor também opcional do mesmo jeito — ver comentário acima).
@@ -1283,7 +1356,13 @@ function buscarToleranciaSopro(maquina, gramatura, cor, frasco, parametro){
 // status: 'warn' (baixa confiança, precisa conferir antes de tudo) > 'bad'/'ok' (comparação com tolerância) > 'none' (sem tolerância cadastrada ou valor não numérico)
 function statusDoValor(reg, v, cabecalho){
   if (v.confianca === 'baixa') return { status:'warn', tol:null };
-  var tol = buscarTolerancia(cabecalho.maquina, cabecalho.gramatura, reg.cor, reg.resina, v.parametro);
+  var tol;
+  if (ehParametroCavidadeDependente(v.parametro)){
+    var cavidadeAtiva = buscarValorIrmao(reg.valores, 'Cavidades ativas');
+    tol = buscarToleranciaCavidade(cabecalho.maquina, cabecalho.gramatura, v.parametro, cavidadeAtiva);
+  } else {
+    tol = buscarTolerancia(cabecalho.maquina, cabecalho.gramatura, reg.cor, reg.resina, v.parametro);
+  }
   if (!tol) return { status:'none', tol:null };
   var n = paraNumero(v.valor);
   if (isNaN(n)) return { status:'none', tol:tol };
@@ -2456,6 +2535,17 @@ function aplicarFiltrosDashV3(){
     return true;
   });
 
+  // mapa id_sessao -> valor de "Cavidades ativas" lido no mesmo horário — usado só pelos 3
+  // parâmetros dependentes de cavidade (ver PARAMETROS_CAVIDADE_DEPENDENTE), que não têm
+  // tolerância fixa por Máquina/Gramatura/Resina. Construído a partir de `filtrados` (não de
+  // `registrosCarregados` inteiro) pra respeitar os mesmos filtros de Máquina/Gramatura/Cor/
+  // Resina/Data já aplicados — e antes do filtro de Parâmetros (fParametros), que é só de
+  // exibição e não deve esconder essa leitura "irmã".
+  var cavidadesPorSessao = {};
+  filtrados.forEach(function(r){
+    if (r.parametro === 'Cavidades ativas' && r.id_sessao) cavidadesPorSessao[r.id_sessao] = r.valor_medido;
+  });
+
   // agrupa por parâmetro: cada ponto é {t: Date, v: número, dentro, lmin, lmax}.
   // A tolerância agora é buscada POR PONTO (não mais por um único combo do filtro),
   // porque com seleção múltipla dá pra combinar várias máquinas/gramaturas/cores/
@@ -2468,7 +2558,12 @@ function aplicarFiltrosDashV3(){
     if (isNaN(n)) return; // não plota valores não-numéricos (texto, "—")
     var t = parseDataHoraBR(r.data, r.hora);
     if (!t) return;
-    var tol = buscarTolerancia(r.maquina, r.gramatura, r.cor, r.resina, r.parametro);
+    var tol;
+    if (ehParametroCavidadeDependente(r.parametro)){
+      tol = buscarToleranciaCavidade(r.maquina, r.gramatura, r.parametro, cavidadesPorSessao[r.id_sessao]);
+    } else {
+      tol = buscarTolerancia(r.maquina, r.gramatura, r.cor, r.resina, r.parametro);
+    }
     var lmin = tol ? paraNumero(tol.valor_min) : NaN;
     var lmax = tol ? paraNumero(tol.valor_max) : NaN;
     lmin = isNaN(lmin) ? null : lmin;
@@ -3006,6 +3101,17 @@ function lmLinhaParam(nome, valor, status, idx, funcaoOnInput){
   '</div>';
 }
 
+// Mesma ideia de buscarTolerancia, mas roteando os 3 parâmetros dependentes de cavidade pra
+// buscarToleranciaCavidade (usando o "Cavidades ativas" já digitado nesse mesmo lançamento,
+// em LM.valoresInjecao) — ver PARAMETROS_CAVIDADE_DEPENDENTE/buscarValorIrmao.
+function lmBuscarTolerancia(maquina, gramatura, parametro){
+  if (ehParametroCavidadeDependente(parametro)){
+    var cavidadeAtiva = buscarValorIrmao(LM.valoresInjecao, 'Cavidades ativas');
+    return buscarToleranciaCavidade(maquina, gramatura, parametro, cavidadeAtiva);
+  }
+  return buscarTolerancia(maquina, gramatura, LM.corInjecao, LM.resinaInjecao, parametro);
+}
+
 // ---- Injeção ----
 function lmRenderInjecao(){
   var maquina = document.getElementById('lmMaquinaI').value;
@@ -3028,7 +3134,7 @@ function lmRenderInjecao(){
     '</div>';
 
   var paramsHtml = LM.valoresInjecao.map(function(item, idx){
-    var tol = buscarTolerancia(maquina, gramatura, LM.corInjecao, LM.resinaInjecao, item.parametro);
+    var tol = lmBuscarTolerancia(maquina, gramatura, item.parametro);
     var status = lmStatus(item.valor, tol);
     return lmLinhaParam(item.parametro, item.valor, status, idx, 'lmAtualizarValorInjecao');
   }).join('');
@@ -3039,7 +3145,7 @@ function lmAtualizarValorInjecao(idx, novoValor){
   LM.valoresInjecao[idx].valor = novoValor;
   var maquina = document.getElementById('lmMaquinaI').value;
   var gramatura = document.getElementById('lmGramaturaI').value;
-  var tol = buscarTolerancia(maquina, gramatura, LM.corInjecao, LM.resinaInjecao, LM.valoresInjecao[idx].parametro);
+  var tol = lmBuscarTolerancia(maquina, gramatura, LM.valoresInjecao[idx].parametro);
   var status = lmStatus(novoValor, tol);
   var row = document.querySelectorAll('#lmParamsInjecao .prow-param')[idx];
   if (!row) return;
@@ -3069,7 +3175,7 @@ async function lmSalvarInjecao(){
     var cabecalho = { maquina: maquina, gramatura: gramatura };
     var linhas = LM.valoresInjecao.map(function(item){
       var valor = (item.valor || '').trim() || '—';
-      var tol = buscarTolerancia(maquina, gramatura, LM.corInjecao, LM.resinaInjecao, item.parametro);
+      var tol = lmBuscarTolerancia(maquina, gramatura, item.parametro);
       var status = lmStatus(valor, tol);
       var dentro = status === 'ok' ? 'SIM' : status === 'bad' ? 'NÃO' : '';
       var obj = {
@@ -3211,12 +3317,16 @@ async function carregarTolerancias(token){
     if (!resp.ok){ tolerancias = []; return; }
     var json = await resp.json();
     tolerancias = (json.value || []).map(function(row){
-      var v = row.values[0]; // processo, maquina, gramatura, cor, resina, parametro, valor_min, valor_max, ativo
+      var v = row.values[0]; // processo, maquina, gramatura, cor, resina, parametro, valor_min, valor_max, ativo, cavidade_ativa
       var ativo = v[8];
+      // v[9] (cavidade_ativa) só existe depois que garantirColunaCavidade() cria a 10ª coluna —
+      // em linhas antigas/sem essa coluna ainda, v[9] vem undefined e cai em ''.
+      var cavidadeAtiva = v[9] !== undefined && v[9] !== null && String(v[9]).trim() !== '' ? String(v[9]).trim() : '';
       return {
         processo: v[0], maquina: v[1], gramatura: v[2], cor: v[3], resina: v[4], parametro: v[5],
         valor_min: v[6] !== undefined && v[6] !== null ? String(v[6]) : '', valor_max: v[7] !== undefined && v[7] !== null ? String(v[7]) : '',
         ativoFalso: (ativo === false || ativo === 'FALSE' || ativo === 'Não' || ativo === 'NAO' || ativo === 0 || ativo === '0'),
+        cavidade_ativa: cavidadeAtiva,
         _maquina: norm(v[1]), _gramatura: norm(v[2]), _cor: norm(v[3]), _resina: norm(v[4]), _parametro: norm(v[5]),
         _index: row.index // posição da linha na tabela do Excel — necessário pra editar/excluir essa linha depois.
       };
@@ -3433,6 +3543,59 @@ async function garantirTabelaSopro(worksheet, tabela, headers, token){
   tabelasSoproGarantidas[tabela] = true;
 }
 
+// Garante que a TabelaTolerancias (Injeção) já tenha a 10ª coluna "cavidade_ativa" (critérios
+// de Percurso/Comprimento do shotpot/Número de batidas por Cavidades ativas — ver
+// buscarToleranciaCavidade). Mesma ideia de garantirTabelaSopro, mas ADICIONANDO uma coluna
+// numa tabela que já existe, em vez de criar a tabela inteira — por isso usa o endpoint
+// columns/add (acrescenta no fim, já que nenhum índice é passado), em vez de reescrever o
+// cabeçalho inteiro. Linhas que já existiam na tabela antes dessa coluna existir ficam com
+// cavidade_ativa em branco automaticamente (comportamento padrão do Excel ao adicionar coluna).
+var colunaCavidadeGarantida = false;
+async function garantirColunaCavidade(token){
+  if (colunaCavidadeGarantida) return;
+  var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias';
+  // confere pela lista de colunas (nome), não por posição — e se não der pra listar, não tenta
+  // criar às cegas (evita acabar com colunas duplicadas a cada sessão).
+  var check = await fetchGraphComRetry(base + '/columns', { headers: { Authorization: 'Bearer ' + token } });
+  if (!check.ok) throw new Error('Não consegui ler as colunas da TabelaTolerancias (status ' + check.status + ').');
+  var jc = await check.json();
+  var colunas = (jc.value || []).map(function(c){ return norm(c.name); });
+  if (colunas.indexOf('cavidade_ativa') >= 0){ colunaCavidadeGarantida = true; return; }
+  if (colunas.length !== 9) throw new Error('A TabelaTolerancias tem ' + colunas.length + ' colunas (esperado 9 antes de criar "cavidade_ativa") — confira a aba Tolerancias_App antes de continuar.');
+
+  var hdrs = { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' };
+
+  // 1ª tentativa: columns/add já com o cabeçalho + uma célula vazia por linha existente (a API
+  // pede a coluna inteira quando "values" é informado).
+  var nLinhas = 0;
+  var respRows = await fetchGraphComRetry(base + '/rows', { headers: { Authorization: 'Bearer ' + token } });
+  if (respRows.ok){ var jr = await respRows.json(); nLinhas = (jr.value || []).length; }
+  var valores = [['cavidade_ativa']];
+  for (var i = 0; i < nLinhas; i++) valores.push(['']);
+  var resp = await fetchGraphComRetry(base + '/columns/add', { method:'POST', headers: hdrs, body: JSON.stringify({ values: valores }) });
+
+  // 2ª tentativa: columns/add sem valores (o Excel cria com nome padrão "Coluna10") e depois
+  // escreve o cabeçalho certo na última célula da linha de cabeçalho, via API de Intervalo.
+  if (!resp.ok){
+    var resp2 = await fetchGraphComRetry(base + '/columns/add', { method:'POST', headers: hdrs, body: JSON.stringify({}) });
+    if (resp2.ok){
+      var respH = await fetchGraphComRetry(base + '/headerRowRange', { headers: { Authorization: 'Bearer ' + token } });
+      var jh = respH.ok ? await respH.json() : {};
+      var endH = (jh.address || '').split('!').pop(); // ex.: A1:J1
+      var ultima = endH.indexOf(':') >= 0 ? endH.split(':')[1] : '';
+      if (ultima){
+        var respP = await fetchGraphComRetry('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + "/workbook/worksheets/Tolerancias_App/range(address='" + ultima + "')", { method:'PATCH', headers: hdrs, body: JSON.stringify({ values: [['cavidade_ativa']] }) });
+        resp = respP.ok ? respP : resp;
+      }
+    }
+  }
+  if (!resp.ok){
+    var json = await resp.json().catch(function(){ return {}; });
+    throw new Error('Não consegui criar a coluna "cavidade_ativa" em Tolerancias_App automaticamente — crie manualmente: abra a planilha, na aba Tolerancias_App digite "cavidade_ativa" na célula logo à direita do cabeçalho "ativo" (a tabela deve crescer sozinha pra 10 colunas) e clique em Importar de novo. Detalhe: ' + (json.error ? json.error.message : resp.status));
+  }
+  colunaCavidadeGarantida = true;
+}
+
 // ---- Listas de apoio (Máquinas/Gramaturas/Cores/Resinas) ----
 function renderListas(){
   Object.keys(LISTA_CHAVE_PARA_TIPO).forEach(function(chave){
@@ -3511,6 +3674,11 @@ function agruparTolerancias(){
   // fora até a tela de Critérios do Sopro existir.
   tolerancias.forEach(function(t){
     if (t.processo && t.processo !== 'Injeção') return;
+    // Critério por cavidade ativa (Percurso/Shotpot/Batidas) tem formulário e listagem
+    // próprios (ver renderCavidadeCriterios) — entram aqui como um "grupo" por parâmetro só
+    // confundiria (até 10 linhas, uma por cavidade, pro mesmo Máquina+Gramatura) e o form de
+    // Editar/Excluir deste grupo normal colapsaria/perderia as outras cavidades ao salvar.
+    if (t.cavidade_ativa) return;
     var chave = t._maquina+'|'+t._gramatura+'|'+t._cor+'|'+t._resina;
     if (!grupos[chave]){
       grupos[chave] = { maquina:t.maquina, gramatura:t.gramatura, cor:t.cor, resina:t.resina, itens:[] };
@@ -3556,6 +3724,309 @@ function renderCriterios(){
       '</td>' +
     '</tr>';
   }).join('');
+
+  renderCavidadeCriterios();
+}
+
+// ---- Critérios por cavidade ativa (Percurso / Comprimento do shotpot / Número de batidas) ----
+// Só leitura aqui (cadastro é feito pelo importador dos POPs) — agrupa por Máquina+Gramatura,
+// e dentro de cada combo por Cavidades ativas (uma linha por cavidade, com os 3 parâmetros
+// lado a lado). Ver buscarToleranciaCavidade/PARAMETROS_CAVIDADE_DEPENDENTE.
+function agruparToleranciasCavidade(){
+  var porCombo = {}, ordem = [];
+  tolerancias.forEach(function(t){
+    if (t.processo && t.processo !== 'Injeção') return;
+    if (!t.cavidade_ativa) return;
+    var chaveCombo = t._maquina + '|' + t._gramatura;
+    if (!porCombo[chaveCombo]){
+      porCombo[chaveCombo] = { maquina: t.maquina, gramatura: t.gramatura, porCavidade: {}, ordemCav: [] };
+      ordem.push(chaveCombo);
+    }
+    var grupo = porCombo[chaveCombo];
+    var cav = t.cavidade_ativa;
+    if (!grupo.porCavidade[cav]){ grupo.porCavidade[cav] = {}; grupo.ordemCav.push(cav); }
+    grupo.porCavidade[cav][t.parametro] = { min: t.valor_min, max: t.valor_max };
+  });
+  ordem.sort(function(a,b){ return porCombo[a].maquina.localeCompare(porCombo[b].maquina,'pt-BR') || porCombo[a].gramatura.localeCompare(porCombo[b].gramatura,'pt-BR'); });
+  return ordem.map(function(c){
+    var g = porCombo[c];
+    g.ordemCav.sort(function(a,b){ return paraNumero(b) - paraNumero(a); }); // cavidade maior primeiro
+    return g;
+  });
+}
+
+var cavGruposAtuais = [];
+
+function renderCavidadeCriterios(){
+  var sel = document.getElementById('cavSeletorCombo');
+  if (!sel) return; // página ainda não existe no DOM
+  cavGruposAtuais = agruparToleranciasCavidade();
+
+  var valorAnterior = sel.value;
+  sel.innerHTML = cavGruposAtuais.map(function(g, i){
+    return '<option value="'+i+'">' + escHtml(g.maquina) + ' · ' + escHtml(g.gramatura) + '</option>';
+  }).join('');
+  if (cavGruposAtuais.length === 0){
+    sel.innerHTML = '<option value="">Nenhum critério por cavidade cadastrado</option>';
+  } else if (valorAnterior && Number(valorAnterior) < cavGruposAtuais.length){
+    sel.value = valorAnterior;
+  }
+
+  desenharTabelaCavidade();
+}
+
+function desenharTabelaCavidade(){
+  var sel = document.getElementById('cavSeletorCombo');
+  var corpo = document.getElementById('cavBody');
+  var vazio = document.getElementById('cavVazio');
+  var tabela = document.getElementById('cavTable');
+  if (!sel || !corpo) return;
+
+  var g = cavGruposAtuais[Number(sel.value)];
+  if (!g){
+    corpo.innerHTML = '';
+    vazio.hidden = false;
+    tabela.style.display = 'none';
+    return;
+  }
+  vazio.hidden = true;
+  tabela.style.display = '';
+
+  function fmt(v){ return (v === undefined || v === null || v === '') ? '—' : v; }
+  corpo.innerHTML = g.ordemCav.map(function(cav){
+    var p = g.porCavidade[cav];
+    var percurso = (p['Percurso']) || {};
+    var shotpot = (p['Comprimento do shotpot']) || {};
+    var batidas = (p['Número de batidas (set)']) || {};
+    return '<tr>' +
+      '<td>'+escHtml(cav)+'</td>' +
+      '<td>'+fmt(percurso.min)+'</td><td>'+fmt(percurso.max)+'</td>' +
+      '<td>'+fmt(shotpot.min)+'</td><td>'+fmt(shotpot.max)+'</td>' +
+      '<td>'+fmt(batidas.min)+'</td>' +
+    '</tr>';
+  }).join('');
+}
+
+// =============================================================================
+// Importador (uma vez) dos critérios padronizados dos POPs de Injeção — ver bloco
+// <script id="dadosImportPOPs">. Regras combinadas com o Cleber (out/2026):
+//  - critérios por Máquina+Gramatura+Resina, Cor sempre em branco ("Todas as cores");
+//  - nas combinações Máquina+Gramatura+Resina cobertas pelos POPs, o POP substitui o critério
+//    inteiro: critério de Cor específica é removido (Hypet 41,5 Cristal/Âmbar) e parâmetro que
+//    existia mas não está mais no POP é removido; combinações fora dos POPs não são tocadas;
+//  - Percurso/Comprimento do shotpot/Número de batidas (set) vão pra tabela por cavidade ativa
+//    (Cor e Resina em branco, coluna cavidade_ativa preenchida); o Setup dos POPs não entra;
+//  - Cirklo - PCR e Green - PCR ficam como resinas separadas (mesmo com valores iguais hoje).
+// Compara com o que já existe antes de escrever, então rodar de novo não duplica nada.
+// Ordem das escritas igual ao salvarCriterioLote: atualizações (índices ainda estáveis),
+// inclusões (vão pro fim da tabela) e por último exclusões, do maior índice pro menor.
+// =============================================================================
+var importPOPsConfirmando = false, importPOPsConfirmT = null;
+
+function lerDadosImportPOPs(){
+  var el = document.getElementById('dadosImportPOPs');
+  return JSON.parse(el.textContent);
+}
+
+function mesmoValorCriterio(a, b){
+  var na = paraNumero(a), nb = paraNumero(b);
+  if (isNaN(na) && isNaN(nb)) return true;
+  return na === nb;
+}
+
+function montarPlanoImportPOPs(dados){
+  var cobertos = {}, novosPorChave = {}, cavPorChave = {}, combosCav = {};
+  dados.n.forEach(function(r){
+    var combo = norm(r[0])+'|'+norm(r[1])+'|'+norm(r[2]);
+    cobertos[combo] = true;
+    novosPorChave[combo+'|'+norm(r[3])] = r;
+  });
+  dados.c.forEach(function(r){
+    combosCav[norm(r[0])+'|'+norm(r[1])] = true;
+    cavPorChave[norm(r[0])+'|'+norm(r[1])+'|'+norm(r[2])+'|'+paraNumero(r[3])] = r;
+  });
+
+  var toPatch = [], toAdd = [], toDelete = [];
+  var jaVistoNormal = {}, jaVistoCav = {};
+  var motivos = { corEspecifica:0, parametroForaDoPOP:0, duplicada:0, cavidadeForaDoPOP:0 };
+
+  tolerancias.forEach(function(t){
+    if (t.processo && t.processo !== 'Injeção') return;
+    if (t.cavidade_ativa){
+      var comboCav = t._maquina+'|'+t._gramatura;
+      if (!combosCav[comboCav]) return; // fora do escopo dos POPs — não mexe
+      var kc = comboCav+'|'+t._parametro+'|'+paraNumero(t.cavidade_ativa);
+      var alvoC = cavPorChave[kc];
+      if (!alvoC){ toDelete.push(t._index); motivos.cavidadeForaDoPOP++; return; }
+      if (jaVistoCav[kc]){ toDelete.push(t._index); motivos.duplicada++; return; }
+      jaVistoCav[kc] = true;
+      if (t.ativoFalso || !mesmoValorCriterio(t.valor_min, alvoC[4]) || !mesmoValorCriterio(t.valor_max, alvoC[5])){
+        toPatch.push({ index:t._index, linha:['Injeção', alvoC[0], alvoC[1], '', '', alvoC[2], alvoC[4] || null, alvoC[5] || null, true, alvoC[3]] });
+      }
+      return;
+    }
+    var combo = t._maquina+'|'+t._gramatura+'|'+t._resina;
+    if (!cobertos[combo]) return; // combinação que os POPs não cobrem — fica como está
+    if (t._cor !== ''){ toDelete.push(t._index); motivos.corEspecifica++; return; }
+    var k = combo+'|'+t._parametro;
+    var alvo = novosPorChave[k];
+    if (!alvo){ toDelete.push(t._index); motivos.parametroForaDoPOP++; return; }
+    if (jaVistoNormal[k]){ toDelete.push(t._index); motivos.duplicada++; return; }
+    jaVistoNormal[k] = true;
+    if (t.ativoFalso || !mesmoValorCriterio(t.valor_min, alvo[4]) || !mesmoValorCriterio(t.valor_max, alvo[5])){
+      toPatch.push({ index:t._index, linha:['Injeção', alvo[0], alvo[1], '', alvo[2], alvo[3], alvo[4] || null, alvo[5] || null, true, ''] });
+    }
+  });
+
+  Object.keys(novosPorChave).forEach(function(k){
+    if (jaVistoNormal[k]) return;
+    var r = novosPorChave[k];
+    toAdd.push(['Injeção', r[0], r[1], '', r[2], r[3], r[4] || null, r[5] || null, true, '']);
+  });
+  Object.keys(cavPorChave).forEach(function(k){
+    if (jaVistoCav[k]) return;
+    var r = cavPorChave[k];
+    toAdd.push(['Injeção', r[0], r[1], '', '', r[2], r[4] || null, r[5] || null, true, r[3]]);
+  });
+
+  var listasNovas = [];
+  (dados.l.gramaturas || []).forEach(function(v){
+    if (!listas.gramaturas.some(function(i){ return norm(i.valor) === norm(v); })) listasNovas.push([LISTA_CHAVE_PARA_TIPO.gramaturas, v]);
+  });
+  (dados.l.resinas || []).forEach(function(v){
+    if (!listas.resinas.some(function(i){ return norm(i.valor) === norm(v); })) listasNovas.push([LISTA_CHAVE_PARA_TIPO.resinas, v]);
+  });
+
+  return { toPatch:toPatch, toAdd:toAdd, toDelete:toDelete, listasNovas:listasNovas, motivos:motivos };
+}
+
+function logImportPOPs(txt){
+  var el = document.getElementById('importPOPsLog');
+  el.style.display = 'block';
+  el.textContent += txt + '\n';
+}
+function progressoImportPOPs(txt){
+  document.getElementById('importPOPsProgresso').hidden = !txt;
+  if (txt) document.getElementById('importPOPsProgressoTxt').textContent = txt;
+}
+
+// Primeiro clique: lê a planilha de novo e mostra o que vai acontecer; segundo clique (em até
+// 20s) executa. Sem window.confirm (trava o app de teste headless) — mesmo padrão do Excluir.
+async function executarImportacaoPOPs(){
+  var btn = document.getElementById('btnImportarPOPs');
+  if (!itemId){ mostrarToast('Ainda conectando com a planilha, aguarde um instante e tente de novo.', true); return; }
+  var dados;
+  try { dados = lerDadosImportPOPs(); }
+  catch (e){ mostrarToast('Não consegui ler os dados dos POPs embutidos no app: ' + e.message, true); return; }
+
+  if (!importPOPsConfirmando){
+    btn.disabled = true;
+    document.getElementById('importPOPsLog').textContent = '';
+    progressoImportPOPs('Conferindo o que já está cadastrado…');
+    try {
+      var token0 = await getToken();
+      await carregarTolerancias(token0);
+      await carregarListas(token0);
+      var plano0 = montarPlanoImportPOPs(dados);
+      var nCav = plano0.toAdd.filter(function(l){ return l[9] !== ''; }).length;
+      logImportPOPs('Prévia do que vai ser feito na planilha:');
+      logImportPOPs('  • ' + (plano0.toAdd.length - nCav) + ' critério(s) normal(is) novo(s) e ' + nCav + ' critério(s) por cavidade novo(s)');
+      logImportPOPs('  • ' + plano0.toPatch.length + ' critério(s) existente(s) com valor atualizado');
+      logImportPOPs('  • ' + plano0.toDelete.length + ' critério(s) removido(s): ' + plano0.motivos.corEspecifica + ' de Cor específica, ' + plano0.motivos.parametroForaDoPOP + ' que não estão mais no POP' + (plano0.motivos.duplicada ? ', ' + plano0.motivos.duplicada + ' duplicado(s)' : '') + (plano0.motivos.cavidadeForaDoPOP ? ', ' + plano0.motivos.cavidadeForaDoPOP + ' por cavidade fora do POP' : ''));
+      logImportPOPs('  • ' + plano0.listasNovas.length + ' item(ns) novo(s) nas listas de apoio' + (plano0.listasNovas.length ? ' (' + plano0.listasNovas.map(function(l){ return l[1]; }).join(', ') + ')' : ''));
+      if (!plano0.toAdd.length && !plano0.toPatch.length && !plano0.toDelete.length && !plano0.listasNovas.length){
+        logImportPOPs('\nTudo já está igual aos POPs — nada a fazer.');
+        return;
+      }
+      importPOPsConfirmando = true;
+      btn.textContent = 'Clique de novo pra confirmar a importação';
+      btn.classList.add('confirmando');
+      importPOPsConfirmT = setTimeout(function(){
+        importPOPsConfirmando = false;
+        btn.textContent = 'Importar critérios dos POPs ✓';
+        btn.classList.remove('confirmando');
+      }, 20000);
+    } catch (err){
+      logImportPOPs('Falha ao conferir: ' + err.message);
+    } finally {
+      progressoImportPOPs('');
+      btn.disabled = false;
+    }
+    return;
+  }
+
+  clearTimeout(importPOPsConfirmT);
+  importPOPsConfirmando = false;
+  btn.classList.remove('confirmando');
+  btn.disabled = true; btn.textContent = 'Importando…';
+  logImportPOPs('\nImportando…');
+  try {
+    var token = await getToken();
+    progressoImportPOPs('Preparando a coluna cavidade_ativa…');
+    await garantirColunaCavidade(token);
+
+    // recarrega e recalcula na hora (o que estava na prévia pode ter mudado nesse meio-tempo)
+    await carregarTolerancias(token);
+    await carregarListas(token);
+    var plano = montarPlanoImportPOPs(dados);
+
+    if (plano.listasNovas.length){
+      progressoImportPOPs('Atualizando listas de apoio…');
+      var urlL = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + TABELA_LISTAS_INJECAO.tabela + '/rows/add';
+      var respL = await fetchGraphComRetry(urlL, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: plano.listasNovas }) });
+      if (!respL.ok) throw new Error('não consegui adicionar nas listas de apoio (status ' + respL.status + ')');
+      logImportPOPs('  ✓ listas de apoio: ' + plano.listasNovas.length + ' item(ns) adicionado(s)');
+    }
+
+    for (var p = 0; p < plano.toPatch.length; p++){
+      progressoImportPOPs('Atualizando critérios existentes… ' + (p+1) + ' de ' + plano.toPatch.length);
+      await atualizarLinhaTabela('Tolerancias_App', 'TabelaTolerancias', plano.toPatch[p].index, plano.toPatch[p].linha, token);
+    }
+    if (plano.toPatch.length) logImportPOPs('  ✓ ' + plano.toPatch.length + ' critério(s) atualizado(s)');
+
+    var urlA = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias/rows/add';
+    var LOTE = 100;
+    for (var a = 0; a < plano.toAdd.length; a += LOTE){
+      var lote = plano.toAdd.slice(a, a + LOTE);
+      progressoImportPOPs('Cadastrando critérios novos… ' + Math.min(a + LOTE, plano.toAdd.length) + ' de ' + plano.toAdd.length);
+      var respA = await fetchGraphComRetry(urlA, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: lote }) });
+      if (!respA.ok){
+        var jA = await respA.json().catch(function(){ return {}; });
+        throw new Error('falha ao cadastrar critérios novos (lote ' + (a/LOTE + 1) + '): ' + (jA.error ? jA.error.message : respA.status) + ' — os lotes anteriores já foram gravados; clicar de novo continua de onde parou.');
+      }
+    }
+    if (plano.toAdd.length) logImportPOPs('  ✓ ' + plano.toAdd.length + ' critério(s) novo(s) cadastrado(s)');
+
+    var dels = plano.toDelete.slice().sort(function(x,y){ return y - x; });
+    for (var d = 0; d < dels.length; d++){
+      progressoImportPOPs('Removendo critérios antigos… ' + (d+1) + ' de ' + dels.length);
+      await excluirLinhaTabela('Tolerancias_App', 'TabelaTolerancias', dels[d], token);
+    }
+    if (dels.length) logImportPOPs('  ✓ ' + dels.length + ' critério(s) antigo(s) removido(s)');
+
+    progressoImportPOPs('Conferindo o resultado…');
+    var restante = null;
+    for (var t = 0; t < 4; t++){
+      await carregarTolerancias(token);
+      await carregarListas(token);
+      restante = montarPlanoImportPOPs(dados);
+      if (!restante.toAdd.length && !restante.toPatch.length && !restante.toDelete.length && !restante.listasNovas.length) break;
+      await new Promise(function(r){ setTimeout(r, 600 + t*600); });
+    }
+    var pend = restante.toAdd.length + restante.toPatch.length + restante.toDelete.length + restante.listasNovas.length;
+    if (pend === 0){
+      logImportPOPs('\nConferido: a planilha está igual aos POPs ✓');
+      mostrarToast('Critérios dos POPs importados ✓');
+    } else {
+      logImportPOPs('\nAtenção: ' + pend + ' diferença(s) ainda aparecem na releitura (pode ser só atraso do Excel Online) — clique em "Importar" de novo daqui a pouco pra conferir/completar.');
+    }
+  } catch (err){
+    logImportPOPs('\nErro: ' + err.message);
+    mostrarToast('Falha na importação: ' + err.message, true);
+  } finally {
+    progressoImportPOPs('');
+    btn.disabled = false; btn.textContent = 'Importar critérios dos POPs ✓';
+  }
 }
 
 // ---- Formulário de critério em lote (Identificação + os 41 parâmetros de uma vez) ----
@@ -3581,6 +4052,18 @@ function renderCritParamRows(preenchidos){
   var el = document.getElementById('critParamRows');
   el.innerHTML = '<div class="crit-paramrow-head"><span>Parâmetro</span><span>Mínimo</span><span>Máximo</span></div>' +
     PARAMETROS_INJECAO.map(function(param, idx){
+      // Percurso/Comprimento do shotpot/Número de batidas (set) não têm critério fixo por
+      // combinação — dependem da Cavidade ativa (ver seção "Critérios por cavidade ativa",
+      // abaixo da lista) — por isso ficam desabilitados aqui, pra não criar um critério que
+      // buscarTolerancia() nunca vai de fato usar (statusDoValor roteia esses 3 pra
+      // buscarToleranciaCavidade, não pra buscarTolerancia).
+      if (ehParametroCavidadeDependente(param)){
+        return '<div class="prow prow-critrow">' +
+          '<div class="pname">'+escHtml(param)+'</div>' +
+          '<input id="critMin_'+idx+'" value="" placeholder="depende da cavidade ativa" disabled>' +
+          '<input id="critMax_'+idx+'" value="" placeholder="ver seção abaixo da lista" disabled>' +
+          '</div>';
+      }
       var ex = preenchidos[param] || {};
       return '<div class="prow prow-critrow">' +
         '<div class="pname">'+escHtml(param)+'</div>' +
@@ -3688,6 +4171,7 @@ async function salvarCriterioLote(){
   var toPatch = [], toAdd = [], toDelete = [];
   for (var idx = 0; idx < PARAMETROS_INJECAO.length; idx++){
     var param = PARAMETROS_INJECAO[idx];
+    if (ehParametroCavidadeDependente(param)) continue; // critério por cavidade ativa — form/tabela próprios, não passa por aqui
     var min = document.getElementById('critMin_'+idx).value.trim();
     var max = document.getElementById('critMax_'+idx).value.trim();
     if (min && isNaN(paraNumero(min))){ erro('Mínimo de "'+param+'" precisa ser um número.'); return; }
@@ -3696,7 +4180,9 @@ async function salvarCriterioLote(){
       erro('Em "'+param+'", o mínimo não pode ser maior que o máximo.'); return;
     }
     var existente = existentePorParam[param];
-    var linha = ['Injeção', maquina, gramatura, cor, resina, param, min || null, max || null, true];
+    // 10º elemento ('') é a coluna cavidade_ativa — sempre em branco aqui: este formulário só
+    // cadastra critérios normais (por Resina/Cor), nunca por cavidade (ver comentário acima).
+    var linha = ['Injeção', maquina, gramatura, cor, resina, param, min || null, max || null, true, ''];
     if (min || max){
       if (existente) toPatch.push({ index: existente._index, linha: linha, min: min, max: max, chaveM: chaveM, chaveG: chaveG, chaveC: chaveC, chaveX: chaveR, chaveP: norm(param) });
       else toAdd.push(linha);
@@ -3713,6 +4199,7 @@ async function salvarCriterioLote(){
   btn.disabled = true; btn.textContent = 'Salvando…';
   try {
     var token = await getToken();
+    await garantirColunaCavidade(token); // garante as 10 colunas antes de ler/escrever endereços de linha
     var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias/rows';
     for (var p = 0; p < toPatch.length; p++){
       await atualizarLinhaTabela('Tolerancias_App', 'TabelaTolerancias', toPatch[p].index, toPatch[p].linha, token);
