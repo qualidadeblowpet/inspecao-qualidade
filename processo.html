@@ -2742,14 +2742,15 @@ function mselValores(id){
 // A cor de cada leitura usa o resultado GRAVADO no lançamento (dentro_criterio e o limite
 // aplicado na época) — coerente com a decisão de não recalcular o passado.
 // =============================================================================
+// Grupos definidos pelo Cleber (29/10/2026): Temperatura, Secagem, Injeção, Recalque, Ciclo e Molde.
+// "Ciclo" (tempo de ciclo), Percurso, Shotpot, agulha, almofada, rosca, plastificação e contrapressão
+// ficam em Injeção. O pigmentador não foi citado — ficou em Injeção, junto da dosagem/plastificação.
 var GRUPOS_PARAMETROS_INJECAO = [
-  ['Utilidades e secagem', ['Temperatura de água gelada','Temperatura água da torre','Temperatura PET (cone)','Ponto de orvalho (secador)','Nível do silo (%)']],
-  ['Injeção', ['Pressão de injeção (teórico)','Pressão de injeção (real)','Velocidade de injeção (1º perfil)','Velocidade de injeção (2º perfil)','Velocidade de injeção (3º perfil)','Velocidade de injeção (4º perfil)','Velocidade de injeção (5º perfil)','Tempo de injeção']],
+  ['Temperatura', ['Temperatura de água gelada','Temperatura água da torre','Temperatura PET (cone)','Temperatura do canhão','Temperatura do molde','Temperatura de agulha','Temperatura do óleo']],
+  ['Secagem', ['Ponto de orvalho (secador)','Nível do silo (%)']],
+  ['Injeção', ['Pressão de injeção (teórico)','Pressão de injeção (real)','Velocidade de injeção (1º perfil)','Velocidade de injeção (2º perfil)','Velocidade de injeção (3º perfil)','Velocidade de injeção (4º perfil)','Velocidade de injeção (5º perfil)','Tempo de injeção','Tempo de ciclo (total)','Percurso','Comprimento do shotpot','Tempo de abertura de agulha','Almofada de massa','Velocidade da rosca','Tempo de plastificação','Contrapressão','Velocidade do pigmentador (RPM)','Tempo do pigmentador (seg.)']],
   ['Recalque', ['Pressão de recalque (1º perfil)','Pressão de recalque (2º perfil)','Pressão de recalque (3º perfil)','Pressão de recalque (4º perfil)','Pressão de recalque (5º perfil)','Tempo de recalque (1º perfil)','Tempo de recalque (2º perfil)','Tempo de recalque (3º perfil)','Tempo de recalque (4º perfil)','Tempo de recalque (5º perfil)','Tempo total de recalque']],
-  ['Dosagem e plastificação', ['Percurso','Comprimento do shotpot','Tempo de abertura de agulha','Almofada de massa','Velocidade da rosca','Tempo de plastificação','Contrapressão']],
-  ['Temperaturas', ['Temperatura do canhão','Temperatura do molde','Temperatura de agulha','Temperatura do óleo']],
-  ['Ciclo e molde', ['Tempo de refrigeração','Tempo de ciclo (total)','Número de batidas (set)','Cavidades ativas']],
-  ['Pigmentador', ['Velocidade do pigmentador (RPM)','Tempo do pigmentador (seg.)']]
+  ['Ciclo e Molde', ['Tempo de refrigeração','Número de batidas (set)','Cavidades ativas']]
 ];
 var HORARIOS_CHECKLIST = [8, 11, 14, 17, 20, 23, 2, 5]; // horários fixos do checklist FO500-011
 var DASH = { dias: 7, maquinas: [], sel: null, trend: null, soFora: true, pin: {} };
