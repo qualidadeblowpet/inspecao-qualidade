@@ -307,6 +307,99 @@
   .modal-card h4{font-family:var(--font-display);font-size:18px;margin:0 0 8px;text-transform:uppercase;letter-spacing:.3px;}
   .modal-card p{font-size:13px;color:var(--text-dim);margin:0 0 20px;line-height:1.5;}
   .modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  /* ---- Dashboard por máquina (raias + painel do lançamento + tendência) ---- */
+  :root{ --dm-band-a: rgba(91,155,242,.10); --dm-band-b: rgba(156,123,217,.13); }
+  :root[data-theme="claro"]{ --dm-band-a: rgba(46,95,138,.08); --dm-band-b: rgba(124,92,184,.10); }
+  .dm-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;}
+  .dm-chip{font:inherit;font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;}
+  .dm-chip.on{background:var(--accent);border-color:var(--accent);color:#1a1200;}
+  .dm-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--text-dim);margin:2px 0 12px;}
+  .dm-legend i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:6px;vertical-align:-2px;}
+  .dm-legend i.vazada{border:2px dashed var(--text-dim);}
+  .dm-legend i.banda{background:var(--dm-band-b);border-radius:3px;}
+  .dm-lanes{display:grid;grid-template-columns:260px minmax(0,1fr);border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface);}
+  .dm-heads{border-right:1px solid var(--border);min-width:0;}
+  .dm-lh{height:92px;padding:10px 14px;border-top:1px solid var(--border);display:flex;flex-direction:column;justify-content:center;gap:3px;min-width:0;}
+  .dm-lh.dm-axishead{height:42px;border-top:0;font-size:10.5px;letter-spacing:1.2px;color:var(--text-dim);text-transform:uppercase;justify-content:flex-end;}
+  .dm-mname{font-family:var(--font-display);font-size:20px;font-weight:700;letter-spacing:.3px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .dm-prod{font-size:11.5px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .dm-kpis{display:flex;gap:12px;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap;}
+  .dm-kpis .dm-ok{color:var(--ok);} .dm-kpis .dm-warn{color:var(--warn);}
+  .dm-scroll{overflow-x:auto;min-width:0;}
+  .dm-scroll svg{display:block;font-family:var(--font-body);}
+  .dm-lane{border-top:1px solid var(--border);}
+  .dm-dot{cursor:pointer;outline:none;}
+  .dm-dot:hover circle.c,.dm-dot:focus circle.c{stroke:var(--accent);stroke-width:3;}
+  .dm-dot.sel circle.c{stroke:var(--accent);stroke-width:3;}
+  .dm-scrim{position:fixed;inset:0;background:var(--shadow-overlay);z-index:180;}
+  .dm-drawer{position:fixed;top:0;right:0;bottom:0;width:min(500px,100%);background:var(--surface);border-left:1px solid var(--border);z-index:181;display:flex;flex-direction:column;box-shadow:-10px 0 30px var(--shadow-drawer);}
+  .dm-dhead{padding:16px 18px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;}
+  .dm-dhead h2{font-family:var(--font-display);font-size:22px;margin:0;text-transform:uppercase;letter-spacing:.3px;}
+  .dm-x{margin-left:auto;padding:6px 12px;font-size:18px;line-height:1;}
+  .dm-dbody{overflow-y:auto;padding:14px 18px 24px;display:flex;flex-direction:column;gap:12px;}
+  .dm-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:12.5px;}
+  .dm-meta span{color:var(--text-dim);display:block;font-size:10.5px;letter-spacing:1px;text-transform:uppercase;}
+  .dm-forabox{border:1px solid var(--danger);background:var(--danger-bg);border-radius:10px;padding:10px 12px;}
+  .dm-forabox h4,.dm-okbox h4{margin:0 0 6px;font-size:12px;letter-spacing:.8px;text-transform:uppercase;}
+  .dm-forabox h4{color:var(--danger);}
+  .dm-okbox{border:1px solid var(--ok);background:var(--ok-bg);border-radius:10px;padding:10px 12px;}
+  .dm-okbox h4{color:var(--ok);margin:0;}
+  .dm-nonebox{border:1px solid var(--border);background:var(--surface-2);border-radius:10px;padding:10px 12px;font-size:12.5px;color:var(--text-dim);}
+  .dm-frow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;font-size:13px;padding:3px 0;font-variant-numeric:tabular-nums;}
+  .dm-frow .v{color:var(--danger);font-weight:700;} .dm-frow .f{color:var(--text-dim);}
+  .dm-just{font-size:12.5px;margin-top:8px;color:var(--text);}
+  details.dm-grp{border:1px solid var(--border);border-radius:10px;background:var(--surface-2);}
+  details.dm-grp summary{cursor:pointer;padding:10px 12px;font-weight:600;display:flex;align-items:center;gap:8px;list-style:none;}
+  details.dm-grp summary::-webkit-details-marker{display:none;}
+  details.dm-grp summary::before{content:'▸';color:var(--text-dim);transition:transform .15s;}
+  details.dm-grp[open] summary::before{transform:rotate(90deg);}
+  .dm-cnt{margin-left:auto;}
+  .dm-prow{display:grid;grid-template-columns:minmax(0,1fr) 92px 58px 76px;gap:8px;align-items:center;padding:6px 12px;border-top:1px solid var(--border);font-size:12.5px;font-variant-numeric:tabular-nums;}
+  .dm-val{text-align:right;font-weight:700;} .dm-val.bad{color:var(--danger);} .dm-val.ok{color:var(--ok);}
+  .dm-fx{color:var(--text-dim);font-size:11.5px;text-align:right;}
+  .dm-trend{margin-top:18px;}
+  .dm-trendhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;}
+  .dm-trendhead h3{font-family:var(--font-display);font-size:20px;text-transform:uppercase;margin:0;letter-spacing:.3px;}
+  .dm-tgroup{margin-top:12px;}
+  .dm-tgroup h5{margin:0 0 6px;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);}
+  .dm-row3{display:grid;grid-template-columns:26px minmax(150px,240px) minmax(0,1fr) 76px;gap:10px;align-items:center;padding:6px 10px;border:1px solid var(--border);border-radius:9px;background:var(--surface);margin-bottom:6px;cursor:pointer;}
+  .dm-row3:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .dm-pn{font-weight:600;font-size:13px;min-width:0;}
+  .dm-pn small{display:block;color:var(--text-dim);font-weight:400;font-size:11.5px;}
+  .dm-last{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;} .dm-last.bad{color:var(--danger);}
+  .dm-star{font:inherit;background:none;border:0;color:var(--text-dim);font-size:16px;cursor:pointer;padding:0;}
+  .dm-star.on{color:var(--accent);}
+  .dm-big{overflow-x:auto;border:1px solid var(--border);border-radius:9px;background:var(--surface);margin:-2px 0 8px;padding:6px 4px;}
+  .dm-big svg{display:block;font-family:var(--font-body);}
+  @media (max-width: 900px){
+    .dm-lanes{grid-template-columns:140px minmax(0,1fr);}
+    .dm-lh{padding:8px 10px;}
+    .dm-mname{font-size:17px;gap:4px;}
+    .dm-prod{display:none;}
+    .dm-kpis{flex-direction:column;gap:0;}
+    .dm-row3{grid-template-columns:24px minmax(0,1fr) 64px;}
+    .dm-row3 .dm-spark{grid-column:1/-1;}
+    .dm-prow{grid-template-columns:minmax(0,1fr) 64px 70px;}
+    .dm-prow .dm-sp{display:none;}
+  }
+  /* ---- Janela de justificativa (lançamento com parâmetro fora do critério) ---- */
+  .just-card{max-width:560px;text-align:left;max-height:90vh;overflow-y:auto;}
+  .just-card h4{color:var(--danger);}
+  .just-card .just-sub{font-size:12px;color:var(--text-dim);margin:0 0 10px;}
+  .just-lista{border:1px solid var(--border);border-radius:10px;padding:6px 12px;margin-bottom:14px;background:var(--surface-2);}
+  .just-item{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;font-size:13px;padding:5px 0;font-variant-numeric:tabular-nums;}
+  .just-item + .just-item{border-top:1px solid var(--border);}
+  .just-item .jv{color:var(--danger);font-weight:700;}
+  .just-item .jf{color:var(--text-dim);}
+  .just-card label{display:block;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;}
+  .just-card textarea{width:100%;min-height:96px;resize:vertical;font:inherit;font-size:13px;color:var(--text);background:var(--surface-2);
+    border:1px solid var(--border);border-radius:9px;padding:10px 12px;}
+  .just-card textarea:focus{outline:2px solid var(--accent);outline-offset:1px;}
+  .just-erro{color:var(--danger);font-size:12px;margin:6px 0 0;}
+  .just-card .modal-actions{margin-top:16px;}
+  .jbtn{font:inherit;font-size:11px;font-weight:700;background:var(--warn-bg);color:var(--warn);border:0;border-radius:6px;padding:3px 8px;cursor:pointer;}
+  .jtxt{color:var(--text-dim);font-size:11.5px;margin-left:6px;}
+  .widetable th.wt-just,.widetable td.wt-just{min-width:220px;white-space:nowrap;text-align:left;font-family:var(--font-body);}
   .fullscreen-overlay{position:fixed;inset:0;background:var(--bg);z-index:150;overflow-y:auto;}
   .fullscreen-topbar{position:sticky;top:0;background:var(--sidebar);border-bottom:1px solid var(--border);
     padding:16px 28px;display:flex;align-items:center;justify-content:space-between;z-index:5;}
@@ -444,37 +537,31 @@
     </div>
 
     <div id="dashConteudo" hidden>
-      <div class="dv3-filterbar">
-        <div class="dv3-filtergroup"><label>Máquina</label><div class="dv3-msel" id="fMaquinaWrap"></div></div>
-        <div class="dv3-filtergroup"><label>Gramatura</label><div class="dv3-msel" id="fGramaturaWrap"></div></div>
-        <div class="dv3-filtergroup"><label>Cor</label><div class="dv3-msel" id="fCorWrap"></div></div>
-        <div class="dv3-filtergroup"><label>Resina</label><div class="dv3-msel" id="fResinaWrap"></div></div>
-        <div class="dv3-filtergroup"><label>Parâmetros</label><div class="dv3-msel" id="fParametrosWrap"></div></div>
-        <div class="dv3-filtergroup"><label>Data inicial</label><input type="date" id="fData_de"></div>
-        <div class="dv3-filtergroup"><label>Data final</label><input type="date" id="fData_ate"></div>
-        <div class="dv3-filtergroup"><label>Horário inicial</label><input type="time" id="fHora_de" value="00:00"></div>
-        <div class="dv3-filtergroup"><label>Horário final</label><input type="time" id="fHora_ate" value="23:59"></div>
-        <button class="dv3-filtergroup dv3-btnfiltrar" onclick="aplicarFiltrosDashV3()">Aplicar filtro</button>
+      <div class="dm-bar">
+        <span class="note" style="margin:0">Período</span>
+        <button class="dm-chip dm-chip-dias" type="button" onclick="dmMudarDias(3,this)">3 dias</button>
+        <button class="dm-chip dm-chip-dias on" type="button" onclick="dmMudarDias(7,this)">7 dias</button>
+        <button class="dm-chip dm-chip-dias" type="button" onclick="dmMudarDias(14,this)">14 dias</button>
+        <button class="dm-chip dm-chip-dias" type="button" onclick="dmMudarDias(30,this)">30 dias</button>
+        <span style="flex:1"></span>
+        <span class="note" id="dmPeriodo" style="margin:0"></span>
       </div>
-
-      <div class="dv3-legend">
-        <span><i></i>Valor medido</span>
-        <span><i class="dv3-max"></i>Limite máximo</span>
-        <span><i class="dv3-min"></i>Limite mínimo</span>
-        <span><i class="dv3-dot"></i>Leitura fora do limite</span>
+      <div class="dm-legend">
+        <span><i style="background:var(--ok)"></i>Tudo dentro do critério</span>
+        <span><i style="background:var(--danger)"></i>Com parâmetro fora (número = quantos)</span>
+        <span><i style="background:var(--text-dim)"></i>Sem critério gravado</span>
+        <span><i class="vazada"></i>Horário do checklist sem lançamento</span>
+        <span><i class="banda"></i>Fundo = produto rodando</span>
       </div>
-
-      <div class="dv3-panel" id="dashPanel">
-        <div class="dv3-axishead">
-          <div class="dv3-axislabel"><span class="dv3-headtxt">Parâmetros</span></div>
-          <div class="dv3-axisscroll" id="axisScroll"><svg id="axisSvg" height="46"></svg></div>
-          <div class="dv3-resumohead"><span class="dv3-headtxt">Resumo</span></div>
-        </div>
-        <div id="dashRows"></div>
+      <div class="dm-lanes">
+        <div class="dm-heads" id="dmHeads"></div>
+        <div class="dm-scroll" id="dmScroll"></div>
       </div>
-      <p class="note" id="dashVazio" hidden>Nenhum registro encontrado com esse filtro — tenta ajustar a máquina/gramatura/cor/resina ou o período.</p>
-      <p class="note">O eixo de horário/data fica fixo no topo e rola junto com os gráficos. Os pontos marcam horários com cadastro real na planilha.</p>
+      <p class="note" id="dmVazio" hidden>Nenhum lançamento no período escolhido — aumente o período (14 ou 30 dias).</p>
+      <p class="note">Clique numa bolinha para abrir o lançamento. As cores usam o resultado gravado em cada lançamento (o critério que valia no dia).</p>
+      <div id="dmTendencia" class="dm-trend" hidden></div>
     </div>
+    <div id="dmPainelWrap" hidden><div class="dm-scrim" onclick="dmFecharPainel()"></div><aside class="dm-drawer" id="dmPainel" aria-label="Detalhe do lançamento"></aside></div>
     </div><!-- /#pageDashboard -->
 
     <!-- ===== PÁGINA: DADOS CADASTRADOS ===== -->
@@ -998,11 +1085,13 @@
           <div class="sectiontitle" style="margin-top:0;">Identificação</div>
           <div class="grid-2" style="margin-bottom:14px;">
             <div class="field"><label>Máquina</label><select id="lmMaquinaI" onchange="lmRenderInjecao()"></select></div>
-            <div class="field"><label>Responsável</label><select id="lmResponsavelI"></select></div>
+            <div class="field"><label for="lmResponsavelI">Responsável</label><input id="lmResponsavelI" list="lmOperadoresI" autocomplete="off" placeholder="Digite o nome do operador"><datalist id="lmOperadoresI"></datalist></div>
             <div class="field"><label>Gramatura</label><select id="lmGramaturaI" onchange="lmRenderInjecao()"></select></div>
             <div class="field"><label>Lançado em</label><input id="lmAgoraI" readonly></div>
+            <div class="field"><label>Cor</label><select id="lmCorI" onchange="LM.corInjecao=this.value;lmRenderInjecao();"></select></div>
+            <div class="field"><label>Resina</label><select id="lmResinaI" onchange="LM.resinaInjecao=this.value;lmRenderInjecao();"></select></div>
           </div>
-          <p class="note" style="margin:-6px 0 14px;">Máquina, Responsável e Gramatura vêm das listas cadastradas em Critérios → Listas de apoio. Data e hora são preenchidas automaticamente no momento do cadastro.</p>
+          <p class="note" style="margin:-6px 0 14px;">Máquina, Gramatura, Cor e Resina vêm das listas cadastradas em Critérios → Listas de apoio. Responsável é digitado (sugere os operadores cadastrados). Data e hora são preenchidas automaticamente no momento do cadastro.</p>
 
           <div class="legend">
             <span class="ok"><i></i>Dentro do limite</span>
@@ -1076,7 +1165,7 @@ const graphScopes = ["Files.ReadWrite", "User.Read"];
 // Link de compartilhamento da planilha "Controle de Processo - BlowPet.xlsx" (SharePoint/OneDrive).
 const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/inspetor_qualidade_blowpet_com_br/IQDmQnijbPcDTY0p9dqG2ESpAd5D74uyEA8w9oWVNHuR9O0?e=F1ABfi";
 
-const COLS_INJ = ['id_sessao','data','hora','maquina','responsavel','gramatura','cor','resina','parametro','valor_medido','tolerancia_min_aplicada','tolerancia_max_aplicada','dentro_criterio','criado_em'];
+const COLS_INJ = ['id_sessao','data','hora','maquina','responsavel','gramatura','cor','resina','parametro','valor_medido','tolerancia_min_aplicada','tolerancia_max_aplicada','dentro_criterio','criado_em','justificativa'];
 
 let msalInstance = null, msalPronto = null, contaAtual = null, driveId = null, itemId = null;
 let tolerancias = []; // { maquina, gramatura, cor, resina, parametro, valor_min, valor_max, ativo, cavidade_ativa } (chaves normalizadas)
@@ -1574,7 +1663,80 @@ function gerarIdSessao(){
   return 'sess-' + Date.now() + '-' + Math.random().toString(36).slice(2,10);
 }
 
-function montarLinhasParaSalvar(reg, cabecalho){
+// Formata o limite de um critério pra exibição (≤ / ≥ quando só um lado existe).
+function textoLimite(vmin, vmax){
+  var a = (vmin === undefined || vmin === null) ? '' : String(vmin).trim();
+  var b = (vmax === undefined || vmax === null) ? '' : String(vmax).trim();
+  if (a && b) return a === b ? '= ' + a : a + ' – ' + b;
+  if (b) return '≤ ' + b;
+  if (a) return '≥ ' + a;
+  return 'sem critério';
+}
+
+// Janela obrigatória de justificativa (pedido do Cleber, 29/10/2026): ao salvar um lançamento com
+// algum parâmetro fora do critério, abre antes de gravar listando os parâmetros fora e pedindo o
+// motivo. Uma justificativa por lançamento (horário). Devolve uma Promise com o texto digitado,
+// ou null se a pessoa voltar sem salvar. Feita na própria página (sem window.prompt/confirm).
+// foras: [{ parametro, valor, limite }]
+function pedirJustificativa(foras, titulo){
+  return new Promise(function(resolve){
+    var ov = document.createElement('div');
+    ov.className = 'modal-overlay';
+    ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+    ov.innerHTML = '<div class="modal-card just-card">' +
+      '<h4>' + foras.length + ' parâmetro' + (foras.length > 1 ? 's' : '') + ' fora do critério</h4>' +
+      '<p class="just-sub">' + escHtml(titulo || '') + (titulo ? ' · ' : '') + 'Para salvar, explique por que está sendo trabalhado fora do critério.</p>' +
+      '<div class="just-lista">' + foras.map(function(f){
+        return '<div class="just-item"><span>' + escHtml(f.parametro) + '</span><span class="jv">' + escHtml(f.valor) + '</span><span class="jf">' + escHtml(f.limite) + '</span></div>';
+      }).join('') + '</div>' +
+      '<label for="justTexto">Justificativa (obrigatória)</label>' +
+      '<textarea id="justTexto" placeholder="Ex.: troca de lote de resina, ajustando conforme orientação do líder"></textarea>' +
+      '<p class="just-erro" id="justErro" hidden>Escreva a justificativa para poder salvar.</p>' +
+      '<div class="modal-actions"><button type="button" class="btn btn-outline" id="justVoltar">Voltar e corrigir</button>' +
+      '<button type="button" class="btn btn-accent" id="justOk">Salvar com justificativa</button></div></div>';
+    document.body.appendChild(ov);
+    var ta = ov.querySelector('#justTexto');
+    setTimeout(function(){ ta.focus(); }, 0);
+    function fechar(valor){ document.removeEventListener('keydown', onKey); ov.remove(); resolve(valor); }
+    function onKey(e){ if (e.key === 'Escape') fechar(null); }
+    document.addEventListener('keydown', onKey);
+    ov.querySelector('#justVoltar').onclick = function(){ fechar(null); };
+    ov.querySelector('#justOk').onclick = function(){
+      var t = ta.value.trim();
+      if (!t){ ov.querySelector('#justErro').hidden = false; ta.focus(); return; }
+      fechar(t);
+    };
+  });
+}
+
+// Só mostra um texto (justificativa já gravada) numa janela simples.
+function mostrarJustificativa(titulo, texto){
+  var ov = document.createElement('div');
+  ov.className = 'modal-overlay';
+  ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-modal', 'true');
+  ov.innerHTML = '<div class="modal-card just-card"><h4 style="color:var(--text)">Justificativa</h4><p class="just-sub">' + escHtml(titulo) + '</p>' +
+    '<p style="font-size:14px;color:var(--text);white-space:pre-wrap;margin:0">' + escHtml(texto) + '</p>' +
+    '<div class="modal-actions" style="grid-template-columns:1fr"><button type="button" class="btn btn-outline">Fechar</button></div></div>';
+  document.body.appendChild(ov);
+  var b = ov.querySelector('button'); b.focus();
+  function fechar(){ document.removeEventListener('keydown', onKey); ov.remove(); }
+  function onKey(e){ if (e.key === 'Escape') fechar(); }
+  document.addEventListener('keydown', onKey);
+  b.onclick = fechar;
+  ov.onclick = function(e){ if (e.target === ov) fechar(); };
+}
+
+// Lista os parâmetros fora do critério de um horário (Carregar Dados), no formato da janela de justificativa.
+function forasDoRegistro(reg, cabecalho){
+  var out = [];
+  reg.valores.forEach(function(v){
+    var r = statusDoValor(reg, v, cabecalho);
+    if (r.status === 'bad') out.push({ parametro: v.parametro, valor: v.valor, limite: textoLimite(r.tol.valor_min, r.tol.valor_max) });
+  });
+  return out;
+}
+
+function montarLinhasParaSalvar(reg, cabecalho, justificativa){
   var idSessao = gerarIdSessao();
   var criadoEm = new Date().toISOString();
   return reg.valores.map(function(v){
@@ -1585,7 +1747,7 @@ function montarLinhasParaSalvar(reg, cabecalho){
       responsavel: reg.operador, gramatura: cabecalho.gramatura, cor: reg.cor, resina: reg.resina,
       parametro: v.parametro, valor_medido: v.valor,
       tolerancia_min_aplicada: r.tol ? r.tol.valor_min : '', tolerancia_max_aplicada: r.tol ? r.tol.valor_max : '',
-      dentro_criterio: dentro, criado_em: criadoEm
+      dentro_criterio: dentro, criado_em: criadoEm, justificativa: justificativa || ''
     };
     return COLS_INJ.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; });
   });
@@ -1593,10 +1755,16 @@ function montarLinhasParaSalvar(reg, cabecalho){
 
 async function salvarRegistro(){
   if (!itemId){ mostrarToast('Ainda conectando com a planilha, aguarde um instante e tente de novo.', true); return; }
+  var justificativa = '';
+  var foras = forasDoRegistro(registroAtual, resultado.cabecalho);
+  if (foras.length){
+    justificativa = await pedirJustificativa(foras, (resultado.cabecalho.maquina || '') + ' · horário ' + registroAtual.horario);
+    if (justificativa === null) return; // voltou pra corrigir — nada é gravado
+  }
   var btn = document.getElementById('btnSalvarDetail');
   btn.disabled = true; btn.textContent = 'Salvando…';
   try {
-    var linhas = montarLinhasParaSalvar(registroAtual, resultado.cabecalho);
+    var linhas = montarLinhasParaSalvar(registroAtual, resultado.cabecalho, justificativa);
     var token = await getToken();
     await prepararColunasTextoRegistrosInjecao(token);
     var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaRegistrosInjecao/rows/add';
@@ -1624,8 +1792,21 @@ async function salvarTodosPendentes(){
   var pendentes = resultado.registros.filter(function(r){ return !r.salvo; });
   if (pendentes.length === 0){ mostrarToast('Todos os horários já estão salvos.'); return; }
 
+  // Antes de gravar qualquer coisa, pede a justificativa de cada horário que tem parâmetro fora
+  // (uma janela por horário). Se a pessoa voltar sem justificar, aquele horário fica de fora
+  // desta gravação (continua pendente, dá pra corrigir e salvar depois); os demais seguem.
+  var justificativas = {}, pulados = [];
+  for (var j = 0; j < pendentes.length; j++){
+    var foras = forasDoRegistro(pendentes[j], resultado.cabecalho);
+    if (!foras.length) continue;
+    var t = await pedirJustificativa(foras, (resultado.cabecalho.maquina || '') + ' · horário ' + pendentes[j].horario);
+    if (t === null) pulados.push(pendentes[j]); else justificativas[j] = t;
+  }
+  var paraSalvar = pendentes.filter(function(r){ return pulados.indexOf(r) < 0; });
+  if (!paraSalvar.length){ mostrarToast('Nada foi salvo — falta justificar os horários com parâmetro fora.', true); return; }
+
   var btn = document.getElementById('btnSalvarTodos');
-  btn.disabled = true; btn.textContent = 'Salvando ' + pendentes.length + ' horário(s)…';
+  btn.disabled = true; btn.textContent = 'Salvando ' + paraSalvar.length + ' horário(s)…';
 
   var token;
   try {
@@ -1640,8 +1821,9 @@ async function salvarTodosPendentes(){
   var okCount = 0, falhas = [];
   for (var i = 0; i < pendentes.length; i++){
     var reg = pendentes[i];
+    if (pulados.indexOf(reg) >= 0) continue;
     try {
-      var linhas = montarLinhasParaSalvar(reg, resultado.cabecalho);
+      var linhas = montarLinhasParaSalvar(reg, resultado.cabecalho, justificativas[i] || '');
       var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaRegistrosInjecao/rows/add';
       var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: linhas }) });
       if (resp.ok){
@@ -1657,21 +1839,17 @@ async function salvarTodosPendentes(){
 
   renderSummary();
   if (falhas.length === 0){
-    mostrarToast(okCount + ' horário(s) salvos com sucesso ✓');
+    mostrarToast(okCount + ' horário(s) salvos com sucesso ✓' + (pulados.length ? ' — ' + pulados.length + ' ficaram pendentes sem justificativa (' + pulados.map(function(r){ return r.horario; }).join(', ') + ')' : ''), pulados.length > 0);
   } else {
     mostrarToast(okCount + ' salvo(s), ' + falhas.length + ' falharam: ' + falhas.join('; '), true);
   }
 }
 
 // =============================================================================
-// Aba Dashboard — layout empilhado v3 (aprovado em mockup-dashboard-empilhado-v3.html)
-// Carrega os registros já salvos (TabelaRegistrosInjecao) e desenha, pra uma
-// combinação Máquina+Gramatura+Cor+Resina + período escolhido, um gráfico por
-// parâmetro (41), todos empilhados, com eixo de tempo compartilhado no topo.
+// Registros de Injeção carregados (TabelaRegistrosInjecao) — usados pelo Dashboard por
+// máquina (ver renderDashMaquinas), pela tabela Dados Cadastrados e pela página IQR.
 // =============================================================================
-var registrosCarregados = null; // array de objetos {data,hora,maquina,responsavel,gramatura,cor,resina,parametro,valor_medido,tolerancia_min_aplicada,tolerancia_max_aplicada,dentro_criterio,criado_em}
-var dashPX_PER_PONTO = 56; // espaçamento fixo entre horários consecutivos no eixo (não é proporcional ao tempo real decorrido)
-var dashSTART = null, dashEND = null, dashAXIS_W = 0, dashPONTO_INDEX = {};
+var registrosCarregados = null; // array de objetos {id_sessao,data,hora,maquina,responsavel,gramatura,cor,resina,parametro,valor_medido,tolerancia_min_aplicada,tolerancia_max_aplicada,dentro_criterio,criado_em,justificativa}
 
 var PAGINAS_IDS = {
   dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', criterios:'pageCriterios', carregarDados:'pageCarregarDados', iqr:'pageIqr',
@@ -1692,7 +1870,7 @@ function definirTema(tema){
   // o gráfico do Dashboard é desenhado em JS (SVG) e não se redesenha sozinho quando o
   // CSS muda, então força um redesenho com a cor nova se já tinha dados carregados
   // (mesmo estando numa página diferente do Dashboard no momento).
-  if (typeof aplicarFiltrosDashV3 === 'function' && registrosCarregados !== null) aplicarFiltrosDashV3();
+  if (typeof renderDashMaquinas === 'function' && registrosCarregados !== null) renderDashMaquinas();
 }
 function temaSalvo(){
   try { return localStorage.getItem('processoTema') === 'claro' ? 'claro' : 'escuro'; } catch (e) { return 'escuro'; }
@@ -1854,6 +2032,14 @@ function iqrRecalcular(){
     tolIdx[k] = { min: isNaN(cmin)?null:cmin, max: isNaN(cmax)?null:cmax };
   });
 
+  // "Cavidades ativas" de cada horário — Percurso/Comprimento do shotpot/Número de batidas não têm
+  // critério único por produto: cada leitura é comparada com a faixa da SUA quantidade de cavidades
+  // (ver buscarToleranciaCavidade), igual ao Carregar Dados/Lançar Manual/Dashboard.
+  var cavPorSessao = {};
+  registrosCarregados.forEach(function(r){
+    if (r.parametro === 'Cavidades ativas' && r.id_sessao) cavPorSessao[r.id_sessao] = r.valor_medido;
+  });
+
   var produtos = [], achadosEscala = [];
   var ordemStatus = { escala:0, nao_cobre:1, sem_criterio:2, amostra_insuf:3, cobre:4, sem_dado:5 };
   ordemGrupos.forEach(function(key){
@@ -1869,6 +2055,29 @@ function iqrRecalcular(){
       var tkey = grp._maquina + '|' + grp._gramatura + '|' + grp._resina + '|' + String(param||'').trim();
       var tcrit = tolIdx[tkey];
       var nForaCriterio = tcrit ? iqrContaForaCriterio(valsnum, tcrit.min, tcrit.max) : null;
+      var nLeiturasComCriterio = tcrit ? valsnum.length : 0;
+      var critCavidade = null, leiturasCav = null;
+      if (ehParametroCavidadeDependente(param)){
+        tcrit = null; nForaCriterio = null;
+        var porCav = {}, ordemCav = [];
+        leiturasCav = [];
+        rows.forEach(function(r){
+          var x = paraNumero(r.valor_medido); if (isNaN(x)) return;
+          var cav = cavPorSessao[r.id_sessao];
+          var t = buscarToleranciaCavidade(r.maquina, r.gramatura, param, cav);
+          if (!t) return;
+          var nc = paraNumero(cav), lo = paraNumero(t.valor_min), hi = paraNumero(t.valor_max);
+          lo = isNaN(lo) ? null : lo; hi = isNaN(hi) ? null : hi;
+          if (!porCav[nc]){ porCav[nc] = { cav:nc, min:lo, max:hi, n:0 }; ordemCav.push(nc); }
+          porCav[nc].n++;
+          leiturasCav.push({ v:x, min:lo, max:hi });
+        });
+        if (leiturasCav.length){
+          critCavidade = ordemCav.map(function(c){ return porCav[c]; }).sort(function(a,b){ return b.n - a.n; });
+          nLeiturasComCriterio = leiturasCav.length;
+          nForaCriterio = leiturasCav.filter(function(l){ return (l.min !== null && l.v < l.min) || (l.max !== null && l.v > l.max); }).length;
+        }
+      }
 
       var segs = valsnum.length >= 2 ? iqrClustersLog(valsnum, 0.6) : [valsnum.slice()];
       segs = segs.filter(function(s){ return s.length > 0; });
@@ -1887,20 +2096,33 @@ function iqrRecalcular(){
       if (escalaInfo){ status = 'escala'; nEscala++; }
       else if (res.minimo === null){ status = 'sem_dado'; }
       else if (res.amostra_insuf){ status = 'amostra_insuf'; nAmostraInsuf++; }
+      else if (critCavidade){
+        // por cavidade: "cobre" se todas as leituras que sobram depois do corte de outliers (faixa
+        // sugerida pelo IQR) estão dentro da faixa da própria cavidade.
+        var cobreCav = leiturasCav.every(function(l){
+          if (l.v < res.minimo || l.v > res.maximo) return true;
+          return !((l.min !== null && l.v < l.min) || (l.max !== null && l.v > l.max));
+        });
+        status = cobreCav ? 'cobre' : 'nao_cobre';
+        if (!cobreCav) nNaoCobre++;
+      }
       else if (!tcrit){ status = 'sem_criterio'; }
       else {
-        var cobre = (tcrit.min !== null && tcrit.max !== null && tcrit.min <= res.minimo && tcrit.max >= res.maximo);
+        // critério de um lado só (ex.: "≤ 12", "≥ 50"): o lado sem limite é aberto, não conta como fora
+        var cobre = (tcrit.min !== null || tcrit.max !== null) &&
+          (tcrit.min === null || tcrit.min <= res.minimo) && (tcrit.max === null || tcrit.max >= res.maximo);
         status = cobre ? 'cobre' : 'nao_cobre';
         if (!cobre) nNaoCobre++;
       }
-      if (tcrit) nComCriterio++;
+      if (tcrit || critCavidade) nComCriterio++;
 
       paramsOut.push({
         parametro: param,
         criterio_min: tcrit ? tcrit.min : null, criterio_max: tcrit ? tcrit.max : null,
         iqr_min: iqrR2(res.minimo), iqr_max: iqrR2(res.maximo),
         n_total: res.n_total, n_outliers: res.n_outliers,
-        n_fora_criterio: nForaCriterio,
+        n_fora_criterio: nForaCriterio, n_leituras_criterio: nLeiturasComCriterio,
+        criterio_cavidade: critCavidade,
         status: status, clusters: escalaInfo
       });
     });
@@ -2043,6 +2265,19 @@ function iqrFmtFaixa(min, max){
   if (min === null || max === null || min === undefined || max === undefined) return '—';
   return iqrFmtNum(min) + ' – ' + iqrFmtNum(max);
 }
+// Critério cadastrado: mostra o lado que existe quando só um foi definido ("≤ 12", "≥ 50").
+function iqrFmtCriterio(min, max){
+  var temMin = min !== null && min !== undefined, temMax = max !== null && max !== undefined;
+  if (temMin && temMax) return min === max ? '= ' + iqrFmtNum(min) : iqrFmtNum(min) + ' – ' + iqrFmtNum(max);
+  if (temMax) return '≤ ' + iqrFmtNum(max);
+  if (temMin) return '≥ ' + iqrFmtNum(min);
+  return '—';
+}
+function iqrFmtCriterioCavidade(lista){
+  return 'por cavidade' + lista.map(function(c){
+    return '<span style="display:block;color:var(--text-dim);font-size:11px;">' + iqrFmtNum(c.cav) + ' cav.: ' + iqrFmtCriterio(c.min, c.max) + ' · ' + c.n + ' leitura' + (c.n > 1 ? 's' : '') + '</span>';
+  }).join('');
+}
 function iqrStatusBadge(st){
   if (st === 'cobre') return '<span class="critpill sim">cobre</span>';
   if (st === 'nao_cobre') return '<span class="critpill nao">fora do sugerido</span>';
@@ -2081,12 +2316,13 @@ function iqrLinhaDetalhe(p, i){
     var sugerido = pa.status === 'escala'
       ? '<span class="chipclusters">' + pa.clusters.map(function(c){ return c.n+'× '+iqrFmtNum(c.min)+'–'+iqrFmtNum(c.max); }).join(' / ') + '</span>'
       : iqrFmtFaixa(pa.iqr_min, pa.iqr_max);
-    var foraCriterio = (pa.status === 'nao_cobre' && pa.n_fora_criterio !== null && pa.n_fora_criterio !== undefined)
-      ? pa.n_fora_criterio + ' de ' + pa.n_total + ' <span style="color:var(--text-dim);">(' + Math.round(100 * pa.n_fora_criterio / pa.n_total) + '%)</span>'
+    var denom = pa.n_leituras_criterio || pa.n_total;
+    var foraCriterio = (pa.n_fora_criterio !== null && pa.n_fora_criterio !== undefined && denom)
+      ? pa.n_fora_criterio + ' de ' + denom + ' <span style="color:var(--text-dim);">(' + Math.round(100 * pa.n_fora_criterio / denom) + '%)</span>'
       : '—';
     return '<tr>' +
       '<td class="pname">' + escHtml(pa.parametro) + '</td>' +
-      '<td>' + iqrFmtFaixa(pa.criterio_min, pa.criterio_max) + '</td>' +
+      '<td>' + (pa.criterio_cavidade ? iqrFmtCriterioCavidade(pa.criterio_cavidade) : iqrFmtCriterio(pa.criterio_min, pa.criterio_max)) + '</td>' +
       '<td>' + sugerido + '</td>' +
       '<td>' + (pa.n_total || 0) + (pa.n_outliers ? ' <span style="color:var(--text-dim);">(' + pa.n_outliers + ' outlier' + (pa.n_outliers>1?'s':'') + ' removido' + (pa.n_outliers>1?'s':'') + ')</span>' : '') + '</td>' +
       '<td>' + foraCriterio + '</td>' +
@@ -2286,8 +2522,7 @@ async function carregarRegistrosInjecao(){
     registrosCarregados.sort(function(a,b){ return (b.criado_em||'').localeCompare(a.criado_em||''); });
 
     document.getElementById('dashConteudo').hidden = false;
-    popularFiltrosDashV3();
-    aplicarFiltrosDashV3();
+    renderDashMaquinas();
     btn.textContent = 'Atualizar registros';
 
     document.getElementById('tabelaConteudo').hidden = false;
@@ -2495,322 +2730,341 @@ function mselValores(id){
   return st ? st.selecionados.slice() : [];
 }
 
-function popularFiltrosDashV3(){
-  mselConfigurar('fMaquina', valoresUnicos('maquina'), [], null, 'Todos');
-  mselConfigurar('fGramatura', valoresUnicos('gramatura'), [], null, 'Todos');
-  mselConfigurar('fCor', valoresUnicos('cor'), [], null, 'Todos');
-  mselConfigurar('fResina', valoresUnicos('resina'), [], null, 'Todos');
-  mselConfigurar('fParametros', PARAMETROS_INJECAO, [], null, 'Todos os parâmetros');
-  // período: do dia mais antigo ao mais recente dentre os registros carregados
-  var datasIso = registrosCarregados.map(function(r){ return paraDataISO(r.data); }).filter(Boolean).sort();
-  document.getElementById('fData_de').value = datasIso[0] || '';
-  document.getElementById('fData_ate').value = datasIso[datasIso.length-1] || '';
-  document.getElementById('fHora_de').value = '00:00';
-  document.getElementById('fHora_ate').value = '23:59';
-}
+// =============================================================================
+// Dashboard por máquina (aprovado pelo Cleber em 29/10/2026, substitui o "empilhado v3").
+// Nível 1: uma raia por máquina numa linha do tempo; cada lançamento é uma bolinha (verde =
+//   tudo dentro, vermelha com o nº de parâmetros fora, cinza = sem critério gravado, vazada =
+//   horário do checklist sem lançamento). Faixa de fundo = produto (gramatura · resina) rodando.
+// Nível 2: clicar numa bolinha abre o painel daquele lançamento (parâmetros fora + justificativa
+//   + os 41 parâmetros em grupos recolhíveis, com mini-gráfico).
+// Nível 3: "Ver tendência da máquina" — gráficos compactos por parâmetro daquela máquina/produto,
+//   por padrão só os que tiveram leitura fora no período; clicar amplia; ☆ fixa no topo.
+// A cor de cada leitura usa o resultado GRAVADO no lançamento (dentro_criterio e o limite
+// aplicado na época) — coerente com a decisão de não recalcular o passado.
+// =============================================================================
+var GRUPOS_PARAMETROS_INJECAO = [
+  ['Utilidades e secagem', ['Temperatura de água gelada','Temperatura água da torre','Temperatura PET (cone)','Ponto de orvalho (secador)','Nível do silo (%)']],
+  ['Injeção', ['Pressão de injeção (teórico)','Pressão de injeção (real)','Velocidade de injeção (1º perfil)','Velocidade de injeção (2º perfil)','Velocidade de injeção (3º perfil)','Velocidade de injeção (4º perfil)','Velocidade de injeção (5º perfil)','Tempo de injeção']],
+  ['Recalque', ['Pressão de recalque (1º perfil)','Pressão de recalque (2º perfil)','Pressão de recalque (3º perfil)','Pressão de recalque (4º perfil)','Pressão de recalque (5º perfil)','Tempo de recalque (1º perfil)','Tempo de recalque (2º perfil)','Tempo de recalque (3º perfil)','Tempo de recalque (4º perfil)','Tempo de recalque (5º perfil)','Tempo total de recalque']],
+  ['Dosagem e plastificação', ['Percurso','Comprimento do shotpot','Tempo de abertura de agulha','Almofada de massa','Velocidade da rosca','Tempo de plastificação','Contrapressão']],
+  ['Temperaturas', ['Temperatura do canhão','Temperatura do molde','Temperatura de agulha','Temperatura do óleo']],
+  ['Ciclo e molde', ['Tempo de refrigeração','Tempo de ciclo (total)','Número de batidas (set)','Cavidades ativas']],
+  ['Pigmentador', ['Velocidade do pigmentador (RPM)','Tempo do pigmentador (seg.)']]
+];
+var HORARIOS_CHECKLIST = [8, 11, 14, 17, 20, 23, 2, 5]; // horários fixos do checklist FO500-011
+var DASH = { dias: 7, maquinas: [], sel: null, trend: null, soFora: true, pin: {} };
 
-function aplicarFiltrosDashV3(){
-  var maquinas = mselValores('fMaquina');
-  var gramaturas = mselValores('fGramatura');
-  var cores = mselValores('fCor');
-  var resinas = mselValores('fResina');
-  var parametrosSel = mselValores('fParametros');
-  var de = document.getElementById('fData_de').value;
-  var ate = document.getElementById('fData_ate').value;
-  var horaDe = document.getElementById('fHora_de').value || '00:00';
-  var horaAte = document.getElementById('fHora_ate').value || '23:59';
+function dmFmtData(d){ return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0'); }
+function dmFmtHora(d){ return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+function dmProduto(s){ return (s.gramatura || '—') + ' · ' + (s.resina || '—'); }
+function dmChaveProduto(s){ return norm(s.gramatura) + '|' + norm(s.resina); }
+function dmFora(info){ return !!info && info.dentro === 'NÃO'; }
 
-  var filtrados = registrosCarregados.filter(function(r){
-    if (!valorBateFiltro(maquinas, r.maquina, 'maquina')) return false;
-    if (!valorBateFiltro(gramaturas, r.gramatura, 'gramatura')) return false;
-    if (!valorBateFiltro(cores, r.cor, 'cor')) return false;
-    if (!valorBateFiltro(resinas, r.resina, 'resina')) return false;
-    var iso = paraDataISO(r.data);
-    if (de && iso && iso < de) return false;
-    if (ate && iso && iso > ate) return false;
-    if (r.hora){
-      if (horaDe && r.hora < horaDe) return false;
-      if (horaAte && r.hora > horaAte) return false;
-    }
-    return true;
-  });
-
-  // mapa id_sessao -> valor de "Cavidades ativas" lido no mesmo horário — usado só pelos 3
-  // parâmetros dependentes de cavidade (ver PARAMETROS_CAVIDADE_DEPENDENTE), que não têm
-  // tolerância fixa por Máquina/Gramatura/Resina. Construído a partir de `filtrados` (não de
-  // `registrosCarregados` inteiro) pra respeitar os mesmos filtros de Máquina/Gramatura/Cor/
-  // Resina/Data já aplicados — e antes do filtro de Parâmetros (fParametros), que é só de
-  // exibição e não deve esconder essa leitura "irmã".
-  var cavidadesPorSessao = {};
-  filtrados.forEach(function(r){
-    if (r.parametro === 'Cavidades ativas' && r.id_sessao) cavidadesPorSessao[r.id_sessao] = r.valor_medido;
-  });
-
-  // agrupa por parâmetro: cada ponto é {t: Date, v: número, dentro, lmin, lmax}.
-  // A tolerância agora é buscada POR PONTO (não mais por um único combo do filtro),
-  // porque com seleção múltipla dá pra combinar várias máquinas/gramaturas/cores/
-  // resinas ao mesmo tempo — cada leitura pode ter um limite diferente aplicável.
-  var seriesPorParametro = {};
-  PARAMETROS_INJECAO.forEach(function(p){ seriesPorParametro[p] = []; });
-  filtrados.forEach(function(r){
-    if (seriesPorParametro[r.parametro] === undefined) return; // parâmetro fora da lista atual (não deveria acontecer)
-    var n = paraNumero(r.valor_medido);
-    if (isNaN(n)) return; // não plota valores não-numéricos (texto, "—")
-    var t = parseDataHoraBR(r.data, r.hora);
+// Monta as sessões (horários lançados) por máquina a partir de registrosCarregados.
+function dmMontarMaquinas(){
+  var sessoes = agruparPorSessao(registrosCarregados || []);
+  var porMaq = {}, ordem = [];
+  sessoes.forEach(function(s){
+    var t = parseDataHoraBR(s.data, s.hora);
     if (!t) return;
-    var tol;
-    if (ehParametroCavidadeDependente(r.parametro)){
-      tol = buscarToleranciaCavidade(r.maquina, r.gramatura, r.parametro, cavidadesPorSessao[r.id_sessao]);
-    } else {
-      tol = buscarTolerancia(r.maquina, r.gramatura, r.cor, r.resina, r.parametro);
+    var k = normMaquina(s.maquina);
+    if (!k) return;
+    if (!porMaq[k]){ porMaq[k] = { chave: k, rotulos: {}, sessoes: [] }; ordem.push(k); }
+    porMaq[k].rotulos[s.maquina] = (porMaq[k].rotulos[s.maquina] || 0) + 1;
+    var nFora = 0, nCrit = 0, nSim = 0;
+    Object.keys(s.valores).forEach(function(p){ var d = s.valores[p].dentro; if (d === 'NÃO'){ nFora++; nCrit++; } else if (d === 'SIM'){ nSim++; nCrit++; } });
+    s.t = t; s.nFora = nFora; s.nCrit = nCrit; s.nSim = nSim;
+    porMaq[k].sessoes.push(s);
+  });
+  // rótulo: o nome cadastrado nas Listas de apoio, se bater; senão a grafia mais usada
+  var cadastradas = (listas.maquinas || []).map(function(i){ return i.valor; });
+  var maqs = ordem.map(function(k){
+    var m = porMaq[k];
+    var cad = cadastradas.filter(function(v){ return normMaquina(v) === k; })[0];
+    m.nome = cad || Object.keys(m.rotulos).sort(function(a,b){ return m.rotulos[b] - m.rotulos[a]; })[0];
+    m.sessoes.sort(function(a,b){ return a.t - b.t; });
+    return m;
+  });
+  // máquinas cadastradas sem nenhum lançamento também aparecem (raia vazia)
+  cadastradas.forEach(function(v){
+    var k = normMaquina(v);
+    if (!porMaq[k]){ maqs.push({ chave: k, nome: v, sessoes: [] }); porMaq[k] = true; }
+  });
+  maqs.sort(function(a,b){ return a.nome.localeCompare(b.nome, 'pt-BR', { numeric: true }); });
+  return maqs;
+}
+
+// Janela de tempo: dias de produção (06:00 → 06:00 do dia seguinte), terminando no atual.
+function dmJanela(){
+  var agora = new Date();
+  var hojeProd = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 6, 0);
+  if (agora.getHours() < 6) hojeProd = new Date(hojeProd.getTime() - 86400000);
+  var fim = new Date(hojeProd.getTime() + 86400000);
+  var ini = new Date(hojeProd.getTime() - (DASH.dias - 1) * 86400000);
+  return { ini: ini, fim: fim, agora: agora };
+}
+
+function renderDashMaquinas(){
+  var wrapHeads = document.getElementById('dmHeads');
+  if (!wrapHeads || !registrosCarregados) return;
+  DASH.maquinas = dmMontarMaquinas();
+  var J = dmJanela();
+  var pxH = DASH.dias <= 3 ? 12 : DASH.dias <= 7 ? 9 : DASH.dias <= 14 ? 5 : 2.4;
+  var r = DASH.dias <= 14 ? 1 : 0.7; // escala das bolinhas
+  var PADL = 14, LANEH = 92;
+  var totalH = (J.fim - J.ini) / 3600000;
+  var W = Math.ceil(PADL * 2 + totalH * pxH);
+  var X = function(t){ return PADL + (t - J.ini) / 3600000 * pxH; };
+
+  // eixo
+  var axis = '<svg width="' + W + '" height="42" role="img" aria-label="Eixo de dias">';
+  for (var d = 0; d < DASH.dias; d++){
+    var d0 = new Date(J.ini.getTime() + d * 86400000);
+    var x0 = X(d0);
+    axis += '<line x1="' + x0 + '" x2="' + x0 + '" y1="6" y2="42" stroke="var(--border)"/>';
+    axis += '<text x="' + (x0 + 5) + '" y="18" font-size="11" font-weight="700" fill="var(--text)">' + dmFmtData(d0) + '</text>';
+    if (DASH.dias <= 14){
+      HORARIOS_CHECKLIST.forEach(function(h){
+        var th = new Date(d0.getFullYear(), d0.getMonth(), d0.getDate() + (h < 6 ? 1 : 0), h, 0);
+        axis += '<text x="' + X(th) + '" y="36" text-anchor="middle" font-size="9.5" fill="var(--text-dim)">' + String(h).padStart(2,'0') + '</text>';
+      });
     }
-    var lmin = tol ? paraNumero(tol.valor_min) : NaN;
-    var lmax = tol ? paraNumero(tol.valor_max) : NaN;
-    lmin = isNaN(lmin) ? null : lmin;
-    lmax = isNaN(lmax) ? null : lmax;
-    seriesPorParametro[r.parametro].push({ t:t, v:n, dentro: r.dentro_criterio, lmin:lmin, lmax:lmax });
-  });
-  Object.keys(seriesPorParametro).forEach(function(p){
-    seriesPorParametro[p].sort(function(a,b){ return a.t - b.t; });
-  });
-
-  var parametrosParaMostrar = parametrosSel.length ? parametrosSel : PARAMETROS_INJECAO;
-  renderDashboardV3(seriesPorParametro, parametrosParaMostrar);
-}
-
-function xAtDashV3(d){
-  var idx = dashPONTO_INDEX[d.getTime()];
-  if (idx === undefined) idx = 0;
-  return 10 + idx * dashPX_PER_PONTO;
-}
-
-function renderDashboardV3(seriesPorParametro, parametrosParaMostrar){
-  var todosPontos = [];
-  Object.keys(seriesPorParametro).forEach(function(p){
-    seriesPorParametro[p].forEach(function(pt){ todosPontos.push(pt.t); });
-  });
-
-  var painel = document.getElementById('dashPanel');
-  var vazio = document.getElementById('dashVazio');
-  var rowsEl = document.getElementById('dashRows');
-
-  if (todosPontos.length === 0){
-    painel.hidden = true; vazio.hidden = false;
-    rowsEl.innerHTML = '';
-    document.getElementById('axisSvg').innerHTML = '';
-    document.getElementById('axisSvg').setAttribute('width', 0);
-    return;
   }
-  painel.hidden = false; vazio.hidden = true;
+  axis += '</svg>';
 
-  todosPontos.sort(function(a,b){ return a-b; });
-  dashSTART = todosPontos[0];
-  dashEND = todosPontos[todosPontos.length-1];
+  var heads = '<div class="dm-lh dm-axishead">Máquina · produto atual</div>';
+  var rows = '';
+  var algum = false;
+  DASH.maquinas.forEach(function(m, mi){
+    var ses = m.sessoes.filter(function(s){ return s.t >= J.ini && s.t < J.fim; });
+    if (ses.length) algum = true;
+    var comFora = ses.filter(function(s){ return s.nFora > 0; }).length;
+    var leit = 0, leitOk = 0;
+    ses.forEach(function(s){ leit += s.nCrit; leitOk += s.nSim; });
+    var ult = m.sessoes[m.sessoes.length - 1];
 
-  // pontos únicos (datetimes distintos) pra desenhar o eixo — só os horários com leitura real.
-  // O espaçamento no eixo X segue a ORDEM dos pontos, não o tempo real decorrido entre eles —
-  // assim um intervalo sem lançamento (ex.: da noite pra manhã seguinte) não abre um vão vazio
-  // enorme no gráfico; os horários ficam lado a lado, uniformemente espaçados.
-  var vistos = {}, pontosUnicos = [];
-  todosPontos.forEach(function(t){
-    var k = t.getTime();
-    if (!vistos[k]){ vistos[k] = true; pontosUnicos.push(t); }
-  });
-  dashPONTO_INDEX = {};
-  pontosUnicos.forEach(function(t, i){ dashPONTO_INDEX[t.getTime()] = i; });
-  dashAXIS_W = Math.max(240, pontosUnicos.length * dashPX_PER_PONTO + 20);
-
-  drawAxisV3(pontosUnicos);
-
-  rowsEl.innerHTML = '';
-  var scrollGroup = [document.getElementById('axisScroll')];
-  parametrosParaMostrar.forEach(function(nome){
-    var serie = seriesPorParametro[nome] || [];
-
-    // tolerância: usa um único limite (pra desenhar a linha de referência e colorir as
-    // estatísticas) só quando TODOS os pontos visíveis têm a mesma tolerância — caso comum,
-    // uma combinação só selecionada. Se o filtro estiver misturando combinações com
-    // tolerâncias diferentes, cada ponto usa a própria (ver drawMiniV3) e aqui não desenha
-    // uma única linha de referência, pra não sugerir um limite que não vale pra tudo.
-    var uniforme = true, lmin = null, lmax = null;
-    if (serie.length){
-      lmin = serie[0].lmin; lmax = serie[0].lmax;
-      for (var i = 1; i < serie.length; i++){
-        if (serie[i].lmin !== lmin || serie[i].lmax !== lmax){ uniforme = false; break; }
-      }
-      if (!uniforme){ lmin = null; lmax = null; }
+    // horários esperados já passados e sem lançamento (±90 min)
+    var esperados = [], faltando = [];
+    for (var dd = 0; dd < DASH.dias; dd++){
+      var base = new Date(J.ini.getTime() + dd * 86400000);
+      HORARIOS_CHECKLIST.forEach(function(h){
+        var th = new Date(base.getFullYear(), base.getMonth(), base.getDate() + (h < 6 ? 1 : 0), h, 0);
+        if (th > J.agora) return;
+        esperados.push(th);
+        var tem = ses.some(function(s){ return Math.abs(s.t - th) <= 90 * 60000; });
+        if (!tem) faltando.push(th);
+      });
     }
-    var lim;
-    if (serie.length === 0) lim = 'sem limite';
-    else if (!uniforme) lim = 'tolerância varia no filtro';
-    else lim = (lmin!=null?('mín '+lmin):'') + (lmin!=null&&lmax!=null?' · ':'') + (lmax!=null?('máx '+lmax):'') || 'sem limite';
+    var preench = esperados.length - faltando.length;
+    var pct = leit ? Math.round(leitOk * 1000 / leit) / 10 : null;
 
-    var row = document.createElement('div'); row.className = 'dv3-prow';
-    if (serie.length === 0){
-      row.innerHTML =
-        '<div class="dv3-plabel"><div class="dv3-pname">'+nome+'</div><div class="dv3-plim">'+lim+'</div></div>' +
-        '<div class="dv3-semdados">Sem leitura numérica nesse período/combinação</div>' +
-        '<div class="dv3-stats"></div>';
-      rowsEl.appendChild(row);
-      return;
-    }
+    heads += '<div class="dm-lh">' +
+      '<div class="dm-mname">' + escHtml(m.nome) + (ses.length ? (comFora ? ' <span class="critpill nao" title="lançamentos com algum parâmetro fora">' + comFora + ' c/ fora</span>' : ' <span class="critpill sim">ok</span>') : '') + '</div>' +
+      '<div class="dm-prod">' + (ult ? escHtml(dmProduto(ult)) + ' · último ' + dmFmtData(ult.t) + ' ' + dmFmtHora(ult.t) : 'sem lançamentos') + '</div>' +
+      '<div class="dm-kpis"><span><b class="' + (pct === null ? '' : pct >= 98 ? 'dm-ok' : 'dm-warn') + '">' + (pct === null ? '—' : String(pct).replace('.', ',') + '%') + '</b> dentro</span>' +
+      '<span><b>' + preench + '</b>/' + esperados.length + ' horários</span></div></div>';
 
-    var vals = serie.map(function(p){ return p.v; });
-    var media = Math.round((vals.reduce(function(a,b){return a+b;},0)/vals.length)*10)/10;
-    var maximo = Math.max.apply(null, vals);
-    var minimo = Math.min.apply(null, vals);
-    function statusClasse(v){
-      if (lmin==null && lmax==null) return 'ok';
-      var dentro = (lmin==null || v>=lmin) && (lmax==null || v<=lmax);
-      return dentro ? 'ok' : 'bad';
-    }
-
-    row.innerHTML =
-      '<div class="dv3-plabel"><div class="dv3-pname">'+nome+'</div><div class="dv3-plim">'+lim+'</div></div>' +
-      '<div class="dv3-pchartwrap"><svg width="'+dashAXIS_W+'" height="128"></svg></div>' +
-      '<div class="dv3-stats">' +
-        '<div class="dv3-st"><span class="dv3-sl">Média</span><span class="dv3-sv '+statusClasse(media)+'">'+media+'</span></div>' +
-        '<div class="dv3-st"><span class="dv3-sl">Máximo</span><span class="dv3-sv '+statusClasse(maximo)+'">'+maximo+'</span></div>' +
-        '<div class="dv3-st"><span class="dv3-sl">Mínimo</span><span class="dv3-sv '+statusClasse(minimo)+'">'+minimo+'</span></div>' +
-      '</div>';
-    rowsEl.appendChild(row);
-
-    var wrap = row.querySelector('.dv3-pchartwrap');
-    scrollGroup.push(wrap);
-    wrap.addEventListener('scroll', function(){
-      scrollGroup.forEach(function(w){ if (w!==wrap) w.scrollLeft = wrap.scrollLeft; });
+    var svg = '<svg width="' + W + '" height="' + LANEH + '" role="img" aria-label="Lançamentos da ' + escHtml(m.nome) + '" class="dm-lane">';
+    // faixas de produto
+    var segs = [];
+    ses.forEach(function(s){
+      var k = dmChaveProduto(s), u = segs[segs.length - 1];
+      if (u && u.k === k){ u.fim = s.t; } else segs.push({ k: k, ini: s.t, fim: s.t, rot: dmProduto(s) });
     });
-
-    drawMiniV3(row.querySelector('svg'), serie, lmin, lmax, nome);
-  });
-
-  var axisScrollEl = document.getElementById('axisScroll');
-  axisScrollEl.onscroll = function(){
-    scrollGroup.forEach(function(w){ if (w!==axisScrollEl) w.scrollLeft = axisScrollEl.scrollLeft; });
-  };
-
-  if (rowsEl.children.length === 0){
-    rowsEl.innerHTML = '<p class="dv3-semdados" style="padding:16px;">Nenhum parâmetro selecionado no filtro.</p>';
-  }
-}
-
-// Cores do gráfico do Dashboard (SVG), por tema. São desenhadas em JS (não dá pra usar
-// var(--cor) direto num atributo "fill"/"stroke" de SVG gerado assim), então ficam aqui,
-// espelhando os mesmos tons do CSS pra cada tema — ver corTema() e o data-theme em <html>.
-var TEMA_CORES_GRAFICO = {
-  escuro: { linha: '#3fb68b', limite: '#e5484d', fundoPonto: '#17181b', eixoTexto: '#8b8f96' },
-  claro:  { linha: '#1f7a3d', limite: '#b3261e', fundoPonto: '#ffffff', eixoTexto: '#5b6672' }
-};
-function corTema(){
-  var t = document.documentElement.getAttribute('data-theme');
-  return TEMA_CORES_GRAFICO[t === 'claro' ? 'claro' : 'escuro'];
-}
-
-function drawAxisV3(pontos){
-  var svg = document.getElementById('axisSvg');
-  svg.innerHTML = '';
-  svg.setAttribute('width', dashAXIS_W);
-  var svgns = 'http://www.w3.org/2000/svg';
-  function el(tag,attrs){ var e=document.createElementNS(svgns,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
-
-  var lineY = 24, col = corTema().eixoTexto, prevX = null;
-  pontos.forEach(function(pt){
-    var cx = xAtDashV3(pt);
-    if (prevX !== null) svg.appendChild(el('line',{x1:prevX,y1:lineY,x2:cx,y2:lineY,stroke:col,'stroke-width':1.2}));
-    svg.appendChild(el('circle',{cx:cx,cy:lineY,r:2.6,fill:col}));
-    var lbl = el('text',{x:cx,y:lineY-11,fill:col,'font-size':9,'text-anchor':'middle','font-family':'JetBrains Mono, monospace'});
-    lbl.textContent = String(pt.getHours()).padStart(2,'0')+'h';
-    svg.appendChild(lbl);
-    prevX = cx;
-  });
-
-  var byDate = {};
-  pontos.forEach(function(pt){
-    var k = pt.toDateString();
-    if (!byDate[k]) byDate[k] = { min:xAtDashV3(pt), max:xAtDashV3(pt), date:new Date(pt) };
-    byDate[k].max = xAtDashV3(pt);
-  });
-  Object.keys(byDate).forEach(function(k){
-    var g = byDate[k], cx = (g.min+g.max)/2;
-    var dl = el('text',{x:cx,y:40,fill:col,'font-size':9.5,'font-weight':500,'text-anchor':'middle','font-family':'Inter, sans-serif'});
-    var dd = g.date;
-    dl.textContent = String(dd.getDate()).padStart(2,'0')+'/'+String(dd.getMonth()+1).padStart(2,'0')+'/'+dd.getFullYear();
-    svg.appendChild(dl);
-  });
-}
-
-var _dv3GradSeq = 0;
-
-function drawMiniV3(svg, serie, lmin, lmax, nome){
-  var W = dashAXIS_W, H = 128, padT = 26, padB = 26;
-  var vals = serie.map(function(p){ return p.v; });
-  var allVals = vals.slice();
-  if (lmin!=null) allVals.push(lmin);
-  if (lmax!=null) allVals.push(lmax);
-  // inclui também os limites por ponto (podem variar quando o filtro combina mais
-  // de uma máquina/gramatura/cor/resina), pra nenhuma linha de limite ficar cortada.
-  serie.forEach(function(p){
-    if (p.lmin!=null) allVals.push(p.lmin);
-    if (p.lmax!=null) allVals.push(p.lmax);
-  });
-  var yMin = Math.min.apply(null, allVals), yMax = Math.max.apply(null, allVals);
-  var pad = (yMax-yMin)*0.15 || 1;
-  yMin -= pad; yMax += pad;
-  function y(v){ return H-padB - (H-padT-padB) * ((v-yMin)/(yMax-yMin)); }
-  var svgns = 'http://www.w3.org/2000/svg';
-  function el(tag,attrs){ var e=document.createElementNS(svgns,tag); for(var k in attrs) e.setAttribute(k,attrs[k]); return e; }
-
-  var cores = corTema();
-  var corLinha = cores.linha;
-
-  if (lmax!=null) svg.appendChild(el('line',{x1:0,y1:y(lmax),x2:W,y2:y(lmax),stroke:cores.limite,'stroke-width':1.3,'stroke-dasharray':'4,3'}));
-  if (lmin!=null) svg.appendChild(el('line',{x1:0,y1:y(lmin),x2:W,y2:y(lmin),stroke:cores.limite,'stroke-width':1.3,'stroke-dasharray':'4,3'}));
-
-  var pontos = serie.map(function(p){ return { x: xAtDashV3(p.t), y: y(p.v) }; });
-  var d = pontos.map(function(pt,i){ return (i===0?'M':'L')+pt.x+' '+pt.y; }).join(' ');
-
-  // Área preenchida sob a linha (gradiente da cor até transparente, na base do gráfico).
-  if (pontos.length > 1){
-    var gradId = 'dv3grad' + (_dv3GradSeq++);
-    var defs = el('defs', {});
-    var grad = el('linearGradient', { id: gradId, x1:'0', y1:'0', x2:'0', y2:'1' });
-    grad.appendChild(el('stop', { offset:'0%', 'stop-color': corLinha, 'stop-opacity': '0.35' }));
-    grad.appendChild(el('stop', { offset:'100%', 'stop-color': corLinha, 'stop-opacity': '0' }));
-    defs.appendChild(grad);
-    svg.appendChild(defs);
-    var baseline = H - padB;
-    var areaD = d + ' L' + pontos[pontos.length-1].x + ' ' + baseline + ' L' + pontos[0].x + ' ' + baseline + ' Z';
-    svg.appendChild(el('path', { d: areaD, fill: 'url(#'+gradId+')', stroke: 'none' }));
-  }
-
-  svg.appendChild(el('path',{d:d, fill:'none', stroke:corLinha,'stroke-width':1.8,'stroke-linecap':'round','stroke-linejoin':'round'}));
-
-  var tooltip = document.getElementById('dv3tooltip');
-  serie.forEach(function(p){
-    // usa o limite do PRÓPRIO ponto (não o compartilhado da linha), já que o filtro
-    // pode misturar combinações com tolerâncias diferentes.
-    var fora = (p.lmin!=null && p.v<p.lmin) || (p.lmax!=null && p.v>p.lmax);
-    var corPonto = fora ? cores.limite : corLinha;
-    var cx = xAtDashV3(p.t), cy = y(p.v);
-    // bolinha com o valor escrito dentro (a pedido do Cleber, a partir de uma amostra aprovada).
-    svg.appendChild(el('circle',{cx:cx,cy:cy,r:16,fill:cores.fundoPonto,stroke:corPonto,'stroke-width':2}));
-    var valTxt = el('text',{x:cx,y:cy,fill:corPonto,'font-size':10,'font-weight':700,'text-anchor':'middle','dominant-baseline':'central','font-family':"'Inter',sans-serif"});
-    valTxt.textContent = String(p.v).replace('.',',');
-    svg.appendChild(valTxt);
-    var hit = el('circle',{cx:cx,cy:cy,r:16,fill:'transparent'});
-    hit.addEventListener('mouseenter', function(){
-      var fmt = String(p.t.getHours()).padStart(2,'0')+'h '+String(p.t.getDate()).padStart(2,'0')+'/'+String(p.t.getMonth()+1).padStart(2,'0');
-      var limTxt = (p.lmin!=null || p.lmax!=null) ?
-        (' · lim ' + (p.lmin!=null?('mín '+p.lmin):'') + (p.lmin!=null&&p.lmax!=null?'/':'') + (p.lmax!=null?('máx '+p.lmax):'')) : '';
-      tooltip.innerHTML = '<b>'+nome+'</b><br>'+p.v+' &middot; '+fmt+limTxt+'<br><span class="dv3-st '+(fora?'bad':'ok')+'">'+(fora?'Fora do limite':'Dentro do limite')+'</span>';
-      var r = svg.getBoundingClientRect();
-      tooltip.style.left = (r.left + xAtDashV3(p.t) - 50)+'px';
-      tooltip.style.top = (r.top - 54)+'px';
-      tooltip.style.opacity = 1;
+    segs.forEach(function(sg, k){
+      var xa = Math.max(PADL, X(sg.ini) - 1.5 * pxH), xb = Math.min(W - PADL, X(sg.fim) + 1.5 * pxH);
+      svg += '<rect x="' + xa + '" y="6" width="' + Math.max(4, xb - xa) + '" height="' + (LANEH - 12) + '" rx="8" fill="' + (k % 2 ? 'var(--dm-band-b)' : 'var(--dm-band-a)') + '"/>';
+      if (xb - xa > 70) svg += '<text x="' + (xa + 7) + '" y="20" font-size="10.5" fill="var(--text-dim)">' + escHtml(sg.rot) + '</text>';
     });
-    hit.addEventListener('mouseleave', function(){ tooltip.style.opacity = 0; });
-    svg.appendChild(hit);
+    for (var dv = 1; dv < DASH.dias; dv++){ var xd = X(new Date(J.ini.getTime() + dv * 86400000)); svg += '<line x1="' + xd + '" x2="' + xd + '" y1="6" y2="' + (LANEH - 6) + '" stroke="var(--border)" stroke-dasharray="2 3"/>'; }
+    var cy = LANEH / 2 + 8;
+    svg += '<line x1="' + PADL + '" x2="' + (W - PADL) + '" y1="' + cy + '" y2="' + cy + '" stroke="var(--border)"/>';
+    faltando.forEach(function(th){
+      svg += '<circle cx="' + X(th) + '" cy="' + cy + '" r="' + (6.5 * r) + '" fill="var(--surface)" stroke="var(--text-dim)" stroke-width="1.4" stroke-dasharray="2.5 2"><title>' + escHtml(m.nome) + ' · ' + dmFmtData(th) + ' ' + dmFmtHora(th) + ' — sem lançamento</title></circle>';
+    });
+    ses.forEach(function(s){
+      var idx = m.sessoes.indexOf(s), cx = X(s.t);
+      var st = s.nFora > 0 ? 'bad' : s.nCrit > 0 ? 'ok' : 'none';
+      var isSel = DASH.sel && DASH.sel.m === mi && DASH.sel.i === idx;
+      var cor = st === 'bad' ? 'var(--danger)' : st === 'ok' ? 'var(--ok)' : 'var(--text-dim)';
+      var desc = escHtml(m.nome) + ' · ' + dmFmtData(s.t) + ' ' + s.hora + ' · ' + escHtml(s.responsavel || '') + (st === 'bad' ? ' · ' + s.nFora + ' parâmetro(s) fora' : st === 'ok' ? ' · tudo dentro' : ' · sem critério gravado');
+      svg += '<g class="dm-dot' + (isSel ? ' sel' : '') + '" tabindex="0" role="button" data-m="' + mi + '" data-i="' + idx + '" aria-label="' + desc + '">' +
+        '<circle class="c" cx="' + cx + '" cy="' + cy + '" r="' + ((st === 'bad' ? 10 : 7.5) * r) + '" fill="' + cor + '" stroke="var(--surface)" stroke-width="2"/>' +
+        (st === 'bad' && r === 1 ? '<text x="' + cx + '" y="' + (cy + 3.8) + '" text-anchor="middle" font-size="10.5" font-weight="700" fill="#fff" pointer-events="none">' + s.nFora + '</text>' : '') +
+        '<title>' + desc + '</title></g>';
+    });
+    svg += '</svg>';
+    rows += svg;
   });
+
+  wrapHeads.innerHTML = heads;
+  var sc = document.getElementById('dmScroll');
+  sc.innerHTML = axis + rows;
+  sc.scrollLeft = sc.scrollWidth;
+  document.getElementById('dmVazio').hidden = algum;
+  document.getElementById('dmPeriodo').textContent = dmFmtData(J.ini) + ' 06:00 até agora';
+  sc.querySelectorAll('.dm-dot').forEach(function(g){
+    var abrir = function(){ dmAbrirLancamento(+g.getAttribute('data-m'), +g.getAttribute('data-i')); };
+    g.addEventListener('click', abrir);
+    g.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); abrir(); } });
+  });
+  dmRenderTendencia();
+}
+
+function dmMudarDias(n, btn){
+  DASH.dias = n;
+  document.querySelectorAll('.dm-chip-dias').forEach(function(b){ b.classList.toggle('on', b === btn); });
+  renderDashMaquinas();
+}
+
+// Mini-gráfico (SVG) de um parâmetro: últimos lançamentos da máquina no mesmo produto até "ate".
+function dmSpark(lista, p, w, h){
+  var pts = lista.filter(function(s){ return s.valores[p] && !isNaN(paraNumero(s.valores[p].valor)); });
+  if (pts.length < 2) return '<svg width="' + w + '" height="' + h + '"></svg>';
+  var vs = pts.map(function(s){ return paraNumero(s.valores[p].valor); });
+  var ult = pts[pts.length - 1].valores[p];
+  var lo = paraNumero(ult.min), hi = paraNumero(ult.max);
+  var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs);
+  if (!isNaN(lo)) mn = Math.min(mn, lo); if (!isNaN(hi)) mx = Math.max(mx, hi);
+  if (mx === mn){ mx += 1; mn -= 1; }
+  var pad = 4, Y = function(v){ return h - pad - (v - mn) / (mx - mn) * (h - 2 * pad); }, Xs = function(k){ return pad + k * (w - 2 * pad) / (pts.length - 1); };
+  var s = '<svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" preserveAspectRatio="none" role="img" aria-label="Tendência de ' + escHtml(p) + '">';
+  if (!isNaN(lo) || !isNaN(hi)){ var y1 = !isNaN(hi) ? Y(hi) : pad, y2 = !isNaN(lo) ? Y(lo) : h - pad; s += '<rect x="0" y="' + y1 + '" width="' + w + '" height="' + Math.max(1, y2 - y1) + '" fill="var(--ok-bg)"/>'; }
+  s += '<path d="' + pts.map(function(x, k){ return (k ? 'L' : 'M') + Xs(k).toFixed(1) + ' ' + Y(vs[k]).toFixed(1); }).join(' ') + '" fill="none" stroke="var(--purple)" stroke-width="1.6" vector-effect="non-scaling-stroke"/>';
+  pts.forEach(function(x, k){ var b = dmFora(x.valores[p]); if (b || k === pts.length - 1) s += '<circle cx="' + Xs(k) + '" cy="' + Y(vs[k]) + '" r="' + (b ? 3.2 : 2.6) + '" fill="' + (b ? 'var(--danger)' : 'var(--purple)') + '"/>'; });
+  return s + '</svg>';
+}
+
+function dmAbrirLancamento(mi, i){
+  var m = DASH.maquinas[mi], s = m.sessoes[i];
+  if (!s) return;
+  DASH.sel = { m: mi, i: i };
+  var mesmoProd = m.sessoes.slice(0, i + 1).filter(function(x){ return dmChaveProduto(x) === dmChaveProduto(s); }).slice(-12);
+  var foras = PARAMETROS_INJECAO.filter(function(p){ return dmFora(s.valores[p]); });
+  var cav = s.valores['Cavidades ativas'] ? s.valores['Cavidades ativas'].valor : '';
+  var html = '<div class="dm-dhead"><div><h2>' + escHtml(m.nome) + ' · ' + dmFmtData(s.t) + ' ' + s.hora + '</h2>' +
+    '<div class="note" style="margin:2px 0 0">' + escHtml(dmProduto(s)) + (s.cor ? ' · ' + escHtml(s.cor) : '') + (cav ? ' · ' + escHtml(cav) + ' cavidades ativas' : '') + '</div></div>' +
+    '<button class="btn btn-outline dm-x" type="button" onclick="dmFecharPainel()" aria-label="Fechar">×</button></div><div class="dm-dbody">';
+  html += '<div class="dm-meta"><div><span>Responsável</span>' + escHtml(s.responsavel || '—') + '</div><div><span>Parâmetros com critério</span>' + s.nCrit + ' de ' + PARAMETROS_INJECAO.length + '</div></div>';
+  if (foras.length){
+    html += '<div class="dm-forabox"><h4>' + foras.length + ' fora do critério</h4>' + foras.map(function(p){
+      var v = s.valores[p];
+      return '<div class="dm-frow"><span>' + escHtml(p) + '</span><span class="v">' + escHtml(v.valor) + '</span><span class="f">' + escHtml(textoLimite(v.min, v.max)) + '</span></div>';
+    }).join('') + (s.justificativa ? '<div class="dm-just"><b>Justificativa:</b> ' + escHtml(s.justificativa) + '</div>' : '<div class="dm-just">Sem justificativa registrada (lançamento anterior a essa exigência).</div>') + '</div>';
+  } else if (s.nCrit){
+    html += '<div class="dm-okbox"><h4>Todos os parâmetros com critério estão dentro</h4></div>';
+  } else {
+    html += '<div class="dm-nonebox">Este lançamento foi gravado sem critério cadastrado para a combinação — por isso não tem verde/vermelho.</div>';
+  }
+  html += '<button class="btn btn-accent" type="button" onclick="dmAbrirTendencia(' + mi + ',' + i + ')">Ver tendência da ' + escHtml(m.nome) + ' →</button>';
+  GRUPOS_PARAMETROS_INJECAO.forEach(function(g){
+    var nf = g[1].filter(function(p){ return dmFora(s.valores[p]); }).length;
+    html += '<details class="dm-grp"' + (nf ? ' open' : '') + '><summary>' + g[0] + '<span class="dm-cnt">' + (nf ? '<span class="critpill nao">' + nf + ' fora</span>' : '<span class="critpill vazio">' + g[1].length + '</span>') + '</span></summary>';
+    g[1].forEach(function(p){
+      var v = s.valores[p] || {};
+      var cls = v.dentro === 'NÃO' ? 'bad' : v.dentro === 'SIM' ? 'ok' : '';
+      html += '<div class="dm-prow"><span>' + escHtml(p) + '</span><span class="dm-sp">' + dmSpark(mesmoProd, p, 92, 22) + '</span>' +
+        '<span class="dm-val ' + cls + '">' + escHtml(v.valor === undefined || v.valor === '' ? '—' : v.valor) + '</span><span class="dm-fx">' + escHtml(v.dentro ? textoLimite(v.min, v.max) : 'sem critério') + '</span></div>';
+    });
+    html += '</details>';
+  });
+  html += '</div>';
+  document.getElementById('dmPainel').innerHTML = html;
+  document.getElementById('dmPainelWrap').hidden = false;
+  var x = document.querySelector('#dmPainel .dm-x'); if (x) x.focus();
+  renderDashMaquinas();
+}
+function dmFecharPainel(){
+  var w = document.getElementById('dmPainelWrap');
+  if (w) w.hidden = true;
+}
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') dmFecharPainel(); });
+
+function dmAbrirTendencia(mi, i){
+  var s = DASH.maquinas[mi].sessoes[i];
+  DASH.trend = { maquina: DASH.maquinas[mi].chave, produto: dmChaveProduto(s) };
+  dmFecharPainel();
+  dmRenderTendencia();
+  var el = document.getElementById('dmTendencia');
+  if (el && el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function dmRenderTendencia(){
+  var el = document.getElementById('dmTendencia');
+  if (!el) return;
+  if (!DASH.trend){ el.hidden = true; el.innerHTML = ''; return; }
+  var m = DASH.maquinas.filter(function(x){ return x.chave === DASH.trend.maquina; })[0];
+  var J = dmJanela();
+  var ses = m ? m.sessoes.filter(function(s){ return s.t >= J.ini && s.t < J.fim && dmChaveProduto(s) === DASH.trend.produto; }) : [];
+  if (!ses.length){ el.hidden = false; el.innerHTML = '<div class="card"><p class="note" style="margin:0">Sem lançamentos desta máquina/produto no período escolhido. <button class="btn btn-outline" type="button" onclick="DASH.trend=null;dmRenderTendencia()">Fechar</button></p></div>'; return; }
+  var last = ses[ses.length - 1];
+  var comFora = PARAMETROS_INJECAO.filter(function(p){ return ses.some(function(s){ return dmFora(s.valores[p]); }); });
+  var html = '<div class="card"><div class="dm-trendhead"><h3>Tendência · ' + escHtml(m.nome) + ' · ' + escHtml(dmProduto(last)) + '</h3><span style="flex:1"></span>' +
+    '<button class="dm-chip' + (DASH.soFora ? ' on' : '') + '" type="button" onclick="DASH.soFora=true;dmRenderTendencia()">Só com leitura fora (' + comFora.length + ')</button>' +
+    '<button class="dm-chip' + (!DASH.soFora ? ' on' : '') + '" type="button" onclick="DASH.soFora=false;dmRenderTendencia()">Todos (' + PARAMETROS_INJECAO.length + ')</button>' +
+    '<button class="dm-chip" type="button" onclick="DASH.trend=null;dmRenderTendencia()">Fechar</button></div>' +
+    '<p class="note" style="margin:0 0 4px">' + ses.length + ' lançamento(s) no período · faixa verde = critério aplicado · ponto vermelho = leitura fora · clique numa linha para ampliar · ☆ fixa o parâmetro no topo.</p>';
+  function linha(p){
+    var v = last.valores[p] || {};
+    return '<div class="dm-row3" tabindex="0" data-p="' + escHtml(p) + '">' +
+      '<button class="dm-star' + (DASH.pin[p] ? ' on' : '') + '" type="button" data-pin="' + escHtml(p) + '" aria-label="Fixar ' + escHtml(p) + '">' + (DASH.pin[p] ? '★' : '☆') + '</button>' +
+      '<div class="dm-pn">' + escHtml(p) + '<small>' + escHtml(v.dentro ? textoLimite(v.min, v.max) : 'sem critério') + '</small></div>' +
+      '<div class="dm-spark">' + dmSpark(ses.slice(-60), p, 600, 40) + '</div>' +
+      '<div class="dm-last ' + (v.dentro === 'NÃO' ? 'bad' : '') + '">' + escHtml(v.valor === undefined || v.valor === '' ? '—' : v.valor) + '</div></div>';
+  }
+  var fixados = PARAMETROS_INJECAO.filter(function(p){ return DASH.pin[p]; });
+  if (fixados.length) html += '<div class="dm-tgroup"><h5>Fixados</h5>' + fixados.map(linha).join('') + '</div>';
+  var algum = false;
+  GRUPOS_PARAMETROS_INJECAO.forEach(function(g){
+    var ps = g[1].filter(function(p){ return !DASH.pin[p] && (!DASH.soFora || comFora.indexOf(p) >= 0); });
+    if (!ps.length) return;
+    algum = true;
+    html += '<div class="dm-tgroup"><h5>' + g[0] + '</h5>' + ps.map(linha).join('') + '</div>';
+  });
+  if (!algum && !fixados.length) html += '<p class="note">Nenhum parâmetro teve leitura fora no período. Clique em "Todos" para ver os ' + PARAMETROS_INJECAO.length + '.</p>';
+  html += '</div>';
+  el.innerHTML = html;
+  el.hidden = false;
+  el.querySelectorAll('.dm-spark svg').forEach(function(sv){ sv.setAttribute('width', '100%'); });
+  el.querySelectorAll('[data-pin]').forEach(function(b){
+    b.addEventListener('click', function(e){ e.stopPropagation(); var p = b.getAttribute('data-pin'); DASH.pin[p] = !DASH.pin[p]; dmRenderTendencia(); });
+  });
+  el.querySelectorAll('.dm-row3').forEach(function(rw){
+    var abrir = function(){
+      var nx = rw.nextElementSibling;
+      if (nx && nx.classList.contains('dm-big')){ nx.remove(); return; }
+      var d = document.createElement('div'); d.className = 'dm-big';
+      d.innerHTML = dmGraficoGrande(ses, rw.getAttribute('data-p'));
+      rw.after(d);
+    };
+    rw.addEventListener('click', abrir);
+    rw.addEventListener('keydown', function(e){ if (e.key === 'Enter'){ e.preventDefault(); abrir(); } });
+  });
+}
+
+// Gráfico ampliado (bolinhas com o valor dentro, mesmo visual do dashboard antigo).
+function dmGraficoGrande(ses, p){
+  var pts = ses.filter(function(s){ return s.valores[p] && !isNaN(paraNumero(s.valores[p].valor)); }).slice(-30);
+  if (!pts.length) return '<p class="note" style="margin:8px">Sem leitura numérica.</p>';
+  var vs = pts.map(function(s){ return paraNumero(s.valores[p].valor); });
+  var ult = pts[pts.length - 1].valores[p], lo = paraNumero(ult.min), hi = paraNumero(ult.max);
+  var mn = Math.min.apply(null, vs), mx = Math.max.apply(null, vs);
+  if (!isNaN(lo)) mn = Math.min(mn, lo); if (!isNaN(hi)) mx = Math.max(mx, hi);
+  if (mx === mn){ mx += 1; mn -= 1; }
+  var w = Math.max(560, pts.length * 46 + 40), h = 150, pad = 26;
+  var Y = function(v){ return h - pad - (v - mn) / (mx - mn) * (h - 2 * pad); }, Xg = function(k){ return 30 + k * 46; };
+  var s = '<svg width="' + w + '" height="' + (h + 26) + '" role="img" aria-label="' + escHtml(p) + ' ampliado">';
+  if (!isNaN(hi)) s += '<line x1="16" x2="' + w + '" y1="' + Y(hi) + '" y2="' + Y(hi) + '" stroke="var(--danger)" stroke-dasharray="5 4"/>';
+  if (!isNaN(lo)) s += '<line x1="16" x2="' + w + '" y1="' + Y(lo) + '" y2="' + Y(lo) + '" stroke="var(--danger)" stroke-dasharray="5 4"/>';
+  s += '<path d="' + pts.map(function(x, k){ return (k ? 'L' : 'M') + Xg(k) + ' ' + Y(vs[k]); }).join(' ') + '" fill="none" stroke="var(--ok)" stroke-width="2"/>';
+  pts.forEach(function(x, k){
+    var b = dmFora(x.valores[p]), col = b ? 'var(--danger)' : 'var(--ok)';
+    s += '<circle cx="' + Xg(k) + '" cy="' + Y(vs[k]) + '" r="15" fill="var(--surface)" stroke="' + col + '" stroke-width="2"><title>' + dmFmtData(x.t) + ' ' + x.hora + ' · ' + escHtml(x.responsavel || '') + ' · limite ' + escHtml(textoLimite(x.valores[p].min, x.valores[p].max)) + '</title></circle>' +
+      '<text x="' + Xg(k) + '" y="' + (Y(vs[k]) + 3.5) + '" text-anchor="middle" font-size="9.5" font-weight="700" fill="' + col + '" pointer-events="none">' + escHtml(x.valores[p].valor) + '</text>' +
+      '<text x="' + Xg(k) + '" y="' + (h + 8) + '" text-anchor="middle" font-size="9.5" fill="var(--text-dim)">' + x.hora.slice(0, 2) + 'h</text>' +
+      ((k === 0 || dmFmtData(pts[k - 1].t) !== dmFmtData(x.t)) ? '<text x="' + Xg(k) + '" y="' + (h + 21) + '" text-anchor="middle" font-size="9.5" font-weight="700" fill="var(--text)">' + dmFmtData(x.t) + '</text>' : '');
+  });
+  return s + '</svg>';
 }
 
 // =============================================================================
@@ -2827,11 +3081,12 @@ function agruparPorSessao(lista){
     if (!porId[id]){
       porId[id] = {
         id_sessao: id, data: r.data, hora: r.hora, maquina: r.maquina, responsavel: r.responsavel,
-        gramatura: r.gramatura, cor: r.cor, resina: r.resina, criado_em: r.criado_em, valores: {}
+        gramatura: r.gramatura, cor: r.cor, resina: r.resina, criado_em: r.criado_em, justificativa: '', valores: {}
       };
       ordem.push(id);
     }
-    porId[id].valores[r.parametro] = { valor: r.valor_medido, dentro: r.dentro_criterio };
+    porId[id].valores[r.parametro] = { valor: r.valor_medido, dentro: r.dentro_criterio, min: r.tolerancia_min_aplicada, max: r.tolerancia_max_aplicada };
+    if (r.justificativa && !porId[id].justificativa) porId[id].justificativa = String(r.justificativa);
   });
   var sessoes = ordem.map(function(id){ return porId[id]; });
   sessoes.sort(function(a,b){ return (b.criado_em||'').localeCompare(a.criado_em||''); });
@@ -2842,6 +3097,7 @@ function construirCabecalhoTabelaLarga(){
   var head = document.getElementById('widetableHead');
   var fixas = ['Data','Hora','Máquina','Responsável','Gramatura','Cor','Resina'];
   var html = fixas.map(function(c){ return '<th class="wt-fixo">' + c + '</th>'; }).join('');
+  html += '<th class="wt-just">Justificativa</th>';
   html += PARAMETROS_INJECAO.map(function(p){
     return '<th class="wt-param"><div class="wt-paramtxt">' + p + '</div></th>';
   }).join('');
@@ -2875,6 +3131,11 @@ function aplicarFiltroTabela(){
   renderTabelaLarga(sessoes);
 }
 
+var TABELA_LARGA_ATUAL = [];
+function verJustificativaTabela(i){
+  var s = TABELA_LARGA_ATUAL[i]; if (!s) return;
+  mostrarJustificativa(s.maquina + ' · ' + s.data + ' ' + s.hora + ' · ' + (s.responsavel || ''), s.justificativa);
+}
 function renderTabelaLarga(sessoes){
   var wrap = document.getElementById('widetable');
   var body = document.getElementById('widetableBody');
@@ -2893,9 +3154,11 @@ function renderTabelaLarga(sessoes){
   contagem.textContent = 'Mostrando ' + mostrar.length + ' de ' + sessoes.length + ' horário(s) cadastrado(s)' +
     (sessoes.length > mostrar.length ? ' — refine o filtro para ver os demais.' : '.');
 
-  body.innerHTML = mostrar.map(function(s){
+  TABELA_LARGA_ATUAL = mostrar;
+  body.innerHTML = mostrar.map(function(s, si){
     var fixas = [s.data, s.hora, s.maquina, s.responsavel, s.gramatura, s.cor, s.resina];
     var tds = fixas.map(function(v){ return '<td class="wt-fixo">' + (v || '—') + '</td>'; }).join('');
+    tds += '<td class="wt-just">' + (s.justificativa ? '<button type="button" class="jbtn" onclick="verJustificativaTabela(' + si + ')">Ver</button><span class="jtxt">' + escHtml(s.justificativa.length > 34 ? s.justificativa.slice(0, 34) + '…' : s.justificativa) + '</span>' : '') + '</td>';
     tds += PARAMETROS_INJECAO.map(function(p){
       var info = s.valores[p];
       if (!info || info.valor === undefined || info.valor === '' || info.valor === null) return '<td class="wt-param">—</td>';
@@ -2964,6 +3227,7 @@ function letraColuna(indiceZeroBased){
 }
 
 async function prepararColunasTextoRegistrosInjecao(token){
+  await garantirColunaJustificativa(token); // toda gravação manda 15 valores — a coluna precisa existir antes
   if (colunasTextoPreparadas) return;
   var camposTexto = ['data', 'hora', 'gramatura', 'criado_em'];
   for (var i = 0; i < camposTexto.length; i++){
@@ -3067,8 +3331,11 @@ function abrirLancamentoManual(processo){
     var btnI = document.getElementById('lmBtnSalvarInjecao');
     btnI.disabled = false; btnI.textContent = 'Confirmar e salvar ✓';
     lmPopularSelect('lmMaquinaI', lmOpcoesLista('maquinas'), 'Selecione a máquina');
-    lmPopularSelect('lmResponsavelI', lmOpcoesLista('operadores'), 'Selecione o operador');
+    document.getElementById('lmResponsavelI').value = '';
+    document.getElementById('lmOperadoresI').innerHTML = lmOpcoesLista('operadores').map(function(v){ return '<option value="'+escHtml(v)+'">'; }).join('');
     lmPopularSelect('lmGramaturaI', lmOpcoesLista('gramaturas'), 'Selecione a gramatura');
+    lmPopularSelect('lmCorI', lmOpcoesLista('cores'), 'Selecione a cor');
+    lmPopularSelect('lmResinaI', lmOpcoesLista('resinas'), 'Selecione a resina');
     document.getElementById('lmAgoraI').value = lmAgora().exibicao;
     LM.valoresInjecao = PARAMETROS_INJECAO.map(function(p){ return { parametro:p, valor:'' }; });
     LM.corInjecao = ''; LM.resinaInjecao = '';
@@ -3117,29 +3384,13 @@ function lmRenderInjecao(){
   var maquina = document.getElementById('lmMaquinaI').value;
   var gramatura = document.getElementById('lmGramaturaI').value;
 
-  var corResinaHtml =
-    '<div class="prow prow-texto">' +
-      '<div><div class="pname">Cor</div></div>' +
-      '<select id="lmCorI" onchange="LM.corInjecao=this.value;lmRenderInjecao();">' +
-        '<option value="" '+(LM.corInjecao?'':'selected')+' disabled>Selecione a cor</option>' +
-        lmOpcoesLista('cores').map(function(v){ return '<option value="'+escHtml(v)+'"'+(v===LM.corInjecao?' selected':'')+'>'+escHtml(v)+'</option>'; }).join('') +
-      '</select>' +
-    '</div>' +
-    '<div class="prow prow-texto">' +
-      '<div><div class="pname">Resina</div></div>' +
-      '<select id="lmResinaI" onchange="LM.resinaInjecao=this.value;lmRenderInjecao();">' +
-        '<option value="" '+(LM.resinaInjecao?'':'selected')+' disabled>Selecione a resina</option>' +
-        lmOpcoesLista('resinas').map(function(v){ return '<option value="'+escHtml(v)+'"'+(v===LM.resinaInjecao?' selected':'')+'>'+escHtml(v)+'</option>'; }).join('') +
-      '</select>' +
-    '</div>';
-
   var paramsHtml = LM.valoresInjecao.map(function(item, idx){
     var tol = lmBuscarTolerancia(maquina, gramatura, item.parametro);
     var status = lmStatus(item.valor, tol);
     return lmLinhaParam(item.parametro, item.valor, status, idx, 'lmAtualizarValorInjecao');
   }).join('');
 
-  document.getElementById('lmParamsInjecao').innerHTML = corResinaHtml + paramsHtml;
+  document.getElementById('lmParamsInjecao').innerHTML = paramsHtml;
 }
 function lmAtualizarValorInjecao(idx, novoValor){
   LM.valoresInjecao[idx].valor = novoValor;
@@ -3157,7 +3408,7 @@ function lmAtualizarValorInjecao(idx, novoValor){
 
 async function lmSalvarInjecao(){
   var maquina = document.getElementById('lmMaquinaI').value;
-  var responsavel = document.getElementById('lmResponsavelI').value;
+  var responsavel = document.getElementById('lmResponsavelI').value.trim();
   var gramatura = document.getElementById('lmGramaturaI').value;
   var erroEl = document.getElementById('lmErroInjecao');
   function erro(msg){ erroEl.textContent = msg; erroEl.style.display = 'block'; }
@@ -3166,6 +3417,18 @@ async function lmSalvarInjecao(){
     erro('Selecione Máquina, Responsável, Gramatura, Cor e Resina antes de salvar.'); return;
   }
   if (!itemId){ mostrarToast('Ainda conectando com a planilha, aguarde um instante e tente de novo.', true); return; }
+
+  // Parâmetro fora do critério → justificativa obrigatória antes de gravar.
+  var foras = [];
+  LM.valoresInjecao.forEach(function(item){
+    var tolF = lmBuscarTolerancia(maquina, gramatura, item.parametro);
+    if (lmStatus(item.valor, tolF) === 'bad') foras.push({ parametro: item.parametro, valor: item.valor, limite: textoLimite(tolF.valor_min, tolF.valor_max) });
+  });
+  var justificativa = '';
+  if (foras.length){
+    justificativa = await pedirJustificativa(foras, maquina + ' · lançamento manual');
+    if (justificativa === null) return; // voltou pra corrigir
+  }
 
   var btn = document.getElementById('lmBtnSalvarInjecao');
   btn.disabled = true; btn.textContent = 'Salvando…';
@@ -3182,7 +3445,7 @@ async function lmSalvarInjecao(){
         id_sessao: idSessao, data: agora.dataStr, hora: agora.horaStr, maquina: maquina, responsavel: responsavel,
         gramatura: gramatura, cor: LM.corInjecao, resina: LM.resinaInjecao, parametro: item.parametro, valor_medido: valor,
         tolerancia_min_aplicada: tol ? tol.valor_min : '', tolerancia_max_aplicada: tol ? tol.valor_max : '',
-        dentro_criterio: dentro, criado_em: agora.isoStr
+        dentro_criterio: dentro, criado_em: agora.isoStr, justificativa: justificativa
       };
       return COLS_INJ.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; });
     });
@@ -3543,57 +3806,73 @@ async function garantirTabelaSopro(worksheet, tabela, headers, token){
   tabelasSoproGarantidas[tabela] = true;
 }
 
-// Garante que a TabelaTolerancias (Injeção) já tenha a 10ª coluna "cavidade_ativa" (critérios
-// de Percurso/Comprimento do shotpot/Número de batidas por Cavidades ativas — ver
-// buscarToleranciaCavidade). Mesma ideia de garantirTabelaSopro, mas ADICIONANDO uma coluna
-// numa tabela que já existe, em vez de criar a tabela inteira — por isso usa o endpoint
-// columns/add (acrescenta no fim, já que nenhum índice é passado), em vez de reescrever o
-// cabeçalho inteiro. Linhas que já existiam na tabela antes dessa coluna existir ficam com
-// cavidade_ativa em branco automaticamente (comportamento padrão do Excel ao adicionar coluna).
-var colunaCavidadeGarantida = false;
-async function garantirColunaCavidade(token){
-  if (colunaCavidadeGarantida) return;
-  var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias';
-  // confere pela lista de colunas (nome), não por posição — e se não der pra listar, não tenta
-  // criar às cegas (evita acabar com colunas duplicadas a cada sessão).
+// Garante que uma Tabela do Excel que JÁ existe tenha uma coluna a mais no fim (ex.: a 10ª coluna
+// "cavidade_ativa" da TabelaTolerancias, ou a 15ª "justificativa" da TabelaRegistrosInjecao).
+// Confere pelo NOME na lista de colunas (não pela posição); se não der pra listar, ou se a
+// tabela não tiver o número de colunas esperado antes da nova, não cria nada às cegas (evita
+// colunas duplicadas). Linhas antigas ficam com a coluna nova em branco (padrão do Excel).
+// Ordem das tentativas: 1) columns/add sem valores (o Excel cria "ColunaN") + escreve o
+// cabeçalho certo na última célula da linha de cabeçalho via API de Intervalo — barato mesmo
+// em tabela grande (Registros_Injecao tem dezenas de milhares de linhas); 2) columns/add com a
+// coluna inteira (cabeçalho + uma célula vazia por linha), se a 1ª não for aceita.
+var colunasGarantidas = {};
+async function garantirColunaTabela(cfg, token){
+  var chave = cfg.tabela + '|' + cfg.nome;
+  if (colunasGarantidas[chave]) return;
+  var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + cfg.tabela;
+  var hdrs = { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' };
   var check = await fetchGraphComRetry(base + '/columns', { headers: { Authorization: 'Bearer ' + token } });
-  if (!check.ok) throw new Error('Não consegui ler as colunas da TabelaTolerancias (status ' + check.status + ').');
+  if (!check.ok) throw new Error('Não consegui ler as colunas da ' + cfg.tabela + ' (status ' + check.status + ').');
   var jc = await check.json();
   var colunas = (jc.value || []).map(function(c){ return norm(c.name); });
-  if (colunas.indexOf('cavidade_ativa') >= 0){ colunaCavidadeGarantida = true; return; }
-  if (colunas.length !== 9) throw new Error('A TabelaTolerancias tem ' + colunas.length + ' colunas (esperado 9 antes de criar "cavidade_ativa") — confira a aba Tolerancias_App antes de continuar.');
+  if (colunas.indexOf(norm(cfg.nome)) >= 0){ colunasGarantidas[chave] = true; return; }
 
-  var hdrs = { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' };
+  async function escreverCabecalho(){
+    var respH = await fetchGraphComRetry(base + '/headerRowRange', { headers: { Authorization: 'Bearer ' + token } });
+    var jh = respH.ok ? await respH.json() : {};
+    var endH = (jh.address || '').split('!').pop(); // ex.: A1:O1
+    var ultima = endH.indexOf(':') >= 0 ? endH.split(':')[1] : '';
+    if (!ultima) return null;
+    return fetchGraphComRetry('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + "/workbook/worksheets/" + cfg.worksheet + "/range(address='" + ultima + "')", { method:'PATCH', headers: hdrs, body: JSON.stringify({ values: [[cfg.nome]] }) });
+  }
 
-  // 1ª tentativa: columns/add já com o cabeçalho + uma célula vazia por linha existente (a API
-  // pede a coluna inteira quando "values" é informado).
-  var nLinhas = 0;
-  var respRows = await fetchGraphComRetry(base + '/rows', { headers: { Authorization: 'Bearer ' + token } });
-  if (respRows.ok){ var jr = await respRows.json(); nLinhas = (jr.value || []).length; }
-  var valores = [['cavidade_ativa']];
-  for (var i = 0; i < nLinhas; i++) valores.push(['']);
-  var resp = await fetchGraphComRetry(base + '/columns/add', { method:'POST', headers: hdrs, body: JSON.stringify({ values: valores }) });
+  // Sobra de uma tentativa anterior que criou a coluna mas não conseguiu renomear ("Coluna10"/
+  // "Column10" logo depois das esperadas): só renomeia, sem criar outra.
+  var ultimaCol = colunas[colunas.length - 1] || '';
+  if (colunas.length === cfg.colunasAntes + 1 && /^(coluna|column)\s*\d+$/.test(ultimaCol)){
+    var rr = await escreverCabecalho();
+    if (rr && rr.ok){ colunasGarantidas[chave] = true; return; }
+  }
+  if (colunas.length !== cfg.colunasAntes) throw new Error('A ' + cfg.tabela + ' tem ' + colunas.length + ' colunas (esperado ' + cfg.colunasAntes + ' antes de criar "' + cfg.nome + '") — confira a aba ' + cfg.worksheet + ' antes de continuar.');
 
-  // 2ª tentativa: columns/add sem valores (o Excel cria com nome padrão "Coluna10") e depois
-  // escreve o cabeçalho certo na última célula da linha de cabeçalho, via API de Intervalo.
-  if (!resp.ok){
-    var resp2 = await fetchGraphComRetry(base + '/columns/add', { method:'POST', headers: hdrs, body: JSON.stringify({}) });
-    if (resp2.ok){
-      var respH = await fetchGraphComRetry(base + '/headerRowRange', { headers: { Authorization: 'Bearer ' + token } });
-      var jh = respH.ok ? await respH.json() : {};
-      var endH = (jh.address || '').split('!').pop(); // ex.: A1:J1
-      var ultima = endH.indexOf(':') >= 0 ? endH.split(':')[1] : '';
-      if (ultima){
-        var respP = await fetchGraphComRetry('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + "/workbook/worksheets/Tolerancias_App/range(address='" + ultima + "')", { method:'PATCH', headers: hdrs, body: JSON.stringify({ values: [['cavidade_ativa']] }) });
-        resp = respP.ok ? respP : resp;
-      }
-    }
+  var resp = await fetchGraphComRetry(base + '/columns/add', { method:'POST', headers: hdrs, body: JSON.stringify({}) });
+  if (resp.ok){
+    var rh = await escreverCabecalho();
+    resp = rh || resp;
+  } else {
+    var nLinhas = 0;
+    var respRows = await fetchGraphComRetry(base + '/rows', { headers: { Authorization: 'Bearer ' + token } });
+    if (respRows.ok){ var jr = await respRows.json(); nLinhas = (jr.value || []).length; }
+    var valores = [[cfg.nome]];
+    for (var i = 0; i < nLinhas; i++) valores.push(['']);
+    resp = await fetchGraphComRetry(base + '/columns/add', { method:'POST', headers: hdrs, body: JSON.stringify({ values: valores }) });
   }
   if (!resp.ok){
     var json = await resp.json().catch(function(){ return {}; });
-    throw new Error('Não consegui criar a coluna "cavidade_ativa" em Tolerancias_App automaticamente — crie manualmente: abra a planilha, na aba Tolerancias_App digite "cavidade_ativa" na célula logo à direita do cabeçalho "ativo" (a tabela deve crescer sozinha pra 10 colunas) e clique em Importar de novo. Detalhe: ' + (json.error ? json.error.message : resp.status));
+    throw new Error('Não consegui criar a coluna "' + cfg.nome + '" em ' + cfg.worksheet + ' automaticamente — crie manualmente: abra a planilha, na aba ' + cfg.worksheet + ' digite "' + cfg.nome + '" na célula logo à direita do último cabeçalho (a tabela deve crescer sozinha) e tente de novo. Detalhe: ' + (json.error ? json.error.message : resp.status));
   }
-  colunaCavidadeGarantida = true;
+  colunasGarantidas[chave] = true;
+}
+
+// 10ª coluna da TabelaTolerancias: critérios de Percurso/Comprimento do shotpot/Número de
+// batidas por Cavidades ativas (ver buscarToleranciaCavidade).
+async function garantirColunaCavidade(token){
+  await garantirColunaTabela({ worksheet:'Tolerancias_App', tabela:'TabelaTolerancias', nome:'cavidade_ativa', colunasAntes:9 }, token);
+}
+// 15ª coluna da TabelaRegistrosInjecao: justificativa obrigatória quando o lançamento tem algum
+// parâmetro fora do critério (ver pedirJustificativa). Chamada antes de toda gravação de registro.
+async function garantirColunaJustificativa(token){
+  await garantirColunaTabela({ worksheet:'Registros_Injecao', tabela:'TabelaRegistrosInjecao', nome:'justificativa', colunasAntes:14 }, token);
 }
 
 // ---- Listas de apoio (Máquinas/Gramaturas/Cores/Resinas) ----
