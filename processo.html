@@ -3746,6 +3746,100 @@ async function atualizarLinhaTabela(worksheet, tabela, idx, valores, token){
   }
 }
 
+// ---- Gravação em lote (mais rápida) ----
+// Antes, cada linha alterada custava 2 chamadas em sequência (descobrir o endereço da linha +
+// PATCH/DELETE), e cada inclusão era um POST separado — editar um grupo de ~30 parâmetros dava
+// ~60 chamadas, uma esperando a outra. Agora: 1) o endereço da tabela é lido UMA vez (GET
+// .../tables/{t}/range) e o endereço de cada linha é calculado (linha de dados N = linha do
+// cabeçalho + 1 + N, porque a Tabela do Excel é sempre um bloco contínuo); 2) linhas com índices
+// consecutivos viram UM só PATCH (ou um só delete) de várias linhas; 3) todas as inclusões vão
+// num único POST rows/add. Se a leitura do endereço da tabela falhar, cai no caminho antigo,
+// linha a linha (mais lento, mas já validado).
+function colunaParaNumero(letras){ var n = 0; for (var i = 0; i < letras.length; i++) n = n * 26 + (letras.charCodeAt(i) - 64); return n; }
+async function enderecoTabela(tabela, token){
+  var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + tabela + '/range';
+  var resp = await fetchGraphComRetry(url, { headers: { Authorization: 'Bearer ' + token } });
+  if (!resp.ok) return null;
+  var j = await resp.json();
+  var m = String(j.address || '').split('!').pop().match(/^\$?([A-Z]+)\$?(\d+):\$?([A-Z]+)\$?(\d+)$/);
+  if (!m) return null;
+  return { colIni: m[1], linhaCab: parseInt(m[2], 10), colFim: m[3], largura: colunaParaNumero(m[3]) - colunaParaNumero(m[1]) + 1 };
+}
+function agruparConsecutivos(indicesOrdenados){
+  var runs = [];
+  indicesOrdenados.forEach(function(i){
+    var u = runs[runs.length - 1];
+    if (u && i === u.fim + 1) u.fim = i; else runs.push({ ini: i, fim: i });
+  });
+  return runs;
+}
+// itens: [{ index, linha }] — atualiza as linhas; consecutivas vão num PATCH só.
+async function atualizarLinhasTabelaLote(worksheet, tabela, itens, token){
+  if (!itens.length) return;
+  var end = await enderecoTabela(tabela, token);
+  if (!end || itens.some(function(it){ return it.linha.length !== end.largura; })){
+    for (var k = 0; k < itens.length; k++) await atualizarLinhaTabela(worksheet, tabela, itens[k].index, itens[k].linha, token);
+    return;
+  }
+  var porIndice = {};
+  itens.forEach(function(it){ porIndice[it.index] = it.linha; });
+  var runs = agruparConsecutivos(Object.keys(porIndice).map(Number).sort(function(a,b){ return a - b; }));
+  for (var r = 0; r < runs.length; r++){
+    var ini = runs[r].ini, fim = runs[r].fim, valores = [];
+    for (var i = ini; i <= fim; i++) valores.push(porIndice[i]);
+    var local = end.colIni + (end.linhaCab + 1 + ini) + ':' + end.colFim + (end.linhaCab + 1 + fim);
+    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + worksheet + "/range(address='" + local + "')";
+    var resp = await fetchGraphComRetry(url, { method:'PATCH', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: valores }) });
+    if (!resp.ok){
+      var json = await resp.json().catch(function(){ return {}; });
+      throw new Error(json.error ? json.error.message : ('status ' + resp.status));
+    }
+  }
+}
+// Exclui as linhas pelos índices; blocos consecutivos saem num delete só, do fim pro começo
+// (excluir desloca pra cima só as linhas de baixo, então os blocos de cima não mudam de lugar).
+async function excluirLinhasTabelaLote(worksheet, tabela, indices, token){
+  if (!indices.length) return;
+  var ordenados = indices.slice().sort(function(a,b){ return a - b; });
+  var end = await enderecoTabela(tabela, token);
+  if (!end){
+    for (var k = ordenados.length - 1; k >= 0; k--) await excluirLinhaTabela(worksheet, tabela, ordenados[k], token);
+    return;
+  }
+  var runs = agruparConsecutivos(ordenados).reverse();
+  for (var r = 0; r < runs.length; r++){
+    var local = end.colIni + (end.linhaCab + 1 + runs[r].ini) + ':' + end.colFim + (end.linhaCab + 1 + runs[r].fim);
+    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + worksheet + "/range(address='" + local + "')/delete";
+    var resp = await fetchGraphComRetry(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ shift: 'Up' }) });
+    if (!resp.ok){
+      var json = await resp.json().catch(function(){ return {}; });
+      throw new Error(json.error ? json.error.message : ('status ' + resp.status));
+    }
+  }
+}
+// Todas as linhas novas num POST só.
+async function incluirLinhasTabelaLote(tabela, linhas, token){
+  if (!linhas.length) return;
+  var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + tabela + '/rows/add';
+  var resp = await fetchGraphComRetry(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: linhas }) });
+  if (!resp.ok){
+    var json = await resp.json().catch(function(){ return {}; });
+    throw new Error('não consegui incluir os critérios novos: ' + (json.error ? json.error.message : ('status ' + resp.status)));
+  }
+}
+// Critério existente mudou? (compara número com número — "4,0" e 4 são o mesmo valor)
+function mesmoNumeroOuVazio(a, b){
+  var na = paraNumero(a), nb = paraNumero(b);
+  if (isNaN(na) && isNaN(nb)) return true;
+  return na === nb;
+}
+function criterioMudou(existente, chaves, min, max){
+  if (existente.ativoFalso) return true;
+  if (existente._maquina !== chaves.m || existente._gramatura !== chaves.g || existente._cor !== chaves.c || existente._resina !== chaves.r) return true;
+  if (String(existente.maquina) !== chaves.mOrig || String(existente.gramatura) !== chaves.gOrig || String(existente.resina !== undefined ? existente.resina : existente.frasco) !== chaves.rOrig) return true;
+  return !mesmoNumeroOuVazio(existente.valor_min, min) || !mesmoNumeroOuVazio(existente.valor_max, max);
+}
+
 // Depois de um PATCH via API de Range (atualizarLinhaTabela), o recarregamento (GET) às vezes
 // volta com os valores de ANTES da escrita por um instante — um atraso de consistência ocasional
 // do Excel Online nessa planilha específica (gerada por script, não pelo Excel de verdade), não
@@ -3763,7 +3857,10 @@ async function confirmarPatchesRecarregados(toPatch, obterArr, recarregarFn, tok
       var atual = arr.filter(function(x){
         return x._maquina===p.chaveM && x._gramatura===p.chaveG && x._cor===p.chaveC && x._resina===p.chaveX && x._parametro===p.chaveP;
       })[0];
-      return atual && atual.valor_min === p.min && atual.valor_max === p.max;
+      // compara como número: o Excel pode devolver "4" pra um "4,0" digitado — comparar texto com
+      // texto fazia essa checagem achar que não gravou e recarregar a tabela inteira mais 3 vezes
+      // (com pausas), deixando o salvar bem mais lento sem necessidade.
+      return atual && mesmoNumeroOuVazio(atual.valor_min, p.min) && mesmoNumeroOuVazio(atual.valor_max, p.max);
     });
     if (bateTudo || t === 3) return;
     await new Promise(function(r){ setTimeout(r, 500 + t*500); });
@@ -4258,9 +4355,9 @@ async function executarImportacaoPOPs(){
       logImportPOPs('  ✓ listas de apoio: ' + plano.listasNovas.length + ' item(ns) adicionado(s)');
     }
 
-    for (var p = 0; p < plano.toPatch.length; p++){
-      progressoImportPOPs('Atualizando critérios existentes… ' + (p+1) + ' de ' + plano.toPatch.length);
-      await atualizarLinhaTabela('Tolerancias_App', 'TabelaTolerancias', plano.toPatch[p].index, plano.toPatch[p].linha, token);
+    if (plano.toPatch.length){
+      progressoImportPOPs('Atualizando ' + plano.toPatch.length + ' critério(s) existente(s)…');
+      await atualizarLinhasTabelaLote('Tolerancias_App', 'TabelaTolerancias', plano.toPatch, token);
     }
     if (plano.toPatch.length) logImportPOPs('  ✓ ' + plano.toPatch.length + ' critério(s) atualizado(s)');
 
@@ -4277,10 +4374,10 @@ async function executarImportacaoPOPs(){
     }
     if (plano.toAdd.length) logImportPOPs('  ✓ ' + plano.toAdd.length + ' critério(s) novo(s) cadastrado(s)');
 
-    var dels = plano.toDelete.slice().sort(function(x,y){ return y - x; });
-    for (var d = 0; d < dels.length; d++){
-      progressoImportPOPs('Removendo critérios antigos… ' + (d+1) + ' de ' + dels.length);
-      await excluirLinhaTabela('Tolerancias_App', 'TabelaTolerancias', dels[d], token);
+    var dels = plano.toDelete.slice();
+    if (dels.length){
+      progressoImportPOPs('Removendo ' + dels.length + ' critério(s) antigo(s)…');
+      await excluirLinhasTabelaLote('Tolerancias_App', 'TabelaTolerancias', dels, token);
     }
     if (dels.length) logImportPOPs('  ✓ ' + dels.length + ' critério(s) antigo(s) removido(s)');
 
@@ -4448,7 +4545,8 @@ async function salvarCriterioLote(){
     return t._maquina===chaveM && t._gramatura===chaveG && t._cor===chaveC && t._resina===chaveR;
   })).forEach(function(t){ existentePorParam[t.parametro] = t; });
 
-  var toPatch = [], toAdd = [], toDelete = [];
+  var toPatch = [], toAdd = [], toDelete = [], algumPreenchido = false;
+  var chavesComp = { m: chaveM, g: chaveG, c: chaveC, r: chaveR, mOrig: maquina, gOrig: gramatura, rOrig: resina };
   for (var idx = 0; idx < PARAMETROS_INJECAO.length; idx++){
     var param = PARAMETROS_INJECAO[idx];
     if (ehParametroCavidadeDependente(param)) continue; // critério por cavidade ativa — form/tabela próprios, não passa por aqui
@@ -4464,15 +4562,22 @@ async function salvarCriterioLote(){
     // cadastra critérios normais (por Resina/Cor), nunca por cavidade (ver comentário acima).
     var linha = ['Injeção', maquina, gramatura, cor, resina, param, min || null, max || null, true, ''];
     if (min || max){
-      if (existente) toPatch.push({ index: existente._index, linha: linha, min: min, max: max, chaveM: chaveM, chaveG: chaveG, chaveC: chaveC, chaveX: chaveR, chaveP: norm(param) });
+      algumPreenchido = true;
+      if (existente){
+        // só regrava a linha se algo mudou de verdade (valor, identificação ou estava inativo)
+        if (criterioMudou(existente, chavesComp, min, max)) toPatch.push({ index: existente._index, linha: linha, min: min, max: max, chaveM: chaveM, chaveG: chaveG, chaveC: chaveC, chaveX: chaveR, chaveP: norm(param) });
+      }
       else toAdd.push(linha);
     } else if (existente){
       toDelete.push(existente._index);
     }
   }
 
-  if (!toPatch.length && !toAdd.length && !toDelete.length){
+  if (!algumPreenchido && !toDelete.length){
     erro('Preencha o Mínimo ou o Máximo de pelo menos um parâmetro.'); return;
+  }
+  if (!toPatch.length && !toAdd.length && !toDelete.length){
+    fecharFormCriterio(); mostrarToast('Nenhuma alteração para salvar.'); return;
   }
 
   var btn = document.getElementById('critBtnSalvar');
@@ -4480,20 +4585,10 @@ async function salvarCriterioLote(){
   try {
     var token = await getToken();
     await garantirColunaCavidade(token); // garante as 10 colunas antes de ler/escrever endereços de linha
-    var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaTolerancias/rows';
-    for (var p = 0; p < toPatch.length; p++){
-      await atualizarLinhaTabela('Tolerancias_App', 'TabelaTolerancias', toPatch[p].index, toPatch[p].linha, token);
-    }
-    for (var a = 0; a < toAdd.length; a++){
-      await fetch(base + '/add', { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values:[toAdd[a]] }) });
-    }
-    // exclusões por último e do maior índice pro menor: excluir uma linha desloca pra cima os
-    // índices das linhas abaixo dela, então processar do fim pro começo evita usar um índice
-    // que a exclusão anterior já invalidou.
-    toDelete.sort(function(x,y){ return y - x; });
-    for (var d = 0; d < toDelete.length; d++){
-      await excluirLinhaTabela('Tolerancias_App', 'TabelaTolerancias', toDelete[d], token);
-    }
+    // ordem: atualizações (índices ainda estáveis), inclusões (vão pro fim) e por último exclusões
+    await atualizarLinhasTabelaLote('Tolerancias_App', 'TabelaTolerancias', toPatch, token);
+    await incluirLinhasTabelaLote('TabelaTolerancias', toAdd, token);
+    await excluirLinhasTabelaLote('Tolerancias_App', 'TabelaTolerancias', toDelete, token);
     await carregarTolerancias(token);
     await confirmarPatchesRecarregados(toPatch, function(){ return tolerancias; }, carregarTolerancias, token);
     fecharFormCriterio();
@@ -4529,9 +4624,7 @@ async function excluirGrupo(i){
   var indices = g.itens.map(function(t){ return t._index; }).sort(function(a,b){ return b - a; });
   try {
     var token = await getToken();
-    for (var k = 0; k < indices.length; k++){
-      await excluirLinhaTabela('Tolerancias_App', 'TabelaTolerancias', indices[k], token);
-    }
+    await excluirLinhasTabelaLote('Tolerancias_App', 'TabelaTolerancias', indices, token);
     await carregarTolerancias(token);
     mostrarToast('Critérios de ' + g.maquina + ' · ' + g.gramatura + ' · ' + g.cor + ' · ' + g.resina + ' removidos.');
   } catch (err) {
@@ -4755,7 +4848,8 @@ async function salvarCriterioLoteSopro(){
     return t._maquina===chaveM && t._gramatura===chaveG && t._cor===chaveC && t._resina===chaveF;
   })).forEach(function(t){ existentePorParam[t.parametro] = t; });
 
-  var toPatch = [], toAdd = [], toDelete = [];
+  var toPatch = [], toAdd = [], toDelete = [], algumPreenchido = false;
+  var chavesComp = { m: chaveM, g: chaveG, c: chaveC, r: chaveF, mOrig: maquina, gOrig: gramatura, rOrig: frasco };
   for (var idx = 0; idx < critParamListSoproAtual.length; idx++){
     var param = critParamListSoproAtual[idx].param;
     var min = document.getElementById('critMinS_'+idx).value.trim();
@@ -4769,15 +4863,21 @@ async function salvarCriterioLoteSopro(){
     // ['maquina','gramatura','cor','frasco','parametro','valor_min','valor_max','ativo'] — tabela própria do Sopro, sem "processo".
     var linha = [maquina, gramatura, cor, frasco, param, min || null, max || null, true];
     if (min || max){
-      if (existente) toPatch.push({ index: existente._index, linha: linha, min: min, max: max, chaveM: chaveM, chaveG: chaveG, chaveC: chaveC, chaveX: chaveF, chaveP: norm(param) });
+      algumPreenchido = true;
+      if (existente){
+        if (criterioMudou(existente, chavesComp, min, max)) toPatch.push({ index: existente._index, linha: linha, min: min, max: max, chaveM: chaveM, chaveG: chaveG, chaveC: chaveC, chaveX: chaveF, chaveP: norm(param) });
+      }
       else toAdd.push(linha);
     } else if (existente){
       toDelete.push(existente._index);
     }
   }
 
-  if (!toPatch.length && !toAdd.length && !toDelete.length){
+  if (!algumPreenchido && !toDelete.length){
     erro('Preencha o Mínimo ou o Máximo de pelo menos um parâmetro.'); return;
+  }
+  if (!toPatch.length && !toAdd.length && !toDelete.length){
+    fecharFormCriterioSopro(); mostrarToast('Nenhuma alteração para salvar.'); return;
   }
 
   var btn = document.getElementById('critBtnSalvarSopro');
@@ -4785,17 +4885,9 @@ async function salvarCriterioLoteSopro(){
   try {
     var token = await getToken();
     await garantirTabelaSopro(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, ['maquina','gramatura','cor','frasco','parametro','valor_min','valor_max','ativo'], token);
-    var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + TABELA_TOLERANCIAS_SOPRO.tabela + '/rows';
-    for (var p = 0; p < toPatch.length; p++){
-      await atualizarLinhaTabela(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, toPatch[p].index, toPatch[p].linha, token);
-    }
-    for (var a = 0; a < toAdd.length; a++){
-      await fetch(base + '/add', { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values:[toAdd[a]] }) });
-    }
-    toDelete.sort(function(x,y){ return y - x; });
-    for (var d = 0; d < toDelete.length; d++){
-      await excluirLinhaTabela(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, toDelete[d], token);
-    }
+    await atualizarLinhasTabelaLote(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, toPatch, token);
+    await incluirLinhasTabelaLote(TABELA_TOLERANCIAS_SOPRO.tabela, toAdd, token);
+    await excluirLinhasTabelaLote(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, toDelete, token);
     await carregarToleranciasSopro(token);
     await confirmarPatchesRecarregados(toPatch, function(){ return toleranciasSopro; }, carregarToleranciasSopro, token);
     fecharFormCriterioSopro();
@@ -4829,9 +4921,7 @@ async function excluirGrupoSopro(i){
   var indices = g.itens.map(function(t){ return t._index; }).sort(function(a,b){ return b - a; });
   try {
     var token = await getToken();
-    for (var k = 0; k < indices.length; k++){
-      await excluirLinhaTabela(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, indices[k], token);
-    }
+    await excluirLinhasTabelaLote(TABELA_TOLERANCIAS_SOPRO.worksheet, TABELA_TOLERANCIAS_SOPRO.tabela, indices, token);
     await carregarToleranciasSopro(token);
     mostrarToast('Critérios de ' + g.maquina + ' · ' + g.gramatura + ' · ' + g.cor + ' · ' + g.frasco + ' removidos.');
   } catch (err) {
