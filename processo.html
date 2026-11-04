@@ -404,6 +404,73 @@
   .jbtn{font:inherit;font-size:11px;font-weight:700;background:var(--warn-bg);color:var(--warn);border:0;border-radius:6px;padding:3px 8px;cursor:pointer;}
   .jtxt{color:var(--text-dim);font-size:11.5px;margin-left:6px;}
   .widetable th.wt-just,.widetable td.wt-just{min-width:220px;white-space:nowrap;text-align:left;font-family:var(--font-body);}
+  /* ---- Versão da operação (celular/tablet) ---- */
+  body.modo-op #app{display:none !important;}
+  #opApp{position:fixed;inset:0;background:var(--bg);z-index:100;overflow-y:auto;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
+  #opApp[hidden]{display:none;}
+  .op-home{min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:28px max(20px, env(safe-area-inset-right,0px)) 28px max(20px, env(safe-area-inset-left,0px));max-width:560px;margin:0 auto;}
+  .op-brand{font-family:var(--font-display);font-weight:700;color:var(--accent);font-size:26px;letter-spacing:.4px;text-align:center;}
+  .op-hello{color:var(--text-dim);text-align:center;margin:-8px 0 6px;font-size:13px;}
+  .op-big{display:flex;flex-direction:column;align-items:flex-start;gap:4px;width:100%;padding:24px 20px;border-radius:18px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;text-align:left;font-family:var(--font-body);}
+  .op-big b{font-family:var(--font-display);font-size:36px;text-transform:uppercase;letter-spacing:.5px;line-height:1;}
+  .op-big span{color:var(--text-dim);font-size:13px;}
+  .op-big.inj{border-color:color-mix(in srgb,var(--accent) 55%,var(--border));}
+  .op-big.sop{border-color:color-mix(in srgb,var(--blue) 55%,var(--border));}
+  .op-foot{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:10px;color:var(--text-dim);font-size:12px;}
+  .op-footbtns{display:flex;gap:8px;}
+  .op-footbtns button{font:inherit;font-size:12px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-dim);border-radius:8px;padding:7px 12px;cursor:pointer;}
+  .op-top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;padding:14px max(16px, env(safe-area-inset-right,0px)) 12px max(16px, env(safe-area-inset-left,0px));}
+  .op-ttl{font-family:var(--font-display);font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1.1;}
+  .op-sub{font-size:11.5px;color:var(--text-dim);}
+  .op-back,.op-refresh{font:inherit;font-size:20px;line-height:1;width:42px;height:42px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;flex:none;}
+  .op-refresh{margin-left:auto;font-size:18px;}
+  .op-body{padding:16px max(16px, env(safe-area-inset-right,0px)) 28px max(16px, env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:12px;max-width:720px;margin:0 auto;}
+  .op-cta{display:flex;align-items:center;justify-content:center;width:100%;padding:17px;border-radius:14px;border:0;background:var(--accent);color:#1a1200;font-weight:700;font-size:16px;cursor:pointer;font-family:var(--font-body);}
+  .op-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--text-dim);}
+  .op-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px;}
+  .op-cards{display:flex;flex-direction:column;gap:10px;}
+  .op-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;}
+  .op-mrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .op-mname{font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:.3px;}
+  .op-mprod{font-size:11.5px;color:var(--text-dim);margin-left:auto;text-align:right;}
+  .op-dots{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;}
+  .op-dbtn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;color:var(--text-dim);cursor:pointer;padding:2px 0;font-size:10.5px;font-variant-numeric:tabular-nums;font-family:var(--font-body);}
+  .op-dbtn.vazio{cursor:default;}
+  .op-dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#fff;}
+  .op-dot.ok{background:var(--ok);} .op-dot.bad{background:var(--danger);} .op-dot.none{background:var(--text-dim);}
+  .op-dot.vazio{background:transparent;border:1.5px dashed var(--border);}
+  .op-mfoot{font-size:11.5px;color:var(--text-dim);display:flex;justify-content:space-between;gap:8px;}
+  .op-sheetwrap{position:fixed;inset:0;z-index:120;display:flex;flex-direction:column;justify-content:flex-end;background:var(--shadow-overlay);}
+  .op-sheetwrap[hidden]{display:none;}
+  .op-sheet{background:var(--surface);border-radius:20px 20px 0 0;max-height:88%;overflow-y:auto;padding:8px max(16px, env(safe-area-inset-right,0px)) calc(22px + env(safe-area-inset-bottom,0px)) max(16px, env(safe-area-inset-left,0px));border-top:1px solid var(--border);max-width:720px;width:100%;margin:0 auto;}
+  .op-grab{width:42px;height:4px;border-radius:2px;background:var(--border);margin:6px auto 12px;}
+  .op-sheethead{display:flex;align-items:flex-start;gap:10px;}
+  .op-sheethead h3{font-family:var(--font-display);font-size:22px;margin:0;text-transform:uppercase;}
+  .op-sheethead .op-back{margin-left:auto;}
+  .op-sheetbody{display:flex;flex-direction:column;gap:10px;margin-top:12px;}
+  .op-prow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 12px;border-top:1px solid var(--border);font-size:13px;font-variant-numeric:tabular-nums;}
+  .op-prow small{display:block;color:var(--text-dim);font-size:11px;}
+  /* ---- Registro do Check List: conferência e concluído ---- */
+  .lmc{display:flex;flex-direction:column;gap:12px;}
+  .lmc-head h3{font-family:var(--font-display);font-size:22px;text-transform:uppercase;margin:0;letter-spacing:.3px;}
+  .lmc-id{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;font-size:13px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;}
+  .lmc-id span{display:block;color:var(--text-dim);font-size:10.5px;letter-spacing:.9px;text-transform:uppercase;}
+  .lmc-chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .lmc-label{display:block;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--text-dim);margin:10px 0 6px;}
+  .lmc-textarea{width:100%;min-height:90px;resize:vertical;font:inherit;font-size:14px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+  .lmc-fim{align-items:center;text-align:center;}
+  .lmc-fim h3{font-family:var(--font-display);font-size:26px;text-transform:uppercase;margin:0;}
+  .lmc-check{width:72px;height:72px;border-radius:50%;background:var(--ok-bg);color:var(--ok);display:grid;place-items:center;font-size:38px;font-weight:700;}
+  .lmc-ask{width:100%;display:flex;flex-direction:column;gap:12px;text-align:left;background:var(--surface-2);border:1px solid var(--border);border-radius:14px;padding:14px;}
+  .lmc-ask b{font-size:15px;}
+  .lmc-file{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12.5px;word-break:break-all;}
+  .lmc-file i{font-style:normal;font-weight:800;font-size:11px;color:#fff;background:var(--danger);border-radius:6px;padding:5px 5px;flex:none;white-space:nowrap;word-break:normal;}
+  @media (max-width: 560px){
+    .fullscreen-topbar{padding:12px 16px;}
+    .fullscreen-body{padding:16px 14px 60px;}
+    .prow{grid-template-columns:minmax(0,1fr) 92px 58px;}
+    .lmc-id{grid-template-columns:1fr;}
+  }
   .fullscreen-overlay{position:fixed;inset:0;background:var(--bg);z-index:150;overflow-y:auto;}
   .fullscreen-topbar{position:sticky;top:0;background:var(--sidebar);border-bottom:1px solid var(--border);
     padding:16px 28px;display:flex;align-items:center;justify-content:space-between;z-index:5;}
@@ -498,6 +565,27 @@
     </div>
   </div>
 
+  <!-- ===== VERSÃO DA OPERAÇÃO (celular/tablet) ===== -->
+  <div id="opApp" hidden>
+    <section id="opHome" class="op-home">
+      <div class="op-brand">CONTROLE DE PROCESSO</div>
+      <p class="op-hello">Registro do check list e últimos registros</p>
+      <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><b>Injetora</b><span>Registro do check list e últimos registros das injetoras</span></button>
+      <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><b>Sopro</b><span>Registro do check list e últimos registros das sopradoras</span></button>
+      <div class="op-foot"><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div></div>
+    </section>
+    <section id="opDash" hidden>
+      <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Últimos 8 registros de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
+      <div class="op-body">
+        <button type="button" class="op-cta" onclick="opNovoRegistro()">＋ Registro do Check List</button>
+        <div class="op-legend"><span><i style="background:var(--ok)"></i>Tudo dentro</span><span><i style="background:var(--danger)"></i>Com parâmetro fora (nº)</span><span><i style="background:var(--text-dim)"></i>Sem critério</span></div>
+        <div id="opCards" class="op-cards"></div>
+        <p class="note" style="margin:0">Toque numa bolinha para ver o que foi registrado naquele horário.</p>
+      </div>
+      <div class="op-sheetwrap" id="opSheetWrap" hidden onclick="if(event.target===this)opFecharSheet()"><div class="op-sheet" id="opSheet"></div></div>
+    </section>
+  </div>
+
   <!-- ===== APP (pós-login) ===== -->
   <div id="app" hidden>
 
@@ -514,18 +602,19 @@
       <button class="nav-item" data-page="dadosCadastrados" onclick="mudarPagina('dadosCadastrados')"><span class="ic">▤</span> Dados Cadastrados</button>
       <button class="nav-item" data-page="criterios" onclick="mudarPagina('criterios')"><span class="ic">☑</span> Critérios</button>
       <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><span class="ic">⇧</span> Carregar Dados</button>
-      <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('injecao')"><span class="ic">✏</span> Lançar Manual</button>
+      <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('injecao')"><span class="ic">✏</span> Registro do Check List</button>
       <button class="nav-item" data-page="iqr" onclick="mudarPagina('iqr')"><span class="ic">∑</span> IQR / Intervalo Interquartil</button>
       <div class="nav-section-label">Sopro</div>
       <button class="nav-item" data-page="dashboardSopro" onclick="mudarPagina('dashboardSopro')"><span class="ic">▦</span> Dashboard</button>
       <button class="nav-item" data-page="dadosCadastradosSopro" onclick="mudarPagina('dadosCadastradosSopro')"><span class="ic">▤</span> Dados Cadastrados</button>
       <button class="nav-item" data-page="criteriosSopro" onclick="mudarPagina('criteriosSopro')"><span class="ic">☑</span> Critérios</button>
       <button class="nav-item" data-page="carregarDadosSopro" onclick="mudarPagina('carregarDadosSopro')"><span class="ic">⇧</span> Carregar Dados</button>
-      <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('sopro')"><span class="ic">✏</span> Lançar Manual</button>
+      <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('sopro')"><span class="ic">✏</span> Registro do Check List</button>
       <button class="nav-item" data-page="configuracoes" onclick="mudarPagina('configuracoes')"><span class="ic">⚙</span> Configurações</button>
       <div class="sidebar-footer">
         <div class="sidebar-user"><span id="statusText">conectando…</span><br><span id="userEmail"></span></div>
         <button onclick="logout()">Sair</button>
+        <button id="btnVersaoOperacao" onclick="usarVersaoOperacao()" hidden style="margin-top:6px">Voltar à versão da operação</button>
       </div>
     </div>
 
@@ -923,21 +1012,21 @@
   </div><!-- /#pageIqr -->
 
   <!-- ===== PÁGINAS: SOPRO (Dashboard/Dados Cadastrados/Critérios/Carregar Dados) =====
-       Ainda não construídas — por enquanto só o Lançar Manual do Sopro está em funcionamento.
+       Ainda não construídas — por enquanto só o Registro do Check List do Sopro está em funcionamento.
        Essas 4 ficam como placeholder, mas já no menu (igual à amostra aprovada com o Cleber),
        pra não dar a impressão de menu quebrado/faltando item enquanto elas não ficam prontas. -->
   <div id="pageDashboardSopro" hidden>
     <h1 class="page-title">Dashboard — Sopro</h1>
     <div class="card" style="max-width:560px;">
       <h3>Ainda em construção</h3>
-      <p class="desc" style="margin-bottom:0;">O Dashboard do Sopro (gráficos por parâmetro, igual ao da Injeção) ainda não foi construído. Por enquanto, use o <strong>Lançar Manual</strong> do Sopro, no menu ao lado, pra cadastrar os dados.</p>
+      <p class="desc" style="margin-bottom:0;">O Dashboard do Sopro (gráficos por parâmetro, igual ao da Injeção) ainda não foi construído. Por enquanto, use o <strong>Registro do Check List</strong> do Sopro, no menu ao lado, pra cadastrar os dados.</p>
     </div>
   </div>
   <div id="pageDadosCadastradosSopro" hidden>
     <h1 class="page-title">Dados Cadastrados — Sopro</h1>
     <div class="card" style="max-width:560px;">
       <h3>Ainda em construção</h3>
-      <p class="desc" style="margin-bottom:0;">A tabela de registros do Sopro (igual à de Injeção) ainda não foi construída. Por enquanto, use o <strong>Lançar Manual</strong> do Sopro, no menu ao lado, pra cadastrar os dados.</p>
+      <p class="desc" style="margin-bottom:0;">A tabela de registros do Sopro (igual à de Injeção) ainda não foi construída. Por enquanto, use o <strong>Registro do Check List</strong> do Sopro, no menu ao lado, pra cadastrar os dados.</p>
     </div>
   </div>
   <div id="pageCriteriosSopro" hidden>
@@ -946,7 +1035,7 @@
     <div id="criteriosListaSecaoSopro">
       <div class="card" style="margin-bottom:16px;">
         <div class="crit-toolbar" style="margin-bottom:14px;">
-          <p class="note" style="margin:0;max-width:560px;">Listas só do Sopro — separadas das listas da Injeção. Máquinas, Gramaturas, Cores e Frascos cadastrados aqui viram lista suspensa no cadastro de critérios e no Lançar Manual do Sopro. Operadores alimenta o Responsável do Lançar Manual do Sopro.</p>
+          <p class="note" style="margin:0;max-width:560px;">Listas só do Sopro — separadas das listas da Injeção. Máquinas, Gramaturas, Cores e Frascos cadastrados aqui viram lista suspensa no cadastro de critérios e no Registro do Check List do Sopro. Operadores alimenta o Responsável do Registro do Check List do Sopro.</p>
         </div>
         <div class="listas-grid">
           <div class="lista-col">
@@ -975,7 +1064,7 @@
             <div class="lista-chips" id="listaChips_operadoresSopro"></div>
           </div>
         </div>
-        <p class="note" style="margin:10px 0 0;">Use os nomes de máquina exatamente como no Lançar Manual: <strong>Multipet 1, Multipet 2, SB01, Unipet 1</strong> — são eles que definem quais parâmetros (Sopradora/Rotuladora/Ensacadeira) aparecem no cadastro de critério abaixo.</p>
+        <p class="note" style="margin:10px 0 0;">Use os nomes de máquina exatamente como no Registro do Check List: <strong>Multipet 1, Multipet 2, SB01, Unipet 1</strong> — são eles que definem quais parâmetros (Sopradora/Rotuladora/Ensacadeira) aparecem no cadastro de critério abaixo.</p>
       </div>
 
       <div class="card" style="margin-bottom:16px;">
@@ -1035,7 +1124,7 @@
     <h1 class="page-title">Carregar Dados — Sopro</h1>
     <div class="card" style="max-width:560px;">
       <h3>Ainda em construção</h3>
-      <p class="desc" style="margin-bottom:0;">O envio de planilha do Sopro (igual ao de Injeção) ainda depende de definir o formato .xlsx do checklist transcrito. Por enquanto, use o <strong>Lançar Manual</strong> do Sopro, no menu ao lado, pra cadastrar os dados direto pelo sistema.</p>
+      <p class="desc" style="margin-bottom:0;">O envio de planilha do Sopro (igual ao de Injeção) ainda depende de definir o formato .xlsx do checklist transcrito. Por enquanto, use o <strong>Registro do Check List</strong> do Sopro, no menu ao lado, pra cadastrar os dados direto pelo sistema.</p>
     </div>
   </div>
 
@@ -1069,8 +1158,8 @@
   <div class="modal-overlay" id="lmConfirmModal" hidden>
     <div class="modal-card">
       <div class="micon">✏️</div>
-      <h4>Novo lançamento</h4>
-      <p>Deseja cadastrar um novo lançamento manual de <strong id="lmConfirmProcessoNome">Sopro</strong>?</p>
+      <h4>Registro do Check List</h4>
+      <p>Deseja fazer um novo Registro do Check List de <strong id="lmConfirmProcessoNome">Sopro</strong>?</p>
       <div class="modal-actions">
         <button class="btn btn-outline" onclick="fecharConfirmLancamento()">Cancelar</button>
         <button class="btn btn-accent" onclick="confirmarLancamentoSim()">Sim, cadastrar</button>
@@ -1081,7 +1170,7 @@
   <!-- ===== TELA INTEIRA: formulário do Lançar Manual ===== -->
   <div class="fullscreen-overlay" id="lmFullscreen" hidden>
     <div class="fullscreen-topbar">
-      <div class="fstitle" id="lmFsTitle">Novo lançamento manual</div>
+      <div class="fstitle" id="lmFsTitle">Registro do Check List</div>
       <button class="fsclose" onclick="fecharLancamentoManual()">✕ Fechar</button>
     </div>
     <div class="fullscreen-body">
@@ -1114,7 +1203,7 @@
           <p class="note" id="lmErroInjecao" style="color:var(--danger);display:none;margin-top:12px;"></p>
           <div class="actions">
             <button class="btn btn-outline" onclick="fecharLancamentoManual()">Cancelar</button>
-            <button class="btn btn-accent" id="lmBtnSalvarInjecao" onclick="lmSalvarInjecao()">Confirmar e salvar ✓</button>
+            <button class="btn btn-accent" id="lmBtnSalvarInjecao" onclick="lmConferir('injecao')">Confirmar e salvar ✓</button>
           </div>
           <p class="note">Grava uma sessão nova (um <code>id_sessao</code>) na mesma tabela Registros_Injecao, igual a um horário lido da planilha — o valor medido e o limite mín/máx aplicado no momento são salvos juntos.</p>
         </div>
@@ -1128,7 +1217,7 @@
           <div class="sectiontitle" style="margin-top:0;">Identificação</div>
           <div class="grid-2" style="margin-bottom:14px;">
             <div class="field"><label>Máquina</label><select id="lmMaquinaS" onchange="lmTrocarMaquinaSopro()"></select></div>
-            <div class="field"><label>Responsável</label><select id="lmResponsavelS"></select></div>
+            <div class="field"><label for="lmResponsavelS">Responsável</label><input id="lmResponsavelS" list="lmOperadoresS" autocomplete="off" placeholder="Digite o nome do operador"><datalist id="lmOperadoresS"></datalist></div>
             <div class="field"><label>Frasco</label><select id="lmFrascoS" onchange="lmRenderSopro()"></select></div>
             <div class="field"><label>Lançado em</label><input id="lmAgoraS" readonly></div>
           </div>
@@ -1145,11 +1234,15 @@
           <p class="note" id="lmErroSopro" style="color:var(--danger);display:none;margin-top:12px;"></p>
           <div class="actions">
             <button class="btn btn-outline" onclick="fecharLancamentoManual()">Cancelar</button>
-            <button class="btn btn-accent" id="lmBtnSalvarSopro" onclick="lmSalvarSopro()">Confirmar e salvar ✓</button>
+            <button class="btn btn-accent" id="lmBtnSalvarSopro" onclick="lmConferir('sopro')">Confirmar e salvar ✓</button>
           </div>
           <p class="note">Grava uma sessão nova (um <code>id_sessao</code>) na tabela Registros_Sopro, igual a um horário lido da planilha — o valor medido e o limite mín/máx aplicado no momento são salvos juntos.</p>
         </div>
       </div>
+
+      <!-- CONFERÊNCIA (antes de gravar) e CONCLUÍDO (pergunta do WhatsApp) -->
+      <div id="lmConferencia" hidden></div>
+      <div id="lmConcluido" hidden></div>
 
     </div>
   </div>
@@ -1168,7 +1261,11 @@ const msalConfig = {
     clientId: "f518fc60-a544-45d1-89a9-97e9f6b523ad",
     authority: "https://login.microsoftonline.com/b38f2dcb-4251-4b93-977a-f469eb315033",
     redirectUri: "https://qualidadeblowpet.github.io/inspecao-qualidade/processo.html"
-  }
+  },
+  // localStorage: o login fica guardado no aparelho (celular/tablet da operação não precisa entrar
+  // de novo a cada vez que o navegador é fechado). O padrão do MSAL (sessionStorage) pedia login
+  // de novo em toda sessão nova do navegador.
+  cache: { cacheLocation: "localStorage" }
 };
 const graphScopes = ["Files.ReadWrite", "User.Read"];
 // Link de compartilhamento da planilha "Controle de Processo - BlowPet.xlsx" (SharePoint/OneDrive).
@@ -3253,6 +3350,14 @@ function aposLogin(){
   document.getElementById('viewLogin').hidden = true;
   document.getElementById('app').hidden = false;
   document.getElementById('userEmail').textContent = contaAtual.username;
+  // Celular/tablet: versão da operação (sem o menu lateral). Não carrega a tabela inteira de
+  // registros — só as últimas linhas, quando a pessoa escolhe Injetora ou Sopro.
+  if (modoOperacao()){
+    opIniciar();
+    conectarPlanilha();
+    return;
+  }
+  if (ehAparelhoToque()) document.getElementById('btnVersaoOperacao').hidden = false;
   // Dashboard é a página inicial — carrega os registros assim que a planilha conectar.
   conectarPlanilha().then(function(ok){ if (ok) carregarRegistrosInjecao(); });
 }
@@ -3361,7 +3466,8 @@ function abrirLancamentoManual(processo){
   var ehInjecao = processo === 'injecao';
   document.getElementById('lmFormInjecao').hidden = !ehInjecao;
   document.getElementById('lmFormSopro').hidden = ehInjecao;
-  document.getElementById('lmFsTitle').textContent = 'Novo lançamento manual — ' + (ehInjecao ? 'Injeção' : 'Sopro');
+  document.getElementById('lmFsTitle').textContent = 'Registro do Check List — ' + (ehInjecao ? 'Injeção' : 'Sopro');
+  document.getElementById('lmConferencia').hidden = true; document.getElementById('lmConcluido').hidden = true; LMC = null;
 
   if (ehInjecao){
     document.getElementById('lmErroInjecao').style.display = 'none';
@@ -3384,7 +3490,8 @@ function abrirLancamentoManual(processo){
     var maquinasSopro = ['Multipet 1','Multipet 2','SB01','Unipet 1']; // ordem física, não alfabética das chaves do objeto
     lmPopularSelect('lmMaquinaS', maquinasSopro, 'Selecione a máquina');
     document.getElementById('lmMaquinaS').value = 'Multipet 1';
-    lmPopularSelect('lmResponsavelS', lmOpcoesLista('operadoresSopro'), 'Selecione o operador');
+    document.getElementById('lmResponsavelS').value = '';
+    document.getElementById('lmOperadoresS').innerHTML = lmOpcoesLista('operadoresSopro').map(function(v){ return '<option value="'+escHtml(v)+'">'; }).join('');
     lmPopularSelect('lmFrascoS', lmOpcoesLista('frascos'), 'Selecione o frasco');
     document.getElementById('lmAgoraS').value = lmAgora().exibicao;
     LM.gramaturaSopro = ''; LM.corSopro = '';
@@ -3394,6 +3501,7 @@ function abrirLancamentoManual(processo){
 function fecharLancamentoManual(){
   document.getElementById('lmFullscreen').hidden = true;
   document.body.style.overflow = '';
+  if (document.body.classList.contains('modo-op') && OP.proc && !OP.dados[OP.proc]){ opRenderDash(); opCarregar(OP.proc); }
 }
 
 function lmLinhaParam(nome, valor, status, idx, funcaoOnInput){
@@ -3443,65 +3551,457 @@ function lmAtualizarValorInjecao(idx, novoValor){
   if (pill){ pill.className = 'flagpill ' + status; pill.textContent = status==='ok'?'OK':status==='bad'?'Fora':'—'; }
 }
 
-async function lmSalvarInjecao(){
-  var maquina = document.getElementById('lmMaquinaI').value;
-  var responsavel = document.getElementById('lmResponsavelI').value.trim();
-  var gramatura = document.getElementById('lmGramaturaI').value;
-  var erroEl = document.getElementById('lmErroInjecao');
+// =============================================================================
+// Versão da OPERAÇÃO (celular/tablet) — aprovada pelo Cleber em 29/10/2026 (modelo "Operação no
+// celular"). Em aparelho de toque, o menu lateral some e aparecem só dois botões (Injetora /
+// Sopro); cada um leva a um resumo com os últimos 8 registros de cada máquina e ao botão
+// "Registro do Check List". No computador, nada muda. O link "Abrir versão completa" (guardado
+// no navegador, chave processoModo=completo) permite usar o sistema inteiro num celular, e
+// "Voltar à versão da operação" (no menu, só em aparelho de toque) desfaz isso.
+// =============================================================================
+function ehAparelhoToque(){
+  try { return window.matchMedia('(hover: none) and (pointer: coarse)').matches; } catch (e) { return false; }
+}
+function modoOperacao(){
+  if (window.__MODO_OPERACAO__ !== undefined) return !!window.__MODO_OPERACAO__; // hook de teste
+  try { if (localStorage.getItem('processoModo') === 'completo') return false; } catch (e) {}
+  return ehAparelhoToque();
+}
+function usarVersaoCompleta(){
+  try { localStorage.setItem('processoModo', 'completo'); } catch (e) {}
+  location.reload();
+}
+function usarVersaoOperacao(){
+  try { localStorage.removeItem('processoModo'); } catch (e) {}
+  location.reload();
+}
+
+var OP = { proc: null, dados: { inj: null, sop: null }, carregando: false };
+var MAQUINAS_SOPRO_ORDEM = ['Multipet 1','Multipet 2','SB01','Unipet 1'];
+
+function opIniciar(){
+  document.body.classList.add('modo-op');
+  document.getElementById('opApp').hidden = false;
+  document.getElementById('opEmail').textContent = contaAtual ? contaAtual.username : '';
+  opIr('home');
+}
+function opIr(tela){
+  document.getElementById('opHome').hidden = tela !== 'home';
+  document.getElementById('opDash').hidden = tela !== 'dash';
+  opFecharSheet();
+  document.getElementById('opApp').scrollTop = 0;
+}
+function opAbrirProcesso(p){
+  OP.proc = p;
+  document.getElementById('opDashTitulo').textContent = p === 'inj' ? 'Injetora' : 'Sopro';
+  opIr('dash');
+  opRenderDash();
+  if (!OP.dados[p]) opCarregar(p);
+}
+function opNovoRegistro(){ abrirLancamentoManual(OP.proc === 'inj' ? 'injecao' : 'sopro'); }
+
+// Lê só as últimas N linhas da tabela de registros (no celular, baixar as dezenas de milhares
+// de linhas inteiras seria lento). Usa o endereço da tabela pra saber quantas linhas tem e pede
+// só o final ($skip/$top). Se isso não funcionar, cai na leitura completa e corta o final.
+async function carregarUltimasLinhas(tabela, cols, n, token){
+  var base = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + tabela;
+  var linhas = null;
+  try {
+    var end = await enderecoTabela(tabela, token);
+    if (end && end.linhaFim){
+      var total = end.linhaFim - end.linhaCab;
+      var skip = Math.max(0, total - n);
+      var r = await fetchGraphComRetry(base + '/rows?$skip=' + skip + '&$top=' + n, { headers: { Authorization: 'Bearer ' + token } });
+      if (r.ok){ var j = await r.json(); linhas = j.value || []; }
+    }
+  } catch (e) { linhas = null; }
+  if (!linhas){
+    var r2 = await fetchGraphComRetry(base + '/rows', { headers: { Authorization: 'Bearer ' + token } });
+    if (!r2.ok) throw new Error('não consegui ler os registros (status ' + r2.status + ')');
+    var j2 = await r2.json();
+    linhas = (j2.value || []).slice(-n);
+  }
+  return linhas.map(function(row){
+    var v = row.values[0], obj = {};
+    cols.forEach(function(campo, i){ obj[campo] = normalizarValorDataHora(campo, v[i]); });
+    return obj;
+  });
+}
+
+async function opCarregar(p){
+  var el = document.getElementById('opCards');
+  el.innerHTML = '<div class="loading-row"><div class="spinner"></div> Carregando os últimos registros…</div>';
+  try {
+    var token = await getToken();
+    var regs = p === 'inj'
+      ? await carregarUltimasLinhas('TabelaRegistrosInjecao', COLS_INJ, 3500, token)
+      : await carregarUltimasLinhas('TabelaRegistrosSopro', COLS_SOPRO, 3000, token);
+    OP.dados[p] = regs;
+  } catch (err) {
+    OP.dados[p] = [];
+    mostrarToast('Não consegui carregar os registros: ' + err.message, true);
+  }
+  if (OP.proc === p) opRenderDash();
+}
+
+// Agrupa as linhas (uma por parâmetro) em sessões (um registro de horário) e separa por máquina.
+function opSessoesPorMaquina(regs){
+  var porId = {}, ordem = [];
+  regs.forEach(function(r){
+    var id = r.id_sessao || (r.data + '|' + r.hora + '|' + r.maquina + '|' + r.criado_em);
+    if (!porId[id]){
+      porId[id] = { id: id, data: r.data, hora: r.hora, maquina: r.maquina, responsavel: r.responsavel, gramatura: r.gramatura, cor: r.cor, resina: r.resina, frasco: r.frasco, justificativa: '', criado_em: r.criado_em, valores: {}, nFora: 0, nCrit: 0 };
+      ordem.push(id);
+    }
+    var s = porId[id];
+    s.valores[r.parametro] = { valor: r.valor_medido, dentro: r.dentro_criterio, min: r.tolerancia_min_aplicada, max: r.tolerancia_max_aplicada };
+    if (r.dentro_criterio === 'NÃO'){ s.nFora++; s.nCrit++; } else if (r.dentro_criterio === 'SIM') s.nCrit++;
+    if (r.justificativa && !s.justificativa) s.justificativa = String(r.justificativa);
+  });
+  var porMaq = {};
+  ordem.forEach(function(id){
+    var s = porId[id]; s.t = parseDataHoraBR(s.data, s.hora);
+    if (!s.t) return;
+    var k = normMaquina(s.maquina); if (!k) return;
+    (porMaq[k] = porMaq[k] || { rotulos: {}, sessoes: [] }).sessoes.push(s);
+    porMaq[k].rotulos[s.maquina] = (porMaq[k].rotulos[s.maquina] || 0) + 1;
+  });
+  return porMaq;
+}
+
+function opRenderDash(){
+  var el = document.getElementById('opCards');
+  var p = OP.proc, regs = OP.dados[p];
+  if (!regs) return;
+  var porMaq = opSessoesPorMaquina(regs);
+  var nomes = p === 'inj' ? (listas.maquinas || []).map(function(i){ return i.valor; }) : MAQUINAS_SOPRO_ORDEM.slice();
+  Object.keys(porMaq).forEach(function(k){
+    if (!nomes.some(function(n){ return normMaquina(n) === k; })){
+      var rot = porMaq[k].rotulos; nomes.push(Object.keys(rot).sort(function(a,b){ return rot[b] - rot[a]; })[0]);
+    }
+  });
+  if (p === 'inj') nomes.sort(function(a,b){ return a.localeCompare(b, 'pt-BR', { numeric: true }); });
+  OP.cards = nomes.map(function(nome){
+    var m = porMaq[normMaquina(nome)];
+    var ses = m ? m.sessoes.slice().sort(function(a,b){ return a.t - b.t; }).slice(-8) : [];
+    return { nome: nome, sessoes: ses };
+  });
+  if (!OP.cards.length){ el.innerHTML = '<p class="note">Nenhuma máquina cadastrada.</p>'; return; }
+  el.innerHTML = OP.cards.map(function(c, ci){
+    var ult = c.sessoes[c.sessoes.length - 1];
+    var nf = c.sessoes.filter(function(s){ return s.nFora > 0; }).length;
+    var temCrit = c.sessoes.some(function(s){ return s.nCrit > 0; });
+    var produto = ult ? (p === 'inj' ? (ult.gramatura || '—') + ' · ' + (ult.resina || '—') : (ult.frasco || '—') + ' · ' + (ult.gramatura || '—')) : '';
+    var selo = !c.sessoes.length ? '' : !temCrit ? '<span class="critpill vazio">sem critério</span>' : nf ? '<span class="critpill nao">' + nf + ' c/ fora</span>' : '<span class="critpill sim">ok</span>';
+    var dots = '';
+    for (var i = 0; i < 8; i++){
+      var s = c.sessoes[i];
+      if (!s){ dots += '<span class="op-dbtn vazio"><span class="op-dot vazio"></span>&nbsp;</span>'; continue; }
+      var st = s.nFora > 0 ? 'bad' : s.nCrit > 0 ? 'ok' : 'none';
+      dots += '<button type="button" class="op-dbtn" onclick="opAbrirRegistro(' + ci + ',' + i + ')" aria-label="' + escHtml(c.nome + ' ' + s.data + ' ' + s.hora) + '"><span class="op-dot ' + st + '">' + (s.nFora || '') + '</span>' + escHtml(String(s.hora || '').slice(0, 2)) + 'h</button>';
+    }
+    return '<div class="op-card"><div class="op-mrow"><span class="op-mname">' + escHtml(c.nome) + '</span>' + selo + '<span class="op-mprod">' + escHtml(produto) + '</span></div>' +
+      '<div class="op-dots">' + dots + '</div>' +
+      '<div class="op-mfoot"><span>' + (ult ? 'último: ' + escHtml(ult.data.slice(0, 5)) + ' ' + escHtml(ult.hora) + ' · ' + escHtml(ult.responsavel || '') : 'sem registros ainda') + '</span><span>' + c.sessoes.length + ' de 8</span></div></div>';
+  }).join('');
+}
+
+function opGrupos(maquina){
+  if (OP.proc === 'inj') return GRUPOS_PARAMETROS_INJECAO;
+  var g = PARAMETROS_SOPRO[maquina];
+  if (!g){ var k = Object.keys(PARAMETROS_SOPRO).filter(function(x){ return normMaquina(x) === normMaquina(maquina); })[0]; g = k ? PARAMETROS_SOPRO[k] : null; }
+  return g ? Object.keys(g).map(function(k){ return [k, g[k]]; }) : null;
+}
+function opAbrirRegistro(ci, i){
+  var c = OP.cards[ci], s = c.sessoes[i];
+  var foras = Object.keys(s.valores).filter(function(p){ return s.valores[p].dentro === 'NÃO'; });
+  var produto = OP.proc === 'inj' ? (s.gramatura || '—') + ' · ' + (s.resina || '—') + (s.cor ? ' · ' + s.cor : '') : (s.frasco || '—') + ' · ' + (s.gramatura || '—') + (s.cor ? ' · ' + s.cor : '');
+  var html = '<div class="op-grab"></div><div class="op-sheethead"><div><h3>' + escHtml(c.nome) + ' · ' + escHtml(s.hora) + '</h3><div class="note" style="margin:0">' + escHtml(s.data) + ' · ' + escHtml(s.responsavel || '—') + ' · ' + escHtml(produto) + '</div></div><button type="button" class="op-back" onclick="opFecharSheet()" aria-label="Fechar">×</button></div><div class="op-sheetbody">';
+  if (foras.length){
+    html += '<div class="dm-forabox"><h4>' + foras.length + ' fora do critério</h4>' + foras.map(function(p){ var v = s.valores[p]; return '<div class="dm-frow"><span>' + escHtml(p) + '</span><span class="v">' + escHtml(v.valor) + '</span><span class="f">' + escHtml(textoLimite(v.min, v.max)) + '</span></div>'; }).join('') +
+      (s.justificativa ? '<div class="dm-just"><b>Justificativa:</b> ' + escHtml(s.justificativa) + '</div>' : '') + '</div>';
+  } else if (s.nCrit) html += '<div class="dm-okbox"><h4>Todos os parâmetros com critério estão dentro</h4></div>';
+  else html += '<div class="dm-nonebox">Sem critério cadastrado para esta combinação — por isso não tem verde/vermelho.</div>';
+  var grupos = opGrupos(s.maquina) || [['Parâmetros', Object.keys(s.valores)]];
+  grupos.forEach(function(g){
+    var nf = g[1].filter(function(p){ return s.valores[p] && s.valores[p].dentro === 'NÃO'; }).length;
+    html += '<details class="dm-grp"' + (nf ? ' open' : '') + '><summary>' + escHtml(g[0]) + '<span class="dm-cnt">' + (nf ? '<span class="critpill nao">' + nf + ' fora</span>' : '<span class="critpill vazio">' + g[1].length + '</span>') + '</span></summary>' +
+      g[1].map(function(p){ var v = s.valores[p] || {}; var cls = v.dentro === 'NÃO' ? 'bad' : v.dentro === 'SIM' ? 'ok' : '';
+        return '<div class="op-prow"><div>' + escHtml(p) + '<small>' + escHtml(v.dentro ? textoLimite(v.min, v.max) : 'sem critério') + '</small></div><div class="dm-val ' + cls + '">' + escHtml(v.valor === undefined || v.valor === '' ? '—' : v.valor) + '</div></div>'; }).join('') + '</details>';
+  });
+  html += '</div>';
+  document.getElementById('opSheet').innerHTML = html;
+  document.getElementById('opSheetWrap').hidden = false;
+}
+function opFecharSheet(){ var w = document.getElementById('opSheetWrap'); if (w) w.hidden = true; }
+
+// =============================================================================
+// Registro do Check List (antigo "Lançar Manual") — conferência antes de gravar e, depois de
+// gravar, pergunta se quer enviar o PDF pelo WhatsApp (computador e celular).
+// =============================================================================
+var LMC = null; // dados da conferência em andamento
+
+function lmMostrarEtapa(processo, etapa){ // etapa: 'form' | 'conf' | 'fim'
+  var ehInj = processo === 'injecao';
+  document.getElementById('lmFormInjecao').hidden = !(ehInj && etapa === 'form');
+  document.getElementById('lmFormSopro').hidden = !(!ehInj && etapa === 'form');
+  document.getElementById('lmConferencia').hidden = etapa !== 'conf';
+  document.getElementById('lmConcluido').hidden = etapa !== 'fim';
+  document.getElementById('lmFullscreen').scrollTop = 0;
+}
+
+// Monta os dados da conferência a partir do formulário (sem gravar nada).
+function lmMontarConferencia(processo){
+  var ehInj = processo === 'injecao';
+  var ident, grupos, valores;
+  if (ehInj){
+    var maquina = document.getElementById('lmMaquinaI').value, gramatura = document.getElementById('lmGramaturaI').value;
+    ident = { maquina: maquina, responsavel: document.getElementById('lmResponsavelI').value.trim(), gramatura: gramatura, cor: LM.corInjecao, resina: LM.resinaInjecao,
+      produto: gramatura + ' · ' + LM.resinaInjecao, quando: lmAgora() };
+    valores = {}; LM.valoresInjecao.forEach(function(it){ valores[it.parametro] = it.valor; });
+    grupos = GRUPOS_PARAMETROS_INJECAO.map(function(g){
+      return [g[0], g[1].map(function(p){ var tol = lmBuscarTolerancia(maquina, gramatura, p); var v = (valores[p] || '').trim(); return { parametro: p, valor: v, tol: tol, status: lmStatus(v, tol) }; })];
+    });
+  } else {
+    var maqS = document.getElementById('lmMaquinaS').value, frasco = document.getElementById('lmFrascoS').value;
+    ident = { maquina: maqS, responsavel: document.getElementById('lmResponsavelS').value.trim(), frasco: frasco, gramatura: LM.gramaturaSopro, cor: LM.corSopro,
+      produto: frasco + ' · ' + LM.gramaturaSopro, quando: lmAgora() };
+    valores = {}; LM.valoresSopro.forEach(function(it){ valores[it.parametro] = it.valor; });
+    var gs = PARAMETROS_SOPRO[maqS] || {};
+    grupos = Object.keys(gs).map(function(k){
+      return [k, gs[k].map(function(p){ var tol = buscarToleranciaSopro(maqS, LM.gramaturaSopro, LM.corSopro, frasco, p); var v = (valores[p] || '').trim(); return { parametro: p, valor: v, tol: tol, status: lmStatus(v, tol) }; })];
+    });
+  }
+  var todos = []; grupos.forEach(function(g){ todos = todos.concat(g[1]); });
+  return { processo: processo, ident: ident, grupos: grupos, foras: todos.filter(function(x){ return x.status === 'bad'; }),
+    preenchidos: todos.filter(function(x){ return x.valor; }).length, total: todos.length,
+    temCriterio: todos.some(function(x){ return x.tol; }), exigeJustificativa: ehInj, justificativa: '' };
+}
+
+function lmConferir(processo){
+  var ehInj = processo === 'injecao';
+  var erroEl = document.getElementById(ehInj ? 'lmErroInjecao' : 'lmErroSopro');
   function erro(msg){ erroEl.textContent = msg; erroEl.style.display = 'block'; }
   erroEl.style.display = 'none';
-  if (!maquina || !responsavel || !gramatura || !LM.corInjecao || !LM.resinaInjecao){
-    erro('Selecione Máquina, Responsável, Gramatura, Cor e Resina antes de salvar.'); return;
+  if (ehInj){
+    if (!document.getElementById('lmMaquinaI').value || !document.getElementById('lmResponsavelI').value.trim() || !document.getElementById('lmGramaturaI').value || !LM.corInjecao || !LM.resinaInjecao){
+      erro('Preencha Máquina, Responsável, Gramatura, Cor e Resina antes de salvar.'); return;
+    }
+  } else {
+    if (!document.getElementById('lmMaquinaS').value || !document.getElementById('lmResponsavelS').value.trim() || !document.getElementById('lmFrascoS').value || !LM.gramaturaSopro || !LM.corSopro){
+      erro('Preencha Máquina, Responsável, Gramatura, Cor e Frasco antes de salvar.'); return;
+    }
   }
   if (!itemId){ mostrarToast('Ainda conectando com a planilha, aguarde um instante e tente de novo.', true); return; }
+  var justAnterior = LMC && LMC.processo === processo ? LMC.justificativa : '';
+  LMC = lmMontarConferencia(processo);
+  LMC.justificativa = justAnterior;
+  lmRenderConferencia();
+  lmMostrarEtapa(processo, 'conf');
+}
 
-  // Parâmetro fora do critério → justificativa obrigatória antes de gravar.
-  var foras = [];
-  LM.valoresInjecao.forEach(function(item){
-    var tolF = lmBuscarTolerancia(maquina, gramatura, item.parametro);
-    if (lmStatus(item.valor, tolF) === 'bad') foras.push({ parametro: item.parametro, valor: item.valor, limite: textoLimite(tolF.valor_min, tolF.valor_max) });
-  });
-  var justificativa = '';
-  if (foras.length){
-    justificativa = await pedirJustificativa(foras, maquina + ' · lançamento manual');
-    if (justificativa === null) return; // voltou pra corrigir
+function lmRenderConferencia(){
+  var c = LMC, id = c.ident;
+  var html = '<div class="card lmc">' +
+    '<div class="lmc-head"><h3>Conferir antes de salvar</h3><span class="note" style="margin:0">Nada foi gravado ainda</span></div>' +
+    '<div class="lmc-id"><div><span>Máquina</span>' + escHtml(id.maquina) + '</div><div><span>Responsável</span>' + escHtml(id.responsavel) + '</div>' +
+    '<div><span>Produto</span>' + escHtml(id.produto) + '</div><div><span>Cor</span>' + escHtml(id.cor || '—') + '</div>' +
+    '<div><span>Registrado em</span>' + escHtml(id.quando.exibicao) + '</div><div><span>Preenchidos</span>' + c.preenchidos + ' de ' + c.total + '</div></div>';
+  html += '<div class="lmc-chips">' + (!c.temCriterio ? '<span class="critpill vazio">sem critério cadastrado</span>' : c.foras.length ? '<span class="critpill nao">' + c.foras.length + ' fora do critério</span>' : '<span class="critpill sim">tudo dentro do critério</span>') + '</div>';
+  if (c.foras.length){
+    html += '<div class="dm-forabox"><h4>' + c.foras.length + ' fora do critério</h4>' + c.foras.map(function(f){ return '<div class="dm-frow"><span>' + escHtml(f.parametro) + '</span><span class="v">' + escHtml(f.valor) + '</span><span class="f">' + escHtml(textoLimite(f.tol.valor_min, f.tol.valor_max)) + '</span></div>'; }).join('');
+    if (c.exigeJustificativa){
+      html += '<label class="lmc-label" for="lmcJust">Justificativa (obrigatória)</label><textarea id="lmcJust" class="lmc-textarea" placeholder="Por que está trabalhando fora do critério?">' + escHtml(c.justificativa) + '</textarea><p class="just-erro" id="lmcErro" hidden>Escreva a justificativa para concluir.</p>';
+    }
+    html += '</div>';
   }
+  c.grupos.forEach(function(g){
+    var nf = g[1].filter(function(x){ return x.status === 'bad'; }).length;
+    html += '<details class="dm-grp"' + (nf ? ' open' : '') + '><summary>' + escHtml(g[0]) + '<span class="dm-cnt">' + (nf ? '<span class="critpill nao">' + nf + ' fora</span>' : '<span class="critpill vazio">' + g[1].length + '</span>') + '</span></summary>' +
+      g[1].map(function(x){ var cls = x.status === 'none' ? '' : x.status; return '<div class="op-prow"><div>' + escHtml(x.parametro) + '<small>' + escHtml(x.tol ? textoLimite(x.tol.valor_min, x.tol.valor_max) : 'sem critério') + '</small></div><div class="dm-val ' + cls + '">' + escHtml(x.valor || '—') + '</div></div>'; }).join('') + '</details>';
+  });
+  html += '<p class="note">Confira os valores. <b>Editar</b> volta ao formulário com tudo preenchido; <b>Concluir</b> grava na planilha.</p>' +
+    '<p class="note" id="lmcErroGravar" style="color:var(--danger)" hidden></p>' +
+    '<div class="actions"><button class="btn btn-outline" type="button" onclick="lmEditar()">✎ Editar</button><button class="btn btn-accent" type="button" id="lmcBtnConcluir" onclick="lmConcluir()">Concluir ✓</button></div></div>';
+  document.getElementById('lmConferencia').innerHTML = html;
+  var ta = document.getElementById('lmcJust');
+  if (ta) ta.addEventListener('input', function(){ LMC.justificativa = ta.value; });
+}
+function lmEditar(){ lmMostrarEtapa(LMC.processo, 'form'); }
 
-  var btn = document.getElementById('lmBtnSalvarInjecao');
+async function lmConcluir(){
+  var c = LMC;
+  if (c.foras.length && c.exigeJustificativa && !String(c.justificativa || '').trim()){
+    document.getElementById('lmcErro').hidden = false; document.getElementById('lmcJust').focus(); return;
+  }
+  var btn = document.getElementById('lmcBtnConcluir'), errEl = document.getElementById('lmcErroGravar');
+  errEl.hidden = true;
   btn.disabled = true; btn.textContent = 'Salvando…';
   try {
-    var agora = lmAgora();
-    var idSessao = gerarIdSessao();
-    var cabecalho = { maquina: maquina, gramatura: gramatura };
-    var linhas = LM.valoresInjecao.map(function(item){
-      var valor = (item.valor || '').trim() || '—';
-      var tol = lmBuscarTolerancia(maquina, gramatura, item.parametro);
-      var status = lmStatus(valor, tol);
-      var dentro = status === 'ok' ? 'SIM' : status === 'bad' ? 'NÃO' : '';
-      var obj = {
-        id_sessao: idSessao, data: agora.dataStr, hora: agora.horaStr, maquina: maquina, responsavel: responsavel,
-        gramatura: gramatura, cor: LM.corInjecao, resina: LM.resinaInjecao, parametro: item.parametro, valor_medido: valor,
-        tolerancia_min_aplicada: tol ? tol.valor_min : '', tolerancia_max_aplicada: tol ? tol.valor_max : '',
-        dentro_criterio: dentro, criado_em: agora.isoStr, justificativa: justificativa
-      };
-      return COLS_INJ.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; });
-    });
-    var token = await getToken();
-    await prepararColunasTextoRegistrosInjecao(token);
-    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaRegistrosInjecao/rows/add';
-    var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: linhas }) });
-    if (resp.ok){
-      mostrarToast(linhas.length + ' parâmetro(s) salvos — lançamento manual de Injeção ✓');
-      registrosCarregados = null; // próxima visita ao Dashboard/Dados Cadastrados recarrega já com esse lançamento
-      fecharLancamentoManual();
-    } else {
-      var json = await resp.json().catch(function(){ return {}; });
-      erro('Erro ao salvar: ' + (json.error ? json.error.message : resp.status));
+    c.ident.quando = lmAgora(); // hora real da gravação
+    await lmGravar(c);
+    lmTelaConcluido();
+  } catch (err) {
+    errEl.textContent = 'Não foi possível salvar: ' + err.message; errEl.hidden = false;
+    btn.disabled = false; btn.textContent = 'Concluir ✓';
+  }
+}
+
+// Grava a sessão (mesmo formato de antes) — Injeção com a justificativa na 15ª coluna.
+async function lmGravar(c){
+  var id = c.ident, idSessao = gerarIdSessao(), agora = id.quando;
+  var linhas = [];
+  c.grupos.forEach(function(g){ g[1].forEach(function(x){
+    var valor = x.valor || '—';
+    var st = lmStatus(valor, x.tol);
+    var dentro = st === 'ok' ? 'SIM' : st === 'bad' ? 'NÃO' : '';
+    var obj = { id_sessao: idSessao, data: agora.dataStr, hora: agora.horaStr, maquina: id.maquina, responsavel: id.responsavel, parametro: x.parametro, valor_medido: valor,
+      tolerancia_min_aplicada: x.tol ? x.tol.valor_min : '', tolerancia_max_aplicada: x.tol ? x.tol.valor_max : '', dentro_criterio: dentro, criado_em: agora.isoStr,
+      gramatura: id.gramatura, cor: id.cor };
+    if (c.processo === 'injecao'){ obj.resina = id.resina; obj.justificativa = c.foras.length ? c.justificativa.trim() : ''; }
+    else obj.frasco = id.frasco;
+    var cols = c.processo === 'injecao' ? COLS_INJ : COLS_SOPRO;
+    linhas.push(cols.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; }));
+  }); });
+  var token = await getToken();
+  if (c.processo === 'injecao') await prepararColunasTextoRegistrosInjecao(token); else await prepararColunasTextoRegistrosSopro(token);
+  var tabela = c.processo === 'injecao' ? 'TabelaRegistrosInjecao' : 'TabelaRegistrosSopro';
+  var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + tabela + '/rows/add';
+  var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: linhas }) });
+  if (!resp.ok){
+    var json = await resp.json().catch(function(){ return {}; });
+    throw new Error((json.error ? json.error.message : 'status ' + resp.status) + (c.processo === 'sopro' ? ' — confira se as colunas "frasco", "gramatura" e "cor" já existem no final da tabela Registros_Sopro.' : ''));
+  }
+  if (c.processo === 'injecao') registrosCarregados = null; // Dashboard/Dados Cadastrados recarregam já com esse registro
+  OP.dados[c.processo === 'injecao' ? 'inj' : 'sop'] = null;
+  c.salvoLinhas = linhas.length;
+}
+
+// ---- Depois de gravar: pergunta do WhatsApp + PDF ----
+var LM_PDF = null; // { arquivo: File, nome, texto }
+function lmTelaConcluido(){
+  var c = LMC, id = c.ident;
+  var nome = 'Checklist_' + (c.processo === 'injecao' ? 'Injecao' : 'Sopro') + '_' + id.maquina.replace(/[^A-Za-z0-9]+/g, '') + '_' + id.quando.dataStr.replace(/\//g, '-') + '_' + id.quando.horaStr.replace(':', 'h') + '.pdf';
+  document.getElementById('lmConcluido').innerHTML = '<div class="card lmc lmc-fim">' +
+    '<div class="lmc-check">✓</div><h3>Registro salvo</h3>' +
+    '<p class="note" style="margin:0">' + escHtml(id.maquina + ' · ' + id.quando.exibicao + ' · ' + id.responsavel) + (c.foras.length ? ' · ' + c.foras.length + ' fora do critério' : '') + '</p>' +
+    '<div class="lmc-ask" id="lmcAsk"><b>Deseja enviar o PDF pelo WhatsApp?</b>' +
+    '<div class="lmc-file"><i>PDF</i><span>' + escHtml(nome) + '</span></div>' +
+    '<p class="note" id="lmcPdfStatus" style="margin:0">Preparando o PDF…</p>' +
+    '<div class="actions" style="margin-top:0"><button class="btn btn-outline" type="button" onclick="lmFinalizarSemEnviar()">Agora não</button><button class="btn btn-accent" type="button" id="lmcBtnEnviar" onclick="lmEnviarWhatsapp()" disabled>Enviar pelo WhatsApp</button></div></div></div>';
+  lmMostrarEtapa(c.processo, 'fim');
+  LM_PDF = null;
+  // O PDF é gerado logo aqui (antes do toque em "Enviar"): no celular, o "Compartilhar" só abre
+  // se for chamado direto no toque, sem esperar carregamento no meio.
+  lmGerarPdf(c, nome).then(function(arquivo){
+    LM_PDF = { arquivo: arquivo, nome: nome, texto: 'Registro do Check List — ' + (c.processo === 'injecao' ? 'Injeção' : 'Sopro') + ' · ' + id.maquina + ' · ' + id.quando.exibicao + ' · ' + id.responsavel + (c.foras.length ? ' · ' + c.foras.length + ' parâmetro(s) fora do critério' : '') };
+    var st = document.getElementById('lmcPdfStatus'); if (st) st.textContent = 'PDF pronto.';
+    var b = document.getElementById('lmcBtnEnviar'); if (b) b.disabled = false;
+  }).catch(function(err){
+    var st = document.getElementById('lmcPdfStatus'); if (st){ st.textContent = 'Não consegui gerar o PDF (' + err.message + '). O registro já está salvo.'; st.style.color = 'var(--danger)'; }
+  });
+}
+function lmFinalizarSemEnviar(){
+  fecharLancamentoManual();
+  mostrarToast('Registro salvo ✓');
+}
+async function lmEnviarWhatsapp(){
+  if (!LM_PDF) return;
+  var f = LM_PDF.arquivo;
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [f] })){
+      await navigator.share({ files: [f], title: LM_PDF.nome, text: LM_PDF.texto });
+      lmFinalizarEnviado();
+      return;
     }
   } catch (err) {
-    erro('Falha de conexão: ' + err.message);
+    if (err && err.name === 'AbortError') return; // a pessoa fechou o "Compartilhar" — pode tentar de novo
   }
-  btn.disabled = false; btn.textContent = 'Confirmar e salvar ✓';
+  // Sem "Compartilhar" com arquivo (comum no computador): baixa o PDF e abre o WhatsApp Web com o
+  // texto; aí é só anexar o arquivo baixado na conversa.
+  var url = URL.createObjectURL(f);
+  var a = document.createElement('a'); a.href = url; a.download = LM_PDF.nome; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
+  window.open('https://wa.me/?text=' + encodeURIComponent(LM_PDF.texto), '_blank');
+  var ask = document.getElementById('lmcAsk');
+  if (ask) ask.innerHTML = '<b>PDF baixado</b><p class="note" style="margin:0">Este aparelho não permite anexar direto. O WhatsApp abriu numa nova aba — anexe o arquivo <b>' + escHtml(LM_PDF.nome) + '</b> (pasta de downloads) na conversa.</p><div class="actions" style="margin-top:0"><button class="btn btn-accent" type="button" onclick="lmFinalizarSemEnviar()">Concluir</button></div>';
+}
+function lmFinalizarEnviado(){
+  fecharLancamentoManual();
+  mostrarToast('Registro salvo e PDF compartilhado ✓');
+}
+
+// Carrega o jsPDF só quando precisa (primeiro PDF da sessão).
+var _jspdfPromise = null;
+function carregarJsPDF(){
+  if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+  if (_jspdfPromise) return _jspdfPromise;
+  _jspdfPromise = new Promise(function(resolve, reject){
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+    s.onload = function(){ window.jspdf && window.jspdf.jsPDF ? resolve(window.jspdf.jsPDF) : reject(new Error('biblioteca de PDF não carregou')); };
+    s.onerror = function(){ _jspdfPromise = null; reject(new Error('sem conexão com a biblioteca de PDF')); };
+    document.head.appendChild(s);
+  });
+  return _jspdfPromise;
+}
+// As fontes padrão do PDF não têm "≤"/"≥" — troca por "<="/">=".
+function pdfTxt(s){ return String(s === undefined || s === null ? '' : s).replace(/≤/g, '<=').replace(/≥/g, '>=').replace(/[–—]/g, '-'); }
+
+async function lmGerarPdf(c, nome){
+  var JsPDF = await carregarJsPDF();
+  var doc = new JsPDF({ unit: 'mm', format: 'a4' });
+  var M = 14, W = 210 - 2 * M, y = 16, id = c.ident;
+  var cols = [M, M + 100, M + 130, M + 166]; // parâmetro, valor, critério, status
+  function novaPagina(){ doc.addPage(); y = 16; cabecalhoTabela(); }
+  function cabecalhoTabela(){
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(91, 102, 114);
+    doc.text('PARÂMETRO', cols[0], y); doc.text('VALOR', cols[1], y); doc.text('CRITÉRIO', cols[2], y); doc.text('STATUS', cols[3], y);
+    y += 2; doc.setDrawColor(199, 205, 212); doc.line(M, y, M + W, y); y += 4;
+  }
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(31, 45, 61);
+  doc.text(pdfTxt('Registro do Check List — ' + (c.processo === 'injecao' ? 'Injeção' : 'Sopro')), M, y); y += 6;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(91, 102, 114);
+  doc.text('BlowPet · Controle de Processo', M, y); y += 7;
+  var meta = [['Máquina', id.maquina], ['Data/hora', id.quando.exibicao], ['Produto', id.produto], ['Cor', id.cor || '-'], ['Responsável', id.responsavel], ['Fora do critério', String(c.foras.length)]];
+  doc.setFontSize(10);
+  meta.forEach(function(m, k){
+    var x = k % 2 === 0 ? M : M + W / 2;
+    doc.setTextColor(91, 102, 114); doc.text(pdfTxt(m[0] + ':'), x, y);
+    doc.setTextColor(31, 45, 61); doc.text(pdfTxt(m[1]), x + 30, y);
+    if (k % 2 === 1) y += 6;
+  });
+  y += 2;
+  if (c.foras.length && c.justificativa){
+    var linhasJ = doc.splitTextToSize(pdfTxt('Justificativa: ' + c.justificativa), W - 6);
+    doc.setDrawColor(179, 38, 30); doc.rect(M, y - 4, W, linhasJ.length * 5 + 4);
+    doc.setTextColor(31, 45, 61); doc.text(linhasJ, M + 3, y + 1); y += linhasJ.length * 5 + 6;
+  }
+  cabecalhoTabela();
+  c.grupos.forEach(function(g){
+    if (y > 280) novaPagina();
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(31, 45, 61); doc.text(pdfTxt(g[0]), M, y); y += 5;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
+    g[1].forEach(function(x){
+      if (y > 285) novaPagina();
+      var bad = x.status === 'bad', ok = x.status === 'ok';
+      doc.setTextColor(31, 45, 61); doc.text(pdfTxt(x.parametro), cols[0] + 2, y);
+      doc.setTextColor(bad ? 179 : 31, bad ? 38 : 45, bad ? 30 : 61); doc.text(pdfTxt(x.valor || '-'), cols[1], y);
+      doc.setTextColor(91, 102, 114); doc.text(pdfTxt(x.tol ? textoLimite(x.tol.valor_min, x.tol.valor_max) : 'sem critério'), cols[2], y);
+      if (bad){ doc.setTextColor(179, 38, 30); doc.text('Fora', cols[3], y); }
+      else if (ok){ doc.setTextColor(31, 122, 61); doc.text('OK', cols[3], y); }
+      else { doc.setTextColor(91, 102, 114); doc.text('-', cols[3], y); }
+      y += 1.6; doc.setDrawColor(230, 233, 237); doc.line(M, y, M + W, y); y += 3.6;
+    });
+    y += 1.5;
+  });
+  var n = doc.getNumberOfPages();
+  for (var p = 1; p <= n; p++){
+    doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(91, 102, 114);
+    doc.text(pdfTxt('Gerado pelo app Controle de Processo em ' + id.quando.exibicao + ' · página ' + p + ' de ' + n), M, 292);
+  }
+  var blob = doc.output('blob');
+  return new File([blob], nome, { type: 'application/pdf' });
 }
 
 // ---- Sopro ----
@@ -3562,53 +4062,6 @@ function lmAtualizarValorSopro(idx, novoValor){
   inputEl.className = (status==='none'?'':status);
   var pill = row.querySelector('.flagpill');
   if (pill){ pill.className = 'flagpill ' + status; pill.textContent = status==='ok'?'OK':status==='bad'?'Fora':'—'; }
-}
-
-async function lmSalvarSopro(){
-  var maquina = document.getElementById('lmMaquinaS').value;
-  var responsavel = document.getElementById('lmResponsavelS').value;
-  var frasco = document.getElementById('lmFrascoS').value;
-  var erroEl = document.getElementById('lmErroSopro');
-  function erro(msg){ erroEl.textContent = msg; erroEl.style.display = 'block'; }
-  erroEl.style.display = 'none';
-  if (!maquina || !responsavel || !frasco || !LM.gramaturaSopro || !LM.corSopro){
-    erro('Selecione Máquina, Responsável, Gramatura, Cor e Frasco antes de salvar.'); return;
-  }
-  if (!itemId){ mostrarToast('Ainda conectando com a planilha, aguarde um instante e tente de novo.', true); return; }
-
-  var btn = document.getElementById('lmBtnSalvarSopro');
-  btn.disabled = true; btn.textContent = 'Salvando…';
-  try {
-    var agora = lmAgora();
-    var idSessao = gerarIdSessao();
-    var linhas = LM.valoresSopro.map(function(item){
-      var valor = (item.valor || '').trim() || '—';
-      var tol = buscarToleranciaSopro(maquina, LM.gramaturaSopro, LM.corSopro, frasco, item.parametro);
-      var status = lmStatus(valor, tol);
-      var dentro = status === 'ok' ? 'SIM' : status === 'bad' ? 'NÃO' : '';
-      var obj = {
-        id_sessao: idSessao, data: agora.dataStr, hora: agora.horaStr, maquina: maquina, responsavel: responsavel,
-        parametro: item.parametro, valor_medido: valor,
-        tolerancia_min_aplicada: tol ? tol.valor_min : '', tolerancia_max_aplicada: tol ? tol.valor_max : '',
-        dentro_criterio: dentro, criado_em: agora.isoStr, frasco: frasco, gramatura: LM.gramaturaSopro, cor: LM.corSopro
-      };
-      return COLS_SOPRO.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; });
-    });
-    var token = await getToken();
-    await prepararColunasTextoRegistrosSopro(token);
-    var url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaRegistrosSopro/rows/add';
-    var resp = await fetch(url, { method:'POST', headers:{ Authorization:'Bearer '+token, 'Content-Type':'application/json' }, body: JSON.stringify({ values: linhas }) });
-    if (resp.ok){
-      mostrarToast(linhas.length + ' parâmetro(s) salvos — lançamento manual de Sopro ✓');
-      fecharLancamentoManual();
-    } else {
-      var json = await resp.json().catch(function(){ return {}; });
-      erro('Erro ao salvar: ' + (json.error ? json.error.message : resp.status) + ' — confira se as colunas "frasco", "gramatura" e "cor" já existem no final da tabela Registros_Sopro.');
-    }
-  } catch (err) {
-    erro('Falha de conexão: ' + err.message);
-  }
-  btn.disabled = false; btn.textContent = 'Confirmar e salvar ✓';
 }
 
 async function carregarTolerancias(token){
@@ -3799,7 +4252,7 @@ async function enderecoTabela(tabela, token){
   var j = await resp.json();
   var m = String(j.address || '').split('!').pop().match(/^\$?([A-Z]+)\$?(\d+):\$?([A-Z]+)\$?(\d+)$/);
   if (!m) return null;
-  return { colIni: m[1], linhaCab: parseInt(m[2], 10), colFim: m[3], largura: colunaParaNumero(m[3]) - colunaParaNumero(m[1]) + 1 };
+  return { colIni: m[1], linhaCab: parseInt(m[2], 10), colFim: m[3], linhaFim: parseInt(m[4], 10), largura: colunaParaNumero(m[3]) - colunaParaNumero(m[1]) + 1 };
 }
 function agruparConsecutivos(indicesOrdenados){
   var runs = [];
