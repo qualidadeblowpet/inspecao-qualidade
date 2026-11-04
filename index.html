@@ -162,13 +162,98 @@
   .charts-grid .card.wide { grid-column: 1 / -1; }
   .chart-wrap { position: relative; height: 260px; }
   /* "Intervalo entre inspeções": Injeção e Sopro em dois gráficos empilhados, cada um com sua escala */
-  .chart-wrap-48 { height: 210px; }
-  .chart48-sub { border: 1px solid var(--border); border-radius: 10px; padding: 12px 12px 8px; margin-top: 12px; }
-  .chart48-cab { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
-  .chart48-cab span { margin-left: auto; font-weight: 400; font-size: 11.5px; color: var(--text-dim); }
-  .chart48-chip { width: 12px; height: 12px; border-radius: 3px; border: 2px solid; display: inline-block; }
-  .chart48-chip.inj { border-color: #9c7bd9; background: rgba(156,123,217,.25); }
-  .chart48-chip.sop { border-color: #5b9bf2; background: rgba(91,155,242,.25); }
+
+  /* ---------- Dashboard: "Intervalo entre inspeções — últimas 48 horas" (cadastros por máquina) ---------- */
+  :root { --iv-sd: #6b6f76; --iv-dash: #4a4e55; --iv-band-a: rgba(91,155,242,.11); --iv-band-a-b: rgba(91,155,242,.28); --iv-band-b: rgba(156,123,217,.15); --iv-band-b-b: rgba(156,123,217,.32); }
+  body.tema-claro { --iv-dash: #b4b8be; --iv-band-a: rgba(46,95,138,.09); --iv-band-a-b: rgba(46,95,138,.28); --iv-band-b: rgba(124,92,184,.11); --iv-band-b-b: rgba(124,92,184,.3); }
+  .iv-legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 11.5px; color: var(--text-dim); }
+  .iv-legend i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 5px; vertical-align: -2px; }
+  .iv-legend i.iv-ba { background: var(--iv-band-a); border: 1px solid var(--iv-band-a-b); border-radius: 3px; }
+  .iv-legend i.iv-bb { background: var(--iv-band-b); border: 1px solid var(--iv-band-b-b); border-radius: 3px; margin-left: -9px; }
+  .iv-sub { border: 1px solid var(--border); border-radius: 10px; margin-top: 12px; overflow: hidden; }
+  .iv-cab { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; padding: 11px 14px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .iv-tot { margin-left: auto; font-weight: 400; font-size: 11.5px; color: var(--text-dim); }
+  .iv-chip { width: 12px; height: 12px; border-radius: 3px; border: 2px solid; display: inline-block; }
+  .iv-chip.inj { border-color: #9c7bd9; background: rgba(156,123,217,.25); }
+  .iv-chip.sop { border-color: #5b9bf2; background: rgba(91,155,242,.25); }
+  .iv-tb { font-family: var(--font-body); font-size: 11px; font-weight: 500; color: var(--text-dim); background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 3px 9px; cursor: pointer; }
+  .iv-tb:hover { color: var(--text); }
+  .iv-cab .iv-tb:first-of-type { margin-left: 8px; }
+  .iv-lane { display: grid; grid-template-columns: 200px minmax(0,1fr); border-top: 1px solid var(--border); }
+  .iv-lane:first-child { border-top: 0; }
+  .iv-lh { padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 0; border-right: 1px solid var(--border); cursor: pointer; position: relative; }
+  .iv-lh:hover, .iv-sum:hover { background: rgba(128,128,128,.07); }
+  .iv-lh:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .iv-mname { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: .3px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; text-transform: uppercase; padding-right: 22px; }
+  .iv-pill { font-family: var(--font-body); font-size: 9.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; letter-spacing: .3px; white-space: nowrap; }
+  .iv-pill.sd { background: rgba(155,160,168,.15); color: var(--text-dim); } .iv-pill.leve { background: rgba(63,182,139,.15); color: var(--ok); } .iv-pill.medio { background: rgba(242,169,59,.15); color: var(--warn); } .iv-pill.grave { background: rgba(229,72,77,.15); color: var(--danger); }
+  .iv-mprod { font-size: 11.5px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .iv-mfoot { font-size: 11px; color: var(--text-dim); }
+  .iv-chev { position: absolute; right: 12px; top: 50%; margin-top: -8px; width: 16px; height: 16px; color: var(--text-dim); transition: transform .15s; font-size: 11px; display: grid; place-items: center; }
+  .iv-lane.open .iv-chev { transform: rotate(90deg); }
+  .iv-lane.closed .iv-rail { display: none; } .iv-lane.open .iv-sum { display: none; }
+  .iv-lane.closed .iv-lh { padding-top: 9px; padding-bottom: 9px; } .iv-lane.closed .iv-lh .iv-pill, .iv-lane.closed .iv-lh .iv-mfoot { display: none; }
+  .iv-sum { display: flex; align-items: center; gap: 16px; padding: 6px 14px; min-width: 0; cursor: pointer; flex-wrap: wrap; }
+  .iv-mds { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .iv-md { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 0; padding: 0; cursor: pointer; }
+  .iv-md:hover { transform: scale(1.3); }
+  .iv-md.sd { background: var(--iv-sd); } .iv-md.leve { background: var(--ok); } .iv-md.medio { background: var(--warn); } .iv-md.grave { background: var(--danger); }
+  .iv-md.sep { background: none; width: 1px; height: 16px; border-radius: 0; margin: 0 4px; border-left: 1px solid var(--border); cursor: default; }
+  .iv-sx { font-size: 11.5px; color: var(--text-dim); white-space: nowrap; }
+  .iv-sx b { color: var(--text); font-weight: 600; }
+  .iv-sx .iv-lt { color: var(--accent); font-weight: 600; }
+  .iv-rail { overflow-x: auto; min-width: 0; padding: 8px 10px; display: flex; align-items: stretch; gap: 4px; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  .iv-band { flex: 0 0 auto; display: flex; flex-direction: column; gap: 4px; padding: 5px 5px 6px; border-radius: 10px; }
+  .iv-band.a { background: var(--iv-band-a); border: 1px solid var(--iv-band-a-b); } .iv-band.b { background: var(--iv-band-b); border: 1px solid var(--iv-band-b-b); }
+  .iv-rot { font-size: 10px; line-height: 13px; height: 13px; color: var(--text-dim); white-space: nowrap; font-weight: 600; }
+  .iv-items { display: flex; gap: 0; }
+  .iv-it { width: 51px; display: flex; flex-direction: column; align-items: center; gap: 2px; background: none; border: 0; padding: 2px 0; cursor: pointer; color: var(--text-dim); font-family: var(--font-body); }
+  .iv-dot { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; margin-bottom: 3px; transition: transform .1s; }
+  .iv-it:hover .iv-dot, .iv-it:focus-visible .iv-dot { transform: scale(1.15); }
+  .iv-it:focus-visible { outline: none; }
+  .iv-dot.sd { background: var(--iv-sd); } .iv-dot.leve { background: var(--ok); } .iv-dot.medio { background: var(--warn); color: #1a1200; } .iv-dot.grave { background: var(--danger); }
+  .iv-it.sel .iv-dot, .iv-md.sel { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
+  .iv-hm { font-size: 10.5px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.15; }
+  .iv-dm { font-size: 9.5px; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .iv-nome { font-size: 10px; line-height: 1.2; max-width: 49px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); opacity: .85; font-weight: 500; }
+  .iv-gp { flex: 0 0 auto; position: relative; width: 30px; height: 24px; margin-top: 2px; }
+  .iv-gp::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; border-top: 1.5px dashed var(--iv-dash); }
+  .iv-gp .tx { position: absolute; left: 0; right: 0; bottom: 50%; margin-bottom: 3px; text-align: center; font-size: 9.5px; font-weight: 600; color: var(--text-dim); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .iv-rail > .iv-gp { margin-top: 25px; }
+  .iv-gp.fim { width: 52px; }
+  .iv-gp.fim::after { border-top-color: rgba(242,169,59,.65); right: 8px; }
+  .iv-gp.fim .tx { color: var(--accent); right: 8px; }
+  .iv-gp.fim .ag { position: absolute; right: 0; top: 50%; width: 8px; height: 8px; margin-top: -4px; border-radius: 50%; border: 1.5px solid var(--accent); background: var(--surface); }
+  .iv-gp.fim .agt { position: absolute; left: 0; right: 0; top: 50%; margin-top: 3px; text-align: center; font-size: 8.5px; color: var(--text-dim); }
+  .iv-vazio { display: flex; align-items: center; padding: 6px 6px; font-size: 13px; color: var(--text-dim); }
+  .iv-tip { position: fixed; z-index: 90; background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; font-size: 12px; min-width: 200px; max-width: 280px; box-shadow: 0 10px 30px rgba(0,0,0,.45); pointer-events: none; display: none; }
+  .iv-tip .t1 { font-weight: 700; font-size: 13px; display: flex; justify-content: space-between; gap: 10px; }
+  .iv-tip .t2 { color: var(--text-dim); margin-top: 2px; line-height: 1.5; }
+  .iv-tip .d { display: flex; justify-content: space-between; gap: 8px; margin-top: 5px; }
+  .iv-tip .okk { color: var(--ok); margin-top: 5px; }
+  .iv-tip .hint { color: var(--text-dim); font-size: 10.5px; margin-top: 7px; border-top: 1px solid var(--border); padding-top: 6px; }
+  /* gaveta do cadastro */
+  .iv-scrim { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 118; display: none; }
+  .iv-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(520px, 100%); background: var(--surface); border-left: 1px solid var(--border); z-index: 119; display: none; flex-direction: column; box-shadow: -12px 0 36px rgba(0,0,0,.4); }
+  body.iv-aberto .iv-scrim { display: block; } body.iv-aberto .iv-drawer { display: flex; animation: ivEntra .18s ease-out; }
+  @keyframes ivEntra { from { transform: translateX(30px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .iv-dh { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); display: flex; gap: 10px; align-items: flex-start; }
+  .iv-dh h2 { font-family: var(--font-display); font-size: 26px; margin: 0; text-transform: uppercase; letter-spacing: .3px; line-height: 1.05; }
+  .iv-dh .sub2 { font-size: 12.5px; color: var(--text-dim); margin-top: 3px; }
+  .iv-nav { margin-left: auto; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .iv-ib { width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 16px; cursor: pointer; line-height: 1; font-family: var(--font-body); }
+  .iv-ib:disabled { opacity: .35; cursor: default; }
+  .iv-pos { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; min-width: 44px; text-align: center; }
+  .iv-db { overflow-y: auto; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+  .iv-db > * { flex-shrink: 0; }
+  .iv-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .iv-chp { font-size: 11px; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); }
+  .iv-chp b { color: var(--text); font-weight: 600; }
+  .iv-chp.int { border-color: rgba(242,169,59,.45); color: var(--accent); }
+  .iv-df { padding: 12px 18px calc(12px + env(safe-area-inset-bottom,0px)); border-top: 1px solid var(--border); }
+  .iv-wbtn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); font-weight: 700; font-size: 14px; cursor: pointer; font-family: var(--font-body); }
+  .iv-wbtn:hover { background: rgba(242,169,59,.08); }
+  @media (max-width: 760px) { .iv-lane { grid-template-columns: 1fr; } .iv-lh { border-right: 0; border-bottom: 1px solid var(--border); } .iv-lane.closed .iv-lh { border-bottom: 0; padding-bottom: 2px; } }
   /* Responsividade mobile fica no final do CSS, perto do fechamento da tag de estilo */
 
   /* ---------- Table ---------- */
@@ -818,6 +903,11 @@
 </div>
 
 <!-- ===================== APP ===================== -->
+<!-- Dashboard: gaveta do cadastro e balão do "Intervalo entre inspeções" (fora do #opApp, que fica oculto no computador) -->
+<div class="iv-scrim" id="ivScrim" onclick="ivFecharCadastro()"></div>
+<aside class="iv-drawer" id="ivDrawer" aria-label="Cadastro de inspeção" aria-hidden="true"></aside>
+<div class="iv-tip" id="ivTip"></div>
+
 <div id="app" class="hidden">
 
   <div id="opCadBar"><button type="button" class="op-back" onclick="opVoltarDoCadastro(false)" aria-label="Voltar">‹</button><div class="op-ttl" id="opCadTitulo">Cadastro</div></div>
@@ -993,8 +1083,9 @@
 
       <div class="charts-grid">
         <div class="card wide"><h3>Intervalo entre inspeções — últimas 48 horas</h3>
-          <div class="chart48-sub"><div class="chart48-cab"><i class="chart48-chip inj"></i>Injeção<span id="chart48TotInj"></span></div><div class="chart-wrap chart-wrap-48"><canvas id="chart48hInj"></canvas></div></div>
-          <div class="chart48-sub"><div class="chart48-cab"><i class="chart48-chip sop"></i>Sopro<span id="chart48TotSop"></span></div><div class="chart-wrap chart-wrap-48"><canvas id="chart48hSop"></canvas></div></div>
+          <div class="iv-legend"><span><i style="background:var(--iv-sd)"></i>Sem desvio</span><span><i style="background:var(--ok)"></i>Leve</span><span><i style="background:var(--warn)"></i>Médio</span><span><i style="background:var(--danger)"></i>Grave</span><span>nº = desvios</span><span>tracejado = tempo entre cadastros (laranja: do último até agora)</span><span><i class="iv-ba"></i><i class="iv-bb"></i>Fundo = produto (muda de cor quando o produto muda)</span></div>
+          <div class="iv-sub"><div class="iv-cab"><i class="iv-chip inj"></i>Injeção<button type="button" class="iv-tb" onclick="ivTodas('inj', true)">Expandir todas</button><button type="button" class="iv-tb" onclick="ivTodas('inj', false)">Recolher todas</button><span class="iv-tot" id="ivTotInj"></span></div><div id="ivInj"></div></div>
+          <div class="iv-sub"><div class="iv-cab"><i class="iv-chip sop"></i>Sopro<button type="button" class="iv-tb" onclick="ivTodas('sop', true)">Expandir todas</button><button type="button" class="iv-tb" onclick="ivTodas('sop', false)">Recolher todas</button><span class="iv-tot" id="ivTotSop"></span></div><div id="ivSop"></div></div>
         </div>
         <div class="card wide">
           <div class="analise-topo">
@@ -1537,7 +1628,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 /* Data/hora da última atualização deste arquivo (index.html) — atualizar manualmente
    a cada nova versão publicada, só pra controle de qual versão está em uso em cada
    dispositivo. Exibido no rodapé do menu lateral. */
-const ULTIMA_ATUALIZACAO_SISTEMA = '04/11/2026 19:20';
+const ULTIMA_ATUALIZACAO_SISTEMA = '04/11/2026 16:59';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -4119,131 +4210,6 @@ function criarLineChart(canvasId, labels, valores) {
       scales: { x: { ticks: { color: c.tick, font: { size: 10 } }, grid: { display: false } }, y: { ticks: { color: c.tick }, grid: { color: c.grid }, beginAtZero: true } } } });
 }
 
-function atualizarGrafico48h() {
-  const rotulosDate = [];
-  const base = new Date();
-  base.setMinutes(0, 0, 0);
-  for (let i = 47; i >= 0; i--) {
-    rotulosDate.push(new Date(base.getTime() - i * 3600000));
-  }
-  const labels = rotulosDate.map(function(d) {
-    return String(d.getHours()).padStart(2,'0') + 'h';
-  });
-  const gruposData = [];
-  rotulosDate.forEach(function(d, i) {
-    const chave = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate();
-    const rotulo = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
-    const ultimo = gruposData[gruposData.length - 1];
-    if (!ultimo || ultimo.chave !== chave) {
-      gruposData.push({ chave: chave, label: rotulo, startIdx: i, endIdx: i });
-    } else {
-      ultimo.endIdx = i;
-    }
-  });
-  const contInj = new Array(48).fill(0);
-  const contSop = new Array(48).fill(0);
-
-  function processar(linhas, contador) {
-    const vistos = {};
-    (linhas || []).forEach(function(l) {
-      if (!l.id_sessao || vistos[l.id_sessao]) return;
-      vistos[l.id_sessao] = true;
-      if (!l.criado_em) return;
-      const dt = new Date(l.criado_em);
-      if (isNaN(dt.getTime())) return;
-      dt.setMinutes(0, 0, 0);
-      for (let i = 0; i < 48; i++) {
-        if (rotulosDate[i].getTime() === dt.getTime()) { contador[i]++; break; }
-      }
-    });
-  }
-  processar(dadosCache.injecao, contInj);
-  processar(dadosCache.sopro, contSop);
-
-  const c = coresGrafico();
-
-  const pontoMaiorOndeHaInspecao = function(context) {
-    const v = context.raw;
-    return (v && v > 0) ? 5 : 2;
-  };
-  const pontoHoverMaiorOndeHaInspecao = function(context) {
-    const v = context.raw;
-    return (v && v > 0) ? 7 : 3;
-  };
-
-  const bandaDatasPlugin = {
-    id: 'bandaDatas',
-    afterDraw: function(chart, args, opts) {
-      const grupos = opts && opts.grupos;
-      if (!grupos || !grupos.length) return;
-      const xScale = chart.scales.x;
-      const chartArea = chart.chartArea;
-      const bandHeight = 18;
-      const bandTop = xScale.bottom - bandHeight;
-      const ctx = chart.ctx;
-      ctx.save();
-      ctx.font = '10px sans-serif';
-      ctx.fillStyle = opts.textColor || '#8b8f96';
-      ctx.strokeStyle = opts.lineColor || 'rgba(255,255,255,0.15)';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.beginPath();
-      ctx.moveTo(chartArea.left, bandTop);
-      ctx.lineTo(chartArea.right, bandTop);
-      ctx.stroke();
-      grupos.forEach(function(g, idx) {
-        const pxStart = xScale.getPixelForTick(g.startIdx);
-        const pxEnd = xScale.getPixelForTick(g.endIdx);
-        const leftBound = idx === 0 ? chartArea.left : (xScale.getPixelForTick(g.startIdx - 1) + pxStart) / 2;
-        const rightBound = idx === grupos.length - 1 ? chartArea.right : (pxEnd + xScale.getPixelForTick(g.endIdx + 1)) / 2;
-        const centerX = (leftBound + rightBound) / 2;
-        ctx.fillText(g.label, centerX, bandTop + bandHeight / 2 + 1);
-        if (idx > 0) {
-          ctx.beginPath();
-          ctx.moveTo(leftBound, xScale.top);
-          ctx.lineTo(leftBound, xScale.bottom);
-          ctx.stroke();
-        }
-      });
-      ctx.restore();
-    }
-  };
-
-  // Dois gráficos separados (Injeção e Sopro), cada um com a própria escala — antes eram duas linhas no
-  // mesmo gráfico e uma escondia a outra. Mesma contagem (cadastros únicos por hora) de antes.
-  function criarGrafico48h(chave, canvasId, nome, dados, cor, fundo, totalId) {
-    destruirChart(chave);
-    const canvas = document.getElementById(canvasId);
-    if (!canvas) return;
-    const totalEl = document.getElementById(totalId);
-    if (totalEl) { const t = dados.reduce(function(x, y) { return x + y; }, 0); totalEl.textContent = t + ' cadastro' + (t === 1 ? '' : 's') + ' nas 48h'; }
-    charts[chave] = new Chart(canvas.getContext('2d'), {
-      type: 'line',
-      data: { labels: labels, datasets: [
-        { label: nome, data: dados, borderColor: cor, backgroundColor: fundo, fill: true, tension: 0.25, borderWidth: 1.5, pointRadius: pontoMaiorOndeHaInspecao, pointHoverRadius: pontoHoverMaiorOndeHaInspecao }
-      ] },
-      plugins: [bandaDatasPlugin],
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          bandaDatas: { grupos: gruposData, textColor: c.tick, lineColor: c.grid }
-        },
-        scales: {
-          x: {
-            ticks: { color: c.tick, font: { size: 9 }, maxRotation: 0, minRotation: 0, autoSkip: false },
-            grid: { display: false },
-            afterFit: function(scale) { scale.height += 18; }
-          },
-          y: { ticks: { color: c.tick, precision: 0 }, grid: { color: c.grid }, beginAtZero: true, suggestedMax: 2 }
-        }
-      }
-    });
-  }
-  criarGrafico48h('chart48hInj', 'chart48hInj', 'Injeção', contInj, '#9c7bd9', 'rgba(156,123,217,0.12)', 'chart48TotInj');
-  criarGrafico48h('chart48hSop', 'chart48hSop', 'Sopro', contSop, '#5b9bf2', 'rgba(91,155,242,0.12)', 'chart48TotSop');
-}
-
 async function atualizarDashboard() {
   if (!itemId) return;
   const linhas = linhasFiltradasBase();
@@ -4259,6 +4225,7 @@ async function atualizarDashboard() {
   // "Análise do período por máquina": gerada automaticamente junto com o resto do Dashboard (é só
   // cálculo local sobre os dados já carregados, não depende do Chart.js). O botão ficou como "Atualizar".
   try { gerarAnaliseIA(); } catch (e) { console.error('Erro ao gerar análise do período:', e); }
+  try { ivRender48h(); } catch (e) { console.error('Erro ao montar o Intervalo entre inspeções:', e); }
 
   // Chart.js só é carregado aqui, na primeira vez que o Dashboard precisa desenhar um gráfico
   // (ver garantirChartJs). Os KPIs/tabelas acima e abaixo não dependem dela, então continuam
@@ -4284,7 +4251,6 @@ async function atualizarDashboard() {
     const datasOrdenadas = Object.keys(porData).sort();
     criarLineChart('chartEvolucao', datasOrdenadas, datasOrdenadas.map(function(d){return porData[d];}));
 
-    atualizarGrafico48h();
   }
 
   renderTabelaSopro();
@@ -5634,12 +5600,11 @@ function opLinhaPar(rotulo, valor) {
   const cl = u === 'APROVADO' ? ' op-v-ok' : u === 'REPROVADO' ? ' op-v-ruim' : '';
   return '<div class="op-prow"><span>' + opEsc(rotulo) + '</span><span class="op-pv' + cl + '">' + opEsc(valor) + '</span></div>';
 }
-function opAbrirRegistro(ci, i) {
-  const c = OP.cards[ci], r = c && c.sessoes[i];
-  if (!r) return;
-  OP.sel = { ci: ci, i: i };
-  const s = r.s, inj = OP.proc === 'inj';
-  let h = '<div class="op-grab"></div><div class="op-sheethead"><div><h3>' + opEsc(c.nome) + ' · ' + opEsc(String(r.hora || '').slice(0, 5)) + '</h3><div class="op-note">' + opEsc(opDataLonga(r.data)) + ' · ' + opEsc(r.hora) + ' · ' + opEsc(s.responsavel || '—') + '</div></div><button type="button" class="op-back" onclick="opFecharSheet()" aria-label="Fechar">×</button></div><div class="op-sheetbody">';
+// Corpo do cadastro (identificação, desvios, verificações, temperaturas/postos) — usado pela folha do
+// celular/tablet e pela gaveta do computador. abrir=true deixa os grupos já abertos.
+function opCorpoRegistro(r, inj, abrir) {
+  const s = r.s, ab = abrir ? ' open' : '';
+  let h = '';
   if (inj) {
     h += '<div class="op-idg"><div><span>Responsável</span>' + opEsc(s.responsavel || '—') + '</div><div><span>Operador</span>' + opEsc(s.operador_principal || '—') + '</div>' +
       '<div><span>OP – Caixa</span>' + opEsc((s.op || '—') + (s.numero_caixa ? '-' + s.numero_caixa : '')) + '</div><div><span>Produto</span>' + opEsc(formatarGramaturaWpp(s.gramatura) + ' · ' + (s.cor || '—')) + '</div>' +
@@ -5660,23 +5625,32 @@ function opAbrirRegistro(ci, i) {
       h += '<div class="op-des ' + cl + '"><div class="t"><span>' + (k + 1) + '. ' + opEsc(d.defeito) + '</span><span class="badge ' + (cl === 'leve' ? 'leve' : cl === 'medio' ? 'medio' : 'grave') + '">' + opEsc(crit) + '</span></div><div class="m">' +
         (inj ? 'Cavidade(s): ' + opEsc(formatarCavidadesWpp(d.cavidade, d.cavidade_todas)) + '<br>Operador ciente: ' + opEsc(porExtenso(d.operador_ciente)) + '<br>' : '') +
         'Status: ' + opEsc(d.status_correcao || '—') + (d.observacao ? '<br>Obs.: ' + opEsc(d.observacao) : '') + '</div>' +
-        (d.foto_url ? '<a class="op-foto" href="' + opEsc(d.foto_url) + '" target="_blank" rel="noopener">📷 <span>Foto anexada — <b>toque para abrir</b></span></a>' : '') + '</div>';
+        (d.foto_url ? '<a class="op-foto" href="' + opEsc(d.foto_url) + '" target="_blank" rel="noopener">📷 <span>Foto anexada — <b>' + (abrir ? 'clique' : 'toque') + ' para abrir</b></span></a>' : '') + '</div>';
     });
   }
   if (inj) {
-    h += '<details class="op-grp"><summary>Verificações de qualidade</summary>' + opLinhaPar('Organização linha', porExtenso(s.organizacao_linha_produtiva)) + opLinhaPar('Tonalidade preforma', porExtenso(s.tonalidade_preforma)) + opLinhaPar('Alinhamento etiqueta', porExtenso(s.alinhamento_etiqueta_caixa)) + '</details>';
-    h += '<details class="op-grp"><summary>Temperaturas</summary>' + opLinhaPar('Gate mín. / máx.', formatarTemperatura(s.temperatura_gate_min) + ' / ' + formatarTemperatura(s.temperatura_gate_max) + ' °C') + opLinhaPar('Corpo mín. / máx.', formatarTemperatura(s.temperatura_corpo_min) + ' / ' + formatarTemperatura(s.temperatura_corpo_max) + ' °C') + '</details>';
+    h += '<details class="op-grp"' + ab + '><summary>Verificações de qualidade</summary>' + opLinhaPar('Organização linha', porExtenso(s.organizacao_linha_produtiva)) + opLinhaPar('Tonalidade preforma', porExtenso(s.tonalidade_preforma)) + opLinhaPar('Alinhamento etiqueta', porExtenso(s.alinhamento_etiqueta_caixa)) + '</details>';
+    h += '<details class="op-grp"' + ab + '><summary>Temperaturas</summary>' + opLinhaPar('Gate mín. / máx.', formatarTemperatura(s.temperatura_gate_min) + ' / ' + formatarTemperatura(s.temperatura_gate_max) + ' °C') + opLinhaPar('Corpo mín. / máx.', formatarTemperatura(s.temperatura_corpo_min) + ' / ' + formatarTemperatura(s.temperatura_corpo_max) + ' °C') + '</details>';
   } else {
-    h += '<details class="op-grp"><summary>Verificações de qualidade</summary>' + opLinhaPar('Fechamento do saco', porExtenso(s.condicao_fechamento_saco)) + opLinhaPar('Alinhamento dos paletes', porExtenso(s.alinhamento_paletes)) + opLinhaPar('Organização linha', porExtenso(s.organizacao_linha_produtiva)) +
+    h += '<details class="op-grp"' + ab + '><summary>Verificações de qualidade</summary>' + opLinhaPar('Fechamento do saco', porExtenso(s.condicao_fechamento_saco)) + opLinhaPar('Alinhamento dos paletes', porExtenso(s.alinhamento_paletes)) + opLinhaPar('Organização linha', porExtenso(s.organizacao_linha_produtiva)) +
       opLinhaPar('Produto rotulado', porExtenso(s.produto_rotulado)) + opLinhaPar('Condição do rótulo', porExtenso(s.condicao_rotulo)) + opLinhaPar('Teste pela produção', porExtenso(s.teste_producao)) +
       opLinhaPar('Caixa vermelha', porExtenso(s.caixa_vermelha) + (s.motivo_caixa_vermelha ? ' — ' + s.motivo_caixa_vermelha : '')) + '</details>';
     const n = parseInt(s.num_postos_molde, 10) || 0;
     if (n) {
       let postos = '';
       for (let k = 1; k <= n; k++) postos += opLinhaPar('Posto ' + k, (s['peso_' + k] || '—') + ' g · ' + (s['altura_' + k] || '—') + ' mm');
-      h += '<details class="op-grp"><summary>Peso e altura por posto</summary>' + postos + '</details>';
+      h += '<details class="op-grp"' + ab + '><summary>Peso e altura por posto</summary>' + postos + '</details>';
     }
   }
+  return h;
+}
+function opAbrirRegistro(ci, i) {
+  const c = OP.cards[ci], r = c && c.sessoes[i];
+  if (!r) return;
+  OP.sel = { ci: ci, i: i };
+  const s = r.s, inj = OP.proc === 'inj';
+  let h = '<div class="op-grab"></div><div class="op-sheethead"><div><h3>' + opEsc(c.nome) + ' · ' + opEsc(String(r.hora || '').slice(0, 5)) + '</h3><div class="op-note">' + opEsc(opDataLonga(r.data)) + ' · ' + opEsc(r.hora) + ' · ' + opEsc(s.responsavel || '—') + '</div></div><button type="button" class="op-back" onclick="opFecharSheet()" aria-label="Fechar">×</button></div><div class="op-sheetbody">';
+  h += opCorpoRegistro(r, inj, false);
   h += '<div class="op-sendbar"><button type="button" class="op-wbtn" onclick="opEnviarWhatsApp()">📲 Enviar por WhatsApp</button></div></div>';
   document.getElementById('opSheet').innerHTML = h;
   document.getElementById('opSheetWrap').hidden = false;
@@ -5693,6 +5667,178 @@ function opEnviarWhatsApp() {
   const quando = opDataLonga(r.data) + ' - ' + String(r.hora || '').slice(0, 5);
   abrirPerguntaWhatsApp(OP.proc === 'inj' ? 'injecao' : 'sopro', r.linhas, { origem: 'op-consulta', quando: quando });
 }
+
+
+/* ---------------- Dashboard: Intervalo entre inspeções — últimas 48 horas ----------------
+   Uma linha por máquina (recolhida = resumo; aberta = cadastros das últimas 48h com hora, data,
+   responsável, fundo por produto e o tempo entre cadastros). Clicar numa bolinha abre a gaveta do
+   cadastro (mesmo conteúdo da folha do celular). Usa os cadastros que o Dashboard já carregou. */
+const IV = { cards: { inj: [], sop: [] }, abertas: {}, sel: null };
+try { IV.abertas = JSON.parse(localStorage.getItem('inspecaoIvAbertas') || '{}') || {}; } catch (e) { IV.abertas = {}; }
+function ivSalvarAbertas() { try { localStorage.setItem('inspecaoIvAbertas', JSON.stringify(IV.abertas)); } catch (e) {} }
+function ivHM(t) { const d = new Date(t); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+function ivDM(t) { const d = new Date(t); return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0'); }
+function ivDataLonga(t) { return ivDM(t) + '/' + new Date(t).getFullYear(); }
+function ivDur(ms) { const m = Math.max(0, Math.round(ms / 60000)), h = Math.floor(m / 60), r = m % 60; return h ? (r ? h + 'h' + String(r).padStart(2, '0') : h + 'h') : m + 'min'; }
+function ivPrimeiroNome(n) { return String(n || '').trim().split(/\s+/)[0] || '—'; }
+function ivProduto(proc, s) { return proc === 'inj' ? (s.gramatura || '—') + ' · ' + (s.cor || '—') : (s.tipo_frasco || '—') + ' · ' + (s.ml || '—'); }
+function ivChaveLane(proc, nome) { return proc + '|' + opNomeChave(nome); }
+
+function ivMontarCards(proc) {
+  const regs = proc === 'inj' ? dadosCache.injecao : dadosCache.sopro;
+  const agora = Date.now(), ini = agora - 48 * 3600000, d0 = new Date(ini - 24 * 3600000);
+  const minISO = d0.getFullYear() + '-' + String(d0.getMonth() + 1).padStart(2, '0') + '-' + String(d0.getDate()).padStart(2, '0');
+  const recentes = (regs || []).filter(function(l) { return !l.data || String(l.data) >= minISO; });
+  const porMaq = opSessoesPorMaquina(recentes);
+  const nomes = ordenarLista((proc === 'inj' ? listas.equipInjecao : listas.equipSopro) || []);
+  Object.keys(porMaq).forEach(function(k) {
+    if (!nomes.some(function(n) { return opNomeChave(n) === k; })) {
+      const rot = porMaq[k].rotulos; nomes.push(Object.keys(rot).sort(function(a, b) { return rot[b] - rot[a]; })[0]);
+    }
+  });
+  return nomes.map(function(nome) {
+    const m = porMaq[opNomeChave(nome)];
+    const ses = m ? m.sessoes.filter(function(x) { return x.t >= ini && x.t <= agora + 3600000; })
+      .sort(function(a, b) { return a.t - b.t || String(a.criado).localeCompare(String(b.criado)); }) : [];
+    ses.forEach(function(x) { x.prod = ivProduto(proc, x.s); });
+    return { nome: nome, chave: ivChaveLane(proc, nome), sessoes: ses };
+  });
+}
+
+function ivRenderLane(proc, ci, c) {
+  const itens = c.sessoes, ult = itens[itens.length - 1], agora = Date.now();
+  const nCom = itens.filter(function(x) { return x.desvios.length; }).length;
+  const piorG = itens.reduce(function(m, x) { return Math.max(m, x.pior); }, 0);
+  const selo = !itens.length ? '' : !nCom ? '<span class="iv-pill sd">sem desvio</span>' : '<span class="iv-pill ' + opClasseRank(piorG) + '">' + nCom + ' c/ desvio</span>';
+  const grupos = [];
+  itens.forEach(function(x) { const u = grupos[grupos.length - 1]; if (u && u.prod.toLowerCase() === x.prod.toLowerCase()) u.itens.push(x); else grupos.push({ prod: x.prod, itens: [x] }); });
+  const idx = function(x) { return itens.indexOf(x); };
+  let rail = '';
+  if (!itens.length) rail = '<div class="iv-vazio">Não houve cadastro nas últimas 48 horas.</div>';
+  let prev = null;
+  grupos.forEach(function(g, gi) {
+    if (prev) rail += '<div class="iv-gp" title="Intervalo entre os cadastros"><span class="tx">' + ivDur(g.itens[0].t - prev.t) + '</span></div>';
+    rail += '<div class="iv-band ' + (gi % 2 ? 'b' : 'a') + '"><div class="iv-rot" title="' + opEsc(g.prod) + '">' + opEsc(g.prod) + '</div><div class="iv-items">';
+    g.itens.forEach(function(x, xi) {
+      if (xi > 0) rail += '<div class="iv-gp" title="Intervalo entre os cadastros"><span class="tx">' + ivDur(x.t - g.itens[xi - 1].t) + '</span></div>';
+      rail += '<button type="button" class="iv-it" data-p="' + proc + '" data-c="' + ci + '" data-i="' + idx(x) + '" aria-label="' + opEsc(c.nome + ' ' + ivDM(x.t) + ' ' + ivHM(x.t) + ' ' + (x.s.responsavel || '')) + '">' +
+        '<span class="iv-dot ' + opClasseRank(x.pior) + '">' + (x.desvios.length || '') + '</span><span class="iv-hm">' + ivHM(x.t) + '</span><span class="iv-dm">' + ivDM(x.t) + '</span><span class="iv-nome">' + opEsc(ivPrimeiroNome(x.s.responsavel)) + '</span></button>';
+      prev = x;
+    });
+    rail += '</div></div>';
+  });
+  if (ult) rail += '<div class="iv-gp fim" title="Tempo desde o último cadastro até agora"><span class="tx iv-ago" data-t="' + ult.t + '">há ' + ivDur(agora - ult.t) + '</span><span class="ag"></span><span class="agt">agora</span></div>';
+  let maior = 0; for (let q = 1; q < itens.length; q++) maior = Math.max(maior, itens[q].t - itens[q - 1].t);
+  let mds = '';
+  grupos.forEach(function(g, gi) {
+    if (gi) mds += '<i class="iv-md sep"></i>';
+    g.itens.forEach(function(x) { mds += '<button type="button" class="iv-md ' + opClasseRank(x.pior) + '" data-p="' + proc + '" data-c="' + ci + '" data-i="' + idx(x) + '" title="' + ivHM(x.t) + ' ' + ivDM(x.t) + ' · ' + opEsc(ivPrimeiroNome(x.s.responsavel)) + (x.desvios.length ? ' · ' + x.desvios.length + ' desvio(s)' : ' · sem desvio') + '" aria-label="' + opEsc(c.nome + ' ' + ivDM(x.t) + ' ' + ivHM(x.t)) + '"></button>'; });
+  });
+  const sum = !itens.length ? '<div class="iv-sum"><span class="iv-sx">Não houve cadastro nas últimas 48 horas.</span></div>' :
+    '<div class="iv-sum">' + selo + '<div class="iv-mds">' + mds + '</div><span class="iv-sx"><b>' + itens.length + '</b> cadastro' + (itens.length > 1 ? 's' : '') + '</span>' +
+    '<span class="iv-sx">último <span class="iv-lt iv-ago" data-t="' + ult.t + '">há ' + ivDur(agora - ult.t) + '</span> (' + ivHM(ult.t) + ' ' + ivDM(ult.t) + ' · ' + opEsc(ivPrimeiroNome(ult.s.responsavel)) + ')</span>' +
+    (itens.length > 1 ? '<span class="iv-sx">maior intervalo <b>' + ivDur(maior) + '</b></span>' : '') + '</div>';
+  const aberta = !!IV.abertas[c.chave];
+  return '<div class="iv-lane ' + (aberta ? 'open' : 'closed') + '" data-p="' + proc + '" data-c="' + ci + '"><div class="iv-lh" role="button" tabindex="0" aria-expanded="' + (aberta ? 'true' : 'false') + '">' +
+    '<div class="iv-mname">' + opEsc(c.nome) + selo + '</div><div class="iv-mprod">' + (ult ? opEsc(ult.prod) : 'sem cadastros') + '</div>' +
+    '<div class="iv-mfoot">' + (itens.length ? itens.length + ' cadastro' + (itens.length > 1 ? 's' : '') + ' nas 48h' : '') + '</div><span class="iv-chev">▶</span></div>' + sum + '<div class="iv-rail">' + rail + '</div></div>';
+}
+
+function ivRender48h() {
+  const alvo = { inj: document.getElementById('ivInj'), sop: document.getElementById('ivSop') };
+  if (!alvo.inj || !alvo.sop) return;
+  ['inj', 'sop'].forEach(function(proc) {
+    const el = alvo[proc], tot = document.getElementById(proc === 'inj' ? 'ivTotInj' : 'ivTotSop');
+    const guardados = {}; el.querySelectorAll('.iv-lane').forEach(function(l) { const r = l.querySelector('.iv-rail'); if (r) guardados[l.dataset.c] = r.scrollLeft; });
+    if (!dadosHistoricoCarregados) { el.innerHTML = '<div class="iv-vazio" style="padding:14px">Carregando os cadastros…</div>'; tot.textContent = ''; return; }
+    const cards = ivMontarCards(proc); IV.cards[proc] = cards;
+    el.innerHTML = cards.map(function(c, ci) { return ivRenderLane(proc, ci, c); }).join('');
+    let total = 0, comDesv = 0;
+    cards.forEach(function(c) { total += c.sessoes.length; comDesv += c.sessoes.filter(function(x) { return x.desvios.length; }).length; });
+    tot.textContent = total + ' cadastro' + (total === 1 ? '' : 's') + ' nas 48h · ' + comDesv + ' com desvio';
+    el.querySelectorAll('.iv-lane.open .iv-rail').forEach(function(r) { const l = r.parentNode; r.scrollLeft = guardados[l.dataset.c] !== undefined ? guardados[l.dataset.c] : r.scrollWidth; });
+  });
+  ivMarcarSelecionado();
+}
+function ivAlternarLane(lane, abrir) {
+  const proc = lane.dataset.p, c = IV.cards[proc][+lane.dataset.c]; if (!c) return;
+  const abre = abrir === undefined ? lane.classList.contains('closed') : abrir;
+  lane.classList.toggle('open', abre); lane.classList.toggle('closed', !abre);
+  lane.querySelector('.iv-lh').setAttribute('aria-expanded', abre ? 'true' : 'false');
+  if (abre) IV.abertas[c.chave] = 1; else delete IV.abertas[c.chave];
+  ivSalvarAbertas();
+  if (abre) { const r = lane.querySelector('.iv-rail'); r.scrollLeft = r.scrollWidth; }
+}
+function ivTodas(proc, abrir) { document.querySelectorAll('#' + (proc === 'inj' ? 'ivInj' : 'ivSop') + ' .iv-lane').forEach(function(l) { ivAlternarLane(l, abrir); }); }
+function ivAtualizarAgora() { const t = Date.now(); document.querySelectorAll('.iv-ago').forEach(function(e) { e.textContent = 'há ' + ivDur(t - (+e.dataset.t)); }); }
+
+// balão ao passar o mouse
+function ivMostrarTip(btn) {
+  const c = IV.cards[btn.dataset.p][+btn.dataset.c], x = c && c.sessoes[+btn.dataset.i], tip = document.getElementById('ivTip'); if (!x) return;
+  let h = '<div class="t1"><span>' + opEsc(c.nome) + '</span><span>' + ivHM(x.t) + '</span></div><div class="t2">' + ivDataLonga(x.t) + ' · Responsável: <b style="color:var(--text)">' + opEsc(x.s.responsavel || '—') + '</b><br>Produto: ' + opEsc(x.prod) + '</div>';
+  if (!x.desvios.length) h += '<div class="okk">Sem desvio</div>';
+  else x.desvios.forEach(function(d) { const cl = opClasseRank(opRankCrit(d.criticidade)); h += '<div class="d"><span>' + opEsc(d.defeito) + '</span><span class="badge ' + cl + '">' + opEsc(String(d.criticidade || '—').toUpperCase()) + '</span></div>'; });
+  h += '<div class="hint">Clique para abrir o cadastro</div>';
+  tip.innerHTML = h; tip.style.display = 'block';
+  const r = btn.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+  let px = r.left + r.width / 2 - tw / 2, py = r.top - th - 8; if (py < 6) py = r.bottom + 8;
+  tip.style.left = Math.max(6, Math.min(px, window.innerWidth - tw - 6)) + 'px'; tip.style.top = py + 'px';
+}
+function ivEsconderTip() { const t = document.getElementById('ivTip'); if (t) t.style.display = 'none'; }
+
+// gaveta do cadastro
+function ivAbrirCadastro(proc, ci, i) {
+  const c = IV.cards[proc][ci], r = c && c.sessoes[i]; if (!r) return;
+  IV.sel = { p: proc, c: ci, i: i };
+  const s = r.s, inj = proc === 'inj', prev = c.sessoes[i - 1], prox = c.sessoes[i + 1];
+  let h = '<div class="iv-dh"><div><h2>' + opEsc(c.nome) + ' · ' + opEsc(ivHM(r.t)) + '</h2><div class="sub2">' + opEsc(opDataLonga(r.data)) + ' · Responsável: ' + opEsc(s.responsavel || '—') + '</div></div>' +
+    '<div class="iv-nav"><button type="button" class="iv-ib" id="ivPrev" ' + (prev ? '' : 'disabled') + ' aria-label="Cadastro anterior" title="Cadastro anterior (←)">‹</button><span class="iv-pos">' + (i + 1) + ' de ' + c.sessoes.length + '</span>' +
+    '<button type="button" class="iv-ib" id="ivProx" ' + (prox ? '' : 'disabled') + ' aria-label="Próximo cadastro" title="Próximo cadastro (→)">›</button><button type="button" class="iv-ib" onclick="ivFecharCadastro()" aria-label="Fechar" title="Fechar (Esc)" style="margin-left:6px">×</button></div></div><div class="iv-db">';
+  h += '<div class="iv-chips"><span class="iv-chp">Produto <b>' + opEsc(r.prod) + '</b></span>' + (prev ? '<span class="iv-chp int">' + ivDur(r.t - prev.t) + ' desde o cadastro anterior</span>' : '<span class="iv-chp">Primeiro cadastro das 48h</span>') + '</div>';
+  h += opCorpoRegistro(r, inj, true);
+  h += '</div><div class="iv-df"><button type="button" class="iv-wbtn" onclick="ivEnviarWhatsApp()">📲 Enviar por WhatsApp</button></div>';
+  const dr = document.getElementById('ivDrawer'); dr.innerHTML = h; dr.setAttribute('aria-hidden', 'false'); dr.querySelector('.iv-db').scrollTop = 0;
+  document.body.classList.add('iv-aberto'); ivEsconderTip();
+  document.getElementById('ivPrev').onclick = function() { if (prev) ivAbrirCadastro(proc, ci, i - 1); };
+  document.getElementById('ivProx').onclick = function() { if (prox) ivAbrirCadastro(proc, ci, i + 1); };
+  ivMarcarSelecionado();
+  const bt = document.querySelector('.iv-it.sel'); if (bt && bt.offsetParent && bt.scrollIntoView) bt.scrollIntoView({ block: 'nearest', inline: 'center' });
+}
+function ivMarcarSelecionado() {
+  document.querySelectorAll('.iv-it.sel, .iv-md.sel').forEach(function(e) { e.classList.remove('sel'); });
+  if (!IV.sel) return;
+  document.querySelectorAll('[data-p="' + IV.sel.p + '"][data-c="' + IV.sel.c + '"][data-i="' + IV.sel.i + '"]').forEach(function(e) { if (e.classList.contains('iv-it') || e.classList.contains('iv-md')) e.classList.add('sel'); });
+}
+function ivFecharCadastro() {
+  document.body.classList.remove('iv-aberto'); const dr = document.getElementById('ivDrawer'); if (dr) dr.setAttribute('aria-hidden', 'true');
+  IV.sel = null; ivMarcarSelecionado();
+}
+function ivEnviarWhatsApp() {
+  if (!IV.sel) return;
+  const c = IV.cards[IV.sel.p][IV.sel.c], r = c && c.sessoes[IV.sel.i]; if (!r) return;
+  const quando = opDataLonga(r.data) + ' - ' + String(r.hora || '').slice(0, 5);
+  abrirPerguntaWhatsApp(IV.sel.p === 'inj' ? 'injecao' : 'sopro', r.linhas, { origem: 'op-consulta', quando: quando });
+}
+document.addEventListener('click', function(e) {
+  const t = e.target; if (!t.closest) return;
+  const bola = t.closest('.iv-it, .iv-md:not(.sep)');
+  if (bola) { ivAbrirCadastro(bola.dataset.p, +bola.dataset.c, +bola.dataset.i); return; }
+  const lane = t.closest('.iv-lane');
+  if (lane && (t.closest('.iv-lh') || t.closest('.iv-sum'))) ivAlternarLane(lane);
+});
+document.addEventListener('mouseover', function(e) { const b = e.target.closest && e.target.closest('.iv-it'); if (b) ivMostrarTip(b); });
+document.addEventListener('mouseout', function(e) { const b = e.target.closest && e.target.closest('.iv-it'); if (b) ivEsconderTip(); });
+document.addEventListener('keydown', function(e) {
+  const t = e.target;
+  if ((e.key === 'Enter' || e.key === ' ') && t.classList && t.classList.contains('iv-lh')) { e.preventDefault(); ivAlternarLane(t.closest('.iv-lane')); return; }
+  if (!document.body.classList.contains('iv-aberto')) return;
+  const waAberto = !document.getElementById('waConfirmaOverlay').classList.contains('hidden');
+  if (e.key === 'Escape' && !waAberto) { ivFecharCadastro(); return; }
+  if (waAberto || (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
+  if (e.key === 'ArrowLeft') { const b = document.getElementById('ivPrev'); if (b && !b.disabled) b.click(); }
+  if (e.key === 'ArrowRight') { const b = document.getElementById('ivProx'); if (b && !b.disabled) b.click(); }
+});
+setInterval(ivAtualizarAgora, 60000);
 
 /* ---------------- Inicialização ---------------- */
 function init() {
