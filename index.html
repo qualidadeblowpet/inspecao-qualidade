@@ -336,6 +336,14 @@
   .remove-desvio { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--text-dim); font-size: 18px; cursor: pointer; line-height: 1; padding: 4px; }
   .remove-desvio:hover { color: var(--danger); }
   .empty-state { text-align: center; padding: 24px 10px; color: var(--text-dim); font-size: 13px; }
+  /* "Foi identificado algum defeito?" sem resposta: destaca o campo em vermelho */
+  .field.campo-erro select { border-color: var(--danger); box-shadow: 0 0 0 2px rgba(229,72,77,0.28); }
+  /* Aviso forte na tela de revisão quando a sessão será gravada como SEM DESVIO */
+  .revisao-sem-desvio { border: 1px solid var(--warn); background: rgba(242,169,59,0.12); border-radius: 10px; padding: 14px; }
+  .revisao-sem-desvio .rsd-titulo { font-weight: 700; color: var(--warn); font-size: 14px; margin-bottom: 6px; }
+  .revisao-sem-desvio .rsd-texto { font-size: 13px; color: var(--text); line-height: 1.5; margin: 0 0 12px; }
+  .revisao-sem-desvio label.rsd-check { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; font-size: 13.5px; color: var(--text); text-transform: none; letter-spacing: 0; margin: 0; }
+  .revisao-sem-desvio label.rsd-check input { width: 20px; height: 20px; margin: 1px 0 0; flex-shrink: 0; accent-color: var(--accent); }
 
   /* Seletor de cavidades (multi-select) */
   .cav-details { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; }
@@ -421,6 +429,12 @@
   .wa-confirma-sub { font-size: 13.5px; color: var(--text-dim); margin: 0 0 26px; line-height: 1.5; }
   .wa-confirma-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .wa-confirma-acoes .btn { padding: 13px; font-size: 14.5px; }
+  .wa-confirma-pilha { display: grid; gap: 10px; }
+  .wa-confirma-pilha .btn { padding: 13px; font-size: 14.5px; }
+  .wa-confirma-pilha .btn.btn-copiado { background: rgba(63,182,139,0.15); border: 1px solid var(--ok); color: var(--ok); }
+  .wa-confirma-link { background: none; border: none; color: var(--text-dim); font-size: 13.5px; padding: 8px; cursor: pointer; font-family: var(--font-body); }
+  .wa-copia-manual { width: 100%; box-sizing: border-box; margin-top: 12px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px; font-size: 12.5px; font-family: var(--font-mono); line-height: 1.5; }
+  .wa-copia-manual.hidden { display: none; }
   .btn-perigo { background: var(--danger); color: #fff; border: 1px solid var(--danger); }
   .btn-perigo:hover { filter: brightness(1.08); }
   .btn-perigo:disabled { opacity: 0.6; }
@@ -722,11 +736,13 @@
     <div class="wa-confirma-card">
       <div class="wa-confirma-icon">✓</div>
       <h2 class="wa-confirma-titulo">Cadastro salvo com sucesso!</h2>
-      <p class="wa-confirma-sub">Deseja enviar esse cadastro por WhatsApp agora?</p>
-      <div class="wa-confirma-acoes">
-        <button class="btn btn-outline btn-block" onclick="responderPerguntaWhatsApp(false)">Não</button>
-        <button class="btn btn-accent btn-block" onclick="responderPerguntaWhatsApp(true)">🟢 Sim, enviar</button>
+      <p class="wa-confirma-sub">Deseja enviar esse cadastro por WhatsApp ou copiar as informações?</p>
+      <div class="wa-confirma-pilha">
+        <button class="btn btn-accent btn-block" onclick="responderPerguntaWhatsApp(true)">🟢 Enviar por WhatsApp</button>
+        <button class="btn btn-outline btn-block" id="waBtnCopiar" onclick="copiarCadastroSalvo()">📋 Copiar informações</button>
+        <button class="wa-confirma-link" onclick="responderPerguntaWhatsApp(false)">Agora não</button>
       </div>
+      <textarea id="waCopiaManual" class="wa-copia-manual hidden" readonly rows="7" aria-label="Texto do cadastro para copiar manualmente"></textarea>
     </div>
   </div>
 
@@ -746,6 +762,18 @@
       <div class="wa-confirma-acoes">
         <button class="btn btn-outline btn-block" onclick="fecharConfirmExclusao()">Cancelar</button>
         <button class="btn btn-block btn-perigo" id="confirmExclusaoBtnOk" onclick="confirmarExclusaoPendente()">Excluir</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wa-confirma-overlay hidden" id="confirmTrocaDefeitoOverlay">
+    <div class="wa-confirma-card">
+      <div class="wa-confirma-icon perigo">⚠️</div>
+      <h2 class="wa-confirma-titulo">Apagar os defeitos lançados?</h2>
+      <p class="wa-confirma-sub" id="confirmTrocaDefeitoSub"></p>
+      <div class="wa-confirma-acoes">
+        <button class="btn btn-outline btn-block" onclick="cancelarTrocaTemDefeito()">Manter defeitos</button>
+        <button class="btn btn-block btn-perigo" onclick="confirmarTrocaTemDefeito()">Apagar e marcar NÃO</button>
       </div>
     </div>
   </div>
@@ -2713,8 +2741,7 @@ async function carregarListasDaPlanilha(tokenPreCarregado, worksheetsPreCarregad
       if (novasListas[chave].length > 0) listas[chave] = novasListas[chave];
     });
     renderListasNaTela();
-    renderFormInjecao();
-    renderFormSopro();
+    atualizarOpcoesDosFormularios();
   } catch (err) {
     console.error('Erro ao carregar listas da planilha:', err);
   }
@@ -2771,6 +2798,33 @@ function preencherSelect(id, opcoes, comTodos) {
   el.innerHTML = html;
 }
 
+/* Atualiza SÓ as opções dos campos de lista dos formulários de Cadastro (Injeção e Sopro), mantendo
+   o que já foi preenchido/escolhido e os desvios lançados. Antes, "Salvar listas" recriava o
+   formulário inteiro do zero — apagando tudo o que o inspetor já tinha digitado e lançado. */
+function atualizarOpcoesDosFormularios() {
+  const mapa = [
+    ['inj_equipamento', 'equipInjecao'], ['inj_responsavel', 'responsaveis'], ['inj_operador', 'operadores'],
+    ['inj_cor', 'coresInjecao'], ['inj_gramatura', 'gramaturas'], ['inj_resina', 'resinas'],
+    ['sop_equipamento', 'equipSopro'], ['sop_responsavel', 'responsaveis'], ['sop_operador', 'operadoresSopro'],
+    ['sop_cor', 'coresSopro'], ['sop_ml', 'mlSopro'], ['sop_frasco', 'tipoFrasco'],
+    ['sop_fornecedorPreforma', 'fornecedoresPreforma'], ['sop_gramaturaPreforma', 'gramaturasPreforma']
+  ];
+  let gramaturaPerdida = false;
+  mapa.forEach(function(par) {
+    const el = document.getElementById(par[0]);
+    if (!el) return;
+    const atual = el.value;
+    preencherSelect(par[0], listas[par[1]]);
+    if (atual && Array.prototype.some.call(el.options, function(o){ return o.value === atual; })) el.value = atual;
+    else if (atual && par[0] === 'inj_gramatura') gramaturaPerdida = true;
+  });
+  // Lista de defeitos pode ter mudado: redesenha os cards (o conteúdo vem do estado, nada se perde)
+  renderDesvios('injecao');
+  renderDesvios('sopro');
+  // Gramatura escolhida deixou de existir na lista: reseta a restrição de cavidades dela
+  if (gramaturaPerdida) verificarCavidadesGramatura();
+}
+
 function renderListasNaTela() {
   document.getElementById('listaResponsaveis').value = listas.responsaveis.join('\n');
   document.getElementById('listaEquipInjecao').value = listas.equipInjecao.join('\n');
@@ -2806,8 +2860,7 @@ async function salvarListas() {
   listas.fornecedoresPreforma = parse('listaFornecedoresPreforma');
   listas.gramaturasPreforma = parse('listaGramaturasPreforma');
   listas.operadoresSopro = parse('listaOperadoresSopro');
-  renderFormInjecao();
-  renderFormSopro();
+  atualizarOpcoesDosFormularios();
   renderCavidadesConfig();
 
   const btn = document.getElementById('btnSalvarListas');
@@ -2858,7 +2911,7 @@ function renderFormInjecao() {
         '<div class="field"><label>Temperatura Corpo — °C Mínima</label><input type="number" step="0.1" id="inj_tempCorpoMin" placeholder="Ex: 245.0"></div>' +
         '<div class="field"><label>Temperatura Corpo — °C Máxima</label><input type="number" step="0.1" id="inj_tempCorpoMax" placeholder="Ex: 255.0"></div>' +
       '</div>' +
-      '<div class="field"><label>Foi identificado algum defeito?</label><select id="inj_temDefeito" onchange="alternarSecaoDesvios(\'injecao\',this.value)"><option value="NAO" selected>NÃO</option><option value="SIM">SIM</option></select></div>' +
+      '<div class="field"><label>Foi identificado algum defeito?</label><select id="inj_temDefeito" onchange="aoMudarTemDefeito(\'injecao\')"><option value="" disabled selected>Selecione…</option><option value="NAO">NÃO</option><option value="SIM">SIM</option></select></div>' +
     '</div>' +
     '<div class="card" id="cardDesviosInjecao"><h3>Desvios encontrados</h3>' +
       '<div id="listaDesviosInjecao"></div>' +
@@ -2875,7 +2928,7 @@ function renderFormInjecao() {
   document.getElementById('inj_data').value = hojeISO();
   document.getElementById('inj_hora_inicio').value = agoraHHMM();
   renderDesvios('injecao');
-  alternarSecaoDesvios('injecao', 'NAO');
+  alternarSecaoDesvios('injecao', '');
 }
 
 function renderFormSopro() {
@@ -2922,7 +2975,7 @@ function renderFormSopro() {
         '<option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4" selected>4</option>' +
       '</select></div>' +
       '<div id="postosMoldeContainer"></div>' +
-      '<div class="field"><label>Foi identificado algum defeito?</label><select id="sop_temDefeito" onchange="alternarSecaoDesvios(\'sopro\',this.value)"><option value="NAO" selected>NÃO</option><option value="SIM">SIM</option></select></div>' +
+      '<div class="field"><label>Foi identificado algum defeito?</label><select id="sop_temDefeito" onchange="aoMudarTemDefeito(\'sopro\')"><option value="" disabled selected>Selecione…</option><option value="NAO">NÃO</option><option value="SIM">SIM</option></select></div>' +
     '</div>' +
     '<div class="card" id="cardDesviosSopro"><h3>Desvios encontrados</h3>' +
       '<div id="listaDesviosSopro"></div>' +
@@ -2942,7 +2995,7 @@ function renderFormSopro() {
   document.getElementById('sop_data').value = hojeISO();
   document.getElementById('sop_hora_inicio').value = agoraHHMM();
   renderDesvios('sopro');
-  alternarSecaoDesvios('sopro', 'NAO');
+  alternarSecaoDesvios('sopro', '');
 }
 
 function listaDesvios(processo) { return processo === 'sopro' ? desviosSopro : desviosInjecao; }
@@ -3040,7 +3093,7 @@ function armazenarFoto(processo, id, files) {
 function alternarSecaoDesvios(processo, valor) {
   const card = document.getElementById(processo === 'sopro' ? 'cardDesviosSopro' : 'cardDesviosInjecao');
   const btnAdd = document.getElementById(processo === 'sopro' ? 'btnAddDesvioSopro' : 'btnAddDesvioInjecao');
-  const travado = (valor === 'NAO');
+  const travado = (valor !== 'SIM'); // '' (ainda sem resposta) e 'NAO' mantêm a seção travada
   card.style.opacity = travado ? '0.45' : '1';
   card.querySelectorAll('input, select, textarea, button').forEach(function(el) { el.disabled = travado; });
   btnAdd.disabled = travado;
@@ -3050,6 +3103,48 @@ function alternarSecaoDesvios(processo, valor) {
   } else if (listaDesvios(processo).length === 0) {
     adicionarDesvio(processo);
   }
+}
+
+/* "Foi identificado algum defeito?" — trocar de SIM para NÃO apagaria os desvios já lançados (com as
+   fotos anexadas), então quando houver conteúdo lançado o app pergunta antes. Enquanto a pergunta
+   estiver aberta o campo continua em SIM; só vira NÃO (e apaga) se a pessoa confirmar. */
+let trocaTemDefeitoPendente = null; // processo aguardando confirmação
+function desviosTemConteudo(processo) {
+  return listaDesvios(processo).some(function(d) {
+    const cav = Array.isArray(d.cavidade) ? d.cavidade.length > 0 : !!d.cavidade;
+    return !!(d.defeito || cav || d.fotoFile || d.observacao);
+  });
+}
+function aoMudarTemDefeito(processo) {
+  const pfx = processo === 'sopro' ? 'sop_' : 'inj_';
+  const select = document.getElementById(pfx + 'temDefeito');
+  if (!select) return;
+  const campo = select.closest('.field');
+  if (campo) campo.classList.remove('campo-erro');
+  if (select.value !== 'SIM' && desviosTemConteudo(processo)) {
+    select.value = 'SIM';
+    trocaTemDefeitoPendente = processo;
+    const n = listaDesvios(processo).length;
+    document.getElementById('confirmTrocaDefeitoSub').textContent =
+      'Você já lançou ' + n + ' desvio' + (n === 1 ? '' : 's') + '. Se marcar NÃO, ' + (n === 1 ? 'ele será apagado' : 'eles serão apagados') + ' junto com as fotos anexadas e a sessão será salva como "Sem desvio".';
+    document.getElementById('confirmTrocaDefeitoOverlay').classList.remove('hidden');
+    return;
+  }
+  alternarSecaoDesvios(processo, select.value);
+}
+function fecharConfirmTrocaDefeito() {
+  document.getElementById('confirmTrocaDefeitoOverlay').classList.add('hidden');
+  trocaTemDefeitoPendente = null;
+}
+function cancelarTrocaTemDefeito() { fecharConfirmTrocaDefeito(); }
+function confirmarTrocaTemDefeito() {
+  const processo = trocaTemDefeitoPendente;
+  fecharConfirmTrocaDefeito();
+  if (!processo) return;
+  const select = document.getElementById((processo === 'sopro' ? 'sop_' : 'inj_') + 'temDefeito');
+  if (select) select.value = 'NAO';
+  alternarSecaoDesvios(processo, 'NAO');
+  salvarRascunho(processo);
 }
 
 function renderDesvios(processo) {
@@ -3167,7 +3262,7 @@ function salvarRascunho(processo) {
         criticidade: d.criticidade, operadorCiente: d.operadorCiente, status: d.status, observacao: d.observacao,
         temFotoPendente: !!d.fotoFile };
     });
-    localStorage.setItem('rascunho_cadastro_' + processo, JSON.stringify({ campos: campos, desvios: desvios, salvoEm: new Date().toISOString() }));
+    localStorage.setItem('rascunho_cadastro_' + processo, JSON.stringify({ v: 2, campos: campos, desvios: desvios, salvoEm: new Date().toISOString() }));
   } catch (e) { /* localStorage indisponível/cheio — rascunho é só um extra, não trava o app */ }
 }
 
@@ -3213,7 +3308,10 @@ function restaurarRascunho(processo) {
 
   // Seção de desvios: reaplica "Foi identificado algum defeito?" pra desbloquear/bloquear a
   // seção do jeito certo, e então substitui a lista pela restaurada
-  const temDefeito = rascunho.campos[pfx + 'temDefeito'] || 'NAO';
+  // Rascunhos antigos (sem "v") nasceram quando "NÃO" era o valor padrão — não dá pra saber se foi
+  // escolha da pessoa, então nesses casos a pergunta volta em branco pra ser respondida de novo.
+  let temDefeito = rascunho.campos[pfx + 'temDefeito'] || '';
+  if (!rascunho.v && temDefeito === 'NAO') temDefeito = '';
   const campoTemDefeito = document.getElementById(pfx + 'temDefeito');
   if (campoTemDefeito) campoTemDefeito.value = temDefeito;
   alternarSecaoDesvios(processo, temDefeito);
@@ -3326,6 +3424,15 @@ function abrirRevisao(processo) {
   }
 
   const temDefeito = document.getElementById(pfx+'temDefeito').value;
+  // A pergunta "Foi identificado algum defeito?" não tem mais valor padrão: precisa ser respondida
+  // (SIM ou NÃO) de propósito, pra uma sessão nunca virar "Sem desvio" só porque ninguém mexeu no campo.
+  if (temDefeito !== 'SIM' && temDefeito !== 'NAO') {
+    const campoTD = document.getElementById(pfx+'temDefeito');
+    const boxTD = campoTD.closest('.field');
+    if (boxTD) { boxTD.classList.add('campo-erro'); boxTD.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+    mostrarToast('ATENÇÃO: responda "Foi identificado algum defeito?" (SIM ou NÃO) antes de salvar.', true);
+    return;
+  }
   const desviosCheck = temDefeito === 'NAO' ? [] : listaDesvios(processo);
   if (temDefeito === 'SIM' && desviosCheck.length === 0) { mostrarToast('Adicione ao menos um desvio.', true); return; }
 
@@ -3484,7 +3591,9 @@ function renderRevisaoHtml(processo, temDefeito, desvios) {
       return '<div class="revisao-desvio"><div class="revisao-desvio-num">DESVIO ' + String(idx+1).padStart(2,'0') + '</div><div class="revisao-desvio-grid">' + campos + '</div></div>';
     }).join('');
   } else {
-    desviosHtml = '<p style="color:var(--text-dim); font-size:13px; margin:0;">Nenhum desvio — sessão será registrada como "Sem desvio".</p>';
+    desviosHtml = '<div class="revisao-sem-desvio"><div class="rsd-titulo">⚠ Esta sessão será salva como SEM DESVIO</div>' +
+      '<p class="rsd-texto">Você respondeu que <b>nenhum defeito</b> foi identificado. Nenhum defeito, cavidade ou foto será gravado. Se encontrou algum defeito, volte em "Ajustar dados" e marque SIM.</p>' +
+      '<label class="rsd-check"><input type="checkbox" id="chkSemDesvio_' + processo + '" onchange="alternarConfirmarSemDesvio(\'' + processo + '\')"> Confirmo que a inspeção não encontrou nenhum defeito</label></div>';
   }
   corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Desvios encontrados' + (temDefeito === 'SIM' ? ' (' + desvios.length + ')' : '') + '</div>' + desviosHtml + '</div>';
 
@@ -3494,14 +3603,26 @@ function renderRevisaoHtml(processo, temDefeito, desvios) {
     corpo +
     '<div class="revisao-acoes">' +
       '<button class="btn btn-outline btn-block" onclick="voltarAjustarDados(\'' + processo + '\')">← Ajustar dados</button>' +
-      '<button class="btn btn-accent btn-block" id="' + btnConfirmarId + '" onclick="confirmarSalvarSessao(\'' + processo + '\')">Confirmar e salvar ✓</button>' +
+      '<button class="btn btn-accent btn-block" id="' + btnConfirmarId + '"' + (temDefeito === 'SIM' ? '' : ' disabled') + ' onclick="confirmarSalvarSessao(\'' + processo + '\')">Confirmar e salvar ✓</button>' +
     '</div>' +
   '</div></div>';
+}
+
+// Sessão "Sem desvio": o botão Confirmar e salvar só libera depois de marcar a confirmação explícita.
+function alternarConfirmarSemDesvio(processo) {
+  const chk = document.getElementById('chkSemDesvio_' + processo);
+  const btn = document.getElementById(processo === 'sopro' ? 'btnConfirmarSopro' : 'btnConfirmarInjecao');
+  if (btn && chk) btn.disabled = !chk.checked;
 }
 
 async function confirmarSalvarSessao(processo) {
   const pfx = processo === 'sopro' ? 'sop_' : 'inj_';
   const temDefeito = document.getElementById(pfx+'temDefeito').value;
+  if (temDefeito !== 'SIM' && temDefeito !== 'NAO') { mostrarToast('Responda se foi identificado algum defeito (SIM ou NÃO) antes de salvar.', true); voltarAjustarDados(processo); return; }
+  if (temDefeito === 'NAO') {
+    const chk = document.getElementById('chkSemDesvio_' + processo);
+    if (!chk || !chk.checked) { mostrarToast('Marque a confirmação de que nenhum defeito foi encontrado para salvar.', true); return; }
+  }
   const desvios = temDefeito === 'NAO' ? [{ defeito: '', cavidade: [], criticidade: '', operadorCiente: '', status: 'SEM DESVIO', observacao: '', fotoFile: null }] : listaDesvios(processo);
   if (temDefeito === 'SIM' && desvios.length === 0) { mostrarToast('Adicione ao menos um desvio.', true); return; }
 
@@ -4832,6 +4953,8 @@ function montarTextoWhatsApp(processo, linhas) {
       if (s.op || s.numero_caixa) {
         texto += '*_OP: ' + (s.op || '—') + '-' + (s.numero_caixa || '—') + '_*\n';
       }
+      texto += '*_Operador: ' + (s.operador_principal || '—') + '_*\n';
+      texto += '*_Responsável: ' + (s.responsavel || '—') + '_*\n';
       g.itens.forEach(function(item) {
         if (!item.defeito) return;
         texto += item.defeito + ' - ' + (item.criticidade || '—') + '\n';
@@ -4846,6 +4969,8 @@ function montarTextoWhatsApp(processo, linhas) {
       const s = g.sessao;
       texto += '*_' + (s.equipamento || '—') + '_*\n';
       texto += (s.tipo_frasco || '—') + ' - ' + (s.ml || '—') + '\n';
+      texto += '*_Operador: ' + (s.operador || '—') + '_*\n';
+      texto += '*_Responsável: ' + (s.responsavel || '—') + '_*\n';
       g.itens.forEach(function(item) {
         if (!item.defeito) return;
         texto += item.defeito + ' - ' + (item.criticidade || '—') + '\n';
@@ -4885,8 +5010,62 @@ function abrirPerguntaWhatsApp(processo, linhasObj) {
   document.getElementById('waConfirmaOverlay').classList.remove('hidden');
 }
 
+// Copia texto pra área de transferência. Tenta a API moderna; se o navegador bloquear (ex.: página
+// sem https, permissão negada), cai no método antigo (textarea + execCommand).
+function copiarTextoParaAreaTransferencia(texto) {
+  function metodoAntigo() {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = texto;
+      ta.setAttribute('readonly', '');
+      ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, texto.length);
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      return ok;
+    } catch (e) { return false; }
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(texto).then(function() { return true; }, function() { return metodoAntigo(); });
+  }
+  return Promise.resolve(metodoAntigo());
+}
+
+// Botão "Copiar informações" da pergunta pós-cadastro: só copia o texto (o mesmo da mensagem do WhatsApp)
+// e mantém o quadro aberto — a pessoa ainda pode enviar pelo WhatsApp ou fechar em "Agora não".
+let waTimerCopiado = null;
+function copiarCadastroSalvo() {
+  const pendente = waPendente;
+  if (!pendente || !pendente.linhasObj || pendente.linhasObj.length === 0) return;
+  const texto = montarTextoWhatsApp(pendente.processo, pendente.linhasObj);
+  const btn = document.getElementById('waBtnCopiar');
+  const manual = document.getElementById('waCopiaManual');
+  copiarTextoParaAreaTransferencia(texto).then(function(ok) {
+    if (ok) {
+      manual.classList.add('hidden');
+      btn.classList.add('btn-copiado');
+      btn.textContent = '✓ Copiado';
+      mostrarToast('Informações copiadas — é só colar onde quiser.');
+      clearTimeout(waTimerCopiado);
+      waTimerCopiado = setTimeout(function() { btn.classList.remove('btn-copiado'); btn.textContent = '📋 Copiar informações'; }, 2200);
+    } else {
+      // Último recurso: mostra o texto já selecionado pra a pessoa copiar manualmente
+      manual.value = texto;
+      manual.classList.remove('hidden');
+      manual.focus(); manual.select();
+      mostrarToast('Não consegui copiar automaticamente — o texto foi selecionado, é só copiar.', true);
+    }
+  });
+}
+
 function responderPerguntaWhatsApp(enviar) {
   document.getElementById('waConfirmaOverlay').classList.add('hidden');
+  const manual = document.getElementById('waCopiaManual');
+  if (manual) { manual.classList.add('hidden'); manual.value = ''; }
+  const btnCopiar = document.getElementById('waBtnCopiar');
+  if (btnCopiar) { btnCopiar.classList.remove('btn-copiado'); btnCopiar.textContent = '📋 Copiar informações'; }
   const pendente = waPendente;
   waPendente = null;
   if (enviar && pendente && pendente.linhasObj && pendente.linhasObj.length > 0) {
