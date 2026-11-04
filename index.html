@@ -450,7 +450,9 @@
   .op-pill.grave { background: rgba(229,72,77,.15); color: var(--danger); }
   .op-dots { display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; }
   .op-dbtn { display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: 0; color: var(--text-dim); cursor: pointer; padding: 2px 0; font-size: 10.5px; font-variant-numeric: tabular-nums; font-family: var(--font-body); }
-  .op-dbtn.vazio { cursor: default; }
+  .op-dbtn .op-hm { color: var(--text); font-weight: 600; line-height: 1.1; }
+  .op-dbtn .op-dm { font-size: 9.5px; line-height: 1.1; opacity: .8; }
+  .op-semcad { text-align: center; padding: 14px 8px; font-size: 13px; color: var(--text-dim); border: 1px dashed var(--border); border-radius: 10px; }
   .op-dot { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff; }
   .op-dot.sd { background: #6b6f76; } .op-dot.leve { background: var(--ok); } .op-dot.medio { background: var(--warn); color: #1a1200; } .op-dot.grave { background: var(--danger); }
   .op-dot.vazio { background: transparent; border: 1.5px dashed var(--border); }
@@ -479,6 +481,7 @@
   .op-okbox h4 { margin: 0 0 3px; font-size: 14px; color: var(--ok); }
   .op-grp { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
   .op-grp summary { padding: 10px 12px; font-size: 13px; font-weight: 600; cursor: pointer; background: var(--surface-2); list-style: none; display: flex; justify-content: space-between; gap: 8px; }
+  .op-pv.op-v-ok { color: var(--ok); font-weight: 700; } .op-pv.op-v-ruim { color: var(--danger); font-weight: 700; }
   .op-prow { display: flex; justify-content: space-between; gap: 10px; padding: 8px 12px; border-top: 1px solid var(--border); font-size: 13px; }
   .op-sendbar { position: sticky; bottom: -22px; margin: 14px -16px -22px; padding: 12px 16px calc(22px + env(safe-area-inset-bottom,0px)); background: linear-gradient(to top, var(--surface) 78%, transparent); }
   .op-wbtn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--accent); background: var(--surface); color: var(--accent); font-weight: 700; font-size: 15px; cursor: pointer; font-family: var(--font-body); }
@@ -803,7 +806,7 @@
     <div class="op-foot"><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div></div>
   </section>
   <section id="opDash" hidden>
-    <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Últimos 8 cadastros de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
+    <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Cadastros das últimas 24 horas (até 8 por máquina)</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
     <div class="op-body">
       <button type="button" class="op-cta" onclick="opNovoCadastro()">＋ Cadastro de Inspeção</button>
       <div class="op-legend"><span><i style="background:#6b6f76"></i>Sem desvio</span><span><i style="background:var(--ok)"></i>Leve</span><span><i style="background:var(--warn)"></i>Médio</span><span><i style="background:var(--danger)"></i>Grave</span><span>(nº = desvios)</span></div>
@@ -1534,7 +1537,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 /* Data/hora da última atualização deste arquivo (index.html) — atualizar manualmente
    a cada nova versão publicada, só pra controle de qual versão está em uso em cada
    dispositivo. Exibido no rodapé do menu lateral. */
-const ULTIMA_ATUALIZACAO_SISTEMA = '09/09/2026 22:10';
+const ULTIMA_ATUALIZACAO_SISTEMA = '04/11/2026 19:20';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -5600,10 +5603,12 @@ function opRenderDash() {
       const rot = porMaq[k].rotulos; nomes.push(Object.keys(rot).sort(function(a, b) { return rot[b] - rot[a]; })[0]);
     }
   });
+  const agora = Date.now(), limite24h = agora - 24 * 3600000;
   OP.cards = nomes.map(function(nome) {
     const m = porMaq[opNomeChave(nome)];
-    const ses = m ? m.sessoes.slice().sort(function(a, b) { return a.t - b.t || String(a.criado).localeCompare(String(b.criado)); }).slice(-8) : [];
-    return { nome: nome, sessoes: ses };
+    const ses = m ? m.sessoes.slice().sort(function(a, b) { return a.t - b.t || String(a.criado).localeCompare(String(b.criado)); }).filter(function(x) { return x.t >= limite24h && x.t <= agora + 3600000; }).slice(-8) : [];
+    const ultGeral = m && m.sessoes.length ? m.sessoes.reduce(function(a, b) { return (b.t > a.t || (b.t === a.t && String(b.criado) > String(a.criado))) ? b : a; }) : null;
+    return { nome: nome, sessoes: ses, ultGeral: ultGeral };
   });
   if (!OP.cards.length) { el.innerHTML = '<div class="op-erro">Nenhuma máquina cadastrada.</div>'; return; }
   el.innerHTML = OP.cards.map(function(c, ci) {
@@ -5613,24 +5618,28 @@ function opRenderDash() {
     const produto = ult ? (p === 'inj' ? (ult.s.gramatura || '—') + ' · ' + (ult.s.cor || '—') : (ult.s.tipo_frasco || '—') + ' · ' + (ult.s.ml || '—')) : '';
     const selo = !c.sessoes.length ? '' : !comDesvio ? '<span class="op-pill sd">sem desvio</span>' : '<span class="op-pill ' + opClasseRank(piorGeral) + '">' + comDesvio + ' c/ desvio</span>';
     let dots = '';
-    for (let i = 0; i < 8; i++) {
-      const s = c.sessoes[i];
-      if (!s) { dots += '<span class="op-dbtn vazio"><span class="op-dot vazio"></span>&nbsp;</span>'; continue; }
-      dots += '<button type="button" class="op-dbtn" onclick="opAbrirRegistro(' + ci + ',' + i + ')" aria-label="' + opEsc(c.nome + ' ' + s.data + ' ' + s.hora) + '"><span class="op-dot ' + opClasseRank(s.pior) + '">' + (s.desvios.length || '') + '</span>' + opEsc(String(s.hora || '').slice(0, 2)) + 'h</button>';
-    }
+    c.sessoes.forEach(function(s, i) {
+      const hm = String(s.hora || '').slice(0, 5);
+      dots += '<button type="button" class="op-dbtn" onclick="opAbrirRegistro(' + ci + ',' + i + ')" aria-label="' + opEsc(c.nome + ' ' + s.data + ' ' + s.hora) + '"><span class="op-dot ' + opClasseRank(s.pior) + '">' + (s.desvios.length || '') + '</span><span class="op-hm">' + opEsc(hm) + '</span><span class="op-dm">' + opEsc(opDataCurta(s.data)) + '</span></button>';
+    });
+    if (!c.sessoes.length) dots = '';
     return '<div class="op-card"><div class="op-mrow"><span class="op-mname">' + opEsc(c.nome) + '</span>' + selo + '<span class="op-mprod">' + opEsc(produto) + '</span></div>' +
-      '<div class="op-dots">' + dots + '</div>' +
-      '<div class="op-mfoot"><span>' + (ult ? 'último: ' + opEsc(opDataCurta(ult.data)) + ' ' + opEsc(ult.hora) + ' · ' + opEsc(ult.s.responsavel || '') : 'sem cadastros ainda') + '</span><span>' + c.sessoes.length + ' de 8</span></div></div>';
+      (c.sessoes.length ? '<div class="op-dots">' + dots + '</div>' : '<div class="op-semcad">Não houve cadastro nas últimas 24 horas.</div>') +
+      '<div class="op-mfoot"><span>' + (ult ? 'último: ' + opEsc(opDataCurta(ult.data)) + ' ' + opEsc(String(ult.hora || '').slice(0, 5)) + ' · ' + opEsc(ult.s.responsavel || '') : (c.ultGeral ? 'último cadastro: ' + opEsc(opDataCurta(c.ultGeral.data)) + ' ' + opEsc(String(c.ultGeral.hora || '').slice(0, 5)) : 'sem cadastros ainda')) + '</span><span>' + (c.sessoes.length ? c.sessoes.length + ' nas últimas 24h' : '') + '</span></div></div>';
   }).join('');
 }
 
-function opLinhaPar(rotulo, valor) { return '<div class="op-prow"><span>' + opEsc(rotulo) + '</span><span>' + opEsc(valor) + '</span></div>'; }
+function opLinhaPar(rotulo, valor) {
+  const u = String(valor || '').trim().toUpperCase();
+  const cl = u === 'APROVADO' ? ' op-v-ok' : u === 'REPROVADO' ? ' op-v-ruim' : '';
+  return '<div class="op-prow"><span>' + opEsc(rotulo) + '</span><span class="op-pv' + cl + '">' + opEsc(valor) + '</span></div>';
+}
 function opAbrirRegistro(ci, i) {
   const c = OP.cards[ci], r = c && c.sessoes[i];
   if (!r) return;
   OP.sel = { ci: ci, i: i };
   const s = r.s, inj = OP.proc === 'inj';
-  let h = '<div class="op-grab"></div><div class="op-sheethead"><div><h3>' + opEsc(c.nome) + ' · ' + opEsc(String(r.hora || '').slice(0, 2)) + 'h</h3><div class="op-note">' + opEsc(opDataLonga(r.data)) + ' · ' + opEsc(r.hora) + ' · ' + opEsc(s.responsavel || '—') + '</div></div><button type="button" class="op-back" onclick="opFecharSheet()" aria-label="Fechar">×</button></div><div class="op-sheetbody">';
+  let h = '<div class="op-grab"></div><div class="op-sheethead"><div><h3>' + opEsc(c.nome) + ' · ' + opEsc(String(r.hora || '').slice(0, 5)) + '</h3><div class="op-note">' + opEsc(opDataLonga(r.data)) + ' · ' + opEsc(r.hora) + ' · ' + opEsc(s.responsavel || '—') + '</div></div><button type="button" class="op-back" onclick="opFecharSheet()" aria-label="Fechar">×</button></div><div class="op-sheetbody">';
   if (inj) {
     h += '<div class="op-idg"><div><span>Responsável</span>' + opEsc(s.responsavel || '—') + '</div><div><span>Operador</span>' + opEsc(s.operador_principal || '—') + '</div>' +
       '<div><span>OP – Caixa</span>' + opEsc((s.op || '—') + (s.numero_caixa ? '-' + s.numero_caixa : '')) + '</div><div><span>Produto</span>' + opEsc(formatarGramaturaWpp(s.gramatura) + ' · ' + (s.cor || '—')) + '</div>' +
