@@ -465,6 +465,14 @@
   .lmc-ask b{font-size:15px;}
   .lmc-file{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:12.5px;word-break:break-all;}
   .lmc-file i{font-style:normal;font-weight:800;font-size:11px;color:#fff;background:var(--danger);border-radius:6px;padding:5px 5px;flex:none;white-space:nowrap;word-break:normal;}
+  .pdf-wa{width:100%;background:#25d366;border-color:#25d366;color:#fff;font-weight:700;font-size:15px;padding:13px 16px;}
+  .pdf-wa:hover{filter:brightness(.95);}
+  .pdf-linha{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .pdf-linha .btn{width:100%;}
+  .pdf-corpo{display:flex;flex-direction:column;gap:12px;margin-top:6px;}
+  .pdf-card{max-width:460px;}
+  .op-pdfbtn{background:none;border:1px solid var(--border);color:var(--text);border-radius:8px;font:inherit;font-size:12px;font-weight:600;padding:5px 10px;cursor:pointer;white-space:nowrap;}
+  .op-pdfbtn:active{background:var(--surface-2);}
   @media (max-width: 560px){
     .fullscreen-topbar{padding:12px 16px;}
     .fullscreen-body{padding:16px 14px 60px;}
@@ -3702,7 +3710,7 @@ function opRenderDash(){
     }
     return '<div class="op-card"><div class="op-mrow"><span class="op-mname">' + escHtml(c.nome) + '</span>' + selo + '<span class="op-mprod">' + escHtml(produto) + '</span></div>' +
       '<div class="op-dots">' + dots + '</div>' +
-      '<div class="op-mfoot"><span>' + (ult ? 'último: ' + escHtml(ult.data.slice(0, 5)) + ' ' + escHtml(ult.hora) + ' · ' + escHtml(ult.responsavel || '') : 'sem registros ainda') + '</span><span>' + c.sessoes.length + ' de 8</span></div></div>';
+      '<div class="op-mfoot" style="align-items:center"><span>' + (ult ? 'último: ' + escHtml(ult.data.slice(0, 5)) + ' ' + escHtml(ult.hora) + ' · ' + escHtml(ult.responsavel || '') : 'sem registros ainda') + '</span><button type="button" class="op-pdfbtn" onclick="opPdfDia(' + ci + ')">📄 PDF do dia</button></div></div>';
   }).join('');
 }
 
@@ -3850,6 +3858,7 @@ async function lmConcluir(){
 // Grava a sessão (mesmo formato de antes) — Injeção com a justificativa na 15ª coluna.
 async function lmGravar(c){
   var id = c.ident, idSessao = gerarIdSessao(), agora = id.quando;
+  c.idSessao = idSessao;
   var linhas = [];
   c.grupos.forEach(function(g){ g[1].forEach(function(x){
     var valor = x.valor || '—';
@@ -3877,131 +3886,328 @@ async function lmGravar(c){
   c.salvoLinhas = linhas.length;
 }
 
-// ---- Depois de gravar: pergunta do WhatsApp + PDF ----
-var LM_PDF = null; // { arquivo: File, nome, texto }
+// ---- Depois de gravar: PDF do dia da máquina (07:00 → 07:00) + envio pelo WhatsApp ----
+// Pedido do Cleber (05/11/2026): mesmo padrão do "Resumo do turno" do app de Inspeção da
+// Qualidade — janela "PDF pronto" com Enviar por WhatsApp / Baixar / Ver PDF. O PDF é a folha do
+// checklist do DIA daquela máquina: parâmetros nas linhas, horários nas colunas.
+//  - Horários fixos do checklist: 08, 11, 14, 17, 20, 23, 02, 05 (confirmados pelo Cleber).
+//  - Um registro feito até 1 hora antes/depois de um horário fixo ocupa esse horário; mais longe
+//    que isso, vira uma coluna própria com a hora real ("fora do horário").
+//  - Horário que já passou sem registro = "não feito"; que ainda não chegou = "aguardando".
+// Também dá pra gerar a qualquer hora pelo botão "PDF do dia" de cada máquina (versão da operação).
+var HORAS_CHECKLIST_DIA = [8, 11, 14, 17, 20, 23, 2, 5];
+var TOLERANCIA_SLOT_MIN = 60;
+var INICIO_DIA_H = 7;
+var PDF_ATUAL = null; // { blob, nome, paginas, kb, texto }
+
+function pdTxt(s){ return String(s === undefined || s === null ? '' : s).replace(/[–—]/g, '-').replace(/≤/g, '<=').replace(/≥/g, '>='); }
+function pdP2(n){ return String(n).padStart(2, '0'); }
+function pdHM(d){ return pdP2(d.getHours()) + ':' + pdP2(d.getMinutes()); }
+function pdData(d){ return pdP2(d.getDate()) + '/' + pdP2(d.getMonth() + 1) + '/' + d.getFullYear(); }
+function pdLimite(vmin, vmax){
+  var a = vmin === undefined || vmin === null ? '' : String(vmin).trim();
+  var b = vmax === undefined || vmax === null ? '' : String(vmax).trim();
+  if (a && b) return a === b ? '= ' + a : a + ' - ' + b;
+  if (b) return 'máx. ' + b;
+  if (a) return 'mín. ' + a;
+  return '';
+}
+function inicioDiaProducao(t){
+  var d = new Date(t.getFullYear(), t.getMonth(), t.getDate(), INICIO_DIA_H, 0, 0, 0);
+  if (t < d) d = new Date(d.getTime() - 86400000);
+  return d;
+}
+function montarColunasDia(ini, agora, sessoes){
+  var fim = new Date(ini.getTime() + 86400000);
+  var doDia = sessoes.filter(function(s){ return s.t >= ini && s.t < fim; }).sort(function(a, b){ return a.t - b.t; });
+  var slots = HORAS_CHECKLIST_DIA.map(function(h){
+    return { t: new Date(ini.getFullYear(), ini.getMonth(), ini.getDate() + (h < INICIO_DIA_H ? 1 : 0), h, 0, 0, 0), sessao: null };
+  });
+  var extras = [];
+  doDia.forEach(function(s){
+    var melhor = null, dist = Infinity;
+    slots.forEach(function(sl){
+      var d = Math.abs(s.t - sl.t) / 60000;
+      if (!sl.sessao && d <= TOLERANCIA_SLOT_MIN && d < dist){ melhor = sl; dist = d; }
+    });
+    if (melhor) melhor.sessao = s; else extras.push({ t: s.t, sessao: s, extra: true });
+  });
+  var cols = slots.concat(extras).sort(function(a, b){ return a.t - b.t; });
+  cols.forEach(function(c){
+    if (c.sessao){ c.status = 'feito'; c.rotulo = c.extra ? pdHM(c.sessao.t) : pdP2(c.t.getHours()) + 'h'; c.sub = c.extra ? 'fora do horário' : 'feito ' + pdHM(c.sessao.t); }
+    else if (c.t <= agora){ c.status = 'naofeito'; c.rotulo = pdP2(c.t.getHours()) + 'h'; c.sub = 'não feito'; }
+    else { c.status = 'aguardando'; c.rotulo = pdP2(c.t.getHours()) + 'h'; c.sub = 'aguardando'; }
+  });
+  return { ini: ini, fim: fim, cols: cols, registros: doDia };
+}
+
+// opts: { JsPDF, processo: 'Injeção'|'Sopro', maquina, agora, ini, sessoes, grupos, rotuloProduto, destaque }
+function gerarPdfDia(opts){
+  var doc = new opts.JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
+  var D = montarColunasDia(opts.ini, opts.agora, opts.sessoes);
+  var cols = D.cols, M = 10, W = 297 - 2 * M;
+  var nFeitos = cols.filter(function(c){ return c.status === 'feito'; }).length;
+  var nNao = cols.filter(function(c){ return c.status === 'naofeito'; }).length;
+  var nAg = cols.filter(function(c){ return c.status === 'aguardando'; }).length;
+  var nFora = 0;
+  D.registros.forEach(function(s){ Object.keys(s.valores).forEach(function(p){ if (s.valores[p].dentro === 'NÃO') nFora++; }); });
+  var diaFinal = D.fim.getTime() <= opts.agora.getTime();
+
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(120, 128, 138);
+  doc.text('BLOWPET · CONTROLE DE PROCESSO', M, 11);
+  doc.setFontSize(15); doc.setTextColor(31, 45, 61);
+  doc.text(pdTxt('Check List de Parâmetros — ' + opts.processo + ' · ' + opts.maquina), M, 18);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(91, 102, 114);
+  doc.text(pdTxt('Dia ' + pdData(D.ini) + ' · das 07:00 de ' + pdData(D.ini) + ' às 07:00 de ' + pdData(D.fim) +
+    (diaFinal ? ' · dia encerrado' : ' · parcial até ' + pdHM(opts.agora))), M, 23.5);
+  var kpis = [['Registros feitos', String(nFeitos), [31, 122, 61]], ['Horários não feitos', String(nNao), nNao ? [179, 38, 30] : [31, 45, 61]], ['Aguardando', String(nAg), [91, 102, 114]], ['Valores fora', String(nFora), nFora ? [179, 38, 30] : [31, 122, 61]]];
+  var kw = 30, kx = M + W - kpis.length * kw;
+  kpis.forEach(function(k, i){
+    var x = kx + i * kw;
+    doc.setDrawColor(215, 220, 225); doc.setFillColor(247, 248, 250); doc.roundedRect(x + 1, 8, kw - 2, 15, 1.5, 1.5, 'FD');
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); doc.setTextColor(91, 102, 114); doc.text(pdTxt(k[0]), x + 3, 12);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(k[2][0], k[2][1], k[2][2]); doc.text(k[1], x + 3, 20);
+  });
+
+  var head = [[{ content: 'Parâmetro', styles: { halign: 'left' } }, { content: 'Critério', styles: { halign: 'center' } }].concat(cols.map(function(c){ return { content: c.rotulo + '\n' + c.sub, _col: c }; }))];
+  var body = [];
+  function linhaInfo(rotulo, fn){
+    body.push([{ content: rotulo, styles: { fontStyle: 'bold', textColor: [91, 102, 114] } }, ''].concat(cols.map(function(c){ return { content: c.sessao ? pdTxt(fn(c.sessao)) : '', _col: c, _info: true }; })));
+  }
+  linhaInfo('Responsável', function(s){ return s.responsavel || '-'; });
+  linhaInfo('Produto', opts.rotuloProduto);
+  linhaInfo('Cor', function(s){ return s.cor || '-'; });
+  var ultimoComCriterio = {};
+  D.registros.forEach(function(s){ Object.keys(s.valores).forEach(function(p){ var v = s.valores[p]; if (v.dentro) ultimoComCriterio[p] = v; }); });
+  opts.grupos.forEach(function(g){
+    body.push([{ content: pdTxt(g[0]).toUpperCase(), colSpan: 2 + cols.length, styles: { fontStyle: 'bold', fillColor: [233, 236, 240], textColor: [31, 45, 61], fontSize: 6.4, cellPadding: { top: 0.4, bottom: 0.4, left: 1.2, right: 1.2 } } }]);
+    g[1].forEach(function(p){
+      var ref = ultimoComCriterio[p];
+      body.push([pdTxt(p), { content: ref ? pdTxt(pdLimite(ref.min, ref.max)) : '-', styles: { halign: 'center', textColor: [91, 102, 114] } }].concat(cols.map(function(c){
+        var v = c.sessao ? c.sessao.valores[p] : null;
+        return { content: v && v.valor !== undefined && v.valor !== '' ? pdTxt(v.valor) : (c.sessao ? '-' : ''), _col: c, _fora: !!(v && v.dentro === 'NÃO') };
+      })));
+    });
+  });
+
+  var larguraCols = (W - 62 - 20) / cols.length;
+  var colStyles = { 0: { cellWidth: 62 }, 1: { cellWidth: 20 } };
+  for (var i = 0; i < cols.length; i++) colStyles[i + 2] = { cellWidth: larguraCols, halign: 'center' };
+
+  doc.autoTable({
+    head: head, body: body, startY: 27, margin: { left: M, right: M, top: 14, bottom: 9 },
+    theme: 'grid', columnStyles: colStyles,
+    styles: { font: 'helvetica', fontSize: 6.3, cellPadding: { top: 0.22, bottom: 0.22, left: 1.2, right: 1.2 }, lineColor: [215, 220, 225], lineWidth: 0.15, textColor: [31, 45, 61], valign: 'middle', overflow: 'ellipsize' },
+    headStyles: { fillColor: [31, 45, 61], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 6.8, halign: 'center', valign: 'middle', cellPadding: 0.9 },
+    didParseCell: function(data){
+      var raw = data.cell.raw, c = raw && raw._col;
+      if (!c) return;
+      if (data.section === 'head'){
+        if (c.status === 'naofeito') data.cell.styles.fillColor = [179, 38, 30];
+        else if (c.status === 'aguardando'){ data.cell.styles.fillColor = [200, 205, 211]; data.cell.styles.textColor = [60, 68, 78]; }
+        else if (c.extra) data.cell.styles.fillColor = [138, 97, 0];
+        else data.cell.styles.fillColor = [31, 122, 61];
+        return;
+      }
+      if (c.status === 'naofeito') data.cell.styles.fillColor = [251, 236, 235];
+      else if (c.status === 'aguardando') data.cell.styles.fillColor = [244, 245, 247];
+      if (opts.destaque && c.sessao && c.sessao === opts.destaque && c.status === 'feito') data.cell.styles.fillColor = [255, 247, 230];
+      if (raw._fora){ data.cell.styles.textColor = [179, 38, 30]; data.cell.styles.fontStyle = 'bold'; data.cell.styles.fillColor = [251, 228, 226]; }
+      if (raw._info){ data.cell.styles.fontSize = 5.9; data.cell.styles.textColor = [60, 68, 78]; data.cell.styles.overflow = 'linebreak'; }
+    },
+    didDrawPage: function(){
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(120, 128, 138);
+      doc.text(pdTxt('Check List · ' + opts.processo + ' · ' + opts.maquina + ' · dia ' + pdData(D.ini) + ' · gerado em ' + pdData(opts.agora) + ' ' + pdHM(opts.agora)), M, 206);
+    }
+  });
+
+  var justs = D.registros.filter(function(s){ return s.justificativa; });
+  var y = doc.lastAutoTable.finalY + 4;
+  doc.setFontSize(7.4);
+  var blocos = justs.map(function(s){
+    var foras = Object.keys(s.valores).filter(function(p){ return s.valores[p].dentro === 'NÃO'; });
+    return doc.splitTextToSize(pdTxt(pdHM(s.t) + ' · ' + (s.responsavel || '') + ' · ' + foras.join(', ') + ' — ' + s.justificativa), W);
+  });
+  var precisa = (justs.length ? 4 + blocos.reduce(function(t, l){ return t + l.length * 3.2 + 0.8; }, 0) : 0) + 5;
+  if (y + precisa > 203){ doc.addPage(); y = 16; }
+  if (justs.length){
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(179, 38, 30);
+    doc.text(pdTxt('Justificativas dos valores fora do critério'), M, y); y += 3.8;
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.4); doc.setTextColor(31, 45, 61);
+    blocos.forEach(function(l){ if (y + l.length * 3.2 > 203){ doc.addPage(); y = 16; } doc.text(l, M, y); y += l.length * 3.2 + 0.8; });
+  }
+  y += 2.5;
+  var leg = [[[31, 122, 61], 'Feito no horário'], [[138, 97, 0], 'Feito fora do horário (coluna própria)'], [[179, 38, 30], 'Horário já passou sem registro'], [[200, 205, 211], 'Horário ainda não chegou']];
+  if (opts.destaque) leg.push([[255, 236, 200], 'Registro que acabou de ser salvo']);
+  var lx = M;
+  doc.setFontSize(6.8); doc.setFont('helvetica', 'normal');
+  leg.forEach(function(l){ doc.setFillColor(l[0][0], l[0][1], l[0][2]); doc.rect(lx, y - 2.4, 3, 3, 'F'); doc.setTextColor(91, 102, 114); doc.text(pdTxt(l[1]), lx + 4.2, y); lx += doc.getTextWidth(pdTxt(l[1])) + 10; });
+  doc.setTextColor(179, 38, 30); doc.setFont('helvetica', 'bold'); doc.text('123', lx, y); doc.setFont('helvetica', 'normal'); doc.setTextColor(91, 102, 114); doc.text(pdTxt('= valor fora do critério'), lx + 5.5, y);
+
+  var tot = doc.internal.getNumberOfPages();
+  for (var pg = 1; pg <= tot; pg++){
+    doc.setPage(pg); doc.setFontSize(7); doc.setTextColor(120, 128, 138);
+    doc.text('Página ' + pg + ' de ' + tot, 297 - M, 206, { align: 'right' });
+  }
+  return { doc: doc, colunas: D.cols, registros: D.registros, paginas: tot, nFora: nFora, nNao: nNao };
+}
+
+// Carrega o jsPDF + o plugin de tabela (jspdf-autotable) só quando precisa.
+var _jspdfPromise = null;
+function carregarScriptPdf(src){
+  return new Promise(function(resolve, reject){
+    var s = document.createElement('script'); s.src = src;
+    s.onload = resolve; s.onerror = function(){ reject(new Error('sem conexão com a biblioteca de PDF')); };
+    document.head.appendChild(s);
+  });
+}
+function carregarJsPDF(){
+  if (window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable) return Promise.resolve(window.jspdf.jsPDF);
+  if (_jspdfPromise) return _jspdfPromise;
+  _jspdfPromise = (window.jspdf && window.jspdf.jsPDF ? Promise.resolve() : carregarScriptPdf('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js'))
+    .then(function(){ return carregarScriptPdf('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js'); })
+    .then(function(){
+      if (!(window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API.autoTable)) throw new Error('biblioteca de PDF não carregou');
+      return window.jspdf.jsPDF;
+    })
+    .catch(function(err){ _jspdfPromise = null; throw err; });
+  return _jspdfPromise;
+}
+
+function pdGrupos(processo, maquina){
+  if (processo === 'injecao') return GRUPOS_PARAMETROS_INJECAO;
+  var g = PARAMETROS_SOPRO[maquina];
+  if (!g){ var k = Object.keys(PARAMETROS_SOPRO).filter(function(x){ return normMaquina(x) === normMaquina(maquina); })[0]; g = k ? PARAMETROS_SOPRO[k] : null; }
+  return g ? Object.keys(g).map(function(k){ return [k, g[k]]; }) : [['Parâmetros', []]];
+}
+
+// Sessões (registros) de uma máquina a partir das linhas da tabela de registros.
+function pdSessoesDaMaquina(linhas, maquina){
+  var porMaq = opSessoesPorMaquina(linhas || []);
+  var m = porMaq[normMaquina(maquina)];
+  return m ? m.sessoes : [];
+}
+
+// Gera o PDF do dia de uma máquina. sessoes: registros dessa máquina (de qualquer dia).
+async function montarPdfDiaMaquina(processo, maquina, sessoes, destaque, agora){
+  var JsPDF = await carregarJsPDF();
+  agora = agora || new Date();
+  var ini = inicioDiaProducao(destaque && destaque.t ? destaque.t : agora);
+  var ehInj = processo === 'injecao';
+  var grupos = pdGrupos(processo, maquina);
+  if (!ehInj){ // Sopro: parâmetros que estão nos registros mas não na lista da máquina vão num grupo à parte
+    var conhecidos = {}; grupos.forEach(function(g){ g[1].forEach(function(p){ conhecidos[p] = true; }); });
+    var outros = {}; sessoes.forEach(function(s){ Object.keys(s.valores).forEach(function(p){ if (!conhecidos[p]) outros[p] = true; }); });
+    if (Object.keys(outros).length) grupos = grupos.concat([['Outros', Object.keys(outros)]]);
+  }
+  var r = gerarPdfDia({ JsPDF: JsPDF, processo: ehInj ? 'Injeção' : 'Sopro', maquina: maquina, agora: agora, ini: ini, sessoes: sessoes, grupos: grupos, destaque: destaque || null,
+    rotuloProduto: function(s){ return ehInj ? (s.gramatura || '-') + ' · ' + (s.resina || '-') : (s.frasco || '-') + ' · ' + (s.gramatura || '-'); } });
+  var blob = r.doc.output('blob');
+  var nome = 'Checklist_' + (ehInj ? 'Injecao' : 'Sopro') + '_' + String(maquina).replace(/[^A-Za-z0-9]+/g, '') + '_' + pdP2(ini.getDate()) + '-' + pdP2(ini.getMonth() + 1) + '-' + ini.getFullYear() + '.pdf';
+  return { blob: blob, nome: nome, paginas: r.paginas, kb: Math.max(1, Math.round(blob.size / 1024)), ini: ini,
+    texto: 'Check List ' + (ehInj ? 'Injeção' : 'Sopro') + ' · ' + maquina + ' · dia ' + pdData(ini) + ' (07h → 07h)' + (r.nFora ? ' · ' + r.nFora + ' valor(es) fora do critério' : '') + (r.nNao ? ' · ' + r.nNao + ' horário(s) não feito(s)' : '') };
+}
+
+function pdEhCelular(){ return modoOperacao() || (ehAparelhoToque() && window.innerWidth <= 1100); }
+function htmlCartaoPdf(info){
+  var dica = pdEhCelular()
+    ? 'Vai abrir a lista de compartilhar do aparelho, já com o PDF anexado — é só escolher o WhatsApp e o contato ou grupo.'
+    : 'O PDF será baixado e o WhatsApp Web abre em seguida — é só anexar o arquivo (clipe) na conversa.';
+  return '<div class="lmc-file"><i>PDF</i><span><b>' + escHtml(info.nome) + '</b><br><span class="note" style="margin:0">Dia ' + pdData(info.ini) + ' (07h → 07h) · ' + info.paginas + ' página' + (info.paginas > 1 ? 's' : '') + ' · A4 paisagem · ' + info.kb + ' KB</span></span></div>' +
+    '<button type="button" class="btn pdf-wa" onclick="pdfEnviarWhats()">📲 Enviar por WhatsApp</button>' +
+    '<div class="pdf-linha"><button type="button" class="btn btn-outline" onclick="pdfBaixar()">⬇ Baixar</button><button type="button" class="btn btn-outline" onclick="pdfVer()">👁 Ver PDF</button></div>' +
+    '<p class="note" style="margin:0">' + dica + '</p>';
+}
+function pdfBaixar(){
+  var p = PDF_ATUAL; if (!p) return;
+  var url = URL.createObjectURL(p.blob), a = document.createElement('a');
+  a.href = url; a.download = p.nome; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 30000);
+}
+function pdfVer(){
+  var p = PDF_ATUAL; if (!p) return;
+  var url = URL.createObjectURL(p.blob);
+  var w = window.open(url, '_blank');
+  if (!w) pdfBaixar(); // bloqueador de pop-up: baixa em vez de abrir
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 120000);
+}
+async function pdfEnviarWhats(){
+  var p = PDF_ATUAL; if (!p) return;
+  var arquivo = new File([p.blob], p.nome, { type: 'application/pdf' });
+  if (pdEhCelular() && navigator.canShare && navigator.canShare({ files: [arquivo] })){
+    try { await navigator.share({ files: [arquivo], title: p.nome, text: p.texto }); mostrarToast('PDF compartilhado ✓'); return; }
+    catch (e){ if (e && e.name === 'AbortError') return; } // fechou o "Compartilhar": não faz mais nada
+  }
+  pdfBaixar();
+  window.open('https://web.whatsapp.com/', '_blank', 'noopener');
+  mostrarToast('PDF baixado. No WhatsApp, anexe o arquivo (clipe) na conversa.');
+}
+
+// Monta a sessão recém-gravada a partir da conferência (caso a releitura da planilha ainda não a traga).
+function pdSessaoLocal(c){
+  var id = c.ident, valores = {};
+  c.grupos.forEach(function(g){ g[1].forEach(function(x){
+    var valor = x.valor || '—', st = lmStatus(valor, x.tol);
+    valores[x.parametro] = { valor: valor, dentro: st === 'ok' ? 'SIM' : st === 'bad' ? 'NÃO' : '', min: x.tol ? x.tol.valor_min : '', max: x.tol ? x.tol.valor_max : '' };
+  }); });
+  return { id: c.idSessao, t: parseDataHoraBR(id.quando.dataStr, id.quando.horaStr), data: id.quando.dataStr, hora: id.quando.horaStr, maquina: id.maquina, responsavel: id.responsavel,
+    gramatura: id.gramatura, cor: id.cor, resina: id.resina, frasco: id.frasco, justificativa: c.foras.length ? String(c.justificativa || '').trim() : '', valores: valores };
+}
+
 function lmTelaConcluido(){
   var c = LMC, id = c.ident;
-  var nome = 'Checklist_' + (c.processo === 'injecao' ? 'Injecao' : 'Sopro') + '_' + id.maquina.replace(/[^A-Za-z0-9]+/g, '') + '_' + id.quando.dataStr.replace(/\//g, '-') + '_' + id.quando.horaStr.replace(':', 'h') + '.pdf';
   document.getElementById('lmConcluido').innerHTML = '<div class="card lmc lmc-fim">' +
     '<div class="lmc-check">✓</div><h3>Registro salvo</h3>' +
     '<p class="note" style="margin:0">' + escHtml(id.maquina + ' · ' + id.quando.exibicao + ' · ' + id.responsavel) + (c.foras.length ? ' · ' + c.foras.length + ' fora do critério' : '') + '</p>' +
-    '<div class="lmc-ask" id="lmcAsk"><b>Deseja enviar o PDF pelo WhatsApp?</b>' +
-    '<div class="lmc-file"><i>PDF</i><span>' + escHtml(nome) + '</span></div>' +
-    '<p class="note" id="lmcPdfStatus" style="margin:0">Preparando o PDF…</p>' +
-    '<div class="actions" style="margin-top:0"><button class="btn btn-outline" type="button" onclick="lmFinalizarSemEnviar()">Agora não</button><button class="btn btn-accent" type="button" id="lmcBtnEnviar" onclick="lmEnviarWhatsapp()" disabled>Enviar pelo WhatsApp</button></div></div></div>';
+    '<div class="lmc-ask" id="lmcAsk"><b>PDF do dia da ' + escHtml(id.maquina) + '</b><div class="loading-row" style="margin:0"><div class="spinner"></div> Gerando o PDF com os registros de hoje (07h → 07h)…</div></div>' +
+    '<button type="button" class="btn btn-outline" onclick="lmFinalizarSemEnviar()">Fechar</button></div>';
   lmMostrarEtapa(c.processo, 'fim');
-  LM_PDF = null;
-  // O PDF é gerado logo aqui (antes do toque em "Enviar"): no celular, o "Compartilhar" só abre
-  // se for chamado direto no toque, sem esperar carregamento no meio.
-  lmGerarPdf(c, nome).then(function(arquivo){
-    LM_PDF = { arquivo: arquivo, nome: nome, texto: 'Registro do Check List — ' + (c.processo === 'injecao' ? 'Injeção' : 'Sopro') + ' · ' + id.maquina + ' · ' + id.quando.exibicao + ' · ' + id.responsavel + (c.foras.length ? ' · ' + c.foras.length + ' parâmetro(s) fora do critério' : '') };
-    var st = document.getElementById('lmcPdfStatus'); if (st) st.textContent = 'PDF pronto.';
-    var b = document.getElementById('lmcBtnEnviar'); if (b) b.disabled = false;
-  }).catch(function(err){
-    var st = document.getElementById('lmcPdfStatus'); if (st){ st.textContent = 'Não consegui gerar o PDF (' + err.message + '). O registro já está salvo.'; st.style.color = 'var(--danger)'; }
+  PDF_ATUAL = null;
+  (async function(){
+    var local = pdSessaoLocal(c), sessoes = [];
+    try {
+      var token = await getToken();
+      var linhas = c.processo === 'injecao'
+        ? await carregarUltimasLinhas('TabelaRegistrosInjecao', COLS_INJ, 3500, token)
+        : await carregarUltimasLinhas('TabelaRegistrosSopro', COLS_SOPRO, 3000, token);
+      sessoes = pdSessoesDaMaquina(linhas, id.maquina);
+    } catch (e){ sessoes = []; } // sem conseguir reler: o PDF sai só com o registro que acabou de ser salvo
+    var achada = sessoes.filter(function(s){ return s.id === c.idSessao; })[0];
+    if (!achada){ sessoes.push(local); achada = local; }
+    var info = await montarPdfDiaMaquina(c.processo, id.maquina, sessoes, achada, new Date());
+    PDF_ATUAL = info;
+    var ask = document.getElementById('lmcAsk');
+    if (ask) ask.innerHTML = '<b>PDF pronto</b>' + htmlCartaoPdf(info);
+  })().catch(function(err){
+    var ask = document.getElementById('lmcAsk');
+    if (ask) ask.innerHTML = '<b>Não consegui gerar o PDF</b><p class="note" style="margin:0;color:var(--danger)">' + escHtml(err && err.message ? err.message : 'Verifique a conexão.') + ' O registro já está salvo.</p><button type="button" class="btn btn-outline" onclick="lmTelaConcluido()">Tentar de novo</button>';
   });
 }
 function lmFinalizarSemEnviar(){
   fecharLancamentoManual();
   mostrarToast('Registro salvo ✓');
 }
-async function lmEnviarWhatsapp(){
-  if (!LM_PDF) return;
-  var f = LM_PDF.arquivo;
+
+// Botão "PDF do dia" de cada máquina (versão da operação): mesmo PDF, a qualquer hora.
+async function opPdfDia(ci){
+  var card = OP.cards && OP.cards[ci]; if (!card) return;
+  var processo = OP.proc === 'inj' ? 'injecao' : 'sopro';
+  var ov = document.createElement('div');
+  ov.className = 'modal-overlay'; ov.id = 'pdfDiaOv';
+  ov.innerHTML = '<div class="modal-card just-card pdf-card"><h4 style="color:var(--text)">PDF do dia · ' + escHtml(card.nome) + '</h4><div id="pdfDiaCorpo"><div class="loading-row"><div class="spinner"></div> Gerando o PDF…</div></div>' +
+    '<div class="modal-actions" style="grid-template-columns:1fr"><button type="button" class="btn btn-outline" onclick="document.getElementById(\'pdfDiaOv\').remove()">Fechar</button></div></div>';
+  ov.addEventListener('click', function(e){ if (e.target === ov) ov.remove(); });
+  document.body.appendChild(ov);
   try {
-    if (navigator.canShare && navigator.canShare({ files: [f] })){
-      await navigator.share({ files: [f], title: LM_PDF.nome, text: LM_PDF.texto });
-      lmFinalizarEnviado();
-      return;
-    }
-  } catch (err) {
-    if (err && err.name === 'AbortError') return; // a pessoa fechou o "Compartilhar" — pode tentar de novo
+    var sessoes = pdSessoesDaMaquina(OP.dados[OP.proc] || [], card.nome);
+    var info = await montarPdfDiaMaquina(processo, card.nome, sessoes, null, new Date());
+    PDF_ATUAL = info;
+    var corpo = document.getElementById('pdfDiaCorpo');
+    if (corpo) corpo.innerHTML = '<div class="pdf-corpo">' + htmlCartaoPdf(info) + '</div>';
+  } catch (err){
+    var corpo2 = document.getElementById('pdfDiaCorpo');
+    if (corpo2) corpo2.innerHTML = '<p class="note" style="color:var(--danger)">Não consegui gerar o PDF: ' + escHtml(err.message || '') + '</p>';
   }
-  // Sem "Compartilhar" com arquivo (comum no computador): baixa o PDF e abre o WhatsApp Web com o
-  // texto; aí é só anexar o arquivo baixado na conversa.
-  var url = URL.createObjectURL(f);
-  var a = document.createElement('a'); a.href = url; a.download = LM_PDF.nome; document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(function(){ URL.revokeObjectURL(url); }, 60000);
-  window.open('https://wa.me/?text=' + encodeURIComponent(LM_PDF.texto), '_blank');
-  var ask = document.getElementById('lmcAsk');
-  if (ask) ask.innerHTML = '<b>PDF baixado</b><p class="note" style="margin:0">Este aparelho não permite anexar direto. O WhatsApp abriu numa nova aba — anexe o arquivo <b>' + escHtml(LM_PDF.nome) + '</b> (pasta de downloads) na conversa.</p><div class="actions" style="margin-top:0"><button class="btn btn-accent" type="button" onclick="lmFinalizarSemEnviar()">Concluir</button></div>';
-}
-function lmFinalizarEnviado(){
-  fecharLancamentoManual();
-  mostrarToast('Registro salvo e PDF compartilhado ✓');
-}
-
-// Carrega o jsPDF só quando precisa (primeiro PDF da sessão).
-var _jspdfPromise = null;
-function carregarJsPDF(){
-  if (window.jspdf && window.jspdf.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
-  if (_jspdfPromise) return _jspdfPromise;
-  _jspdfPromise = new Promise(function(resolve, reject){
-    var s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-    s.onload = function(){ window.jspdf && window.jspdf.jsPDF ? resolve(window.jspdf.jsPDF) : reject(new Error('biblioteca de PDF não carregou')); };
-    s.onerror = function(){ _jspdfPromise = null; reject(new Error('sem conexão com a biblioteca de PDF')); };
-    document.head.appendChild(s);
-  });
-  return _jspdfPromise;
-}
-// As fontes padrão do PDF não têm "≤"/"≥" — troca por "<="/">=".
-function pdfTxt(s){ return String(s === undefined || s === null ? '' : s).replace(/≤/g, '<=').replace(/≥/g, '>=').replace(/[–—]/g, '-'); }
-
-async function lmGerarPdf(c, nome){
-  var JsPDF = await carregarJsPDF();
-  var doc = new JsPDF({ unit: 'mm', format: 'a4' });
-  var M = 14, W = 210 - 2 * M, y = 16, id = c.ident;
-  var cols = [M, M + 100, M + 130, M + 166]; // parâmetro, valor, critério, status
-  function novaPagina(){ doc.addPage(); y = 16; cabecalhoTabela(); }
-  function cabecalhoTabela(){
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.setTextColor(91, 102, 114);
-    doc.text('PARÂMETRO', cols[0], y); doc.text('VALOR', cols[1], y); doc.text('CRITÉRIO', cols[2], y); doc.text('STATUS', cols[3], y);
-    y += 2; doc.setDrawColor(199, 205, 212); doc.line(M, y, M + W, y); y += 4;
-  }
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(15); doc.setTextColor(31, 45, 61);
-  doc.text(pdfTxt('Registro do Check List — ' + (c.processo === 'injecao' ? 'Injeção' : 'Sopro')), M, y); y += 6;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(91, 102, 114);
-  doc.text('BlowPet · Controle de Processo', M, y); y += 7;
-  var meta = [['Máquina', id.maquina], ['Data/hora', id.quando.exibicao], ['Produto', id.produto], ['Cor', id.cor || '-'], ['Responsável', id.responsavel], ['Fora do critério', String(c.foras.length)]];
-  doc.setFontSize(10);
-  meta.forEach(function(m, k){
-    var x = k % 2 === 0 ? M : M + W / 2;
-    doc.setTextColor(91, 102, 114); doc.text(pdfTxt(m[0] + ':'), x, y);
-    doc.setTextColor(31, 45, 61); doc.text(pdfTxt(m[1]), x + 30, y);
-    if (k % 2 === 1) y += 6;
-  });
-  y += 2;
-  if (c.foras.length && c.justificativa){
-    var linhasJ = doc.splitTextToSize(pdfTxt('Justificativa: ' + c.justificativa), W - 6);
-    doc.setDrawColor(179, 38, 30); doc.rect(M, y - 4, W, linhasJ.length * 5 + 4);
-    doc.setTextColor(31, 45, 61); doc.text(linhasJ, M + 3, y + 1); y += linhasJ.length * 5 + 6;
-  }
-  cabecalhoTabela();
-  c.grupos.forEach(function(g){
-    if (y > 280) novaPagina();
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(31, 45, 61); doc.text(pdfTxt(g[0]), M, y); y += 5;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(9);
-    g[1].forEach(function(x){
-      if (y > 285) novaPagina();
-      var bad = x.status === 'bad', ok = x.status === 'ok';
-      doc.setTextColor(31, 45, 61); doc.text(pdfTxt(x.parametro), cols[0] + 2, y);
-      doc.setTextColor(bad ? 179 : 31, bad ? 38 : 45, bad ? 30 : 61); doc.text(pdfTxt(x.valor || '-'), cols[1], y);
-      doc.setTextColor(91, 102, 114); doc.text(pdfTxt(x.tol ? textoLimite(x.tol.valor_min, x.tol.valor_max) : 'sem critério'), cols[2], y);
-      if (bad){ doc.setTextColor(179, 38, 30); doc.text('Fora', cols[3], y); }
-      else if (ok){ doc.setTextColor(31, 122, 61); doc.text('OK', cols[3], y); }
-      else { doc.setTextColor(91, 102, 114); doc.text('-', cols[3], y); }
-      y += 1.6; doc.setDrawColor(230, 233, 237); doc.line(M, y, M + W, y); y += 3.6;
-    });
-    y += 1.5;
-  });
-  var n = doc.getNumberOfPages();
-  for (var p = 1; p <= n; p++){
-    doc.setPage(p); doc.setFontSize(7.5); doc.setTextColor(91, 102, 114);
-    doc.text(pdfTxt('Gerado pelo app Controle de Processo em ' + id.quando.exibicao + ' · página ' + p + ' de ' + n), M, 292);
-  }
-  var blob = doc.output('blob');
-  return new File([blob], nome, { type: 'application/pdf' });
 }
 
 // ---- Sopro ----
