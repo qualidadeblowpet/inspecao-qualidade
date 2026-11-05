@@ -1862,7 +1862,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 /* Data/hora da última atualização deste arquivo (index.html) — atualizar manualmente
    a cada nova versão publicada, só pra controle de qual versão está em uso em cada
    dispositivo. Exibido no rodapé do menu lateral. */
-const ULTIMA_ATUALIZACAO_SISTEMA = '05/11/2026 09:13';
+const ULTIMA_ATUALIZACAO_SISTEMA = '05/11/2026 10:34';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -6724,47 +6724,84 @@ function rtPaginar(R) {
 function rtNomeArquivo(R) { return 'Resumo_Turno_' + R.turno + '_' + rtP2(rtParseISO(R.dataISO).getDate()) + '-' + rtP2(rtParseISO(R.dataISO).getMonth() + 1) + '-' + rtParseISO(R.dataISO).getFullYear() + '.pdf'; }
 
 // Foto -> imagem pequena (recortada em quadrado, como na tela) embutida no PDF
-function rtReduzirQuadrada(blob, lado) {
-  return new Promise(function(resolve) {
-    const url = URL.createObjectURL(blob), img = new Image();
-    img.onload = function() {
-      try {
-        const s = Math.min(img.naturalWidth, img.naturalHeight), sx = (img.naturalWidth - s) / 2, sy = (img.naturalHeight - s) / 2, out = Math.min(lado, s);
-        const c = document.createElement('canvas'); c.width = out; c.height = out;
-        const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, out, out); ctx.drawImage(img, sx, sy, s, s, 0, 0, out, out);
-        URL.revokeObjectURL(url); resolve(c.toDataURL('image/jpeg', 0.85));
-      } catch (e) { URL.revokeObjectURL(url); resolve(null); }
-    };
-    img.onerror = function() { URL.revokeObjectURL(url); resolve(null); };
-    img.src = url;
-  });
+// Abre a foto (createImageBitmap quando existe: usa menos memória e não trava a tela) e devolve um
+// quadrado de até 'lado' px em JPEG. A foto original (às vezes 3–5 MB) é descartada logo em seguida.
+async function rtReduzirQuadrada(blob, lado) {
+  let fonte = null, w = 0, h = 0, liberar = function() {};
+  if (window.createImageBitmap) {
+    try { fonte = await createImageBitmap(blob); w = fonte.width; h = fonte.height; liberar = function() { try { fonte.close(); } catch (e) {} }; } catch (e) { fonte = null; }
+  }
+  if (!fonte) {
+    fonte = await new Promise(function(resolve) {
+      const url = URL.createObjectURL(blob), img = new Image();
+      img.onload = function() { liberar = function() { URL.revokeObjectURL(url); }; resolve(img); };
+      img.onerror = function() { URL.revokeObjectURL(url); resolve(null); };
+      img.src = url;
+    });
+    if (!fonte) return null;
+    w = fonte.naturalWidth; h = fonte.naturalHeight;
+  }
+  try {
+    const q = Math.min(w, h), sx = (w - q) / 2, sy = (h - q) / 2, out = Math.min(lado, q);
+    const c = document.createElement('canvas'); c.width = out; c.height = out;
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, out, out); ctx.drawImage(fonte, sx, sy, q, q, 0, 0, out, out);
+    const d = c.toDataURL('image/jpeg', 0.85); c.width = c.height = 0;
+    return d;
+  } catch (e) { return null; } finally { liberar(); }
+}
+function rtComPrazo(promessa, ms) {
+  return Promise.race([promessa, new Promise(function(_, rej) { setTimeout(function() { rej(new Error('demorou demais')); }, ms); })]);
+}
+// Para o PDF é preciso ler os PIXELS da foto (não basta mostrar), e o navegador só deixa isso quando o
+// servidor libera o acesso (CORS). A miniatura do SharePoint não libera; o link de download que a própria
+// Microsoft fornece para apps no navegador (@microsoft.graph.downloadUrl) libera. Então: tenta a
+// miniatura (rápida) e, se o navegador bloquear, baixa pelo downloadUrl. Em seguida a foto é reduzida
+// aqui mesmo para um quadrado de 420 px (JPEG) — o PDF fica leve, sem perder nitidez no tamanho em que
+// a foto aparece no relatório. Cada falha guarda o MOTIVO (RT.fotoMotivo), mostrado no aviso do PDF.
+function rtCodigoShare(webUrl) { return 'u!' + btoa(unescape(encodeURIComponent(webUrl))).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-'); }
+async function rtBaixarFotoInterno(webUrl) {
+  let blob = null;
+  const thumb = await obterMiniaturaFoto(webUrl);
+  if (thumb) { try { const r = await fetch(thumb); if (r.ok) blob = await r.blob(); } catch (e) { blob = null; } }
+  if (!blob) {
+    const token = await getToken(), H = { headers: { Authorization: 'Bearer ' + token } };
+    const base = 'https://graph.microsoft.com/v1.0/shares/' + rtCodigoShare(webUrl) + '/driveItem';
+    let r2 = await opFetchRetry(base + '?$select=id,size,file,@microsoft.graph.downloadUrl', H);
+    if (!r2.ok && r2.status === 400) r2 = await opFetchRetry(base, H);
+    if (!r2.ok) throw new Error(r2.status === 404 ? 'foto não encontrada no SharePoint' : r2.status === 403 || r2.status === 401 ? 'sem permissão para a foto' : 'Microsoft respondeu ' + r2.status);
+    const it = await r2.json(), dl = it['@microsoft.graph.downloadUrl'];
+    if (!dl) throw new Error('sem link de download');
+    let r3;
+    try { r3 = await opFetchRetry(dl, {}); } catch (e) { throw new Error('download bloqueado pelo navegador'); }
+    if (!r3.ok) throw new Error('download falhou (' + r3.status + ')');
+    blob = await r3.blob();
+  }
+  const out = await rtReduzirQuadrada(blob, 420);
+  if (!out) throw new Error('não consegui abrir a imagem' + (blob && blob.type ? ' (' + blob.type + ')' : ''));
+  return out;
 }
 async function rtBaixarFoto(webUrl) {
-  if (webUrl in RT.fotoData) return RT.fotoData[webUrl];
+  if (RT.fotoData[webUrl]) return RT.fotoData[webUrl];
   let out = null;
-  try {
-    let blob = null;
-    const thumb = await obterMiniaturaFoto(webUrl);
-    if (thumb) { try { const r = await fetch(thumb); if (r.ok) blob = await r.blob(); } catch (e) { blob = null; } }
-    if (!blob) {
-      const token = await getToken();
-      const cod = 'u!' + btoa(unescape(encodeURIComponent(webUrl))).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
-      const r2 = await fetch('https://graph.microsoft.com/v1.0/shares/' + cod + '/driveItem/thumbnails/0/large/content', { headers: { Authorization: 'Bearer ' + token } });
-      if (r2.ok) blob = await r2.blob();
-    }
-    if (blob) out = await rtReduzirQuadrada(blob, 420);
-  } catch (e) { out = null; }
+  RT.fotoMotivo = RT.fotoMotivo || {};
+  try { out = await rtComPrazo(rtBaixarFotoInterno(webUrl), 60000); delete RT.fotoMotivo[webUrl]; }
+  catch (e) { out = null; RT.fotoMotivo[webUrl] = (e && e.message) || 'erro desconhecido'; console.warn('Resumo do turno: foto não carregada para o PDF —', RT.fotoMotivo[webUrl], webUrl, e); }
   RT.fotoData[webUrl] = out;
   return out;
 }
-async function rtPrepararFotosPDF(R) {
+async function rtPrepararFotosPDF(R, aoProgredir) {
   const urls = [];
   R.maqs.forEach(function(m) { rtSelecionarFotos(m).sel.forEach(function(f) { if (urls.indexOf(f.url) < 0 && !RT.fotoData[f.url]) urls.push(f.url); }); });
-  let i = 0;
-  const worker = async function() { while (i < urls.length) { const u = urls[i++]; delete RT.fotoData[u]; await rtBaixarFoto(u); } };
-  await Promise.all([worker(), worker(), worker()]);
-  let falhas = 0;
-  R.maqs.forEach(function(m) { rtSelecionarFotos(m).sel.forEach(function(f) { if (!RT.fotoData[f.url]) falhas++; }); });
+  let i = 0, feitas = 0;
+  if (aoProgredir && urls.length) aoProgredir(0, urls.length);
+  // poucas ao mesmo tempo: no celular, abrir várias fotos grandes juntas estoura a memória do navegador
+  const simultaneas = rtEhCelular() ? 2 : 3;
+  const worker = async function() { while (i < urls.length) { const u = urls[i++]; await rtBaixarFoto(u); feitas++; if (aoProgredir) aoProgredir(feitas, urls.length); } };
+  const ws = []; for (let k = 0; k < simultaneas; k++) ws.push(worker());
+  await Promise.all(ws);
+  let falhas = 0; const motivos = {};
+  R.maqs.forEach(function(m) { rtSelecionarFotos(m).sel.forEach(function(f) { if (!RT.fotoData[f.url]) { falhas++; const mo = (RT.fotoMotivo || {})[f.url] || 'erro desconhecido'; motivos[mo] = (motivos[mo] || 0) + 1; } }); });
+  RT.fotoMotivosUltimo = motivos;
   return falhas;
 }
 
@@ -6779,7 +6816,8 @@ async function rtCompartilhar() {
   try {
     await rtDescarregarTodas();                       // observações pendentes entram no PDF e na planilha
     await garantirLibsPDF();
-    const falhasFoto = await rtPrepararFotosPDF(R);
+    const falhasFoto = await rtPrepararFotosPDF(R, function(n, total) { const e = document.querySelector('#rtOv .rt-ov-s'); if (e) e.textContent = 'Preparando as fotos (' + n + ' de ' + total + ')…'; });
+    { const e = document.querySelector('#rtOv .rt-ov-s'); if (e) e.textContent = 'Montando as páginas do resumo…'; }
     paginacao = rtPaginar(R);
     const imgs = [];
     for (const pg of paginacao.paginas) {
@@ -6804,10 +6842,14 @@ function rtMostrarPronto() {
   const dica = mobile ? 'Vai abrir a lista de compartilhar do aparelho, já com o PDF anexado — é só escolher o WhatsApp e o contato ou grupo.' : 'O PDF será baixado e o WhatsApp Web abre em seguida — é só anexar o arquivo (clipe) na conversa.';
   rtOv('<div class="rt-ov-card"><div class="rt-ov-ok">✓</div><div class="rt-ov-t">PDF pronto</div>' +
     '<div class="rt-arq"><div class="rt-arq-ic">PDF</div><div><div class="rt-arq-n">' + rtEsc(p.nome) + '</div><div class="rt-arq-s">' + p.paginas + ' página' + (p.paginas > 1 ? 's' : '') + ' · A4 retrato · ' + p.kb + ' KB</div></div></div>' +
-    (p.falhasFoto ? '<div class="rt-aviso" style="width:100%;text-align:left;margin:0">⚠ ' + p.falhasFoto + ' foto' + (p.falhasFoto > 1 ? 's não puderam' : ' não pôde') + ' ser carregada' + (p.falhasFoto > 1 ? 's' : '') + ' e ficou' + (p.falhasFoto > 1 ? 'ram' : '') + ' de fora do PDF.</div>' : '') +
+    (p.falhasFoto ? '<div class="rt-aviso" style="width:100%;text-align:left;margin:0">⚠ ' + (p.falhasFoto > 1 ? p.falhasFoto + ' fotos não puderam ser carregadas e ficaram' : '1 foto não pôde ser carregada e ficou') + ' de fora do PDF.' + rtTextoMotivos() + '<br><button type="button" class="rt-link" style="padding:6px 0 0;color:inherit;font-weight:700" onclick="rtCompartilhar()">↻ Tentar carregar as fotos de novo</button></div>' : '') +
     '<button type="button" class="rt-btn wa" onclick="rtEnviarWhats()">📲 Enviar por WhatsApp</button>' +
     '<div class="rt-ov-linha"><button type="button" class="rt-btn sec" onclick="rtBaixar()">⬇ Baixar</button><button type="button" class="rt-btn sec" onclick="rtVerPdf()">👁 Ver PDF</button></div>' +
     '<div class="rt-ov-s" style="text-align:left">' + dica + '</div><button type="button" class="rt-link" onclick="rtFecharOv()">Fechar</button></div>');
+}
+function rtTextoMotivos() {
+  const m = RT.fotoMotivosUltimo || {}, k = Object.keys(m);
+  return k.length ? '<br><small style="opacity:.85">Motivo: ' + k.map(function(x) { return rtEsc(x) + (m[x] > 1 ? ' (' + m[x] + ')' : ''); }).join(' · ') + '</small>' : '';
 }
 function rtEhCelular() { return modoOperacao() || (ehAparelhoToque() && window.innerWidth <= 1100); }
 function rtBaixar() {
