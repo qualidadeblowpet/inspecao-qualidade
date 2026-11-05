@@ -931,9 +931,12 @@
   .rt-maq.vazia .rt-mm { color: var(--warn); font-weight: 600; }
   .rt-tira { padding: 6px 7px 4px; border: 1px solid var(--mbd); border: 1px solid color-mix(in srgb, var(--mc) 60%, transparent); border-radius: 8px; background: transparent; }
   .rt-tira-g, .rt-tira-h { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; }
-  .rt-tc { height: 17px; border-radius: 4px; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 800; color: #fff; }
+  .rt-tc { height: 17px; border-radius: 4px; border: 1px solid rgba(139,143,150,.45); background: rgba(139,143,150,.12); display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 800; color: #fff; }
   .rt-tc.sd { background: var(--iv-sd, #6b6f76); border: 0; } .rt-tc.leve { background: var(--ok); border: 0; } .rt-tc.medio { background: var(--warn); border: 0; color: #1a1405; } .rt-tc.grave { background: var(--danger); border: 0; }
-  .rt-tc.fut { border-style: dotted; opacity: .4; background: repeating-linear-gradient(135deg, transparent 0 4px, rgba(128,132,140,.35) 4px 5px); }
+  .rt-tc.fut { border-style: dashed; background: repeating-linear-gradient(135deg, transparent 0 3px, rgba(139,143,150,.45) 3px 4px); }
+  .rt-leg { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; font-size: 11.5px; color: var(--text-dim); border: 1px solid var(--border); border-radius: 10px; padding: 9px 13px; margin: 10px 0 2px; }
+  .rt-leg b { color: var(--text); font-weight: 700; } .rt-leg > span { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .rt-leg .rt-tc { width: 22px; height: 14px; font-size: 9px; flex: none; } .rt-leg .rt-leg-t { display: block; flex-basis: 100%; white-space: normal; }
   .rt-tira-h { margin-top: 3px; font-size: 9px; color: var(--text-dim); text-align: center; }
   .rt-mat { border-top: 1px solid var(--mbd); }
   .rt-ati { display: flex; gap: 10px; padding: 7px 14px; font-size: 12.5px; line-height: 1.45; } .rt-ati + .rt-ati { border-top: 1px solid var(--mbd); }
@@ -1057,9 +1060,12 @@
   .rtp-mtira .rtp-tira { border: 1px solid var(--tb); border-radius: 7px; padding: 4px 5px 3px; }
   .rtp-tg, .rtp-th { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; }
   .rtp-th { margin-top: 2px; font-size: 7.5px; color: #7a7f87; text-align: center; }
-  .rtp-tc { height: 11px; border-radius: 3px; border: 1px dashed #cdd1d6; display: flex; align-items: center; justify-content: center; font-size: 7.5px; font-weight: 800; color: #fff; }
+  .rtp-tc { height: 11px; border-radius: 3px; border: 1px solid #c9cdd3; background: #eef0f2; display: flex; align-items: center; justify-content: center; font-size: 7.5px; font-weight: 800; color: #fff; }
   .rtp-tc.sd { background: #8a8f97; border: 0; } .rtp-tc.leve { background: #1f9d73; border: 0; } .rtp-tc.medio { background: #e08e0b; border: 0; } .rtp-tc.grave { background: #d93036; border: 0; }
-  .rtp-tc.fut { border-style: dotted; background: repeating-linear-gradient(135deg, transparent 0 3px, #dfe2e6 3px 4px); }
+  .rtp-tc.fut { border-style: dashed; background: repeating-linear-gradient(135deg, #fff 0 3px, #cdd1d6 3px 4px); }
+  .rtp-leg { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 9.5px; color: #6b7078; border: 1px solid #e1e4e8; border-radius: 8px; padding: 6px 10px; margin-top: 8px; }
+  .rtp-leg b { color: #14161a; } .rtp-leg > span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .rtp-leg .rtp-tc { width: 18px; height: 11px; flex: none; } .rtp-leg .rtp-leg-t { display: block; flex-basis: 100%; white-space: normal; }
   .rtp-mat { border-top: 1px solid var(--d); } .rtp-ati { display: flex; gap: 8px; padding: 5px 12px; font-size: 11.5px; } .rtp-ati + .rtp-ati { border-top: 1px solid var(--d); }
   .rtp-ati.g { background: #fdf0f0; } .rtp-ati.w { background: #fdf7e8; }
   .rtp-top { border-top: 1px solid var(--d); padding: 2px 12px 6px; } .rtp-topt { font-size: 9px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: #7a7f87; padding: 7px 0 2px; }
@@ -1863,7 +1869,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 /* Data/hora da última atualização deste arquivo (index.html) — atualizar manualmente
    a cada nova versão publicada, só pra controle de qual versão está em uso em cada
    dispositivo. Exibido no rodapé do menu lateral. */
-const ULTIMA_ATUALIZACAO_SISTEMA = '05/11/2026 10:46';
+const ULTIMA_ATUALIZACAO_SISTEMA = '05/11/2026 10:59';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -6224,7 +6230,8 @@ function rtCalcular(dataISO, turno) {
       if (d.foto) x.fotos.push({ hora: d.hora, r: d.r, c: d.c, cav: d.cav, url: d.foto, d: d.d });
       if (d.cav) String(d.cav).split(',').forEach(function(z) { z = z.trim(); if (z && x.cavs.indexOf(z) < 0) x.cavs.push(z); });
     });
-    m.top = Object.keys(tm).map(function(k) { return tm[k]; }).sort(function(a, b) { return b.q - a.q || b.pior - a.pior || a.d.localeCompare(b.d, 'pt-BR'); });
+    // Ordem definida pelo Cleber: primeiro a gravidade (Grave, Médio, Leve) e, dentro dela, o volume.
+    m.top = Object.keys(tm).map(function(k) { return tm[k]; }).sort(function(a, b) { return b.pior - a.pior || b.q - a.q || b.por.GRAVE - a.por.GRAVE || b.por['MÉDIO'] - a.por['MÉDIO'] || a.d.localeCompare(b.d, 'pt-BR'); });
     m.top.forEach(function(x) { x.fotos.sort(function(a, b) { return b.r - a.r || (a.hora < b.hora ? -1 : a.hora > b.hora ? 1 : 0); }); });
     // verificações reprovadas (nos campos de aprovado/reprovado do cadastro)
     m.verif = [];
@@ -6362,6 +6369,12 @@ function rtNotaHTML(R, eq, p, titulo) {
   return eq === '__geral' ? '<div class="rt-geral"><label>' + titulo + '</label>' + ta + stEl + '</div>'
                           : '<div class="rt-obs"><label>📝 ' + titulo + '</label>' + ta + stEl + '</div>';
 }
+function rtLegendaHTML(R, pp) {
+  const P = pp ? 'rtp-' : 'rt-', c = function(cl, txt, n) { return '<span><i class="' + P + 'tc' + (cl ? ' ' + cl : '') + '">' + (n || '') + '</i>' + txt + '</span>'; };
+  return '<div class="' + P + 'leg"><span class="' + P + 'leg-t"><b>Como ler a linha do tempo de cada máquina:</b> cada quadrado é 1 hora do turno; a cor mostra o desvio mais grave cadastrado naquela hora. As mesmas cores valem para os defeitos e as fotos.</span>' +
+    c('sd', 'Cadastro sem desvio') + c('leve', 'Leve') + c('medio', 'Médio') + c('grave', 'Grave') + c('', 'Hora sem cadastro') +
+    (R.concluido ? '' : c('fut', 'Hora que ainda não chegou')) + c('sd', 'Nº = cadastros na mesma hora', '2') + '</div>';
+}
 function rtChipsAtencao(R, pp) {
   const t = R.tot, P = pp ? 'rtp-pill' : 'rt-pill';
   return [t.nGrave && '<span class="' + P + ' grave">🔴 ' + t.nGrave + ' grave' + (t.nGrave > 1 ? 's' : '') + '</span>',
@@ -6400,6 +6413,7 @@ function rtCorpoHTML(R) {
   const ch = rtChipsAtencao(R, false);
   h += ch.length ? '<div class="rt-atencao"><span>Pontos de atenção — detalhados em cada máquina:</span>' + ch.join('') + '</div>'
     : (t.cad ? '<div class="rt-okbox">✅ Turno sem pontos de atenção: nenhum desvio grave, nenhuma verificação reprovada e todas as máquinas inspecionadas dentro do intervalo.</div>' : '');
+  h += rtLegendaHTML(R, false);
   [['inj', 'Injeção por máquina'], ['sop', 'Sopro por máquina']].forEach(function(par) {
     const ms = R.maqs.filter(function(m) { return m.p === par[0]; });
     if (!ms.length) return;
@@ -6669,6 +6683,7 @@ function rtPpCabecalho(R) {
     '<div class="rtp-kpis">' + rtKpisDados(R).map(function(k) { return '<div class="rtp-kpi ' + (k.c === 'alerta' ? 'bad' : k.c) + '"><small>' + k.l + '</small><b>' + k.v + '</b><span>' + rtEsc(k.d) + '</span></div>'; }).join('') + '</div>';
   h += ch.length ? '<div class="rtp-chips"><span>Pontos de atenção (detalhados em cada máquina):</span>' + ch.join('') + '</div>'
     : (t.cad ? '<div class="rtp-okbox">✅ Turno sem pontos de atenção: nenhum desvio grave, nenhuma verificação reprovada e todas as máquinas inspecionadas dentro do intervalo.</div>' : '');
+  h += rtLegendaHTML(R, true);
   return h;
 }
 function rtPpNota(R, eq) {
