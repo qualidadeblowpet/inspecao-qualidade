@@ -184,7 +184,7 @@
   .iv-lh { padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 0; border-right: 1px solid var(--border); cursor: pointer; position: relative; }
   .iv-lh:hover, .iv-sum:hover { background: rgba(128,128,128,.07); }
   .iv-lh:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-  .iv-mname { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: .3px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; text-transform: uppercase; padding-right: 22px; }
+  .iv-mname { font-family: var(--font-body); font-size: 15px; font-weight: 700; letter-spacing: 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; text-transform: none; /* mesma fonte do nome em "Análise do período por máquina" (.analise-maquina-nome) */ padding-right: 22px; }
   .iv-pill { font-family: var(--font-body); font-size: 9.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; letter-spacing: .3px; white-space: nowrap; }
   .iv-pill.sd { background: rgba(155,160,168,.15); color: var(--text-dim); } .iv-pill.leve { background: rgba(63,182,139,.15); color: var(--ok); } .iv-pill.medio { background: rgba(242,169,59,.15); color: var(--warn); } .iv-pill.grave { background: rgba(229,72,77,.15); color: var(--danger); }
   .iv-mprod { font-size: 11.5px; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -1869,7 +1869,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 /* Data/hora da última atualização deste arquivo (index.html) — atualizar manualmente
    a cada nova versão publicada, só pra controle de qual versão está em uso em cada
    dispositivo. Exibido no rodapé do menu lateral. */
-const ULTIMA_ATUALIZACAO_SISTEMA = '05/11/2026 10:59';
+const ULTIMA_ATUALIZACAO_SISTEMA = '05/11/2026 11:10';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
