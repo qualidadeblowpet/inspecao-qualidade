@@ -869,6 +869,227 @@
     .mold-controls { width: 100%; }
     .mold-controls select { flex: 1 1 auto; }
   }
+
+  /* =============== Resumo do turno =============== */
+  .rt-scrim { position: fixed; inset: 0; z-index: 3000; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 18px; }
+  body.tema-claro .rt-scrim { background: rgba(20,22,26,.4); }
+  .rt-scrim[hidden], .rt-ov[hidden] { display: none; }
+  .rt-box { position: relative; width: min(1120px, 100%); max-height: 100%; display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+  .rt-cab { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--border); flex: none; }
+  .rt-cab h2 { font-family: var(--font-display); font-size: 25px; letter-spacing: .4px; text-transform: uppercase; margin: 0; }
+  .rt-x { margin-left: auto; width: 34px; height: 34px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text); font-size: 15px; cursor: pointer; }
+  .rt-sel { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; padding: 11px 20px; background: var(--surface-2); border-bottom: 1px solid var(--border); flex: none; }
+  .rt-lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--text-dim); }
+  .rt-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--surface); }
+  .rt-seg button { font: 600 12.5px var(--font-body); color: var(--text-dim); background: transparent; border: 0; border-right: 1px solid var(--border); padding: 8px 13px; cursor: pointer; }
+  .rt-seg button:last-child { border-right: 0; }
+  .rt-seg button.on { color: #1a1405; background: var(--accent); }
+  .rt-sel input[type=date], .rt-sel select { font: 600 12.5px var(--font-body); color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; }
+  .rt-periodo { margin-left: auto; font-size: 12.5px; color: var(--text-dim); text-align: right; }
+  .rt-periodo b { color: var(--text); }
+  .rt-badge { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .4px; border-radius: 999px; padding: 2px 8px; margin-left: 8px; text-transform: uppercase; }
+  .rt-badge.ok { color: var(--ok); background: rgba(63,182,139,.15); } .rt-badge.and { color: var(--warn); background: rgba(242,169,59,.15); }
+  .rt-corpo { flex: 1; overflow: auto; padding: 18px 24px 22px; min-height: 120px; }
+  .rt-corpo > .rt-wrap { max-width: 980px; margin: 0 auto; }
+  .rt-rod { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 12px 20px; border-top: 1px solid var(--border); background: var(--surface); flex: none; font-size: 11.5px; color: var(--text-dim); }
+  .rt-rod b { color: var(--text); } .rt-rod-b { display: flex; gap: 8px; }
+  .rt-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 11px 20px; border-radius: 9px; border: 0; font: 700 13.5px var(--font-body); cursor: pointer; }
+  .rt-btn.sec { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+  .rt-btn.wa { background: #25d366; color: #06240f; }
+  .rt-btn:disabled { opacity: .55; cursor: default; }
+  .rt-msg { text-align: center; color: var(--text-dim); padding: 40px 10px; font-size: 14px; line-height: 1.6; }
+  .rt-msg.erro { color: var(--danger); }
+  .rt-insp { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .rt-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--accent-dim); color: var(--accent); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 16px; flex: none; }
+  .rt-insp .n { font-size: 15px; font-weight: 700; } .rt-insp .s { font-size: 11.5px; color: var(--text-dim); }
+  .rt-kpis { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-bottom: 16px; }
+  .rt-kpi { background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 13px; }
+  .rt-kpi .l { font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--text-dim); }
+  .rt-kpi .v { font-family: var(--font-display); font-size: 30px; font-weight: 700; line-height: 1.1; margin-top: 2px; }
+  .rt-kpi .d { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+  .rt-kpi.alerta .v { color: var(--danger); } .rt-kpi.ok .v { color: var(--ok); } .rt-kpi.warn .v { color: var(--warn); }
+  .rt-sec { font-size: 10.5px; font-weight: 700; letter-spacing: .7px; text-transform: uppercase; color: var(--text-dim); margin: 20px 0 9px; display: flex; align-items: center; gap: 9px; }
+  .rt-sec::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .rt-chip { width: 11px; height: 11px; border-radius: 3px; display: inline-block; } .rt-chip.inj { background: #8b8f96; } .rt-chip.sop { background: #5b9bf2; }
+  .rt-pill { font: 700 9.5px var(--font-body); padding: 2px 8px; border-radius: 999px; letter-spacing: .3px; white-space: nowrap; display: inline-block; }
+  .rt-pill.sd { background: rgba(155,160,168,.15); color: var(--text-dim); } .rt-pill.leve { background: rgba(63,182,139,.15); color: var(--ok); }
+  .rt-pill.medio { background: rgba(242,169,59,.16); color: var(--warn); } .rt-pill.grave { background: rgba(229,72,77,.16); color: var(--danger); }
+  .rt-atencao { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; font-size: 11.5px; color: var(--text-dim); margin: -4px 0 6px; }
+  .rt-atencao .rt-pill { font-size: 10.5px; padding: 3px 9px; }
+  .rt-okbox { border: 1px solid rgba(63,182,139,.4); background: rgba(63,182,139,.08); color: var(--ok); border-radius: 10px; padding: 10px 14px; font-size: 12.5px; margin-bottom: 6px; }
+  .rt-aviso { border: 1px solid rgba(242,169,59,.45); background: rgba(242,169,59,.08); color: var(--warn); border-radius: 10px; padding: 9px 14px; font-size: 12.5px; margin-bottom: 12px; }
+  /* cartão da máquina */
+  .rt-maq { --mc: #8b8f96; --mbg: rgba(139,143,150,.07); --mhd: rgba(139,143,150,.15); --mbd: rgba(139,143,150,.3);
+    background: var(--mbg); border: 1px solid var(--mbd); border-left: 5px solid var(--mc); border-radius: 10px; margin-bottom: 16px; overflow: hidden; }
+  .rt-maq.sop { --mc: #5b9bf2; --mbg: rgba(91,155,242,.07); --mhd: rgba(91,155,242,.17); --mbd: rgba(91,155,242,.32); }
+  .rt-maq.vazia { background: transparent; border-style: dashed; border-left-style: solid; }
+  .rt-mh { display: grid; grid-template-columns: 150px minmax(0,1fr) 350px; gap: 12px; align-items: center; padding: 11px 14px; background: var(--mhd); }
+  .rt-maq.vazia .rt-mh { grid-template-columns: 150px minmax(0,1fr); background: transparent; }
+  .rt-mn { font-family: var(--font-display); font-size: 20px; font-weight: 700; letter-spacing: .3px; text-transform: uppercase; line-height: 1.1; }
+  .rt-mn small { display: block; font-family: var(--font-body); font-size: 11px; font-weight: 400; color: var(--text-dim); text-transform: none; letter-spacing: 0; margin-top: 2px; }
+  .rt-mm { font-size: 12px; color: var(--text-dim); line-height: 1.5; min-width: 0; } .rt-mm b { color: var(--text); } .rt-mm b.w { color: var(--warn); }
+  .rt-maq.vazia .rt-mm { color: var(--warn); font-weight: 600; }
+  .rt-tira { padding: 6px 7px 4px; border: 1px solid var(--mbd); border: 1px solid color-mix(in srgb, var(--mc) 60%, transparent); border-radius: 8px; background: transparent; }
+  .rt-tira-g, .rt-tira-h { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; }
+  .rt-tc { height: 17px; border-radius: 4px; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: 9.5px; font-weight: 800; color: #fff; }
+  .rt-tc.sd { background: var(--iv-sd, #6b6f76); border: 0; } .rt-tc.leve { background: var(--ok); border: 0; } .rt-tc.medio { background: var(--warn); border: 0; color: #1a1405; } .rt-tc.grave { background: var(--danger); border: 0; }
+  .rt-tc.fut { border-style: dotted; opacity: .4; background: repeating-linear-gradient(135deg, transparent 0 4px, rgba(128,132,140,.35) 4px 5px); }
+  .rt-tira-h { margin-top: 3px; font-size: 9px; color: var(--text-dim); text-align: center; }
+  .rt-mat { border-top: 1px solid var(--mbd); }
+  .rt-ati { display: flex; gap: 10px; padding: 7px 14px; font-size: 12.5px; line-height: 1.45; } .rt-ati + .rt-ati { border-top: 1px solid var(--mbd); }
+  .rt-ati .ic { width: 20px; flex: none; text-align: center; } .rt-ati b { font-weight: 700; }
+  .rt-ati.g { background: rgba(229,72,77,.08); } .rt-ati.w { background: rgba(242,169,59,.06); }
+  .rt-top { padding: 2px 14px 8px; border-top: 1px solid var(--mbd); }
+  .rt-topt { font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--text-dim); padding: 9px 0 3px; }
+  .rt-tr { display: grid; grid-template-columns: 22px minmax(0,1.1fr) minmax(70px,1fr) 178px 30px; gap: 10px; align-items: center; padding: 6px 0; font-size: 12.5px; border-top: 1px solid var(--mbd); }
+  .rt-tr:first-of-type { border-top: 0; }
+  .rt-rk { width: 20px; height: 20px; border-radius: 50%; font-size: 10.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; color: #fff; background: var(--ok); }
+  .rt-rk.grave { background: var(--danger); } .rt-rk.medio { background: var(--warn); color: #1a1405; }
+  .rt-nm { font-weight: 600; min-width: 0; } .rt-nm small { display: block; font-weight: 400; font-size: 11px; color: var(--text-dim); overflow-wrap: anywhere; }
+  .rt-sbar { height: 9px; border-radius: 5px; background: var(--surface-2); display: flex; overflow: hidden; }
+  .rt-sbar i { display: block; height: 100%; } .rt-sbar i.grave { background: var(--danger); } .rt-sbar i.medio { background: var(--warn); } .rt-sbar i.leve { background: var(--ok); }
+  .rt-pl { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+  .rt-qq { text-align: right; font-family: var(--font-display); font-size: 20px; font-weight: 700; }
+  /* fotos (estilo A — quadradas) */
+  .rt-fxw { border-top: 1px solid var(--mbd); padding: 2px 14px 13px; }
+  .rt-fxt { font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--text-dim); padding: 9px 0 8px; }
+  .rt-fxt span { font-weight: 500; text-transform: none; letter-spacing: 0; margin-left: 6px; }
+  .rt-fx-vz { font-size: 12px; color: var(--text-dim); padding: 11px 0 2px; }
+  .rt-fx { display: grid; gap: 9px; grid-template-columns: repeat(5, minmax(0,1fr)); }
+  .rt-fx-i { margin: 0; min-width: 0; position: relative; }
+  .rt-fx-im { position: relative; overflow: hidden; border-radius: 8px; background: #2a2d31; aspect-ratio: 1 / 1; }
+  .rt-fx-im img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .rt-fx-im .rt-fx-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--text-dim); }
+  .rt-fx-i.grave .rt-fx-im { box-shadow: 0 0 0 2px var(--danger); } .rt-fx-i.medio .rt-fx-im { box-shadow: 0 0 0 2px var(--warn); } .rt-fx-i.leve .rt-fx-im { box-shadow: 0 0 0 2px var(--ok); }
+  .rt-fx-tag { position: absolute; left: 6px; top: 6px; font-size: 8.5px; font-weight: 800; letter-spacing: .4px; padding: 2px 6px; border-radius: 4px; color: #fff; background: var(--ok); }
+  .rt-fx-i.grave .rt-fx-tag { background: var(--danger); } .rt-fx-i.medio .rt-fx-tag { background: var(--warn); color: #1a1404; }
+  .rt-fx-i figcaption { margin-top: 6px; font-size: 11.5px; line-height: 1.3; min-width: 0; }
+  .rt-fx-i figcaption b { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rt-fx-i figcaption small { display: block; color: var(--text-dim); font-size: 10.5px; }
+  /* observação por máquina */
+  .rt-obs { border-top: 1px solid var(--mbd); padding: 9px 14px 12px; }
+  .rt-maq.vazia .rt-obs { border-top: 1px dashed var(--mbd); }
+  .rt-obs label { display: block; font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
+  .rt-obs textarea, .rt-geral textarea { width: 100%; min-height: 54px; resize: vertical; font: 13px var(--font-body); color: var(--text); background: rgba(0,0,0,.22); border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px; box-sizing: border-box; }
+  body.tema-claro .rt-obs textarea, body.tema-claro .rt-geral textarea { background: #fff; }
+  .rt-obs textarea:focus, .rt-geral textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .rt-st { font-size: 11px; color: var(--text-dim); margin-top: 5px; } .rt-st.ok { color: var(--ok); } .rt-st.sv { color: var(--warn); } .rt-st.er { color: var(--danger); font-weight: 600; }
+  .rt-geral label { display: block; font-size: 10px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--text-dim); margin-bottom: 6px; }
+  .rt-rank { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(0,1fr) 34px; gap: 10px; align-items: center; padding: 6px 0; font-size: 12.5px; border-top: 1px solid var(--border); }
+  .rt-rank:first-of-type { border-top: 0; }
+  .rt-rank .bar { height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; } .rt-rank .bar i { display: block; height: 100%; background: var(--accent); }
+  .rt-rank .q { text-align: right; font-weight: 700; } .rt-rank small { display: block; color: var(--text-dim); font-size: 11px; }
+  /* compartilhar */
+  .rt-ov { position: absolute; inset: 0; z-index: 5; background: rgba(0,0,0,.62); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .rt-ov-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 24px 22px 18px; width: min(400px, 100%); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; max-height: 100%; overflow: auto; }
+  .rt-ov-card.grande { width: min(880px, 100%); align-items: stretch; padding: 14px; text-align: left; height: 100%; }
+  .rt-ov-t { font-family: var(--font-display); font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; }
+  .rt-ov-s { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; }
+  .rt-ov-ok { width: 46px; height: 46px; border-radius: 50%; background: rgba(63,182,139,.18); color: var(--ok); font-size: 24px; display: flex; align-items: center; justify-content: center; }
+  .rt-ov-er { width: 46px; height: 46px; border-radius: 50%; background: rgba(229,72,77,.16); color: var(--danger); font-size: 24px; display: flex; align-items: center; justify-content: center; }
+  .rt-spin { width: 42px; height: 42px; border-radius: 50%; border: 4px solid var(--border); border-top-color: var(--accent); animation: girar 0.9s linear infinite; }
+  .rt-arq { display: flex; gap: 12px; align-items: center; border: 1px solid var(--border); background: var(--surface-2); border-radius: 10px; padding: 10px 12px; text-align: left; width: 100%; }
+  .rt-arq-ic { width: 38px; height: 46px; border-radius: 6px; background: #e5484d; color: #fff; font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex: none; }
+  .rt-arq-n { font-size: 12.5px; font-weight: 700; word-break: break-all; } .rt-arq-s { font-size: 11.5px; color: var(--text-dim); }
+  .rt-ov-card .rt-btn { width: 100%; }
+  .rt-ov-linha { display: flex; gap: 8px; width: 100%; } .rt-ov-linha .rt-btn { flex: 1; }
+  .rt-link { background: none; border: 0; color: var(--text-dim); font: 500 12.5px var(--font-body); text-decoration: underline; cursor: pointer; padding: 6px; }
+  .rt-ov-bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 12.5px; padding-bottom: 8px; }
+  .rt-prev { overflow: auto; flex: 1; background: #34373c; border-radius: 10px; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  body.tema-claro .rt-prev { background: #c9ccd1; }
+  .rt-pp-wrap { flex: none; box-shadow: 0 6px 22px rgba(0,0,0,.5); overflow: hidden; background: #fff; }
+  .rt-pp-wrap img { display: block; width: 100%; height: 100%; }
+  /* botão da tela inicial do celular */
+  .op-big.rt { border-color: color-mix(in srgb, var(--ok) 55%, var(--border)); padding: 18px 20px; }
+  .op-big.rt b { font-size: 28px; }
+  @media (max-width: 820px) {
+    .rt-scrim { padding: 0; align-items: flex-end; }
+    .rt-box { width: 100%; max-height: 94vh; border-radius: 18px 18px 0 0; border-bottom: 0; }
+    .rt-cab { padding: 12px 14px; } .rt-cab h2 { font-size: 22px; }
+    .rt-sel { padding: 10px 14px; } .rt-seg button { padding: 8px 10px; font-size: 12px; }
+    .rt-periodo { margin-left: 0; text-align: left; width: 100%; }
+    .rt-corpo { padding: 12px 14px 14px; }
+    .rt-rod { padding: 10px 14px 14px; } .rt-rod-t { display: none; } .rt-rod-b { width: 100%; } .rt-rod-b .rt-btn { flex: 1; padding: 13px; font-size: 14.5px; }
+    .rt-kpis { grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; } .rt-kpi .v { font-size: 26px; }
+    .rt-mh { grid-template-columns: minmax(0,1fr); gap: 6px 10px; padding: 10px 12px; } .rt-maq.vazia .rt-mh { grid-template-columns: minmax(0,1fr); }
+    .rt-ati { padding: 7px 12px; } .rt-top { padding: 2px 12px 6px; } .rt-fxw { padding: 2px 12px 12px; } .rt-obs { padding: 9px 12px 12px; }
+    .rt-tr { grid-template-columns: 22px minmax(0,1fr) 28px; gap: 4px 10px; }
+    .rt-tr .rt-sbar { grid-column: 2 / 4; order: 5; } .rt-tr .rt-pl { grid-column: 2 / 4; order: 6; justify-content: flex-start; }
+    .rt-fx { grid-template-columns: repeat(3, minmax(0,1fr)); gap: 7px; }
+    .rt-ov { align-items: center; }
+  }
+
+  /* ---- folha A4 (o que vira o PDF) — sempre tema claro ---- */
+  .rtp-pagina { width: 794px; height: 1123px; background: #fff; color: #14161a; position: relative; font-family: var(--font-body); font-size: 12px; line-height: 1.4; overflow: hidden; }
+  .rtp-pagina * { box-sizing: border-box; }
+  .rtp-conteudo { position: absolute; left: 42px; right: 42px; top: 38px; height: 1008px; overflow: hidden; }
+  .rtp-rod { position: absolute; left: 42px; right: 42px; bottom: 22px; height: 26px; border-top: 1px solid #d9dce0; display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #7a7f87; }
+  .rtp-bloco { margin-bottom: 11px; }
+  .rtp-cab { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 3px solid #f2a93b; padding-bottom: 8px; }
+  .rtp-marca { font-size: 10px; font-weight: 800; letter-spacing: 1.2px; color: #b5750d; }
+  .rtp-tit { font-family: var(--font-display); font-size: 38px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; line-height: 1; margin-top: 2px; }
+  .rtp-cab-d { text-align: right; display: flex; flex-direction: column; gap: 2px; font-size: 12px; color: #555a62; }
+  .rtp-cab-d b { color: #14161a; font-size: 14px; }
+  .rtp-st { font-size: 10px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase; } .rtp-st.ok { color: #1f9d73; } .rtp-st.and { color: #c77a08; }
+  .rtp-meta { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 12px; margin: 12px 0; font-size: 12px; }
+  .rtp-meta small, .rtp-kpi small { display: block; font-size: 9px; font-weight: 800; letter-spacing: .7px; text-transform: uppercase; color: #7a7f87; }
+  .rtp-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+  .rtp-kpi { border: 1px solid #dfe2e6; background: #f6f7f8; border-radius: 8px; padding: 9px 11px; }
+  .rtp-kpi b { display: block; font-family: var(--font-display); font-size: 28px; line-height: 1.1; } .rtp-kpi span { font-size: 10px; color: #7a7f87; }
+  .rtp-kpi.ok b { color: #1f9d73; } .rtp-kpi.warn b { color: #c77a08; } .rtp-kpi.bad b { color: #d93036; }
+  .rtp-chips { display: flex; flex-wrap: wrap; gap: 5px 6px; align-items: center; margin-top: 9px; font-size: 10.5px; color: #6b7078; }
+  .rtp-okbox { margin-top: 9px; border: 1px solid #bfe5d7; background: #eaf7f2; color: #1a7d5c; border-radius: 8px; padding: 8px 12px; font-size: 11px; }
+  .rtp-pill { display: inline-block; font-size: 9.5px; font-weight: 700; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+  .rtp-pill.grave { background: #fde8e9; color: #c52b31; } .rtp-pill.medio { background: #fdf0d9; color: #a8680a; } .rtp-pill.leve { background: #e1f4ec; color: #17805d; }
+  .rtp-sec { font-size: 10px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; color: #6b7078; margin: 6px 0 7px; display: flex; align-items: center; gap: 8px; }
+  .rtp-sec::after { content: ''; flex: 1; height: 1px; background: #e1e4e8; }
+  .rtp-sec .chip { width: 10px; height: 10px; border-radius: 3px; display: inline-block; } .rtp-sec .chip.inj { background: #8b9097; } .rtp-sec .chip.sop { background: #5b9bf2; }
+  .rtp-maq { --c: #8b9097; --h: #eceef0; --b: #f6f7f8; --d: #d6d9de; --tb: #b6b9be; background: var(--b); border: 1px solid var(--d); border-left: 5px solid var(--c); border-radius: 9px; overflow: hidden; }
+  .rtp-maq.sop { --c: #5b9bf2; --h: #e3eefd; --b: #f4f8fe; --d: #cbddf6; --tb: #9dc3f7; }
+  .rtp-maq.vazia { background: #fafafa; border-style: dashed; border-left-style: solid; }
+  .rtp-mh { display: grid; grid-template-columns: 130px minmax(0,1fr) 285px; gap: 10px; align-items: center; padding: 8px 12px; background: var(--h); }
+  .rtp-maq.vazia .rtp-mh { grid-template-columns: 130px 1fr; background: transparent; }
+  .rtp-mn { font-family: var(--font-display); font-size: 21px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; line-height: 1.1; }
+  .rtp-mn small { display: block; font-family: var(--font-body); font-size: 9.5px; font-weight: 400; color: #7a7f87; text-transform: none; letter-spacing: 0; }
+  .rtp-mm { font-size: 11px; color: #6b7078; } .rtp-mm b { color: #14161a; } .rtp-mm b.w { color: #c77a08; }
+  .rtp-warn { color: #a8680a; font-weight: 600; font-size: 11px; }
+  .rtp-mtira .rtp-tira { border: 1px solid var(--tb); border-radius: 7px; padding: 4px 5px 3px; }
+  .rtp-tg, .rtp-th { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2px; }
+  .rtp-th { margin-top: 2px; font-size: 7.5px; color: #7a7f87; text-align: center; }
+  .rtp-tc { height: 11px; border-radius: 3px; border: 1px dashed #cdd1d6; display: flex; align-items: center; justify-content: center; font-size: 7.5px; font-weight: 800; color: #fff; }
+  .rtp-tc.sd { background: #8a8f97; border: 0; } .rtp-tc.leve { background: #1f9d73; border: 0; } .rtp-tc.medio { background: #e08e0b; border: 0; } .rtp-tc.grave { background: #d93036; border: 0; }
+  .rtp-tc.fut { border-style: dotted; background: repeating-linear-gradient(135deg, transparent 0 3px, #dfe2e6 3px 4px); }
+  .rtp-mat { border-top: 1px solid var(--d); } .rtp-ati { display: flex; gap: 8px; padding: 5px 12px; font-size: 11.5px; } .rtp-ati + .rtp-ati { border-top: 1px solid var(--d); }
+  .rtp-ati.g { background: #fdf0f0; } .rtp-ati.w { background: #fdf7e8; }
+  .rtp-top { border-top: 1px solid var(--d); padding: 2px 12px 6px; } .rtp-topt { font-size: 9px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: #7a7f87; padding: 7px 0 2px; }
+  .rtp-tr { display: grid; grid-template-columns: 20px minmax(0,1.15fr) minmax(60px,1fr) 150px 26px; gap: 8px; align-items: center; padding: 4px 0; font-size: 11.5px; border-top: 1px solid var(--d); } .rtp-tr:first-of-type { border-top: 0; }
+  .rtp-rk { width: 18px; height: 18px; border-radius: 50%; font-size: 9.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; color: #fff; background: #1f9d73; }
+  .rtp-rk.grave { background: #d93036; } .rtp-rk.medio { background: #e08e0b; }
+  .rtp-nm { font-weight: 600; } .rtp-nm small { display: block; font-weight: 400; font-size: 9.5px; color: #7a7f87; }
+  .rtp-sbar { height: 8px; border-radius: 4px; background: #eceef0; display: flex; overflow: hidden; } .rtp-sbar i { display: block; height: 100%; }
+  .rtp-sbar i.grave { background: #d93036; } .rtp-sbar i.medio { background: #e08e0b; } .rtp-sbar i.leve { background: #1f9d73; }
+  .rtp-pl { display: flex; gap: 3px; justify-content: flex-end; flex-wrap: wrap; }
+  .rtp-qq { text-align: right; font-family: var(--font-display); font-size: 18px; font-weight: 700; }
+  .rtp-fxw { border-top: 1px solid var(--d); padding: 2px 12px 10px; }
+  .rtp-fxt { font-size: 9px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: #7a7f87; padding: 7px 0 6px; } .rtp-fxt span { font-weight: 500; text-transform: none; letter-spacing: 0; margin-left: 5px; }
+  .rtp-fx-vz { font-size: 10.5px; color: #7a7f87; padding: 8px 0 2px; }
+  .rtp-fx { display: grid; gap: 7px; grid-template-columns: repeat(5, minmax(0,1fr)); }
+  .rtp-fx-i { margin: 0; min-width: 0; position: relative; }
+  .rtp-fx-im { position: relative; overflow: hidden; border-radius: 7px; background: #e6e8eb; aspect-ratio: 1 / 1; }
+  .rtp-fx-im img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .rtp-fx-i.grave .rtp-fx-im { box-shadow: 0 0 0 2px #d93036; } .rtp-fx-i.medio .rtp-fx-im { box-shadow: 0 0 0 2px #e08e0b; } .rtp-fx-i.leve .rtp-fx-im { box-shadow: 0 0 0 2px #1f9d73; }
+  .rtp-fx-tag { position: absolute; left: 5px; top: 5px; font-size: 7.5px; font-weight: 800; letter-spacing: .4px; padding: 2px 5px; border-radius: 3px; color: #fff; background: #1f9d73; }
+  .rtp-fx-i.grave .rtp-fx-tag { background: #d93036; } .rtp-fx-i.medio .rtp-fx-tag { background: #e08e0b; }
+  .rtp-fx-i figcaption { margin-top: 5px; font-size: 10px; line-height: 1.3; color: #14161a; min-width: 0; }
+  .rtp-fx-i figcaption b { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .rtp-fx-i figcaption small { display: block; color: #7a7f87; font-size: 9px; }
+  .rtp-mnota { border-top: 1px solid var(--d); padding: 7px 12px 9px; font-size: 11px; line-height: 1.5; border-left: 3px solid #f2a93b; margin: 0; background: #fffaf0; }
+  .rtp-mnota b { display: block; font-size: 9px; font-weight: 800; letter-spacing: .6px; text-transform: uppercase; color: #a8680a; margin-bottom: 2px; }
+  .rtp-mnota small { display: block; color: #7a7f87; font-size: 9.5px; margin-top: 3px; }
+  .rtp-rg { display: grid; grid-template-columns: minmax(0,1.3fr) minmax(0,1fr) 34px; gap: 10px; align-items: center; padding: 4px 0; font-size: 11.5px; border-top: 1px solid #eceef0; }
+  .rtp-rg small { display: block; color: #7a7f87; font-size: 9.5px; } .rtp-rg b { text-align: right; }
+  .rtp-bar { height: 8px; border-radius: 4px; background: #eceef0; overflow: hidden; } .rtp-bar i { display: block; height: 100%; background: #f2a93b; }
+  .rtp-obs { border: 1px solid #dfe2e6; background: #fafafa; border-radius: 8px; padding: 11px 13px; font-size: 12px; line-height: 1.55; }
+  .rtp-ass { margin-top: 6px; color: #7a7f87; font-size: 10px; }
 </style>
 </head>
 <body>
@@ -888,6 +1109,7 @@
     <p class="op-hello">Cadastro de inspeções e últimos cadastros</p>
     <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><b>Injetora</b><span>Cadastro de inspeção e últimos cadastros das injetoras</span></button>
     <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><b>Sopro</b><span>Cadastro de inspeção e últimos cadastros das sopradoras</span></button>
+    <button type="button" class="op-big rt" onclick="rtAbrir()"><b>📋 Resumo do turno</b><span id="rtHomeSub">Turno atual</span></button>
     <div class="op-foot"><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div></div>
   </section>
   <section id="opDash" hidden>
@@ -907,6 +1129,17 @@
 <div class="iv-scrim" id="ivScrim" onclick="ivFecharCadastro()"></div>
 <aside class="iv-drawer" id="ivDrawer" aria-label="Cadastro de inspeção" aria-hidden="true"></aside>
 <div class="iv-tip" id="ivTip"></div>
+
+<!-- Resumo do turno (janela por cima de tudo: serve para computador e celular/tablet) -->
+<div id="rtDlg" class="rt-scrim" hidden>
+  <div class="rt-box" role="dialog" aria-modal="true" aria-labelledby="rtTitulo">
+    <div class="rt-cab"><h2 id="rtTitulo">📋 Resumo do turno</h2><button type="button" class="rt-x" onclick="rtFechar()" aria-label="Fechar">✕</button></div>
+    <div class="rt-sel" id="rtSel"></div>
+    <div class="rt-corpo" id="rtCorpo"></div>
+    <div class="rt-rod"><span class="rt-rod-t">As observações são <b>salvas automaticamente</b> por data, turno e máquina. O PDF só é gerado ao clicar em <b>Compartilhar</b>.</span><div class="rt-rod-b"><button type="button" class="rt-btn sec" onclick="rtFechar()">Fechar</button><button type="button" class="rt-btn wa" id="rtBtnCompartilhar" onclick="rtCompartilhar()" disabled>📤 Compartilhar</button></div></div>
+    <div class="rt-ov" id="rtOv" hidden></div>
+  </div>
+</div>
 
 <div id="app" class="hidden">
 
@@ -1013,6 +1246,7 @@
       <div class="quick-actions">
         <button class="btn btn-accent" onclick="setPage('cadastroInjecao')">+ Cadastro Injeção</button>
         <button class="btn btn-accent" onclick="setPage('cadastroSopro')">+ Cadastro Sopro</button>
+        <button class="btn btn-outline" onclick="rtAbrir()" title="Resumo dos cadastros de um turno (para enviar pelo WhatsApp em PDF)">📋 Resumo do turno</button>
       </div>
 
       <div class="filter-bar">
@@ -1628,7 +1862,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 /* Data/hora da última atualização deste arquivo (index.html) — atualizar manualmente
    a cada nova versão publicada, só pra controle de qual versão está em uso em cada
    dispositivo. Exibido no rodapé do menu lateral. */
-const ULTIMA_ATUALIZACAO_SISTEMA = '04/11/2026 16:59';
+const ULTIMA_ATUALIZACAO_SISTEMA = '05/11/2026 09:13';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -5432,6 +5666,7 @@ function opIniciar() {
   opIr('home');
 }
 function opIr(tela) {
+  if (tela === 'home' && typeof rtAtualizarSubHome === 'function') rtAtualizarSubHome();
   document.getElementById('opHome').hidden = tela !== 'home';
   document.getElementById('opDash').hidden = tela !== 'dash';
   opFecharSheet();
@@ -5839,6 +6074,766 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'ArrowRight') { const b = document.getElementById('ivProx'); if (b && !b.disabled) b.click(); }
 });
 setInterval(ivAtualizarAgora, 60000);
+
+/* =============================================================================
+   RESUMO DO TURNO
+   Compila os cadastros de um turno (Dia 06:00–18:00 / Noite 18:00–06:00; o turno da noite pertence ao
+   dia em que COMEÇOU) por máquina, com observações do inspetor (salvas na aba ResumoTurno_App) e gera
+   um PDF A4 para enviar pelo WhatsApp. Nada aqui altera os cadastros: só LÊ TabelaInjecao/TabelaSopro.
+   Só as observações são gravadas, em aba própria, em histórico append-only (vale a mais recente de
+   cada chave data|turno|máquina), no mesmo padrão das abas Cavidades_App e ModelosMolde_App.
+   ============================================================================= */
+const NOME_ABA_RESUMO_TURNO = 'ResumoTurno_App';
+const NOME_TABELA_RESUMO_TURNO = 'TabelaResumoTurno';
+const CABECALHO_RESUMO_TURNO = ['chave','data','turno','processo','equipamento','texto','inspetor','salvo_em'];
+let ordemColunasResumoTurnoReal = CABECALHO_RESUMO_TURNO.slice(); // mesma lógica das outras abas: ordem REAL na planilha
+const RT_LIMITE_INTERVALO_H = 4;     // acima disso, alerta de "intervalo longo sem inspeção"
+const RT_VERIFICACOES = {
+  inj: [['organizacao_linha_produtiva', 'Organização da linha produtiva'], ['tonalidade_preforma', 'Tonalidade da preforma'], ['alinhamento_etiqueta_caixa', 'Alinhamento da etiqueta da caixa']],
+  sop: [['condicao_fechamento_saco', 'Fechamento do saco'], ['alinhamento_paletes', 'Alinhamento dos paletes'], ['organizacao_linha_produtiva', 'Organização da linha produtiva'], ['condicao_rotulo', 'Condição do rótulo']]
+};
+const RT = {
+  aberto: false, modo: 'atual', outro: null,       // outro = { dataISO, turno } escolhido em "Outro…"
+  dados: { inj: null, sop: null }, dadosTs: 0, dadosDesde: { inj: '', sop: '' },
+  notas: {}, rascunho: {}, timers: {}, falhou: {}, fila: Promise.resolve(),
+  tabelaPromise: null, obsLinhas: null, obsDesde: '',
+  R: null, seq: 0, fotoData: {}, pdf: null, carregando: false, erro: ''
+};
+
+function rtP2(n) { return String(n).padStart(2, '0'); }
+function rtISO(d) { return d.getFullYear() + '-' + rtP2(d.getMonth() + 1) + '-' + rtP2(d.getDate()); }
+function rtDataBR(iso) { const p = String(iso || '').split('-'); return p.length === 3 ? p[2] + '/' + p[1] + '/' + p[0] : (iso || ''); }
+function rtDataCurta(iso) { const p = String(iso || '').split('-'); return p.length === 3 ? p[2] + '/' + p[1] : (iso || ''); }
+function rtParseISO(iso) { const p = String(iso || '').split('-'); return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10)); }
+function rtHM(ms) { const d = new Date(ms); return rtP2(d.getHours()) + ':' + rtP2(d.getMinutes()); }
+function rtDHBR(ms) { const d = new Date(ms); return rtP2(d.getDate()) + '/' + rtP2(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + rtHM(ms); }
+function rtEsc(t) { return escaparHtmlFoto(t); }
+
+// Janela do turno: Dia = 06:00–18:00 do dia; Noite = 18:00 do dia até 06:00 do dia seguinte.
+function rtJanela(dataISO, turno) {
+  const d = rtParseISO(dataISO);
+  const h0 = turno === 'Dia' ? 6 : 18;
+  const ini = new Date(d.getFullYear(), d.getMonth(), d.getDate(), h0, 0, 0, 0);
+  const fim = new Date(ini.getTime()); fim.setHours(fim.getHours() + 12);   // setHours trata a virada de dia/horário de verão
+  return { ini: ini.getTime(), fim: fim.getTime() };
+}
+function rtTurnoDe(agora) {
+  const h = agora.getHours();
+  if (h < 6) { const o = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() - 1); return { dataISO: rtISO(o), turno: 'Noite' }; }
+  return { dataISO: rtISO(agora), turno: h < 18 ? 'Dia' : 'Noite' };
+}
+function rtTurnoAnterior(t) {
+  if (t.turno === 'Noite') return { dataISO: t.dataISO, turno: 'Dia' };
+  const d = rtParseISO(t.dataISO); d.setDate(d.getDate() - 1);
+  return { dataISO: rtISO(d), turno: 'Noite' };
+}
+function rtSelecionado() {
+  const atual = rtTurnoDe(new Date());
+  if (RT.modo === 'atual') return atual;
+  if (RT.modo === 'anterior') return rtTurnoAnterior(atual);
+  return RT.outro || rtTurnoAnterior(rtTurnoAnterior(atual));
+}
+function rtAtualizarSubHome() {
+  const el = document.getElementById('rtHomeSub'); if (!el) return;
+  const t = rtTurnoDe(new Date());
+  el.textContent = 'Turno atual: ' + t.turno + ' · ' + (t.turno === 'Dia' ? '06:00 às 18:00' : '18:00 às 06:00');
+}
+
+/* ---------------- Leitura dos cadastros (só leitura) ---------------- */
+function rtPrimeiraData(regs) { return regs && regs.length ? String(regs[0].data || '') : ''; }
+async function rtCarregarDados(iniISO) {
+  const token = await getToken();
+  await Promise.all(['inj', 'sop'].map(async function(p) {
+    const tab = p === 'inj' ? 'TabelaInjecao' : 'TabelaSopro', cab = p === 'inj' ? CABECALHO_INJECAO : CABECALHO_SOPRO, n = p === 'inj' ? 2000 : 1500;
+    let regs = await opLerUltimasLinhas(tab, cab, p, n, token);
+    // Se o turno pedido é mais antigo do que o que veio nas últimas linhas e ainda há mais linhas, lê tudo.
+    let completo = regs.length < n;
+    if (!completo && iniISO && rtPrimeiraData(regs) > iniISO) { regs = await opLerUltimasLinhas(tab, cab, p, 200000, token); completo = true; }
+    RT.dados[p] = regs; RT.dadosDesde[p] = completo ? '0000-00-00' : rtPrimeiraData(regs);
+  }));
+  RT.dadosTs = Date.now();
+}
+function rtDadosCobrem(iniISO) {
+  return ['inj', 'sop'].every(function(p) { return RT.dados[p] && (RT.dadosDesde[p] === '0000-00-00' || RT.dadosDesde[p] <= iniISO); });
+}
+
+/* ---------------- Cálculo do resumo ---------------- */
+function rtRank(c) { return opRankCrit(c); }
+function rtRotuloCrit(r) { return r >= 3 ? 'GRAVE' : r === 2 ? 'MÉDIO' : 'LEVE'; }
+function rtFmtH(x) {
+  const h = Math.floor(x + 1e-6), m = Math.round((x - h) * 60);
+  if (m === 60) return (h + 1) + 'h';
+  return h === 0 ? m + 'min' : (m === 0 ? h + 'h' : h + 'h' + rtP2(m));
+}
+function rtCalcular(dataISO, turno) {
+  const J = rtJanela(dataISO, turno), agora = Date.now();
+  const concluido = agora >= J.fim, futuro = agora < J.ini;
+  let fimOff = ((concluido ? J.fim : Math.max(J.ini, agora)) - J.ini) / 3600000;
+  const maqs = [], contResp = {};
+  ['inj', 'sop'].forEach(function(p) {
+    const porMaq = opSessoesPorMaquina(RT.dados[p] || []);
+    const nomes = ordenarLista((p === 'inj' ? listas.equipInjecao : listas.equipSopro) || []);
+    Object.keys(porMaq).forEach(function(k) {
+      if (nomes.some(function(n) { return opNomeChave(n) === k; })) return;
+      if (!porMaq[k].sessoes.some(function(x) { return x.t >= J.ini && x.t < J.fim; })) return; // máquina antiga/desconhecida só entra se teve cadastro no turno
+      const rot = porMaq[k].rotulos; nomes.push(Object.keys(rot).sort(function(a, b) { return rot[b] - rot[a]; })[0]);
+    });
+    const lista = nomes.map(function(nome) {
+      const m = porMaq[opNomeChave(nome)];
+      const ses = (m ? m.sessoes : []).filter(function(x) { return x.t >= J.ini && x.t < J.fim; })
+        .sort(function(a, b) { return a.t - b.t || String(a.criado).localeCompare(String(b.criado)); });
+      ses.forEach(function(x) { x.o = (x.t - J.ini) / 3600000; fimOff = Math.max(fimOff, x.o); });
+      return { p: p, nome: nome, ses: ses };
+    });
+    lista.forEach(function(it) { it.ses.forEach(function(x) { const r = String(x.s.responsavel || '').trim(); if (r) contResp[r] = (contResp[r] || 0) + 1; }); });
+    lista.forEach(function(it) { maqs.push(it); });
+  });
+  maqs.forEach(function(m) {
+    const ses = m.ses, p = m.p;
+    m.n = ses.length;
+    let maior = 0, gDe = 0, gAte = 0;
+    if (ses.length) {
+      const seq = [0].concat(ses.map(function(x) { return x.o; }), [fimOff]);
+      for (let i = 1; i < seq.length; i++) if (seq[i] - seq[i - 1] > maior) { maior = seq[i] - seq[i - 1]; gDe = seq[i - 1]; gAte = seq[i]; }
+    }
+    m.maior = maior; m.gDe = gDe; m.gAte = gAte;
+    m.ultimo = ses.length ? ses[ses.length - 1] : null;
+    m.produto = '';
+    if (m.ultimo) {
+      const s = m.ultimo.s;
+      m.produto = p === 'inj' ? (s.gramatura ? formatarGramaturaWpp(s.gramatura) : '—') + ' - ' + (s.cor || '—') : (s.tipo_frasco || '—') + ' - ' + (s.ml || '—');
+    }
+    m.desv = [];
+    ses.forEach(function(x) {
+      x.desvios.forEach(function(d) {
+        const r = rtRank(d.criticidade);
+        let cav = '';
+        if (p === 'inj') { cav = formatarCavidadesWpp(d.cavidade, d.cavidade_todas); if (cav === '—') cav = ''; else if (cav === 'Todas') cav = 'todas'; }
+        m.desv.push({ hora: String(x.hora || '').slice(0, 5), d: String(d.defeito || '').trim(), r: r, c: rtRotuloCrit(r), cav: cav, foto: String(d.foto_url || '').trim() });
+      });
+    });
+    m.comDesvio = ses.filter(function(x) { return x.desvios.length > 0; }).length;
+    m.por = { LEVE: 0, 'MÉDIO': 0, GRAVE: 0 }; m.desv.forEach(function(d) { m.por[d.c]++; });
+    const tm = {};
+    m.desv.forEach(function(d) {
+      const x = tm[d.d] = tm[d.d] || { d: d.d, q: 0, por: { LEVE: 0, 'MÉDIO': 0, GRAVE: 0 }, pior: 0, horas: [], cavs: [], fotos: [] };
+      x.q++; x.por[d.c]++; x.pior = Math.max(x.pior, d.r); x.horas.push(d.hora);
+      if (d.foto) x.fotos.push({ hora: d.hora, r: d.r, c: d.c, cav: d.cav, url: d.foto, d: d.d });
+      if (d.cav) String(d.cav).split(',').forEach(function(z) { z = z.trim(); if (z && x.cavs.indexOf(z) < 0) x.cavs.push(z); });
+    });
+    m.top = Object.keys(tm).map(function(k) { return tm[k]; }).sort(function(a, b) { return b.q - a.q || b.pior - a.pior || a.d.localeCompare(b.d, 'pt-BR'); });
+    m.top.forEach(function(x) { x.fotos.sort(function(a, b) { return b.r - a.r || (a.hora < b.hora ? -1 : a.hora > b.hora ? 1 : 0); }); });
+    // verificações reprovadas (nos campos de aprovado/reprovado do cadastro)
+    m.verif = [];
+    ses.forEach(function(x) {
+      RT_VERIFICACOES[p].forEach(function(par) {
+        if (String(x.s[par[0]] || '').trim().toUpperCase() === 'REPROVADO') m.verif.push({ hora: String(x.hora || '').slice(0, 5), v: par[1] });
+      });
+    });
+  });
+  // máquinas sem cadastro vão para o fim, dentro de cada processo
+  const ordem = maqs.map(function(m, i) { m.i = i; return m; });
+  ordem.sort(function(a, b) { return (a.p === b.p ? 0 : a.p === 'inj' ? -1 : 1) || (a.n ? 0 : 1) - (b.n ? 0 : 1) || a.i - b.i; });
+  const ativos = ordem.filter(function(m) { return m.n; });
+  const soma = function(arr, f) { return arr.reduce(function(a, m) { return a + f(m); }, 0); };
+  const tot = {
+    cad: soma(ativos, function(m) { return m.n; }),
+    cadInj: soma(ativos.filter(function(m) { return m.p === 'inj'; }), function(m) { return m.n; }),
+    cadSop: soma(ativos.filter(function(m) { return m.p === 'sop'; }), function(m) { return m.n; }),
+    comDesvio: soma(ativos, function(m) { return m.comDesvio; }),
+    desv: soma(ativos, function(m) { return m.desv.length; }),
+    leve: soma(ativos, function(m) { return m.por.LEVE; }), medio: soma(ativos, function(m) { return m.por['MÉDIO']; }), grave: soma(ativos, function(m) { return m.por.GRAVE; }),
+    semMaq: ordem.filter(function(m) { return !m.n; }).length, totMaq: ordem.length, nMaq: ativos.length
+  };
+  tot.sd = tot.cad - tot.comDesvio; tot.pctSd = tot.cad ? Math.round(tot.sd / tot.cad * 100) : 0;
+  // ranking geral (todas as máquinas juntas)
+  const rk = {};
+  ordem.forEach(function(m) { m.top.forEach(function(x) { const r = rk[x.d] = rk[x.d] || { d: x.d, q: 0, m: [] }; r.q += x.q; r.m.push(m.nome); }); });
+  const ranking = Object.keys(rk).map(function(k) { return rk[k]; }).sort(function(a, b) { return b.q - a.q || a.d.localeCompare(b.d, 'pt-BR'); });
+  // pontos de atenção por máquina
+  const relogio = function(o) { return rtHM(J.ini + Math.round(o * 60) * 60000); };
+  ordem.forEach(function(m) {
+    m.at = [];
+    m.desv.filter(function(d) { return d.r >= 3; }).forEach(function(d) {
+      m.at.push({ t: 'g', ic: '🔴', h: '<b>' + rtEsc(d.hora) + '</b> — ' + rtEsc(d.d) + (d.cav ? ' (CAV ' + rtEsc(d.cav) + ')' : '') + ': <b>GRAVE</b>' });
+    });
+    m.verif.forEach(function(v) { m.at.push({ t: 'g', ic: '⛔', h: '<b>' + rtEsc(v.hora) + '</b> — verificação reprovada: <b>' + rtEsc(v.v) + '</b>' }); });
+    if (m.n && m.maior > RT_LIMITE_INTERVALO_H) {
+      m.at.push({ t: 'w', k: 'int', ic: '⏱️', h: 'Maior intervalo sem inspeção: <b>' + rtFmtH(m.maior) + '</b> (das ' + relogio(m.gDe) + ' às ' + relogio(m.gAte) + (!concluido && Math.abs(m.gAte - fimOff) < 1e-9 ? ', até agora' : '') + ')' });
+    }
+  });
+  tot.nGrave = soma(ordem, function(m) { return m.at.filter(function(x) { return x.ic === '🔴'; }).length; });
+  tot.nVerif = soma(ordem, function(m) { return m.at.filter(function(x) { return x.ic === '⛔'; }).length; });
+  tot.nInt = soma(ordem, function(m) { return m.at.filter(function(x) { return x.k === 'int'; }).length; });
+  const resp = Object.keys(contResp).sort(function(a, b) { return contResp[b] - contResp[a]; });
+  return { dataISO: dataISO, turno: turno, J: J, agora: agora, concluido: concluido, futuro: futuro, fimOff: fimOff, maqs: ordem, tot: tot, ranking: ranking,
+    inspetor: resp.length ? resp[0] : '', inspetores: resp, relogio: relogio };
+}
+
+/* ---------------- Peças visuais (tela e papel usam as mesmas) ---------------- */
+function rtChave(R, eq) { return R.dataISO + '|' + R.turno + '|' + eq; }
+function rtCls(r) { return r >= 3 ? 'grave' : r === 2 ? 'medio' : r === 1 ? 'leve' : 'sd'; }
+function rtPills(x, pp) {
+  const P = pp ? 'rtp-pill' : 'rt-pill';
+  return [x.por.GRAVE && '<span class="' + P + ' grave">' + x.por.GRAVE + ' grave</span>', x.por['MÉDIO'] && '<span class="' + P + ' medio">' + x.por['MÉDIO'] + ' médio</span>', x.por.LEVE && '<span class="' + P + ' leve">' + x.por.LEVE + ' leve</span>'].filter(Boolean).join('');
+}
+function rtTiraHTML(m, R, pp) {
+  const P = pp ? 'rtp-' : 'rt-';
+  let cells = '', labs = '';
+  const ini = new Date(R.J.ini).getHours();
+  for (let i = 0; i < 12; i++) {
+    const dentro = m.ses.filter(function(x) { return Math.floor(x.o + 1e-9) === i; }), hr = (ini + i) % 24;
+    const fut = !R.concluido && i > Math.floor(R.fimOff + 1e-9);
+    const pior = dentro.reduce(function(a, x) { return Math.max(a, x.pior); }, 0);
+    const tt = rtP2(hr) + 'h: ' + (dentro.length ? dentro.length + ' cadastro(s)' : 'sem cadastro');
+    cells += dentro.length ? '<div class="' + P + 'tc ' + (pior ? rtCls(pior) : 'sd') + '" title="' + tt + '">' + (dentro.length > 1 ? dentro.length : '') + '</div>' : '<div class="' + P + 'tc' + (fut ? ' fut' : '') + '" title="' + tt + '"></div>';
+    labs += '<span>' + rtP2(hr) + (pp ? 'h' : '') + '</span>';
+  }
+  return pp ? '<div class="rtp-tira"><div class="rtp-tg">' + cells + '</div><div class="rtp-th">' + labs + '</div></div>'
+            : '<div class="rt-tira"><div class="rt-tira-g">' + cells + '</div><div class="rt-tira-h">' + labs + '</div></div>';
+}
+function rtHorasTxt(horas) {
+  const u = horas.filter(function(h, i) { return horas.indexOf(h) === i; });   // já vêm em ordem cronológica do turno
+  return u.length > 10 ? u.slice(0, 10).join(' · ') + ' …' : u.join(' · ');
+}
+function rtCavTxt(x) {
+  if (!x.cavs.length) return '';
+  if (x.cavs.indexOf('todas') >= 0) return ' · CAV todas';
+  return ' · CAV ' + (x.cavs.length > 8 ? x.cavs.slice(0, 8).join(', ') + ' …' : x.cavs.join(', '));
+}
+function rtTopHTML(m, pp, limite) {
+  if (!m.top.length) return '';
+  const P = pp ? 'rtp-' : 'rt-', mx = m.top[0].q, lista = limite ? m.top.slice(0, limite) : m.top;
+  let h = '<div class="' + P + 'top"><div class="' + P + 'topt">Defeitos mais observados · por gravidade</div>';
+  h += lista.map(function(x, i) {
+    const seg = function(n, c) { return n ? '<i class="' + c + '" style="width:' + (n / mx * 100) + '%"></i>' : ''; };
+    return '<div class="' + P + 'tr"><span class="' + P + 'rk ' + rtCls(x.pior) + '">' + (i + 1) + '</span><div class="' + P + 'nm">' + rtEsc(x.d) + '<small>' + rtEsc(rtHorasTxt(x.horas) + rtCavTxt(x)) + '</small></div><div class="' + P + 'sbar">' + seg(x.por.GRAVE, 'grave') + seg(x.por['MÉDIO'], 'medio') + seg(x.por.LEVE, 'leve') + '</div><div class="' + P + 'pl">' + rtPills(x, pp) + '</div><div class="' + P + 'qq">' + x.q + '×</div></div>';
+  }).join('');
+  if (limite && m.top.length > limite) h += '<div class="' + P + 'fx-vz">+ ' + (m.top.length - limite) + ' outro(s) defeito(s) — veja todos no sistema.</div>';
+  return h + '</div>';
+}
+// Fotos: até 5 por máquina. Primeiro a foto mais grave de cada defeito (na ordem do ranking), depois as extras.
+function rtSelecionarFotos(m) {
+  const top = m.top, sel = []; let total = 0;
+  top.forEach(function(x) { total += x.fotos.length; });
+  top.forEach(function(x, i) { if (x.fotos[0] && sel.length < 5) sel.push(Object.assign({ idx: i }, x.fotos[0])); });
+  for (let k = 1; sel.length < 5 && k < 40; k++) top.forEach(function(x, i) { if (sel.length < 5 && x.fotos[k]) sel.push(Object.assign({ idx: i }, x.fotos[k])); });
+  sel.sort(function(a, b) { return a.idx - b.idx || b.r - a.r; });
+  return { sel: sel, total: total };
+}
+function rtFotosHTML(m, pp) {
+  if (!m.desv.length) return '';
+  const P = pp ? 'rtp-' : 'rt-';
+  const s = rtSelecionarFotos(m);
+  let sel = s.sel, naoCarregou = 0;
+  if (pp) { sel = sel.filter(function(f) { if (RT.fotoData[f.url]) return true; naoCarregou++; return false; }); }
+  if (!s.total) return '<div class="' + P + 'fxw"><div class="' + P + 'fx-vz">📷 Nenhuma foto anexada aos desvios desta máquina neste turno.</div></div>';
+  if (!sel.length) return '<div class="' + P + 'fxw"><div class="' + P + 'fx-vz">📷 ' + (pp ? 'As fotos deste turno não puderam ser carregadas para o PDF.' : 'Carregando fotos…') + '</div></div>';
+  const extra = s.total - sel.length;
+  const itens = sel.map(function(f) {
+    const img = pp ? '<img alt="" src="' + RT.fotoData[f.url] + '">' : '<img alt="" data-rtfoto="' + rtEsc(f.url) + '" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">';
+    return '<figure class="' + P + 'fx-i ' + rtCls(f.r) + '"><div class="' + P + 'fx-im">' + img + '<span class="' + P + 'fx-tag">' + f.c + '</span></div><figcaption><b>' + rtEsc(f.d) + '</b><small>' + rtEsc(f.hora) + (f.cav ? ' · CAV ' + rtEsc(f.cav) : '') + '</small></figcaption></figure>';
+  }).join('');
+  return '<div class="' + P + 'fxw"><div class="' + P + 'fxt">Fotos dos principais defeitos <span>máx. 5' + (extra > 0 ? ' · +' + extra + ' foto' + (extra > 1 ? 's' : '') + ' não exibida' + (extra > 1 ? 's' : '') : '') + '</span></div><div class="' + P + 'fx">' + itens + '</div></div>';
+}
+function rtTxtQuando(sq) { return String(sq || '').replace(/^(\d{2}\/\d{2})\/\d{4}/, '$1'); }
+function rtTextoNota(chave) {
+  const rs = RT.rascunho[chave], n = RT.notas[chave];
+  if (rs) return { texto: rs.texto, autor: n && n.texto === rs.texto ? n.inspetor : rs.inspetor, quando: n && n.texto === rs.texto ? rtTxtQuando(n.salvo_em) : 'ainda não salva na planilha' };
+  return n && n.texto ? { texto: n.texto, autor: n.inspetor, quando: rtTxtQuando(n.salvo_em) } : null;
+}
+function rtStatusTxt(chave) {
+  if (RT.falhou[chave]) return ['⚠ Não conseguiu salvar na planilha — o texto continua aqui e o sistema tenta de novo.', 'er'];
+  if (RT.rascunho[chave] && (RT.timers[chave] !== undefined || RT.salvando === chave)) return ['Salvando…', 'sv'];
+  const n = RT.notas[chave];
+  if (n && n.texto) return ['✓ Salvo por ' + (n.inspetor || '—') + ' · ' + rtTxtQuando(n.salvo_em), 'ok'];
+  return ['Opcional · salva automaticamente na planilha', ''];
+}
+function rtNotaHTML(R, eq, p, titulo) {
+  const chave = rtChave(R, eq), rs = RT.rascunho[chave], n = RT.notas[chave];
+  const st = rtStatusTxt(chave);
+  const attrs = ' data-chave="' + rtEsc(chave) + '" data-eq="' + rtEsc(eq) + '" data-p="' + rtEsc(p) + '" data-d="' + rtEsc(R.dataISO) + '" data-t="' + rtEsc(R.turno) + '"';
+  const ta = '<textarea rows="2" class="rt-ta"' + attrs + ' placeholder="Ex.: parada para troca de molde, aguardando matéria-prima, ajuste feito…" oninput="rtNotaDigitada(this)" onblur="rtNotaBlur(this)" maxlength="2000">' + rtEsc(rs ? rs.texto : (n ? n.texto : '')) + '</textarea>';
+  const stEl = '<div class="rt-st ' + st[1] + '" data-chave="' + rtEsc(chave) + '">' + rtEsc(st[0]) + '</div>';
+  return eq === '__geral' ? '<div class="rt-geral"><label>' + titulo + '</label>' + ta + stEl + '</div>'
+                          : '<div class="rt-obs"><label>📝 ' + titulo + '</label>' + ta + stEl + '</div>';
+}
+function rtChipsAtencao(R, pp) {
+  const t = R.tot, P = pp ? 'rtp-pill' : 'rt-pill';
+  return [t.nGrave && '<span class="' + P + ' grave">🔴 ' + t.nGrave + ' grave' + (t.nGrave > 1 ? 's' : '') + '</span>',
+    t.nVerif && '<span class="' + P + ' grave">⛔ ' + t.nVerif + ' verificação reprovada' + (t.nVerif > 1 ? 's' : '') + '</span>',
+    t.nInt && '<span class="' + P + ' medio">⏱️ ' + t.nInt + ' intervalo' + (t.nInt > 1 ? 's' : '') + ' longo' + (t.nInt > 1 ? 's' : '') + '</span>',
+    t.semMaq && '<span class="' + P + ' medio">⚠️ ' + t.semMaq + ' máquina' + (t.semMaq > 1 ? 's' : '') + ' sem cadastro</span>'].filter(Boolean);
+}
+function rtKpisDados(R) {
+  const t = R.tot;
+  return [
+    { l: 'Cadastros', v: t.cad, d: 'Injeção ' + t.cadInj + ' · Sopro ' + t.cadSop, c: '' },
+    { l: 'Sem desvio', v: t.pctSd + '%', d: t.sd + ' de ' + t.cad + ' cadastros', c: t.cad ? (t.pctSd >= 80 ? 'ok' : 'warn') : '' },
+    { l: 'Desvios', v: t.desv, d: t.desv ? [t.grave && t.grave + ' grave', t.medio && t.medio + ' médio', t.leve && t.leve + ' leve'].filter(Boolean).join(' · ') : 'nenhum no turno', c: t.grave ? 'alerta' : t.desv ? 'warn' : (t.cad ? 'ok' : '') },
+    { l: 'Máquinas com cadastro', v: t.nMaq + '/' + t.totMaq, d: t.semMaq ? t.semMaq + ' sem cadastro no turno' : 'todas inspecionadas', c: t.semMaq ? 'warn' : 'ok' }
+  ];
+}
+
+/* ---------------- Tela ---------------- */
+function rtMaqHTML(m, R) {
+  const p = m.p;
+  if (!m.n) return '<div class="rt-maq vazia ' + p + '"><div class="rt-mh"><div class="rt-mn">' + rtEsc(m.nome) + '</div><div class="rt-mm">⚠️ Nenhum cadastro neste turno</div></div>' + rtNotaHTML(R, m.nome, p, 'Observação do inspetor sobre esta máquina') + '</div>';
+  let h = '<div class="rt-maq ' + p + '"><div class="rt-mh"><div class="rt-mn">' + rtEsc(m.nome) + '<small>' + rtEsc(m.produto) + '</small></div>' +
+    '<div class="rt-mm"><b>' + m.n + '</b> cadastro' + (m.n > 1 ? 's' : '') + ' · último <b>' + rtEsc(String(m.ultimo.hora || '').slice(0, 5)) + '</b> · maior intervalo <b' + (m.maior > RT_LIMITE_INTERVALO_H ? ' class="w"' : '') + '>' + rtFmtH(m.maior) + '</b></div>' +
+    '<div class="rt-mtira">' + rtTiraHTML(m, R, false) + '</div></div>';
+  if (m.at.length) h += '<div class="rt-mat">' + m.at.map(function(a) { return '<div class="rt-ati ' + a.t + '"><span class="ic">' + a.ic + '</span><span>' + a.h + '</span></div>'; }).join('') + '</div>';
+  h += rtTopHTML(m, false) + rtFotosHTML(m, false) + rtNotaHTML(R, m.nome, p, 'Observação do inspetor sobre esta máquina') + '</div>';
+  return h;
+}
+function rtCorpoHTML(R) {
+  const t = R.tot;
+  let h = '<div class="rt-wrap">';
+  if (R.futuro) h += '<div class="rt-aviso">Este turno ainda não começou — não há cadastros para mostrar.</div>';
+  h += '<div class="rt-insp"><div class="rt-avatar">' + rtEsc((R.inspetor || '?').charAt(0).toUpperCase()) + '</div><div><div class="n">' + rtEsc(R.inspetor || 'Sem cadastros no turno') + '</div><div class="s">' +
+    (R.inspetor ? 'Inspetor do turno ' + R.turno.toLowerCase() + ' · definido pelo campo <i>Responsável</i> dos cadastros' + (R.inspetores.length > 1 ? ' (também: ' + rtEsc(R.inspetores.slice(1).join(', ')) + ')' : '') : 'Nenhum cadastro encontrado neste turno') + '</div></div></div>';
+  h += '<div class="rt-kpis">' + rtKpisDados(R).map(function(k) { return '<div class="rt-kpi ' + k.c + '"><div class="l">' + k.l + '</div><div class="v">' + k.v + '</div><div class="d">' + rtEsc(k.d) + '</div></div>'; }).join('') + '</div>';
+  const ch = rtChipsAtencao(R, false);
+  h += ch.length ? '<div class="rt-atencao"><span>Pontos de atenção — detalhados em cada máquina:</span>' + ch.join('') + '</div>'
+    : (t.cad ? '<div class="rt-okbox">✅ Turno sem pontos de atenção: nenhum desvio grave, nenhuma verificação reprovada e todas as máquinas inspecionadas dentro do intervalo.</div>' : '');
+  [['inj', 'Injeção por máquina'], ['sop', 'Sopro por máquina']].forEach(function(par) {
+    const ms = R.maqs.filter(function(m) { return m.p === par[0]; });
+    if (!ms.length) return;
+    h += '<div class="rt-sec"><i class="rt-chip ' + par[0] + '"></i>' + par[1] + '</div>' + ms.map(function(m) { return rtMaqHTML(m, R); }).join('');
+  });
+  h += '<div class="rt-sec">Defeitos mais frequentes · todas as máquinas juntas</div>';
+  if (R.ranking.length) {
+    const mx = R.ranking[0].q;
+    h += R.ranking.slice(0, 5).map(function(r) { return '<div class="rt-rank"><div>' + rtEsc(r.d) + '<small>' + rtEsc(r.m.join(', ')) + '</small></div><div class="bar"><i style="width:' + Math.round(r.q / mx * 100) + '%"></i></div><div class="q">' + r.q + '</div></div>'; }).join('');
+  } else h += '<div style="font-size:12.5px;color:var(--text-dim)">Nenhum defeito registrado neste turno.</div>';
+  h += '<div class="rt-sec">Observação geral do turno <span style="font-weight:400;text-transform:none;letter-spacing:0">(opcional)</span></div>' + rtNotaHTML(R, '__geral', '', 'Observação geral do turno');
+  return h + '</div>';
+}
+function rtSelHTML(R) {
+  const atual = rtTurnoDe(new Date()), ant = rtTurnoAnterior(atual);
+  const b = function(k, txt) { return '<button type="button" class="' + (RT.modo === k ? 'on' : '') + '" onclick="rtModo(\'' + k + '\')">' + txt + '</button>'; };
+  let h = '<span class="rt-lbl">Turno</span><div class="rt-seg">' + b('atual', 'Atual · ' + atual.turno + ' ▶') + b('anterior', 'Anterior · ' + ant.turno) + b('outro', 'Outro…') + '</div>';
+  if (RT.modo === 'outro') {
+    h += '<span class="rt-lbl">Data</span><input type="date" id="rtData" value="' + rtEsc(R.dataISO) + '" max="' + rtISO(new Date()) + '" onchange="rtSetOutro()">' +
+      '<select id="rtTurnoSel" onchange="rtSetOutro()"><option value="Dia"' + (R.turno === 'Dia' ? ' selected' : '') + '>Dia (06:00–18:00)</option><option value="Noite"' + (R.turno === 'Noite' ? ' selected' : '') + '>Noite (18:00–06:00)</option></select>';
+  } else h += '<span class="rt-lbl">Data</span><span class="rt-seg"><button type="button" class="on" style="cursor:default">' + rtDataBR(R.dataISO) + '</button></span>';
+  h += '<div class="rt-seg"><button type="button" onclick="rtRecarregar()" title="Atualizar os dados" aria-label="Atualizar os dados">↻</button></div>';
+  const J = R.J;
+  h += '<div class="rt-periodo"><b>Turno ' + R.turno + '</b> · ' + rtDHBR(J.ini) + ' → ' + rtDHBR(J.fim) +
+    (R.futuro ? '<span class="rt-badge and">ainda não começou</span>' : R.concluido ? '<span class="rt-badge ok">concluído</span>' : '<span class="rt-badge and">em andamento · até ' + rtHM(R.agora) + '</span>') + '</div>';
+  return h;
+}
+
+let rtSelJanela = null;   // turno exibido no momento
+function rtDesenhar() {
+  const sel = rtSelecionado();
+  const R = RT.R = rtCalcular(sel.dataISO, sel.turno);
+  document.getElementById('rtSel').innerHTML = rtSelHTML(R);
+  const corpo = document.getElementById('rtCorpo');
+  const y = corpo.scrollTop;
+  corpo.innerHTML = rtCorpoHTML(R);
+  corpo.scrollTop = y;
+  document.getElementById('rtBtnCompartilhar').disabled = false;
+  rtCarregarFotosTela();
+}
+function rtMostrarMsg(txt, erro, comBotao) {
+  document.getElementById('rtCorpo').innerHTML = '<div class="rt-msg' + (erro ? ' erro' : '') + '">' + (erro ? '' : '<div class="rt-spin" style="margin:0 auto 14px"></div>') + rtEsc(txt) + (comBotao ? '<br><br><button type="button" class="rt-btn sec" onclick="rtRecarregar()">Tentar de novo</button>' : '') + '</div>';
+  document.getElementById('rtBtnCompartilhar').disabled = true;
+}
+
+/* ---------------- Abrir / fechar / trocar de turno ---------------- */
+function rtAbrir() {
+  if (!itemId) { mostrarToast('Aguarde: o sistema ainda está conectando à planilha.', true); return; }
+  RT.modo = 'atual'; RT.outro = null; RT.aberto = true;
+  document.getElementById('rtDlg').hidden = false;
+  document.body.style.overflow = 'hidden';
+  document.addEventListener('keydown', rtTecla);
+  document.getElementById('rtSel').innerHTML = '';
+  rtRecarregar(true);
+}
+function rtTecla(e) { if (e.key === 'Escape' && RT.aberto) { const ov = document.getElementById('rtOv'); if (!ov.hidden) rtFecharOv(); else rtFechar(); } }
+async function rtFechar() {
+  RT.aberto = false; RT.seq++;
+  document.getElementById('rtDlg').hidden = true;
+  document.getElementById('rtOv').hidden = true;
+  document.body.style.overflow = '';
+  document.removeEventListener('keydown', rtTecla);
+  rtDescarregarTodas();   // grava o que ainda estiver pendente (continua em segundo plano)
+}
+async function rtRecarregar(primeira) {
+  const meu = ++RT.seq, sel = rtSelecionado();
+  RT.obsTs = 0;   // força reler as observações da planilha
+  rtMostrarMsg('Carregando os cadastros do turno…');
+  document.getElementById('rtSel').innerHTML = '';
+  try {
+    await rtCarregarDados(sel.dataISO);
+    if (meu !== RT.seq) return;
+    await rtCarregarNotas(sel.dataISO).catch(function(e) { console.error('Resumo do turno: não consegui ler as observações salvas', e); mostrarToast('Não consegui ler as observações já salvas deste turno.', true); });
+    if (meu !== RT.seq) return;
+    rtDesenhar();
+  } catch (err) {
+    if (meu !== RT.seq) return;
+    console.error('Resumo do turno:', err);
+    rtMostrarMsg('Não consegui carregar os cadastros: ' + (err && err.message ? err.message : err), true, true);
+    document.getElementById('rtSel').innerHTML = '';
+  }
+}
+async function rtModo(k) {
+  if (RT.modo === k) return;
+  if (k === 'outro' && !RT.outro) RT.outro = rtTurnoAnterior(rtTurnoAnterior(rtTurnoDe(new Date())));
+  RT.modo = k;
+  rtTrocouSelecao();
+}
+function rtSetOutro() {
+  const d = document.getElementById('rtData').value, t = document.getElementById('rtTurnoSel').value;
+  if (!d) return;
+  RT.outro = { dataISO: d, turno: t === 'Noite' ? 'Noite' : 'Dia' };
+  rtTrocouSelecao();
+}
+async function rtTrocouSelecao() {
+  const meu = ++RT.seq, sel = rtSelecionado();
+  try { document.getElementById('rtSel').innerHTML = rtSelHTML(rtCalcular(sel.dataISO, sel.turno)); } catch (e) {}
+  try {
+    if (!rtDadosCobrem(sel.dataISO) || Date.now() - RT.dadosTs > 120000) { rtMostrarMsg('Carregando os cadastros do turno…'); await rtCarregarDados(sel.dataISO); }
+    if (meu !== RT.seq) return;
+    await rtCarregarNotas(sel.dataISO).catch(function() {});
+    if (meu !== RT.seq) return;
+    rtDesenhar();
+  } catch (err) {
+    if (meu !== RT.seq) return;
+    rtMostrarMsg('Não consegui carregar os cadastros: ' + (err && err.message ? err.message : err), true, true);
+  }
+}
+
+/* ---------------- Fotos na tela ---------------- */
+async function rtCarregarFotosTela() {
+  const meu = RT.seq, imgs = Array.from(document.querySelectorAll('#rtCorpo img[data-rtfoto]'));
+  let i = 0;
+  const worker = async function() {
+    while (i < imgs.length) {
+      const img = imgs[i++], url = img.getAttribute('data-rtfoto');
+      let u = '';
+      try { u = await obterMiniaturaFoto(url); } catch (e) { u = ''; }
+      if (meu !== RT.seq || !img.isConnected) return;
+      if (u) { img.onerror = function() { rtFotoIndisponivel(img); }; img.src = u; } else rtFotoIndisponivel(img);
+    }
+  };
+  await Promise.all([worker(), worker(), worker(), worker()]);
+}
+function rtFotoIndisponivel(img) {
+  const w = img.parentNode; if (!w) return;
+  img.remove(); const ph = document.createElement('span'); ph.className = 'rt-fx-ph'; ph.textContent = '📷'; w.insertBefore(ph, w.firstChild);
+}
+
+/* ---------------- Observações do inspetor (aba ResumoTurno_App) ---------------- */
+function rtBaseWorkbook() { return 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook'; }
+function rtGarantirTabela(token) {
+  if (!RT.tabelaPromise) RT.tabelaPromise = rtCriarTabelaSeFaltar(token).catch(function(e) { RT.tabelaPromise = null; throw e; });
+  return RT.tabelaPromise;
+}
+async function rtCriarTabelaSeFaltar(token) {
+  const H = { Authorization: 'Bearer ' + token }, HJ = { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, base = rtBaseWorkbook();
+  const listaWs = await obterListaWorksheets(token);
+  if (!listaWs.some(function(w) { return w.name === NOME_ABA_RESUMO_TURNO; })) {
+    const r = await fetch(base + '/worksheets/add', { method: 'POST', headers: HJ, body: JSON.stringify({ name: NOME_ABA_RESUMO_TURNO }) });
+    if (!r.ok) throw new Error('não consegui criar a aba ' + NOME_ABA_RESUMO_TURNO + ' (HTTP ' + r.status + ')');
+  }
+  const respTb = await fetch(base + '/worksheets/' + NOME_ABA_RESUMO_TURNO + '/tables', { headers: H });
+  const jsonTb = await respTb.json();
+  const existe = (jsonTb.value || []).some(function(t) { return t.name === NOME_TABELA_RESUMO_TURNO; });
+  if (!existe) {
+    const faixa = 'A1:' + letraColuna(CABECALHO_RESUMO_TURNO.length - 1) + '1';
+    // colunas em formato Texto ANTES de gravar (o Excel não pode converter datas/horas nem tratar "=…" como fórmula)
+    await fetch(base + '/worksheets/' + NOME_ABA_RESUMO_TURNO + '/range(address=\'A:' + letraColuna(CABECALHO_RESUMO_TURNO.length - 1) + '\')', { method: 'PATCH', headers: HJ, body: JSON.stringify({ numberFormat: [['@']] }) }).catch(function() {});
+    const rh = await fetch(base + '/worksheets/' + NOME_ABA_RESUMO_TURNO + '/range(address=\'' + faixa + '\')', { method: 'PATCH', headers: HJ, body: JSON.stringify({ values: [CABECALHO_RESUMO_TURNO] }) });
+    if (!rh.ok) throw new Error('não consegui gravar o cabeçalho (HTTP ' + rh.status + ')');
+    const respAdd = await fetch(base + '/worksheets/' + NOME_ABA_RESUMO_TURNO + '/tables/add', { method: 'POST', headers: HJ, body: JSON.stringify({ address: NOME_ABA_RESUMO_TURNO + '!' + faixa, hasHeaders: true }) });
+    const jsonAdd = await respAdd.json();
+    if (!respAdd.ok || !jsonAdd.id) throw new Error('não consegui criar a tabela (HTTP ' + respAdd.status + ')');
+    await fetch(base + '/tables/' + jsonAdd.id, { method: 'PATCH', headers: HJ, body: JSON.stringify({ name: NOME_TABELA_RESUMO_TURNO }) });
+    ordemColunasResumoTurnoReal = CABECALHO_RESUMO_TURNO.slice();
+    return false;
+  }
+  await rtLerOrdemColunas(token);
+  return true;
+}
+async function rtLerOrdemColunas(token) {
+  const r = await fetch(rtBaseWorkbook() + '/tables/' + NOME_TABELA_RESUMO_TURNO + '/columns', { headers: { Authorization: 'Bearer ' + token } });
+  if (!r.ok) throw new Error('não consegui ler as colunas (HTTP ' + r.status + ')');
+  const j = await r.json(); const nomes = nomesColunasPorIndiceReal(j.value);
+  if (nomes.length) ordemColunasResumoTurnoReal = nomes;
+}
+// Lê só o FINAL da tabela (as observações mais recentes); se o dia pedido for mais antigo, lê tudo.
+// Se a tabela ainda não existe, não cria nada: simplesmente não há observações.
+async function rtCarregarNotas(dataISO) {
+  const token = await getToken(), H = { Authorization: 'Bearer ' + token }, base = rtBaseWorkbook() + '/tables/' + NOME_TABELA_RESUMO_TURNO;
+  if (RT.obsLinhas && (RT.obsDesde === '0000-00-00' || RT.obsDesde <= dataISO) && RT.obsTs && Date.now() - RT.obsTs < 60000) { rtAplicarNotas(dataISO); return; }
+  const rr = await opFetchRetry(base + '/range?$select=address,rowCount', { headers: H });
+  if (rr.status === 404) { RT.obsLinhas = []; RT.obsDesde = '0000-00-00'; RT.obsTs = Date.now(); return; }
+  if (!rr.ok) throw new Error('HTTP ' + rr.status);
+  const j = await rr.json();
+  let total = parseInt(j.rowCount, 10) - 1;   // sem o cabeçalho
+  if (!(total > 0)) { RT.obsLinhas = []; RT.obsDesde = '0000-00-00'; RT.obsTs = Date.now(); return; }
+  await rtLerOrdemColunas(token).catch(function() {});
+  const ler = async function(n) {
+    const skip = Math.max(0, total - n);
+    const r = await opFetchRetry(base + '/rows?$skip=' + skip + '&$top=' + n, { headers: H });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const jj = await r.json();
+    return { skip: skip, linhas: (jj.value || []).map(function(row) { return lerRegistroPorOrdemReal(ordemColunasResumoTurnoReal, CABECALHO_RESUMO_TURNO, row.values[0]); }) };
+  };
+  let res = await ler(800);
+  if (res.skip > 0 && res.linhas.length && String(res.linhas[0].data) > dataISO) res = await ler(200000);
+  RT.obsLinhas = res.linhas; RT.obsDesde = res.skip === 0 ? '0000-00-00' : String(res.linhas.length ? res.linhas[0].data : ''); RT.obsTs = Date.now();
+  rtAplicarNotas(dataISO);
+}
+function rtAplicarNotas(dataISO) {
+  (RT.obsLinhas || []).forEach(function(l) {
+    if (String(l.data) !== dataISO) return;
+    const chave = l.chave; if (!chave || RT.rascunho[chave]) return;   // o que está sendo digitado agora tem prioridade
+    RT.notas[chave] = { texto: String(l.texto || '').replace(/^ (?=[=+\-@])/, ''), inspetor: l.inspetor, salvo_em: l.salvo_em };
+  });
+}
+function rtNotaDigitada(el) {
+  const chave = el.dataset.chave;
+  RT.rascunho[chave] = { texto: el.value, eq: el.dataset.eq, p: el.dataset.p, dataISO: el.dataset.d, turno: el.dataset.t, inspetor: (RT.R && RT.R.dataISO === el.dataset.d && RT.R.turno === el.dataset.t ? RT.R.inspetor : '') || (contaAtual && contaAtual.name) || '' };
+  delete RT.falhou[chave];
+  clearTimeout(RT.timers[chave]);
+  RT.timers[chave] = setTimeout(function() { rtSalvar(chave); }, 1200);
+  rtMostrarStatus(chave);
+}
+function rtNotaBlur(el) { if (RT.rascunho[el.dataset.chave]) rtSalvar(el.dataset.chave); }
+function rtDescarregarTodas() { Object.keys(RT.rascunho).forEach(function(c) { rtSalvar(c); }); return RT.fila; }
+function rtMostrarStatus(chave, forcar) {
+  const st = forcar || rtStatusTxt(chave);
+  Array.prototype.forEach.call(document.querySelectorAll('.rt-st'), function(e) {
+    if (e.dataset.chave === chave) { e.textContent = st[0]; e.className = 'rt-st ' + st[1]; }
+  });
+}
+function rtSalvar(chave) {
+  clearTimeout(RT.timers[chave]); delete RT.timers[chave];
+  const r = RT.rascunho[chave]; if (!r) return RT.fila;
+  const texto = String(r.texto).replace(/\s+$/, '').replace(/^\s+(?=\S)/, '');
+  const atual = RT.notas[chave];
+  if ((atual ? atual.texto : '') === texto) { delete RT.rascunho[chave]; delete RT.falhou[chave]; rtMostrarStatus(chave); return RT.fila; }
+  rtMostrarStatus(chave, ['Salvando…', 'sv']);
+  RT.fila = RT.fila.then(function() { return rtGravarNota(chave); }).catch(function() {});
+  return RT.fila;
+}
+async function rtGravarNota(chave) {
+  const r = RT.rascunho[chave]; if (!r) return;
+  const texto = String(r.texto).replace(/\s+$/, '').replace(/^\s+(?=\S)/, '');
+  const atual = RT.notas[chave];
+  if ((atual ? atual.texto : '') === texto) { delete RT.rascunho[chave]; rtMostrarStatus(chave); return; }
+  RT.salvando = chave;
+  try {
+    const token = await getToken();
+    await rtGarantirTabela(token);
+    const agora = Date.now(), quando = rtDHBR(agora), inspetor = r.inspetor || '—';
+    const reg = { chave: chave, data: r.dataISO, turno: r.turno, processo: r.p || '', equipamento: r.eq, texto: /^[=+\-@]/.test(texto) ? ' ' + texto : texto, inspetor: inspetor, salvo_em: quando };
+    const resp = await fetch(rtBaseWorkbook() + '/tables/' + NOME_TABELA_RESUMO_TURNO + '/rows/add', {
+      method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ values: [construirValoresPorOrdemReal(ordemColunasResumoTurnoReal, reg)] })
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    RT.notas[chave] = { texto: texto, inspetor: inspetor, salvo_em: quando };
+    if (RT.obsLinhas) RT.obsLinhas.push(reg);
+    delete RT.falhou[chave];
+    const novo = RT.rascunho[chave];
+    if (novo && String(novo.texto).replace(/\s+$/, '').replace(/^\s+(?=\S)/, '') === texto) delete RT.rascunho[chave];
+    RT.salvando = null;
+    if (RT.rascunho[chave]) rtMostrarStatus(chave, ['Salvando…', 'sv']);
+    else rtMostrarStatus(chave, texto ? ['✓ Salvo agora · ' + rtTxtQuando(quando), 'ok'] : ['Opcional · salva automaticamente na planilha', '']);
+    if (RT.rascunho[chave] && RT.timers[chave] === undefined) RT.timers[chave] = setTimeout(function() { rtSalvar(chave); }, 300);
+  } catch (err) {
+    RT.salvando = null;
+    console.error('Resumo do turno: falha ao salvar observação', err);
+    RT.falhou[chave] = true;
+    rtMostrarStatus(chave);
+    clearTimeout(RT.timers[chave]);
+    RT.timers[chave] = setTimeout(function() { rtSalvar(chave); }, 15000);   // tenta de novo; o texto digitado nunca é perdido
+  }
+}
+
+/* ---------------- PDF ---------------- */
+const RT_PG_W = 794, RT_PG_H = 1123;
+function rtPpCabecalho(R) {
+  const t = R.tot, ch = rtChipsAtencao(R, true);
+  let h = '<div class="rtp-cab"><div><div class="rtp-marca">INSPEÇÃO DA QUALIDADE · BLOWPET</div><div class="rtp-tit">Resumo do turno</div></div>' +
+    '<div class="rtp-cab-d"><b>Turno ' + R.turno + '</b><span>' + rtDHBR(R.J.ini) + ' → ' + rtDHBR(R.J.fim) + '</span><span class="rtp-st ' + (R.concluido ? 'ok' : 'and') + '">' + (R.concluido ? 'Turno concluído' : 'Parcial até ' + rtHM(R.agora) + ' · em andamento') + '</span></div></div>' +
+    '<div class="rtp-meta"><div><small>Inspetor do turno</small><b>' + rtEsc(R.inspetor || '—') + '</b></div><div><small>Cadastros analisados</small><b>' + t.cad + ' (Injeção ' + t.cadInj + ' · Sopro ' + t.cadSop + ')</b></div><div><small>Gerado em</small><b>' + rtDHBR(R.agora) + '</b></div></div>' +
+    '<div class="rtp-kpis">' + rtKpisDados(R).map(function(k) { return '<div class="rtp-kpi ' + (k.c === 'alerta' ? 'bad' : k.c) + '"><small>' + k.l + '</small><b>' + k.v + '</b><span>' + rtEsc(k.d) + '</span></div>'; }).join('') + '</div>';
+  h += ch.length ? '<div class="rtp-chips"><span>Pontos de atenção (detalhados em cada máquina):</span>' + ch.join('') + '</div>'
+    : (t.cad ? '<div class="rtp-okbox">✅ Turno sem pontos de atenção: nenhum desvio grave, nenhuma verificação reprovada e todas as máquinas inspecionadas dentro do intervalo.</div>' : '');
+  return h;
+}
+function rtPpNota(R, eq) {
+  const n = rtTextoNota(rtChave(R, eq)); if (!n || !String(n.texto).trim()) return '';
+  return '<div class="rtp-mnota"><b>Observação do inspetor</b><div>' + rtEsc(String(n.texto).trim()).replace(/\n/g, '<br>') + '</div><small>— ' + rtEsc(n.autor || '—') + ' · ' + rtEsc(n.quando || '') + '</small></div>';
+}
+function rtPpMaquina(m, R) {
+  if (!m.n) return '<div class="rtp-maq vazia ' + m.p + '"><div class="rtp-mh"><div class="rtp-mn">' + rtEsc(m.nome) + '</div><div class="rtp-warn">⚠️ Nenhum cadastro neste turno</div></div>' + rtPpNota(R, m.nome) + '</div>';
+  let h = '<div class="rtp-maq ' + m.p + '"><div class="rtp-mh"><div class="rtp-mn">' + rtEsc(m.nome) + '<small>' + rtEsc(m.produto) + '</small></div>' +
+    '<div class="rtp-mm"><b>' + m.n + '</b> cadastro' + (m.n > 1 ? 's' : '') + ' · último <b>' + rtEsc(String(m.ultimo.hora || '').slice(0, 5)) + '</b> · maior intervalo <b' + (m.maior > RT_LIMITE_INTERVALO_H ? ' class="w"' : '') + '>' + rtFmtH(m.maior) + '</b></div>' +
+    '<div class="rtp-mtira">' + rtTiraHTML(m, R, true) + '</div></div>';
+  if (m.at.length) {
+    const LIM = 10, vis = m.at.slice(0, LIM);
+    h += '<div class="rtp-mat">' + vis.map(function(a) { return '<div class="rtp-ati ' + a.t + '"><span>' + a.ic + '</span><span>' + a.h + '</span></div>'; }).join('') +
+      (m.at.length > LIM ? '<div class="rtp-ati w"><span>➕</span><span>+ ' + (m.at.length - LIM) + ' outro(s) ponto(s) de atenção — veja todos no sistema.</span></div>' : '') + '</div>';
+  }
+  return h + rtTopHTML(m, true, 8) + rtFotosHTML(m, true) + rtPpNota(R, m.nome) + '</div>';
+}
+function rtPpBlocos(R) {
+  const b = [rtPpCabecalho(R)];
+  [['inj', 'Injeção'], ['sop', 'Sopro']].forEach(function(par) {
+    R.maqs.filter(function(m) { return m.p === par[0]; }).forEach(function(m, i) {
+      b.push((i === 0 ? '<div class="rtp-sec"><i class="chip ' + par[0] + '"></i>' + par[1] + ' por máquina</div>' : '') + rtPpMaquina(m, R));
+    });
+  });
+  if (R.ranking.length) {
+    const mx = R.ranking[0].q;
+    b.push('<div class="rtp-sec">Defeitos mais frequentes · todas as máquinas juntas</div>' + R.ranking.slice(0, 6).map(function(r) { return '<div class="rtp-rg"><div>' + rtEsc(r.d) + '<small>' + rtEsc(r.m.join(', ')) + '</small></div><div class="rtp-bar"><i style="width:' + Math.round(r.q / mx * 100) + '%"></i></div><b>' + r.q + '×</b></div>'; }).join(''));
+  }
+  const g = rtTextoNota(rtChave(R, '__geral'));
+  if (g && String(g.texto).trim()) b.push('<div class="rtp-sec">Observação geral do turno</div><div class="rtp-obs">' + rtEsc(String(g.texto).trim()).replace(/\n/g, '<br>') + '<div class="rtp-ass">— ' + rtEsc(g.autor || '—') + ' · ' + rtEsc(g.quando || '') + '</div></div>');
+  return b;
+}
+// Monta as páginas A4 fora da tela. Cada bloco (cabeçalho, máquina, ranking…) vai inteiro para uma página:
+// mede a altura e, se não couber no que sobra, abre uma página nova — nunca parte uma máquina ao meio.
+function rtPaginar(R) {
+  const host = document.createElement('div');
+  host.style.cssText = 'position:fixed;left:-12000px;top:0;width:' + RT_PG_W + 'px;z-index:-1';
+  document.body.appendChild(host);
+  const nova = function() { const pg = document.createElement('div'); pg.className = 'rtp-pagina'; pg.innerHTML = '<div class="rtp-conteudo"></div><div class="rtp-rod"></div>'; host.appendChild(pg); return pg; };
+  let cur = nova();
+  rtPpBlocos(R).forEach(function(html) {
+    const el = document.createElement('div'); el.className = 'rtp-bloco'; el.innerHTML = html;
+    let c = cur.querySelector('.rtp-conteudo'); c.appendChild(el);
+    if (c.scrollHeight > c.clientHeight + 1 && c.children.length > 1) { c.removeChild(el); cur = nova(); c = cur.querySelector('.rtp-conteudo'); c.appendChild(el); }
+    if (c.scrollHeight > c.clientHeight + 1) {   // bloco maior que uma página inteira (caso extremo): reduz para caber
+      const k = c.clientHeight / el.scrollHeight;
+      el.style.cssText = 'transform-origin:top left;transform:scale(' + k + ');width:' + (100 / k) + '%;height:' + (el.scrollHeight * k) + 'px';
+    }
+  });
+  const pgs = Array.from(host.children), n = pgs.length;
+  pgs.forEach(function(pg, i) {
+    pg.querySelector('.rtp-rod').innerHTML = '<span>Resumo do turno · ' + R.turno + ' ' + rtDataBR(R.dataISO) + (R.inspetor ? ' · Inspetor ' + rtEsc(R.inspetor) : '') + '</span><span>Página ' + (i + 1) + ' de ' + n + '</span>';
+  });
+  return { host: host, paginas: pgs };
+}
+function rtNomeArquivo(R) { return 'Resumo_Turno_' + R.turno + '_' + rtP2(rtParseISO(R.dataISO).getDate()) + '-' + rtP2(rtParseISO(R.dataISO).getMonth() + 1) + '-' + rtParseISO(R.dataISO).getFullYear() + '.pdf'; }
+
+// Foto -> imagem pequena (recortada em quadrado, como na tela) embutida no PDF
+function rtReduzirQuadrada(blob, lado) {
+  return new Promise(function(resolve) {
+    const url = URL.createObjectURL(blob), img = new Image();
+    img.onload = function() {
+      try {
+        const s = Math.min(img.naturalWidth, img.naturalHeight), sx = (img.naturalWidth - s) / 2, sy = (img.naturalHeight - s) / 2, out = Math.min(lado, s);
+        const c = document.createElement('canvas'); c.width = out; c.height = out;
+        const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, out, out); ctx.drawImage(img, sx, sy, s, s, 0, 0, out, out);
+        URL.revokeObjectURL(url); resolve(c.toDataURL('image/jpeg', 0.85));
+      } catch (e) { URL.revokeObjectURL(url); resolve(null); }
+    };
+    img.onerror = function() { URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+async function rtBaixarFoto(webUrl) {
+  if (webUrl in RT.fotoData) return RT.fotoData[webUrl];
+  let out = null;
+  try {
+    let blob = null;
+    const thumb = await obterMiniaturaFoto(webUrl);
+    if (thumb) { try { const r = await fetch(thumb); if (r.ok) blob = await r.blob(); } catch (e) { blob = null; } }
+    if (!blob) {
+      const token = await getToken();
+      const cod = 'u!' + btoa(unescape(encodeURIComponent(webUrl))).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+      const r2 = await fetch('https://graph.microsoft.com/v1.0/shares/' + cod + '/driveItem/thumbnails/0/large/content', { headers: { Authorization: 'Bearer ' + token } });
+      if (r2.ok) blob = await r2.blob();
+    }
+    if (blob) out = await rtReduzirQuadrada(blob, 420);
+  } catch (e) { out = null; }
+  RT.fotoData[webUrl] = out;
+  return out;
+}
+async function rtPrepararFotosPDF(R) {
+  const urls = [];
+  R.maqs.forEach(function(m) { rtSelecionarFotos(m).sel.forEach(function(f) { if (urls.indexOf(f.url) < 0 && !RT.fotoData[f.url]) urls.push(f.url); }); });
+  let i = 0;
+  const worker = async function() { while (i < urls.length) { const u = urls[i++]; delete RT.fotoData[u]; await rtBaixarFoto(u); } };
+  await Promise.all([worker(), worker(), worker()]);
+  let falhas = 0;
+  R.maqs.forEach(function(m) { rtSelecionarFotos(m).sel.forEach(function(f) { if (!RT.fotoData[f.url]) falhas++; }); });
+  return falhas;
+}
+
+/* ---------------- Compartilhar ---------------- */
+function rtOv(html) { const ov = document.getElementById('rtOv'); ov.innerHTML = html; ov.hidden = false; }
+function rtFecharOv() { document.getElementById('rtOv').hidden = true; }
+async function rtCompartilhar() {
+  if (!RT.R) return;
+  const R = RT.R;
+  rtOv('<div class="rt-ov-card"><div class="rt-spin"></div><div class="rt-ov-t">Gerando o PDF…</div><div class="rt-ov-s">Montando as páginas do resumo do turno ' + rtEsc(R.turno.toLowerCase()) + '</div></div>');
+  let paginacao = null;
+  try {
+    await rtDescarregarTodas();                       // observações pendentes entram no PDF e na planilha
+    await garantirLibsPDF();
+    const falhasFoto = await rtPrepararFotosPDF(R);
+    paginacao = rtPaginar(R);
+    const imgs = [];
+    for (const pg of paginacao.paginas) {
+      const canvas = await html2canvas(pg, { scale: 2, backgroundColor: '#ffffff', useCORS: true, logging: false, width: RT_PG_W, height: RT_PG_H });
+      imgs.push(canvas.toDataURL('image/jpeg', 0.9));
+    }
+    const doc = new window.jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait', compress: true });
+    imgs.forEach(function(d, i) { if (i) doc.addPage(); doc.addImage(d, 'JPEG', 0, 0, 210, 297, undefined, 'FAST'); });
+    const blob = doc.output('blob');
+    RT.pdf = { blob: blob, nome: rtNomeArquivo(R), paginas: imgs.length, kb: Math.max(1, Math.round(blob.size / 1024)), imgs: imgs, falhasFoto: falhasFoto, R: R };
+    rtMostrarPronto();
+  } catch (err) {
+    console.error('Resumo do turno: falha ao gerar o PDF', err);
+    rtOv('<div class="rt-ov-card"><div class="rt-ov-er">!</div><div class="rt-ov-t">Não consegui gerar o PDF</div><div class="rt-ov-s">' + rtEsc(err && err.message ? err.message : 'Verifique a conexão e tente de novo.') + '</div><button type="button" class="rt-btn wa" onclick="rtCompartilhar()">Tentar de novo</button><button type="button" class="rt-link" onclick="rtFecharOv()">Fechar</button></div>');
+  } finally {
+    if (paginacao && paginacao.host.parentNode) paginacao.host.parentNode.removeChild(paginacao.host);
+  }
+}
+function rtMostrarPronto() {
+  const p = RT.pdf; if (!p) return;
+  const mobile = rtEhCelular();
+  const dica = mobile ? 'Vai abrir a lista de compartilhar do aparelho, já com o PDF anexado — é só escolher o WhatsApp e o contato ou grupo.' : 'O PDF será baixado e o WhatsApp Web abre em seguida — é só anexar o arquivo (clipe) na conversa.';
+  rtOv('<div class="rt-ov-card"><div class="rt-ov-ok">✓</div><div class="rt-ov-t">PDF pronto</div>' +
+    '<div class="rt-arq"><div class="rt-arq-ic">PDF</div><div><div class="rt-arq-n">' + rtEsc(p.nome) + '</div><div class="rt-arq-s">' + p.paginas + ' página' + (p.paginas > 1 ? 's' : '') + ' · A4 retrato · ' + p.kb + ' KB</div></div></div>' +
+    (p.falhasFoto ? '<div class="rt-aviso" style="width:100%;text-align:left;margin:0">⚠ ' + p.falhasFoto + ' foto' + (p.falhasFoto > 1 ? 's não puderam' : ' não pôde') + ' ser carregada' + (p.falhasFoto > 1 ? 's' : '') + ' e ficou' + (p.falhasFoto > 1 ? 'ram' : '') + ' de fora do PDF.</div>' : '') +
+    '<button type="button" class="rt-btn wa" onclick="rtEnviarWhats()">📲 Enviar por WhatsApp</button>' +
+    '<div class="rt-ov-linha"><button type="button" class="rt-btn sec" onclick="rtBaixar()">⬇ Baixar</button><button type="button" class="rt-btn sec" onclick="rtVerPdf()">👁 Ver PDF</button></div>' +
+    '<div class="rt-ov-s" style="text-align:left">' + dica + '</div><button type="button" class="rt-link" onclick="rtFecharOv()">Fechar</button></div>');
+}
+function rtEhCelular() { return modoOperacao() || (ehAparelhoToque() && window.innerWidth <= 1100); }
+function rtBaixar() {
+  const p = RT.pdf; if (!p) return;
+  const url = URL.createObjectURL(p.blob), a = document.createElement('a');
+  a.href = url; a.download = p.nome; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function() { URL.revokeObjectURL(url); }, 30000);
+}
+async function rtEnviarWhats() {
+  const p = RT.pdf; if (!p) return;
+  const arquivo = new File([p.blob], p.nome, { type: 'application/pdf' });
+  const texto = 'Resumo do turno ' + p.R.turno.toLowerCase() + ' · ' + rtDataBR(p.R.dataISO);
+  if (rtEhCelular() && navigator.canShare && navigator.canShare({ files: [arquivo] })) {
+    try { await navigator.share({ files: [arquivo], title: texto, text: texto }); return; }
+    catch (e) { if (e && e.name === 'AbortError') return; }   // cancelou: não faz mais nada
+  }
+  rtBaixar();
+  window.open('https://web.whatsapp.com/', '_blank', 'noopener');
+  mostrarToast('PDF baixado. No WhatsApp, anexe o arquivo (clipe) na conversa.');
+}
+function rtVerPdf() {
+  const p = RT.pdf; if (!p) return;
+  const z = Math.min(0.82, (Math.min(window.innerWidth, 880) - 70) / RT_PG_W);
+  rtOv('<div class="rt-ov-card grande"><div class="rt-ov-bar"><b>' + rtEsc(p.nome) + '</b><button type="button" class="rt-btn sec" style="padding:7px 12px;width:auto" onclick="rtMostrarPronto()">‹ Voltar</button></div>' +
+    '<div class="rt-prev">' + p.imgs.map(function(src) { return '<div class="rt-pp-wrap" style="width:' + Math.round(RT_PG_W * z) + 'px;height:' + Math.round(RT_PG_H * z) + 'px"><img alt="Página do PDF" src="' + src + '"></div>'; }).join('') + '</div></div>');
+}
 
 /* ---------------- Inicialização ---------------- */
 function init() {
