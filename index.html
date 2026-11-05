@@ -958,6 +958,7 @@
   .rt-fx { display: grid; gap: 9px; grid-template-columns: repeat(5, minmax(0,1fr)); }
   .rt-fx-i { margin: 0; min-width: 0; position: relative; }
   .rt-fx-im { position: relative; overflow: hidden; border-radius: 8px; background: #2a2d31; aspect-ratio: 1 / 1; }
+  .rt-fx-lk { display: block; color: inherit; } .rt-fx-lk:hover .rt-fx-im img { opacity: .88; }
   .rt-fx-im img { display: block; width: 100%; height: 100%; object-fit: cover; }
   .rt-fx-im .rt-fx-ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--text-dim); }
   .rt-fx-i.grave .rt-fx-im { box-shadow: 0 0 0 2px var(--danger); } .rt-fx-i.medio .rt-fx-im { box-shadow: 0 0 0 2px var(--warn); } .rt-fx-i.leve .rt-fx-im { box-shadow: 0 0 0 2px var(--ok); }
@@ -1862,7 +1863,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 /* Data/hora da última atualização deste arquivo (index.html) — atualizar manualmente
    a cada nova versão publicada, só pra controle de qual versão está em uso em cada
    dispositivo. Exibido no rodapé do menu lateral. */
-const ULTIMA_ATUALIZACAO_SISTEMA = '05/11/2026 10:43';
+const ULTIMA_ATUALIZACAO_SISTEMA = '05/11/2026 10:46';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -5946,7 +5947,9 @@ function ivRenderLane(proc, ci, c) {
   const piorG = itens.reduce(function(m, x) { return Math.max(m, x.pior); }, 0);
   const selo = !itens.length ? '' : !nCom ? '<span class="iv-pill sd">sem desvio</span>' : '<span class="iv-pill ' + opClasseRank(piorG) + '">' + nCom + ' c/ desvio</span>';
   const grupos = [];
-  itens.forEach(function(x) { const u = grupos[grupos.length - 1]; if (u && u.prod.toLowerCase() === x.prod.toLowerCase()) u.itens.push(x); else grupos.push({ prod: x.prod, itens: [x] }); });
+  // Quadro novo quando muda o PRODUTO ou o TURNO (Dia 06:00–18:00 / Noite 18:00–06:00) — ver rtTurnoDe()
+  itens.forEach(function(x) { const tt = rtTurnoDe(new Date(x.t)); x.turnoChave = tt.dataISO + '|' + tt.turno; });
+  itens.forEach(function(x) { const u = grupos[grupos.length - 1]; if (u && u.prod.toLowerCase() === x.prod.toLowerCase() && u.turno === x.turnoChave) u.itens.push(x); else grupos.push({ prod: x.prod, turno: x.turnoChave, itens: [x] }); });
   const idx = function(x) { return itens.indexOf(x); };
   let rail = '';
   if (!itens.length) rail = '<div class="iv-vazio">Não houve cadastro nas últimas 48 horas.</div>';
@@ -6332,7 +6335,8 @@ function rtFotosHTML(m, pp) {
   const extra = s.total - sel.length;
   const itens = sel.map(function(f) {
     const img = pp ? '<img alt="" src="' + RT.fotoData[f.url] + '">' : '<img alt="" data-rtfoto="' + rtEsc(f.url) + '" src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==">';
-    return '<figure class="' + P + 'fx-i ' + rtCls(f.r) + '"><div class="' + P + 'fx-im">' + img + '<span class="' + P + 'fx-tag">' + f.c + '</span></div><figcaption><b>' + rtEsc(f.d) + '</b><small>' + rtEsc(f.hora) + (f.cav ? ' · CAV ' + rtEsc(f.cav) : '') + '</small></figcaption></figure>';
+    const quadro = '<div class="' + P + 'fx-im">' + img + '<span class="' + P + 'fx-tag">' + f.c + '</span></div>';
+    return '<figure class="' + P + 'fx-i ' + rtCls(f.r) + '">' + (pp ? quadro : '<a class="rt-fx-lk" href="' + rtEsc(f.url) + '" target="_blank" rel="noopener" title="Abrir a foto original">' + quadro + '</a>') + '<figcaption><b>' + rtEsc(f.d) + '</b><small>' + rtEsc(f.hora) + (f.cav ? ' · CAV ' + rtEsc(f.cav) : '') + '</small></figcaption></figure>';
   }).join('');
   return '<div class="' + P + 'fxw"><div class="' + P + 'fxt">Fotos dos principais defeitos <span>máx. 5' + (extra > 0 ? ' · +' + extra + ' foto' + (extra > 1 ? 's' : '') + ' não exibida' + (extra > 1 ? 's' : '') : '') + '</span></div><div class="' + P + 'fx">' + itens + '</div></div>';
 }
@@ -6513,7 +6517,7 @@ async function rtCarregarFotosTela() {
     while (i < imgs.length) {
       const img = imgs[i++], url = img.getAttribute('data-rtfoto');
       let u = '';
-      try { u = await obterMiniaturaFoto(url); } catch (e) { u = ''; }
+      try { u = await rtMiniatura(url); } catch (e) { u = ''; }
       if (meu !== RT.seq || !img.isConnected) return;
       if (u) { img.onerror = function() { rtFotoIndisponivel(img); }; img.src = u; } else rtFotoIndisponivel(img);
     }
@@ -6758,10 +6762,26 @@ function rtComPrazo(promessa, ms) {
 // miniatura (rápida) e, se o navegador bloquear, baixa pelo downloadUrl. Em seguida a foto é reduzida
 // aqui mesmo para um quadrado de 420 px (JPEG) — o PDF fica leve, sem perder nitidez no tamanho em que
 // a foto aparece no relatório. Cada falha guarda o MOTIVO (RT.fotoMotivo), mostrado no aviso do PDF.
+// Miniatura NÍTIDA para o resumo: pede ao OneDrive um recorte quadrado de 800 x 800 px (c800x800_crop),
+// do tamanho certo para o quadro da foto. As miniaturas padrão podem vir pequenas (176 px) e ficavam
+// borradas/serrilhadas ao serem ampliadas. Se o tamanho personalizado não vier, usa a miniatura padrão.
+const RT_MINIATURAS = {};
+async function rtMiniatura(webUrl) {
+  if (webUrl in RT_MINIATURAS) return RT_MINIATURAS[webUrl];
+  let url = '';
+  try {
+    const token = await getToken();
+    const r = await opFetchRetry('https://graph.microsoft.com/v1.0/shares/' + rtCodigoShare(webUrl) + '/driveItem/thumbnails?select=c800x800_crop', { headers: { Authorization: 'Bearer ' + token } });
+    if (r.ok) { const j = await r.json(), t = (j.value || [])[0]; url = (t && t.c800x800_crop && t.c800x800_crop.url) || ''; }
+  } catch (e) { url = ''; }
+  if (!url) { try { url = await obterMiniaturaFoto(webUrl); } catch (e) { url = ''; } }
+  if (url) RT_MINIATURAS[webUrl] = url;
+  return url;
+}
 function rtCodigoShare(webUrl) { return 'u!' + btoa(unescape(encodeURIComponent(webUrl))).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-'); }
 async function rtBaixarFotoInterno(webUrl) {
   let blob = null;
-  const thumb = await obterMiniaturaFoto(webUrl);
+  const thumb = await rtMiniatura(webUrl);
   // cache: 'no-store' — a mesma miniatura já foi mostrada na tela (<img>, sem CORS) e o navegador do
   // computador reaproveitava essa cópia do cache, que não pode ser lida pelo PDF. Pedindo direto à rede,
   // a resposta vem com a liberação de acesso.
