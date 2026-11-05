@@ -1862,7 +1862,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 /* Data/hora da última atualização deste arquivo (index.html) — atualizar manualmente
    a cada nova versão publicada, só pra controle de qual versão está em uso em cada
    dispositivo. Exibido no rodapé do menu lateral. */
-const ULTIMA_ATUALIZACAO_SISTEMA = '05/11/2026 10:34';
+const ULTIMA_ATUALIZACAO_SISTEMA = '05/11/2026 10:43';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -6762,14 +6762,31 @@ function rtCodigoShare(webUrl) { return 'u!' + btoa(unescape(encodeURIComponent(
 async function rtBaixarFotoInterno(webUrl) {
   let blob = null;
   const thumb = await obterMiniaturaFoto(webUrl);
-  if (thumb) { try { const r = await fetch(thumb); if (r.ok) blob = await r.blob(); } catch (e) { blob = null; } }
+  // cache: 'no-store' — a mesma miniatura já foi mostrada na tela (<img>, sem CORS) e o navegador do
+  // computador reaproveitava essa cópia do cache, que não pode ser lida pelo PDF. Pedindo direto à rede,
+  // a resposta vem com a liberação de acesso.
+  if (thumb) { try { const r = await fetch(thumb, { cache: 'no-store' }); if (r.ok) blob = await r.blob(); } catch (e) { blob = null; } }
   if (!blob) {
     const token = await getToken(), H = { headers: { Authorization: 'Bearer ' + token } };
+    const linkDe = function(it) { return it && (it['@microsoft.graph.downloadUrl'] || it['@content.downloadUrl']) || ''; };
+    // 1) descobre o arquivo pelo link da foto (shares) — pede o link de download e onde o arquivo está
     const base = 'https://graph.microsoft.com/v1.0/shares/' + rtCodigoShare(webUrl) + '/driveItem';
-    let r2 = await opFetchRetry(base + '?$select=id,size,file,@microsoft.graph.downloadUrl', H);
+    let r2 = await opFetchRetry(base + '?$select=id,parentReference,@microsoft.graph.downloadUrl', H);
     if (!r2.ok && r2.status === 400) r2 = await opFetchRetry(base, H);
     if (!r2.ok) throw new Error(r2.status === 404 ? 'foto não encontrada no SharePoint' : r2.status === 403 || r2.status === 401 ? 'sem permissão para a foto' : 'Microsoft respondeu ' + r2.status);
-    const it = await r2.json(), dl = it['@microsoft.graph.downloadUrl'];
+    const it = await r2.json();
+    let dl = linkDe(it);
+    // 2) o caminho "shares" nem sempre devolve o link de download: pede pelo endereço direto do arquivo
+    //    (/drives/{drive}/items/{id}), que é onde a Microsoft documenta o @microsoft.graph.downloadUrl
+    if (!dl && it.id) {
+      const drv = (it.parentReference && it.parentReference.driveId) || driveId;
+      const urlItem = 'https://graph.microsoft.com/v1.0/drives/' + drv + '/items/' + it.id;
+      let r4 = await opFetchRetry(urlItem + '?$select=id,@microsoft.graph.downloadUrl', H);
+      if (r4.ok) dl = linkDe(await r4.json());
+      if (!dl) { r4 = await opFetchRetry(urlItem, H); if (r4.ok) dl = linkDe(await r4.json()); }
+    }
+    // 3) última tentativa: a mesma consulta do passo 1, sem filtrar campos
+    if (!dl) { const r5 = await opFetchRetry(base, H); if (r5.ok) dl = linkDe(await r5.json()); }
     if (!dl) throw new Error('sem link de download');
     let r3;
     try { r3 = await opFetchRetry(dl, {}); } catch (e) { throw new Error('download bloqueado pelo navegador'); }
