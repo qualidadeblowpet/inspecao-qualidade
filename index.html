@@ -225,6 +225,15 @@
     .iv-dot.iv-atual, .iv-md.iv-atual, .iv-legend i.iv-leg-pisca { animation: none; }
     .iv-dot.iv-atual::after { animation: none; transform: scale(1.3); opacity: 1; }
   }
+  /* Linha do tempo geral (todas as máquinas, em ordem de horário) */
+  .iv-chip.ger { border-color: var(--accent); background: rgba(242,169,59,.25); }
+  .iv-gsum { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; padding: 10px 14px 4px; font-size: 12px; color: var(--text-dim); }
+  .iv-gsum b { color: var(--text); font-weight: 700; } .iv-gsum .w { color: var(--warn); }
+  .iv-rail.ger { padding: 8px 14px 12px; }
+  .iv-it.g { width: 64px; }
+  .iv-maq { font-size: 9.5px; line-height: 1.2; font-weight: 700; max-width: 62px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 1px 5px; border-radius: 4px; margin-top: 1px; color: var(--text); }
+  .iv-maq.inj { background: rgba(139,143,150,.22); box-shadow: inset 2px 0 0 #8b8f96; } .iv-maq.sop { background: rgba(91,155,242,.18); box-shadow: inset 2px 0 0 #5b9bf2; }
+  .iv-gp.longo .tx { color: var(--warn); } .iv-gp.longo::after { border-top-color: rgba(242,169,59,.75); }
   .iv-it.sel .iv-dot, .iv-md.sel { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
   .iv-hm { font-size: 10.5px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.15; }
   .iv-dm { font-size: 9.5px; line-height: 1.15; font-variant-numeric: tabular-nums; }
@@ -1338,6 +1347,7 @@
       <div class="charts-grid">
         <div class="card wide"><h3>Intervalo entre inspeções — últimas 48 horas</h3>
           <div class="iv-legend"><span><i style="background:var(--iv-sd)"></i>Sem desvio</span><span><i style="background:var(--ok)"></i>Leve</span><span><i style="background:var(--warn)"></i>Médio</span><span><i style="background:var(--danger)"></i>Grave</span><span>nº = desvios</span><span>tracejado = tempo entre cadastros (laranja: do último até agora)</span><span><i class="iv-ba"></i><i class="iv-bb"></i>Fundo = produto e turno (muda de cor quando o produto ou o turno muda)</span><span><i class="iv-leg-pisca"></i>Piscando = cadastro do turno atual</span></div>
+          <div class="iv-sub iv-geral"><div class="iv-cab"><i class="iv-chip ger"></i>Linha do tempo geral — todas as máquinas<span class="iv-tot" id="ivTotGeral"></span></div><div id="ivGeral"></div></div>
           <div class="iv-sub"><div class="iv-cab"><i class="iv-chip inj"></i>Injeção<button type="button" class="iv-tb" onclick="ivTodas('inj', true)">Expandir todas</button><button type="button" class="iv-tb" onclick="ivTodas('inj', false)">Recolher todas</button><span class="iv-tot" id="ivTotInj"></span></div><div id="ivInj"></div></div>
           <div class="iv-sub"><div class="iv-cab"><i class="iv-chip sop"></i>Sopro<button type="button" class="iv-tb" onclick="ivTodas('sop', true)">Expandir todas</button><button type="button" class="iv-tb" onclick="ivTodas('sop', false)">Recolher todas</button><span class="iv-tot" id="ivTotSop"></span></div><div id="ivSop"></div></div>
         </div>
@@ -1882,7 +1892,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 /* Data/hora da última atualização deste arquivo (index.html) — atualizar manualmente
    a cada nova versão publicada, só pra controle de qual versão está em uso em cada
    dispositivo. Exibido no rodapé do menu lateral. */
-const ULTIMA_ATUALIZACAO_SISTEMA = '09/11/2026 09:32';
+const ULTIMA_ATUALIZACAO_SISTEMA = '09/11/2026 10:09';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -6016,7 +6026,61 @@ function ivRender48h() {
     tot.textContent = total + ' cadastro' + (total === 1 ? '' : 's') + ' nas 48h · ' + comDesv + ' com desvio';
     el.querySelectorAll('.iv-lane.open .iv-rail').forEach(function(r) { const l = r.parentNode; r.scrollLeft = guardados[l.dataset.c] !== undefined ? guardados[l.dataset.c] : r.scrollWidth; });
   });
+  ivRenderGeral();
   ivMarcarSelecionado();
+}
+// Linha do tempo GERAL: todos os cadastros (Injeção + Sopro) em ordem de horário, com o tempo entre um
+// e outro, agrupados por turno (Dia 06:00–18:00 / Noite 18:00–06:00). Cada bolinha mostra a máquina;
+// clicar abre o mesmo cadastro da faixa da máquina. Intervalo de 2h ou mais sem nenhuma inspeção = laranja.
+const IV_GERAL_LIMITE_MS = 2 * 3600000;
+function ivRenderGeral() {
+  const el = document.getElementById('ivGeral'), tot = document.getElementById('ivTotGeral');
+  if (!el) return;
+  if (!dadosHistoricoCarregados) { el.innerHTML = '<div class="iv-vazio" style="padding:14px">Carregando os cadastros…</div>'; if (tot) tot.textContent = ''; return; }
+  const railAnt = el.querySelector('.iv-rail'), scrollAnt = railAnt ? railAnt.scrollLeft : null, fimAnt = railAnt ? railAnt.scrollLeft + railAnt.clientWidth >= railAnt.scrollWidth - 4 : true;
+  const todos = [];
+  ['inj', 'sop'].forEach(function(proc) { (IV.cards[proc] || []).forEach(function(c, ci) { c.sessoes.forEach(function(x, i) { todos.push({ x: x, p: proc, c: ci, i: i, nome: c.nome }); }); }); });
+  todos.sort(function(a, b) { return a.x.t - b.x.t || String(a.x.criado).localeCompare(String(b.x.criado)); });
+  if (!todos.length) { el.innerHTML = '<div class="iv-vazio" style="padding:14px">Não houve cadastro nas últimas 48 horas.</div>'; if (tot) tot.textContent = ''; return; }
+  const kAtual = ivTurnoAtualChave(), agora = Date.now();
+  // turnos
+  const grupos = [];
+  todos.forEach(function(it) {
+    const tt = rtTurnoDe(new Date(it.x.t)), k = tt.dataISO + '|' + tt.turno; it.turno = k;
+    const u = grupos[grupos.length - 1];
+    if (u && u.k === k) u.itens.push(it); else grupos.push({ k: k, turno: tt.turno, dataISO: tt.dataISO, itens: [it] });
+  });
+  // maior intervalo e média
+  let maior = 0, mDe = null, mAte = null, soma = 0;
+  for (let q = 1; q < todos.length; q++) { const d = todos[q].x.t - todos[q - 1].x.t; soma += d; if (d > maior) { maior = d; mDe = todos[q - 1].x.t; mAte = todos[q].x.t; } }
+  const ultimo = todos[todos.length - 1].x.t;
+  if (agora - ultimo > maior) { maior = agora - ultimo; mDe = ultimo; mAte = null; }
+  const nInj = todos.filter(function(t) { return t.p === 'inj'; }).length;
+  const gap = function(ms) { return '<div class="iv-gp' + (ms >= IV_GERAL_LIMITE_MS ? ' longo' : '') + '" title="Tempo sem nenhuma inspeção"><span class="tx">' + ivDur(ms) + '</span></div>'; };
+  let rail = '', prev = null;
+  grupos.forEach(function(g, gi) {
+    if (prev) rail += gap(g.itens[0].x.t - prev.x.t);
+    const cont = {}; g.itens.forEach(function(it) { const r = String(it.x.s.responsavel || '').trim(); if (r) cont[r] = (cont[r] || 0) + 1; });
+    const insp = Object.keys(cont).sort(function(a, b) { return cont[b] - cont[a]; }).map(ivPrimeiroNome);
+    const rot = 'Turno ' + g.turno + ' · ' + opDataCurta(g.dataISO) + (insp.length ? ' · ' + insp.slice(0, 2).join(', ') : '') + ' · ' + g.itens.length + ' inspeç' + (g.itens.length > 1 ? 'ões' : 'ão');
+    rail += '<div class="iv-band ' + (gi % 2 ? 'b' : 'a') + '"><div class="iv-rot" title="' + opEsc(rot) + '">' + opEsc(rot) + '</div><div class="iv-items">';
+    g.itens.forEach(function(it, xi) {
+      if (xi > 0) rail += gap(it.x.t - g.itens[xi - 1].x.t);
+      const x = it.x;
+      rail += '<button type="button" class="iv-it g" data-turno="' + it.turno + '" data-p="' + it.p + '" data-c="' + it.c + '" data-i="' + it.i + '" aria-label="' + opEsc(it.nome + ' ' + ivDM(x.t) + ' ' + ivHM(x.t) + ' ' + (x.s.responsavel || '')) + '">' +
+        '<span class="iv-dot ' + opClasseRank(x.pior) + (it.turno === kAtual ? ' iv-atual' : '') + '">' + (x.desvios.length || '') + '</span><span class="iv-hm">' + ivHM(x.t) + '</span><span class="iv-dm">' + ivDM(x.t) + '</span><span class="iv-maq ' + it.p + '">' + opEsc(it.nome) + '</span></button>';
+      prev = it;
+    });
+    rail += '</div></div>';
+  });
+  rail += '<div class="iv-gp fim' + (agora - ultimo >= IV_GERAL_LIMITE_MS ? ' longo' : '') + '" title="Tempo desde a última inspeção até agora"><span class="tx iv-ago" data-t="' + ultimo + '">há ' + ivDur(agora - ultimo) + '</span><span class="ag"></span><span class="agt">agora</span></div>';
+  const sum = '<div class="iv-gsum"><span><b>' + todos.length + '</b> inspeções nas 48h (Injeção ' + nInj + ' · Sopro ' + (todos.length - nInj) + ')</span>' +
+    (todos.length > 1 ? '<span>intervalo médio <b>' + ivDur(soma / (todos.length - 1)) + '</b></span>' : '') +
+    '<span>maior tempo sem nenhuma inspeção <b class="' + (maior >= IV_GERAL_LIMITE_MS ? 'w' : '') + '">' + ivDur(maior) + '</b> (' + (mAte ? 'das ' + ivHM(mDe) + ' ' + ivDM(mDe) + ' às ' + ivHM(mAte) + ' ' + ivDM(mAte) : 'desde as ' + ivHM(mDe) + ' ' + ivDM(mDe) + ', até agora') + ')</span>' +
+    '<span>tracejado laranja = 2h ou mais sem nenhuma inspeção</span></div>';
+  el.innerHTML = sum + '<div class="iv-rail ger">' + rail + '</div>';
+  const r = el.querySelector('.iv-rail'); r.scrollLeft = (fimAnt || scrollAnt === null) ? r.scrollWidth : scrollAnt;
+  if (tot) tot.textContent = todos.length + ' inspeções nas 48h';
 }
 function ivAlternarLane(lane, abrir) {
   const proc = lane.dataset.p, c = IV.cards[proc][+lane.dataset.c]; if (!c) return;
