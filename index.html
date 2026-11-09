@@ -234,6 +234,24 @@
   .iv-maq { font-size: 9.5px; line-height: 1.2; font-weight: 700; max-width: 62px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 1px 5px; border-radius: 4px; margin-top: 1px; color: var(--text); }
   .iv-maq.inj { background: rgba(139,143,150,.22); box-shadow: inset 2px 0 0 #8b8f96; } .iv-maq.sop { background: rgba(91,155,242,.18); box-shadow: inset 2px 0 0 #5b9bf2; }
   .iv-gp.longo .tx { color: var(--warn); } .iv-gp.longo::after { border-top-color: rgba(242,169,59,.75); }
+  /* Faixa recolhida: 48 quadradinhos = 4 turnos de 12h (do início de 3 turnos atrás até o fim do turno atual) */
+  .iv-t48 { flex: 1 1 520px; max-width: 820px; min-width: 0; display: flex; gap: 7px; padding: 2px 0; }
+  .iv-t48 .tg { flex: 1 1 0; min-width: 0; }
+  .iv-t48 .tl { font-size: 9.5px; font-weight: 700; color: var(--text-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; letter-spacing: .2px; }
+  .iv-t48 .tl.atual { color: var(--accent); }
+  .iv-t48 .tc, .iv-t48 .th { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 2px; }
+  .iv-t48 .th { margin-top: 2px; font-size: 9px; overflow: visible; color: var(--text-dim); text-align: center; font-variant-numeric: tabular-nums; }
+  .iv-tq { height: 15px; border-radius: 3px; border: 1px solid rgba(139,143,150,.45); background: rgba(139,143,150,.12); padding: 0; display: flex; align-items: center; justify-content: center; font: 800 9px var(--font-body); color: #fff; min-width: 0; }
+  button.iv-tq { cursor: pointer; } button.iv-tq:hover { filter: brightness(1.15); outline: 1px solid var(--text); outline-offset: 1px; }
+  .iv-tq.sd { background: var(--iv-sd); border-color: transparent; } .iv-tq.leve { background: var(--ok); border-color: transparent; }
+  .iv-tq.medio { background: var(--warn); border-color: transparent; color: #1a1200; } .iv-tq.grave { background: var(--danger); border-color: transparent; }
+  .iv-tq.fut { border-style: dashed; background: repeating-linear-gradient(135deg, transparent 0 3px, rgba(139,143,150,.45) 3px 4px); }
+  .iv-tq.iv-atual { animation: ivPiscaDot 1.6s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .iv-tq.iv-atual { animation: none; } }
+  .iv-tq.sel { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
+  .iv-sinfo { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; flex: 0 1 300px; min-width: 220px; }
+  .iv-sinfo .l1 { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+  .iv-sinfo .iv-sx { white-space: normal; }
   .iv-it.sel .iv-dot, .iv-md.sel { box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
   .iv-hm { font-size: 10.5px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.15; }
   .iv-dm { font-size: 9.5px; line-height: 1.15; font-variant-numeric: tabular-nums; }
@@ -1346,7 +1364,7 @@
 
       <div class="charts-grid">
         <div class="card wide"><h3>Intervalo entre inspeções — últimas 48 horas</h3>
-          <div class="iv-legend"><span><i style="background:var(--iv-sd)"></i>Sem desvio</span><span><i style="background:var(--ok)"></i>Leve</span><span><i style="background:var(--warn)"></i>Médio</span><span><i style="background:var(--danger)"></i>Grave</span><span>nº = desvios</span><span>tracejado = tempo entre cadastros (laranja: do último até agora)</span><span><i class="iv-ba"></i><i class="iv-bb"></i>Fundo = produto e turno (muda de cor quando o produto ou o turno muda)</span><span><i class="iv-leg-pisca"></i>Piscando = cadastro do turno atual</span></div>
+          <div class="iv-legend"><span><i style="background:var(--iv-sd)"></i>Sem desvio</span><span><i style="background:var(--ok)"></i>Leve</span><span><i style="background:var(--warn)"></i>Médio</span><span><i style="background:var(--danger)"></i>Grave</span><span>nº = desvios</span><span>tracejado = tempo entre cadastros (laranja: do último até agora)</span><span><i class="iv-ba"></i><i class="iv-bb"></i>Fundo = produto e turno (muda de cor quando o produto ou o turno muda)</span><span><i class="iv-leg-pisca"></i>Piscando = cadastro do turno atual</span><span>Recolhido: 48 quadradinhos = 1 hora cada, nos 4 últimos turnos (hachurado = hora que ainda não chegou)</span></div>
           <div class="iv-sub iv-geral"><div class="iv-cab"><i class="iv-chip ger"></i>Linha do tempo geral — todas as máquinas<span class="iv-tot" id="ivTotGeral"></span></div><div id="ivGeral"></div></div>
           <div class="iv-sub"><div class="iv-cab"><i class="iv-chip inj"></i>Injeção<button type="button" class="iv-tb" onclick="ivTodas('inj', true)">Expandir todas</button><button type="button" class="iv-tb" onclick="ivTodas('inj', false)">Recolher todas</button><span class="iv-tot" id="ivTotInj"></span></div><div id="ivInj"></div></div>
           <div class="iv-sub"><div class="iv-cab"><i class="iv-chip sop"></i>Sopro<button type="button" class="iv-tb" onclick="ivTodas('sop', true)">Expandir todas</button><button type="button" class="iv-tb" onclick="ivTodas('sop', false)">Recolher todas</button><span class="iv-tot" id="ivTotSop"></span></div><div id="ivSop"></div></div>
@@ -1892,7 +1910,7 @@ const LINK_PLANILHA_PADRAO = "https://blowpet2-my.sharepoint.com/:x:/g/personal/
 /* Data/hora da última atualização deste arquivo (index.html) — atualizar manualmente
    a cada nova versão publicada, só pra controle de qual versão está em uso em cada
    dispositivo. Exibido no rodapé do menu lateral. */
-const ULTIMA_ATUALIZACAO_SISTEMA = '09/11/2026 10:09';
+const ULTIMA_ATUALIZACAO_SISTEMA = '09/11/2026 14:24';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -5966,11 +5984,45 @@ function ivMontarCards(proc) {
     const ses = m ? m.sessoes.filter(function(x) { return x.t >= ini && x.t <= agora + 3600000; })
       .sort(function(a, b) { return a.t - b.t || String(a.criado).localeCompare(String(b.criado)); }) : [];
     ses.forEach(function(x) { x.prod = ivProduto(proc, x.s); });
-    return { nome: nome, chave: ivChaveLane(proc, nome), sessoes: ses };
+    const J48 = ivJanela48();
+    const tira = m ? m.sessoes.filter(function(x) { return x.t >= J48.ini && x.t < J48.fim; }) : [];
+    return { nome: nome, chave: ivChaveLane(proc, nome), sessoes: ses, tira: tira };
   });
 }
 
 function ivTurnoAtualChave() { const t = rtTurnoDe(new Date()); return t.dataISO + '|' + t.turno; }
+// Janela da faixa recolhida: os 4 últimos turnos (o atual + 3 anteriores) = 48 horas, de hora em hora.
+function ivJanela48() {
+  const tA = rtTurnoDe(new Date()), J = rtJanela(tA.dataISO, tA.turno);
+  const ini = new Date(J.ini); ini.setHours(ini.getHours() - 36);
+  const turnos = []; let t = { dataISO: tA.dataISO, turno: tA.turno };
+  for (let k = 0; k < 4; k++) { turnos.unshift(t); t = rtTurnoAnterior(t); }
+  return { ini: ini.getTime(), fim: J.fim, turnos: turnos, chaveAtual: tA.dataISO + '|' + tA.turno };
+}
+function ivTira48HTML(proc, ci, c) {
+  const W = ivJanela48(), agora = Date.now();
+  let h = '<div class="iv-t48">';
+  W.turnos.forEach(function(tu) {
+    const J = rtJanela(tu.dataISO, tu.turno), k = tu.dataISO + '|' + tu.turno, atual = k === W.chaveAtual;
+    let cel = '', hrs = '';
+    for (let i = 0; i < 12; i++) {
+      const a = new Date(J.ini); a.setHours(a.getHours() + i); const b = new Date(a); b.setHours(b.getHours() + 1);
+      const dentro = (c.tira || []).filter(function(x) { return x.t >= a.getTime() && x.t < b.getTime(); });
+      const hr = String(a.getHours()).padStart(2, '0');
+      if (dentro.length) {
+        const pior = dentro.reduce(function(m, x) { return Math.max(m, x.pior); }, 0), ultimo = dentro[dentro.length - 1];
+        const idx = c.sessoes.indexOf(ultimo), nd = dentro.reduce(function(m, x) { return m + x.desvios.length; }, 0);
+        const tt = hr + 'h ' + ivDM(a.getTime()) + ': ' + dentro.length + ' cadastro' + (dentro.length > 1 ? 's' : '') + ' · ' + (nd ? nd + ' desvio(s)' : 'sem desvio') + ' · ' + dentro.map(function(x) { return ivHM(x.t) + ' ' + ivPrimeiroNome(x.s.responsavel); }).join(', ');
+        const cls = 'iv-tq ' + opClasseRank(pior) + (atual ? ' iv-atual' : '');
+        cel += idx >= 0 ? '<button type="button" class="' + cls + '" data-turno="' + k + '" data-p="' + proc + '" data-c="' + ci + '" data-i="' + idx + '" title="' + opEsc(tt) + '">' + (dentro.length > 1 ? dentro.length : '') + '</button>'
+                        : '<span class="' + cls + '" data-turno="' + k + '" title="' + opEsc(tt) + '">' + (dentro.length > 1 ? dentro.length : '') + '</span>';
+      } else cel += '<span class="iv-tq' + (a.getTime() > agora ? ' fut' : '') + '" title="' + hr + 'h ' + ivDM(a.getTime()) + ': ' + (a.getTime() > agora ? 'ainda não chegou' : 'sem cadastro') + '"></span>';
+      hrs += '<span>' + (i % 2 === 0 ? hr : '') + '</span>';   // hora a cada 2 quadradinhos (48 números não cabem legíveis)
+    }
+    h += '<div class="tg"><div class="tl' + (atual ? ' atual' : '') + '">' + tu.turno + ' ' + opDataCurta(tu.dataISO) + (atual ? ' · atual' : '') + '</div><div class="tc">' + cel + '</div><div class="th">' + hrs + '</div></div>';
+  });
+  return h + '</div>';
+}
 function ivRenderLane(proc, ci, c) {
   const itens = c.sessoes, ult = itens[itens.length - 1], agora = Date.now(), kAtual = ivTurnoAtualChave();
   const nCom = itens.filter(function(x) { return x.desvios.length; }).length;
@@ -6002,10 +6054,10 @@ function ivRenderLane(proc, ci, c) {
     if (gi) mds += '<i class="iv-md sep"></i>';
     g.itens.forEach(function(x) { mds += '<button type="button" class="iv-md ' + opClasseRank(x.pior) + (x.turnoChave === kAtual ? ' iv-atual' : '') + '" data-turno="' + x.turnoChave + '" data-p="' + proc + '" data-c="' + ci + '" data-i="' + idx(x) + '" title="' + ivHM(x.t) + ' ' + ivDM(x.t) + ' · ' + opEsc(ivPrimeiroNome(x.s.responsavel)) + (x.desvios.length ? ' · ' + x.desvios.length + ' desvio(s)' : ' · sem desvio') + '" aria-label="' + opEsc(c.nome + ' ' + ivDM(x.t) + ' ' + ivHM(x.t)) + '"></button>'; });
   });
-  const sum = !itens.length ? '<div class="iv-sum"><span class="iv-sx">Não houve cadastro nas últimas 48 horas.</span></div>' :
-    '<div class="iv-sum">' + selo + '<div class="iv-mds">' + mds + '</div><span class="iv-sx"><b>' + itens.length + '</b> cadastro' + (itens.length > 1 ? 's' : '') + '</span>' +
-    '<span class="iv-sx">último <span class="iv-lt iv-ago" data-t="' + ult.t + '">há ' + ivDur(agora - ult.t) + '</span> (' + ivHM(ult.t) + ' ' + ivDM(ult.t) + ' · ' + opEsc(ivPrimeiroNome(ult.s.responsavel)) + ')</span>' +
-    (itens.length > 1 ? '<span class="iv-sx">maior intervalo <b>' + ivDur(maior) + '</b></span>' : '') + '</div>';
+  const sum = !itens.length ? '<div class="iv-sum">' + ivTira48HTML(proc, ci, c) + '<div class="iv-sinfo"><span class="iv-sx">Não houve cadastro nas últimas 48 horas.</span></div></div>' :
+    '<div class="iv-sum">' + ivTira48HTML(proc, ci, c) + '<div class="iv-sinfo"><div class="l1">' + selo + '<span class="iv-sx"><b>' + itens.length + '</b> cadastro' + (itens.length > 1 ? 's' : '') + '</span>' +
+    (itens.length > 1 ? '<span class="iv-sx">maior intervalo <b>' + ivDur(maior) + '</b></span>' : '') + '</div>' +
+    '<span class="iv-sx">último <span class="iv-lt iv-ago" data-t="' + ult.t + '">há ' + ivDur(agora - ult.t) + '</span> (' + ivHM(ult.t) + ' ' + ivDM(ult.t) + ' · ' + opEsc(ivPrimeiroNome(ult.s.responsavel)) + ')</span></div></div>';
   const aberta = !!IV.abertas[c.chave];
   return '<div class="iv-lane ' + (aberta ? 'open' : 'closed') + '" data-p="' + proc + '" data-c="' + ci + '"><div class="iv-lh" role="button" tabindex="0" aria-expanded="' + (aberta ? 'true' : 'false') + '">' +
     '<div class="iv-mname">' + opEsc(c.nome) + selo + '</div><div class="iv-mprod">' + (ult ? opEsc(ult.prod) : 'sem cadastros') + '</div>' +
@@ -6027,6 +6079,7 @@ function ivRender48h() {
     el.querySelectorAll('.iv-lane.open .iv-rail').forEach(function(r) { const l = r.parentNode; r.scrollLeft = guardados[l.dataset.c] !== undefined ? guardados[l.dataset.c] : r.scrollWidth; });
   });
   ivRenderGeral();
+  IV.turnoDesenhado = ivTurnoAtualChave();
   ivMarcarSelecionado();
 }
 // Linha do tempo GERAL: todos os cadastros (Injeção + Sopro) em ordem de horário, com o tempo entre um
@@ -6095,7 +6148,8 @@ function ivTodas(proc, abrir) { document.querySelectorAll('#' + (proc === 'inj' 
 function ivAtualizarAgora() {
   const t = Date.now(); document.querySelectorAll('.iv-ago').forEach(function(e) { e.textContent = 'há ' + ivDur(t - (+e.dataset.t)); });
   const k = ivTurnoAtualChave();
-  document.querySelectorAll('[data-turno]').forEach(function(e) { const alvo = e.classList.contains('iv-md') ? e : e.querySelector('.iv-dot'); if (alvo) alvo.classList.toggle('iv-atual', e.dataset.turno === k); });
+  document.querySelectorAll('[data-turno]').forEach(function(e) { const alvo = (e.classList.contains('iv-md') || e.classList.contains('iv-tq')) ? e : e.querySelector('.iv-dot'); if (alvo) alvo.classList.toggle('iv-atual', e.dataset.turno === k); });
+  if (IV.turnoDesenhado && IV.turnoDesenhado !== k && dadosHistoricoCarregados) ivRender48h();   // virou o turno: a faixa de 48 quadradinhos anda
 }
 
 // balão ao passar o mouse
@@ -6131,9 +6185,9 @@ function ivAbrirCadastro(proc, ci, i) {
   const bt = document.querySelector('.iv-it.sel'); if (bt && bt.offsetParent && bt.scrollIntoView) bt.scrollIntoView({ block: 'nearest', inline: 'center' });
 }
 function ivMarcarSelecionado() {
-  document.querySelectorAll('.iv-it.sel, .iv-md.sel').forEach(function(e) { e.classList.remove('sel'); });
+  document.querySelectorAll('.iv-it.sel, .iv-md.sel, .iv-tq.sel').forEach(function(e) { e.classList.remove('sel'); });
   if (!IV.sel) return;
-  document.querySelectorAll('[data-p="' + IV.sel.p + '"][data-c="' + IV.sel.c + '"][data-i="' + IV.sel.i + '"]').forEach(function(e) { if (e.classList.contains('iv-it') || e.classList.contains('iv-md')) e.classList.add('sel'); });
+  document.querySelectorAll('[data-p="' + IV.sel.p + '"][data-c="' + IV.sel.c + '"][data-i="' + IV.sel.i + '"]').forEach(function(e) { if (e.classList.contains('iv-it') || e.classList.contains('iv-md') || e.classList.contains('iv-tq')) e.classList.add('sel'); });
 }
 function ivFecharCadastro() {
   document.body.classList.remove('iv-aberto'); const dr = document.getElementById('ivDrawer'); if (dr) dr.setAttribute('aria-hidden', 'true');
@@ -6147,7 +6201,7 @@ function ivEnviarWhatsApp() {
 }
 document.addEventListener('click', function(e) {
   const t = e.target; if (!t.closest) return;
-  const bola = t.closest('.iv-it, .iv-md:not(.sep)');
+  const bola = t.closest('.iv-it, .iv-md:not(.sep), button.iv-tq');
   if (bola) { ivAbrirCadastro(bola.dataset.p, +bola.dataset.c, +bola.dataset.i); return; }
   const lane = t.closest('.iv-lane');
   if (lane && (t.closest('.iv-lh') || t.closest('.iv-sum'))) ivAlternarLane(lane);
