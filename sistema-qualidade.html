@@ -131,7 +131,7 @@ a{color:var(--accent);}
 
 /* ---------- home (tela 1) ---------- */
 .home-pad{padding:18px;}
-.kpi-row{display:grid; grid-template-columns:repeat(4,1fr); gap:11px; margin-bottom:22px;}
+.kpi-row{display:grid; grid-template-columns:repeat(3,1fr); gap:11px; margin-bottom:22px;}
 .kpi{background:var(--surface-2); border:1px solid var(--border); border-radius:11px; padding:14px 15px;}
 .kpi .top{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:9px;}
 .kpi .l{font-size:10.5px; color:var(--fg-faint); text-transform:uppercase; letter-spacing:.5px; font-weight:500;}
@@ -490,7 +490,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
   .app-topbar .material-title{flex:1 1 100%;}
   .app-topbar .tf{flex:1 1 140px;}
   .app-topbar .tf select, .app-topbar .tf input{width:100%; min-width:0;}
-  .kpi-row{grid-template-columns:1fr 1fr;}
+  .kpi-row{grid-template-columns:repeat(3,1fr);}
   .form-grid{grid-template-columns:1fr;}
   .masthead-row{flex-direction:column;}
   .masthead h1{font-size:23px;}
@@ -498,7 +498,7 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
   .app-main{padding:14px 12px 16px;}
 }
 @media (max-width:520px){
-  .kpi-row{grid-template-columns:1fr 1fr; gap:8px;}
+  .kpi-row{grid-template-columns:1fr 1fr; gap:8px;} .kpi-row > .kpi:last-child:nth-child(odd){grid-column:1/-1;}
   .module-grid{grid-template-columns:1fr 1fr;}
 }
 
@@ -620,7 +620,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 }
 @media (max-width:640px){
   .a-top .hide-sm{display:none;} .a-top .conn-status{display:none;}
-  .kpi-row{grid-template-columns:1fr 1fr;}
+  .kpi-row{grid-template-columns:1fr 1fr;} .kpi-row > .kpi:last-child:nth-child(odd){grid-column:1/-1;}
   .dw-kv{grid-template-columns:1fr 1fr;}
 }
 </style>
@@ -669,7 +669,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 <div id="loginScreen">
   <div class="login-logo" role="img" aria-label="BlowPet"></div>
   <div class="mark">Sistema da Qualidade</div>
-  <div class="sub">BlowPet — Recebimento, Reclamação de Cliente e Liberação Não Conforme</div>
+  <div class="sub">BlowPet — Recebimento de matéria-prima e Reclamações de cliente</div>
   <button class="btn btn-accent" id="btnLoginMicrosoft" style="padding:13px 24px; font-size:15px;">Entrar com Microsoft</button>
   <div class="loginMsg" id="loginMsg"></div>
 </div>
@@ -699,7 +699,6 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <button class="a-item mat-btn" data-nav="lista:tampa" data-mat="tampa"><svg><use href="#i-package-lid"/></svg><span>Cx. Preforma (Tampa)</span><span class="ct" id="ctTampa">0</span></button>
       <div class="a-grp">Qualidade</div>
       <button class="a-item" data-nav="reclamacao" onclick="irPara('reclamacao')"><svg><use href="#i-megaphone"/></svg><span>Reclamações de cliente</span><span class="ct" id="ctReclamacoes">0</span></button>
-      <button class="a-item" data-nav="liberacao" onclick="irPara('liberacao')"><svg><use href="#i-shield-alert"/></svg><span>Liberações não conforme</span><span class="ct" id="ctLiberacoes">0</span></button>
       <div class="a-grp">Cadastros</div>
       <button class="a-item cad-btn" data-nav="cadastros:clientes" data-cad="clientes"><svg><use href="#i-users"/></svg><span>Clientes</span><span class="ct" id="ctClientes">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:produtos" data-cad="produtos"><svg><use href="#i-package"/></svg><span>Produtos (preforma/frasco)</span><span class="ct" id="ctProdutos">0</span></button>
@@ -733,7 +732,6 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <button class="kpi kpi-btn" onclick="irParaStatus('analise')"><div class="top"><span class="l">Recebimentos em análise</span><svg><use href="#i-clock"/></svg></div><div class="v warn tabular" id="kpiAnalise">0</div></button>
       <button class="kpi kpi-btn" onclick="irParaStatus('quarentena')"><div class="top"><span class="l">Lotes em quarentena</span><svg><use href="#i-package"/></svg></div><div class="v quar tabular" id="kpiQuarentena">0</div></button>
       <button class="kpi kpi-btn" onclick="irPara('reclamacao')"><div class="top"><span class="l">Reclamações em aberto</span><svg><use href="#i-megaphone"/></svg></div><div class="v danger tabular" id="kpiReclamacoes">0</div></button>
-      <button class="kpi kpi-btn" onclick="irPara('liberacao')"><div class="top"><span class="l">Liberações aguardando aprovação</span><svg><use href="#i-shield-alert"/></svg></div><div class="v accent tabular" id="kpiLiberacoes">0</div></button>
     </div>
     <div class="home-cols">
       <div class="panel"><h3>Precisa de atenção <span class="tabular" id="atencaoCt" style="color:var(--fg-faint);"></span></h3><div id="precisaAtencao"><div class="vazio-home">Nada pendente.</div></div></div>
@@ -813,36 +811,6 @@ table.occ tbody tr.clicavel{cursor:pointer;}
     </div>
   </section>
 
-  <!-- ===================== TELA 4 — LIBERAÇÃO NÃO CONFORME ===================== -->
-  <section class="tela" id="tela-liberacao">
-    <div class="tela-head"><h2>Liberação não conforme</h2></div>
-    <p class="tela-sub">Produto liberado mesmo com não conformidade — o que foi encontrado, a decisão e quem aprovou.</p>
-    <div class="screen">
-      <div class="app-shell">
-        <div class="app-main">
-          <div class="app-topbar">
-            <div class="material-title">Liberação Não Conforme</div>
-            <div class="tf"><label>Status</label>
-              <select id="fStatusLiberacao">
-                <option value="">Todos</option>
-                <option value="analise">Em análise</option>
-                <option value="aprovado">Aprovado</option>
-                <option value="reprovado">Reprovado</option>
-              </select>
-            </div>
-            <div class="tf"><label>Buscar</label><input type="search" id="fBuscaLiberacao" placeholder="Nº registro, produto…"></div>
-            <button class="btn btn-accent" style="margin-left:auto;" onclick="abrirModalLiberacao()"><svg><use href="#i-plus"/></svg> Novo registro</button>
-          </div>
-          <div class="table-scroll">
-            <table class="occ">
-              <thead><tr><th>Nº Registro</th><th>Data</th><th>Produto / Processo</th><th>Não conformidade</th><th>Decisão</th><th>Qtd. liberada</th><th>Responsável</th><th>Status</th></tr></thead>
-              <tbody id="tbodyLiberacao"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- ===================== TELA — CADASTROS ===================== -->
   <section class="tela" id="tela-cadastros">
@@ -876,7 +844,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
   </section>
 
   <footer class="note">
-    Sistema da Qualidade BlowPet — Recebimento (Resina PET, Rótulo, Pigmento, Caixa de Preforma Cinta/Tampa), Fornecedores, Especificações, Rótulos Homologados, Reclamação de Cliente e Liberação Não Conforme. Dados gravados na planilha <span class="mono">sistema_qualidade_blowpet_base.xlsx</span> via Microsoft Graph API, mesmo padrão do app de Inspeção da Qualidade.
+    Sistema da Qualidade BlowPet — Recebimento (Resina PET, Rótulo, Pigmento, Caixa de Preforma Cinta/Tampa), Fornecedores, Especificações, Rótulos Homologados e Reclamação de Cliente. Dados gravados na planilha <span class="mono">sistema_qualidade_blowpet_base.xlsx</span> via Microsoft Graph API, mesmo padrão do app de Inspeção da Qualidade.
   </footer>
     </div>
   </main>
@@ -1326,36 +1294,6 @@ table.occ tbody tr.clicavel{cursor:pointer;}
     </div>
   </div>
 
-  <!-- ===================== JANELA — NOVO REGISTRO DE LIBERAÇÃO ===================== -->
-  <div class="modal-overlay hidden" id="modalLiberacao">
-    <div class="modal-card" style="max-width:620px;">
-      <button class="modal-close" onclick="fecharModalLiberacao()" aria-label="Fechar">✕</button>
-      <div class="modal-head">
-        <h2>Novo registro de liberação não conforme</h2>
-        <p class="tela-sub" style="margin-top:6px;">O número do registro (LNC) é gerado automaticamente ao salvar.</p>
-      </div>
-      <div class="form-wrap" style="padding-top:10px; max-width:none;">
-        <div class="form-grid">
-          <div class="field"><label>Data</label><input type="date" id="liberacaoDataInput"></div>
-          <div class="field"><label>Quantidade liberada</label><input id="liberacaoQtdInput" placeholder="Ex: 1.200 un"></div>
-          <div class="field full"><label>Produto / processo</label><input id="liberacaoProdutoInput" placeholder="Ex: Garrafa 1500 mL — SBO2A"></div>
-          <div class="field full"><label>Não conformidade</label><input id="liberacaoNcInput" placeholder="Ex: Alinhamento de rótulo fora do padrão"></div>
-          <div class="field full"><label>Decisão</label><input id="liberacaoDecisaoInput" placeholder="Ex: Liberado com restrição / Retrabalho / Reprovado"></div>
-          <div class="field"><label>Status</label>
-            <select id="liberacaoStatusSelect"><option value="analise">Em análise</option><option value="aprovado">Aprovado</option><option value="reprovado">Reprovado</option></select>
-          </div>
-          <div class="field"><label>Responsável</label><input id="liberacaoRespInput" list="listaResponsaveis" placeholder="Nome do responsável"></div>
-          <div class="field full"><label>Observações</label><textarea id="liberacaoObsInput" placeholder="Contexto da decisão, quem aprovou, etc."></textarea></div>
-        </div>
-        <div class="form-actions">
-          <span class="save-msg" id="saveMsgLiberacao"></span>
-          <button class="btn btn-ghost" onclick="fecharModalLiberacao()">Cancelar</button>
-          <button class="btn btn-accent" onclick="salvarLiberacao()">Salvar registro</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- ===================== JANELA — CONFIGURAÇÕES ===================== -->
   <div class="modal-overlay hidden" id="modalConfig">
     <div class="modal-card" style="max-width:480px;">
@@ -1449,7 +1387,6 @@ const TABELAS = {
   recItens: "TabelaReclamacoesItens",
   recComent: "TabelaReclamacoesComentarios",
   statusRec: "TabelaStatusReclamacao",
-  liberacoes:  "TabelaLiberacoesNaoConforme",
   listas:      "TabelaListas"
 };
 // Colunas PADRÃO de cada Tabela. Ao conectar, o app lê o cabeçalho real de cada Tabela na
@@ -1470,7 +1407,6 @@ const TABLE_COLS = {
   recItens: ['RAC','Data de Produção','Lote','Caixa','Quantidade','Observação'],
   recComent: ['RAC','Data/Hora','Autor','Comentário','Anexos'],
   statusRec: ['Ordem','Status'],
-  liberacoes: ['Número Registro','Data','Produto/Processo','Não Conformidade','Decisão','Quantidade Liberada','Responsável','Status','Observações'],
   listas: ['Responsaveis','Status Recebimento','Criterio','Unidades','Materiais','Sim Nao','Conferencia Visual','Status Reclamacao','Classificacao Reclamacao','Status Liberacao','Status Rotulo']
 };
 const TABLE_COLS_PADRAO = JSON.parse(JSON.stringify(TABLE_COLS));
@@ -1496,7 +1432,7 @@ const PARAM_COL_MAP = {
 };
 
 /* ====================== ESTADO ====================== */
-var DATA = { resina:[], rotulo:[], pigmento:[], cinta:[], tampa:[], fornecedores:[], especificacoes:[], rotulosHomologados:[], reclamacoes:[], liberacoes:[], listas:{}, clientes:[], produtos:[], recItens:[], recComent:[], statusRec:[] };
+var DATA = { resina:[], rotulo:[], pigmento:[], cinta:[], tampa:[], fornecedores:[], especificacoes:[], rotulosHomologados:[], reclamacoes:[], listas:{}, clientes:[], produtos:[], recItens:[], recComent:[], statusRec:[] };
 var TEM_TABELA = { clientes: false, produtos: false, recItens: false, recComent: false, statusRec: false };   // tabelas que só existem na planilha nova
 var matAtual = 'resina', viewAtual = 'tabela', telaAtual = 'visao';
 var driveId = null, itemId = null;
@@ -1831,7 +1767,7 @@ async function carregarTudo(){
     lerLinhasBrutas(TABELAS.resina), lerLinhasBrutas(TABELAS.rotulo), lerLinhasBrutas(TABELAS.pigmento),
     lerLinhasBrutas(TABELAS.cinta), lerLinhasBrutas(TABELAS.tampa), lerLinhasBrutas(TABELAS.fornecedores),
     lerLinhasBrutas(TABELAS.especificacoes), lerLinhasBrutas(TABELAS.rotulosHomologados),
-    lerLinhasBrutas(TABELAS.reclamacoes), lerLinhasBrutas(TABELAS.liberacoes), lerLinhasBrutas(TABELAS.listas)
+    lerLinhasBrutas(TABELAS.reclamacoes), lerLinhasBrutas(TABELAS.listas)
   ]);
   DATA.resina = linhasParaObjetos('resina', brutos[0]);
   DATA.rotulo = linhasParaObjetos('rotulo', brutos[1]);
@@ -1842,8 +1778,7 @@ async function carregarTudo(){
   DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', brutos[6]));
   DATA.rotulosHomologados = linhasParaObjetos('rotulosHomologados', brutos[7]);
   DATA.reclamacoes = linhasParaObjetos('reclamacoes', brutos[8]);
-  DATA.liberacoes = linhasParaObjetos('liberacoes', brutos[9]);
-  DATA.listas = montarListas(linhasParaObjetos('listas', brutos[10]));
+  DATA.listas = montarListas(linhasParaObjetos('listas', brutos[9]));
   // tabelas que só existem na planilha nova: se faltarem, o sistema segue sem elas
   await Promise.all(['clientes', 'produtos', 'recItens', 'recComent', 'statusRec'].map(async function(k){
     try { DATA[k] = linhasParaObjetos(k, await lerLinhasBrutas(TABELAS[k])); TEM_TABELA[k] = true; }
@@ -2001,7 +1936,6 @@ function badgeLabel(label){ return '<span class="badge ' + statusKey(label) + '"
 function laudoIc(url){ return url ? ('<a class="laudo-ic yes" href="'+url+'" target="_blank" title="Abrir laudo"><svg><use href="#i-check"/></svg></a>') : '<span class="laudo-ic no" title="Sem laudo">–</span>'; }
 const CLASS_RECLAMACAO_LABEL = { procedente: 'Procedente', improcedente: 'Improcedente' };
 const STATUS_RECLAMACAO_LABEL = { aberta: 'Aberta', tratativa: 'Em tratativa', encerrada: 'Encerrada' };
-const STATUS_LIBERACAO_LABEL = { analise: 'Em análise', aprovado: 'Aprovado', reprovado: 'Reprovado' };
 
 /* ====================== DATAS ====================== */
 function formatarDataBR(isoYYYYMMDD){
@@ -2030,7 +1964,7 @@ function irPara(tela){
 function marcarMenu(){
   var chave = telaAtual === 'lista' ? 'lista:' + matAtual : telaAtual === 'cadastros' ? 'cadastros:' + (typeof cadAtual !== 'undefined' ? cadAtual : '') : telaAtual;
   document.querySelectorAll('.a-item').forEach(function(b){ b.classList.toggle('on', b.dataset.nav === chave); });
-  var crumb = { visao:'<b>Visão geral</b>', reclamacao:'Qualidade / <b>Reclamações de cliente</b>', liberacao:'Qualidade / <b>Liberações não conforme</b>' }[telaAtual];
+  var crumb = { visao:'<b>Visão geral</b>', reclamacao:'Qualidade / <b>Reclamações de cliente</b>' }[telaAtual];
   if (telaAtual === 'lista') crumb = 'Recebimento / <b>' + escHtml(MAT_LABEL_PLANO[matAtual] || '') + '</b>';
   if (telaAtual === 'cadastros') crumb = 'Cadastros / <b>' + escHtml((typeof CAD_INFO !== 'undefined' && CAD_INFO[cadAtual]) ? CAD_INFO[cadAtual].titulo : '') + '</b>';
   var el = document.getElementById('aCrumb'); if (el && crumb) el.innerHTML = crumb;
@@ -2058,7 +1992,6 @@ function renderHome(){
   var ICS = { resina:'i-flask', rotulo:'i-tag', pigmento:'i-droplet', cinta:'i-package', tampa:'i-package-lid' };
   document.getElementById('kpiAnalise').textContent = mats.reduce(function(acc, m){ return acc + DATA[m].filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length; }, 0);
   document.getElementById('kpiReclamacoes').textContent = DATA.reclamacoes.filter(function(r){ return !recConcluida(r); }).length;
-  document.getElementById('kpiLiberacoes').textContent = DATA.liberacoes.filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length;
   document.getElementById('kpiQuarentena').textContent = mats.reduce(function(acc, m){ return acc + DATA[m].filter(function(r){ return statusKey(r['Status']) === 'quarentena'; }).length; }, 0);
 
   // Precisa de atenção: recebimentos em análise ou em quarentena, mais recentes primeiro.
@@ -2079,7 +2012,6 @@ function renderHome(){
     DATA[m].forEach(function(r){ atividades.push({ ic: ICS[m], data: r['Data Recebimento'] || r['Data'], t1: MAT_LABEL_PLANO[m] + ' — ' + (r['Fornecedor']||'—'), t2: 'NF ' + (r['Nota Fiscal']||'—') + ' · ' + statusKeyLabelCurto(r['Status']), acao: "abrirDetalheDe('" + m + "'," + r.__index + ")" }); });
   });
   DATA.reclamacoes.forEach(function(r){ atividades.push({ ic:'i-megaphone', data:r['Data'], t1:'Reclamação de Cliente — ' + (r['Cliente']||'—'), t2:(r['RAC']||'') + ' · ' + statusKeyLabelCurto(r['Status']), acao:"irPara('reclamacao')" }); });
-  DATA.liberacoes.forEach(function(r){ atividades.push({ ic:'i-shield-alert', data:r['Data'], t1:'Liberação Não Conforme — ' + (r['Produto/Processo']||'—'), t2:(r['Número Registro']||'') + ' · ' + statusKeyLabelCurto(r['Status']), acao:"irPara('liberacao')" }); });
   atividades.sort(function(a,b){ return dataParaOrdenar(b.data) - dataParaOrdenar(a.data); });
   var el = document.getElementById('atividadeRecente');
   if (!atividades.length) { el.innerHTML = '<div class="vazio-home">Sem registros ainda.</div>'; return; }
@@ -2106,7 +2038,7 @@ function dataParaOrdenar(brStr){
 
 function renderTudo(){
   montarHead(matAtual); atualizarFornecedoresFiltro(); renderRecebimento();
-  renderReclamacoes(); renderLiberacoes(); renderRotulosHomologados();
+  renderReclamacoes(); renderRotulosHomologados();
   renderEspecificacoes(); renderFornecedores(); renderClientes(); renderProdutos(); renderHome(); atualizarContagensCadastros();
   document.getElementById('ctResina').textContent = DATA.resina.length;
   document.getElementById('ctRotulo').textContent = DATA.rotulo.length;
@@ -2114,7 +2046,6 @@ function renderTudo(){
   document.getElementById('ctCinta').textContent = DATA.cinta.length;
   document.getElementById('ctTampa').textContent = DATA.tampa.length;
   document.getElementById('ctReclamacoes').textContent = DATA.reclamacoes.length;
-  document.getElementById('ctLiberacoes').textContent = DATA.liberacoes.length;
   document.getElementById('ctRotulosHom').textContent = DATA.rotulosHomologados.length;
   atualizarContagensCadastros();
 }
@@ -2804,60 +2735,6 @@ async function enviarComentario(){
   finally { var b = document.getElementById('btnComentar'); if (b) b.disabled = false; }
 }
 
-/* ====================== LIBERAÇÃO NÃO CONFORME ====================== */
-function renderLiberacoes(){
-  var status = document.getElementById('fStatusLiberacao').value, busca = document.getElementById('fBuscaLiberacao').value.trim().toLowerCase();
-  var rows = DATA.liberacoes.filter(function(r){
-    if (status && statusKey(r['Status']) !== status) return false;
-    if (busca && !((r['Número Registro']||'').toLowerCase().indexOf(busca) > -1 || (r['Produto/Processo']||'').toLowerCase().indexOf(busca) > -1)) return false;
-    return true;
-  });
-  var tbody = document.getElementById('tbodyLiberacao');
-  if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-note">Nenhum registro encontrado com esses filtros.</td></tr>'; return; }
-  tbody.innerHTML = rows.map(function(r){
-    return '<tr><td class="mono">'+(r['Número Registro']||'')+'</td><td class="cell-dim tabular">'+(r['Data']||'')+'</td><td>'+(r['Produto/Processo']||'')+'</td><td class="cell-dim">'+(r['Não Conformidade']||'')+'</td>'+
-      '<td><span class="pill">'+(r['Decisão']||'')+'</span></td><td class="tabular">'+(r['Quantidade Liberada']||'')+'</td><td class="cell-dim">'+(r['Responsável']||'')+'</td>'+
-      '<td>'+badgeLabel(r['Status'])+'</td></tr>';
-  }).join('');
-}
-document.getElementById('fStatusLiberacao').addEventListener('change', renderLiberacoes);
-document.getElementById('fBuscaLiberacao').addEventListener('input', renderLiberacoes);
-
-function abrirModalLiberacao(){
-  document.getElementById('liberacaoDataInput').value = hojeISO();
-  document.getElementById('liberacaoQtdInput').value = '';
-  document.getElementById('liberacaoProdutoInput').value = '';
-  document.getElementById('liberacaoNcInput').value = '';
-  document.getElementById('liberacaoDecisaoInput').value = '';
-  document.getElementById('liberacaoStatusSelect').value = 'analise';
-  document.getElementById('liberacaoRespInput').value = '';
-  document.getElementById('liberacaoObsInput').value = '';
-  document.getElementById('saveMsgLiberacao').textContent = '';
-  document.getElementById('modalLiberacao').classList.remove('hidden');
-}
-function fecharModalLiberacao(){ document.getElementById('modalLiberacao').classList.add('hidden'); }
-document.getElementById('modalLiberacao').addEventListener('click', function(e){ if (e.target.id === 'modalLiberacao') fecharModalLiberacao(); });
-async function salvarLiberacao(){
-  var produto = document.getElementById('liberacaoProdutoInput').value.trim();
-  if (!produto) { document.getElementById('saveMsgLiberacao').textContent = 'Informe o produto/processo.'; document.getElementById('saveMsgLiberacao').className = 'save-msg err'; return; }
-  var msg = document.getElementById('saveMsgLiberacao'); msg.className = 'save-msg'; msg.textContent = 'Salvando…';
-  try {
-    var numero = proximoNumero(DATA.liberacoes, 'Número Registro', 'LNC', 3);
-    await adicionarLinha('liberacoes', {
-      'Número Registro': numero, 'Data': formatarDataBR(document.getElementById('liberacaoDataInput').value), 'Produto/Processo': produto,
-      'Não Conformidade': document.getElementById('liberacaoNcInput').value.trim(), 'Decisão': document.getElementById('liberacaoDecisaoInput').value.trim(),
-      'Quantidade Liberada': document.getElementById('liberacaoQtdInput').value.trim(),
-      'Responsável': document.getElementById('liberacaoRespInput').value.trim(),
-      'Status': STATUS_LIBERACAO_LABEL[document.getElementById('liberacaoStatusSelect').value],
-      'Observações': document.getElementById('liberacaoObsInput').value.trim()
-    });
-    DATA.liberacoes = linhasParaObjetos('liberacoes', await lerLinhasBrutas(TABELAS.liberacoes));
-    renderLiberacoes(); renderHome();
-    document.getElementById('ctLiberacoes').textContent = DATA.liberacoes.length;
-    mostrarToast(numero + ' salvo com sucesso.');
-    fecharModalLiberacao();
-  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
-}
 
 /* ====================== FOTO DO LAUDO (câmera ou arquivo) ====================== */
 var laudoArquivoPronto = null, laudoPreviewUrl = null;

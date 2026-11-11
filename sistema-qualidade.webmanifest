@@ -1,7 +1,7 @@
 {
   "name": "Sistema da Qualidade — BlowPet",
   "short_name": "Qualidade",
-  "description": "Recebimento de matéria-prima, reclamações de cliente e liberações não conforme da BlowPet.",
+  "description": "Recebimento de matéria-prima e reclamações de cliente da BlowPet.",
   "id": "sistema-qualidade.html",
   "start_url": "sistema-qualidade.html",
   "scope": "./",
