@@ -205,6 +205,20 @@ a{color:var(--accent);}
 .res-chk{display:flex; align-items:flex-start; gap:9px; font-size:13px; cursor:pointer; line-height:1.4;}
 .res-chk input{width:16px; height:16px; accent-color:var(--accent); margin-top:1px; flex-shrink:0;}
 .res-restricao .field{max-width:420px;}
+.combo{position:relative;}
+.combo-lista{position:absolute; left:0; right:0; top:calc(100% + 4px); z-index:30; max-height:260px; overflow:auto; background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:0 12px 30px rgba(0,0,0,.18);}
+.combo-item{display:flex; align-items:center; gap:10px; padding:9px 12px; cursor:pointer; font-size:13px; border-bottom:1px solid var(--border);}
+.combo-item:last-child{border-bottom:none;}
+.combo-item:hover, .combo-item.ativo{background:var(--accent-soft);}
+.combo-item .vol{font-family:var(--font-mono); font-size:11.5px; color:var(--fg-dim); min-width:62px;}
+.combo-item .nm{flex:1; min-width:0;}
+.combo-item .cl{font-size:11.5px; color:var(--fg-faint); white-space:nowrap;}
+.combo-item mark{background:transparent; color:var(--accent); font-weight:600;}
+.combo-vazio{padding:12px; font-size:12.5px; color:var(--fg-faint);}
+.emp-vinc{font-size:12px; color:var(--fg-dim); margin-top:6px; display:flex; flex-wrap:wrap; gap:5px; align-items:center;}
+.emp-import-banner{margin-top:12px; border:1px solid var(--accent-border); background:var(--accent-soft); border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.5; color:var(--fg);}
+.emp-import-banner ul{margin:6px 0 0 18px; padding:0;}
+.itens-table .it-emp{min-width:170px;}
 .conc-aviso.ok{border-color:var(--ok); background:var(--ok-soft);}
 .conc-aviso{border:1px solid var(--warn); background:var(--warn-soft); color:var(--fg); border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.5; margin-bottom:10px;}
 .view-toggle{display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; height:32px;}
@@ -588,7 +602,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <button class="a-item" data-nav="liberacao" onclick="irPara('liberacao')"><svg><use href="#i-shield-alert"/></svg><span>Liberações não conforme</span><span class="ct" id="ctLiberacoes">0</span></button>
       <div class="a-grp">Cadastros</div>
       <button class="a-item cad-btn" data-nav="cadastros:fornecedores" data-cad="fornecedores"><svg><use href="#i-truck"/></svg><span>Fornecedores</span><span class="ct" id="ctFornecedores">0</span></button>
-      <button class="a-item cad-btn" data-nav="cadastros:especificacoes" data-cad="especificacoes"><svg><use href="#i-sliders"/></svg><span>Especificações</span><span class="ct" id="ctEspecificacoes">0</span></button>
+      <button class="a-item cad-btn" data-nav="cadastros:especificacoes" data-cad="especificacoes"><svg><use href="#i-sliders"/></svg><span>EMPs</span><span class="ct" id="ctEspecificacoes">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:rotulos" data-cad="rotulos"><svg><use href="#i-image"/></svg><span>Rótulos homologados</span><span class="ct" id="ctRotulosHom">0</span></button>
     </nav>
     <div class="a-user">
@@ -633,7 +647,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
         <div class="app-main">
           <div class="app-topbar">
             <div class="material-title" id="matTitle">Resina PET</div>
-            <div class="tf"><label>Fornecedor</label><select id="fFornecedor"><option value="">Todos</option></select></div>
+            <div class="tf"><label id="fFornecedorLabel">Fornecedor</label><select id="fFornecedor"><option value="">Todos</option></select></div>
             <div class="tf"><label>Status</label>
               <select id="fStatus">
                 <option value="">Todos</option>
@@ -735,13 +749,15 @@ table.occ tbody tr.clicavel{cursor:pointer;}
   <!-- ===================== TELA — CADASTROS ===================== -->
   <section class="tela" id="tela-cadastros">
     <div class="tela-head"><h2>Cadastros</h2></div>
-    <p class="tela-sub">Fornecedores e o que cada um fornece, especificações de parâmetros/tolerâncias e rótulos homologados. O recebimento puxa fornecedor, tipo e código daqui.</p>
+    <p class="tela-sub">Fornecedores e os produtos que cada um fornece, EMPs (especificações de matéria-prima e insumos) e rótulos homologados. O recebimento puxa fornecedor, tipo, código e a EMP vinculada daqui.</p>
     <div class="screen">
       <div class="app-shell">
         <div class="app-main">
           <div class="app-topbar">
             <div class="material-title" id="cadTitle">Rótulos Homologados</div>
             <div class="tf"><label>Buscar</label><input type="search" id="cadBusca" placeholder="Nome do modelo…"></div>
+            <button class="btn hidden" style="margin-left:auto;" id="cadBtnImportar" onclick="document.getElementById('empArquivoInput').click()" title="Ler o documento Word da EMP e cadastrar os dados"><svg><use href="#i-file-text"/></svg> Importar EMP (.docx)</button>
+            <input type="file" id="empArquivoInput" accept=".docx" multiple hidden onchange="importarEmpArquivos(this)">
             <button class="btn btn-accent" style="margin-left:auto;" id="cadBtnNovo" onclick="abrirModalRotulo()"><svg><use href="#i-plus"/></svg> Novo rótulo homologado</button>
           </div>
           <div id="painelRotulos">
@@ -797,8 +813,18 @@ table.occ tbody tr.clicavel{cursor:pointer;}
               <option value="tampa">Caixa de Preforma (Tampa)</option>
             </select>
           </div>
-          <div class="field"><label>Fornecedor</label><select id="fornecedorSelect" onchange="aoMudarFornecedorReceb()"></select></div>
-          <div class="field"><label>Tipo</label><select id="tipoSelect" onchange="aoMudarTipoReceb()"></select></div>
+          <div class="field" id="campoFornecedorReceb"><label>Fornecedor</label><select id="fornecedorSelect" onchange="aoMudarFornecedorReceb()"></select></div>
+          <div class="field" id="campoTipoReceb"><label>Tipo</label><select id="tipoSelect" onchange="aoMudarTipoReceb()"></select></div>
+          <div class="field" id="campoVolumeRotulo"><label>Volume do rótulo (mL)</label><select id="volumeRotuloSelect" onchange="aoMudarVolumeRotulo()"></select></div>
+          <div class="field full" id="campoNomeRotulo">
+            <label>Nome do rótulo</label>
+            <div class="combo" id="comboRotulo">
+              <input id="rotuloBuscaInput" autocomplete="off" placeholder="Digite pra pesquisar (nome ou cliente)…" onfocus="abrirListaRotulos()" oninput="abrirListaRotulos()" onkeydown="teclaListaRotulos(event)">
+              <div class="combo-lista hidden" id="rotuloLista"></div>
+            </div>
+            <select id="modeloRotuloSelect" hidden></select>
+          </div>
+          <div class="field" id="campoClienteRotulo"><label>Cliente</label><input id="clienteRotuloDisplay" value="—" disabled></div>
           <div class="field" id="campoLoteFornecedorResina">
             <label>Lote do fornecedor</label>
             <input class="mono" id="loteFornecedorInput" placeholder="Ex: 2606216" oninput="verificarLoteExistente()">
@@ -806,10 +832,6 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           <div class="field" id="campoLoteInternoResina">
             <label>Lote interno</label>
             <input class="mono" id="loteInternoDisplay" value="—" disabled>
-          </div>
-          <div class="field" id="campoModeloRotulo">
-            <label>Modelo do rótulo</label>
-            <select id="modeloRotuloSelect" onchange="atualizarPreviaRotulo()"></select>
           </div>
           <div class="field" id="campoConferenciaRotulo">
             <label>Conferência visual</label>
@@ -863,7 +885,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
               <tbody id="tbodyMedicoes"></tbody>
             </table>
           </div>
-          <p class="med-note">L = liberativa, obrigatória pra aprovar o lote · QA = valor transcrito do laudo do fornecedor; se lançado e fora, reprova (obrigatório quando a ficha só tem QA) · C = complementar, não decide a aprovação. Parâmetros cadastrados em <a href="#" onclick="fecharModalCadastro(); abrirCadastro('especificacoes'); return false;">Especificações</a>.</p>
+          <p class="med-note">L = liberativa, obrigatória pra aprovar o lote · QA = valor transcrito do laudo do fornecedor; se lançado e fora, reprova (obrigatório quando a ficha só tem QA) · C = complementar, não decide a aprovação. Parâmetros vêm da EMP vinculada ao produto (cadastro de <a href="#" onclick="fecharModalCadastro(); abrirCadastro('especificacoes'); return false;">EMPs</a>).</p>
         </div>
 
         <div class="section-title">Resultado <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">calculado pela especificação (L e QA)</span></div>
@@ -918,20 +940,20 @@ table.occ tbody tr.clicavel{cursor:pointer;}
     <div class="modal-card">
       <button class="modal-close" onclick="fecharModalEspec()" aria-label="Fechar">✕</button>
       <div class="modal-head">
-        <h2 id="modalEspecTitulo">Nova especificação</h2>
-        <p class="tela-sub" style="margin-top:6px;">Parâmetros de um tipo de material de um fornecedor. Esses parâmetros definem as medições do recebimento.</p>
+        <h2 id="modalEspecTitulo">Nova EMP</h2>
+        <p class="tela-sub" style="margin-top:6px;">Especificação de Matéria-Prima e Insumos. Ela não depende de fornecedor: no cadastro de Fornecedores, cada produto escolhe a EMP que vale pra ele.</p>
+        <div class="emp-import-banner hidden" id="empImportBanner"></div>
       </div>
       <div class="form-wrap" style="padding-top:10px;">
-        <div class="section-title">Dados da ficha</div>
+        <div class="section-title">Dados da EMP</div>
         <div class="form-grid">
-          <div class="field"><label>Material</label><select id="especMaterialSelect" onchange="popularCascataEspec()"><option value="resina">Resina PET</option><option value="rotulo">Rótulo</option><option value="pigmento">Pigmento</option><option value="cinta">Caixa de Preforma (Cinta)</option><option value="tampa">Caixa de Preforma (Tampa)</option></select></div>
-          <div class="field"><label>Fornecedor</label><select id="especFornSelect" onchange="popularCascataEspec(this.value)"></select></div>
-          <div class="field"><label>Tipo</label><select id="especTipoSelect"></select></div>
-          <div class="field"><label>Código do documento</label><input class="mono" id="especDocInput" placeholder="Ex: EMP-002"></div>
-          <div class="field"><label>Revisão</label><input id="especRevInput" placeholder="Ex: Rev.000"></div>
+          <div class="field"><label>Código da EMP</label><input class="mono" id="especDocInput" placeholder="Ex: EMP-002"></div>
+          <div class="field"><label>Material / insumo</label><select id="especMaterialSelect"><option value="resina">Resina PET</option><option value="rotulo">Rótulo</option><option value="pigmento">Pigmento</option><option value="cinta">Caixa de Preforma (Cinta)</option><option value="tampa">Caixa de Preforma (Tampa)</option></select></div>
+          <div class="field full"><label>Descrição</label><input id="especDescInput" placeholder="Ex: Indorama Max Prime"></div>
+          <div class="field"><label>Revisão</label><input id="especRevInput" placeholder="Ex: 00"></div>
           <div class="field"><label>Data do documento</label><input type="date" id="especDataInput"></div>
         </div>
-        <p class="med-note" id="notaEspecForn">Fornecedor e Tipo vêm do cadastro de Fornecedores. Se faltar um tipo, cadastre-o primeiro no fornecedor. Escolha "Todos os fornecedores" pra uma ficha que vale pra todo recebimento do material (ex.: EMP-016 Rótulos); uma ficha de fornecedor+tipo específico tem prioridade sobre a geral.</p>
+        <p class="med-note">Quando um mesmo documento tem mais de uma tabela (ex.: EMP-002 Prime e Off Grade, EMP-008 Tampa e Cinta), cadastre uma EMP para cada uma, com o mesmo código e descrições diferentes.</p>
 
         <div class="section-title">Parâmetros</div>
         <div class="table-scroll">
@@ -946,7 +968,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
         <div class="form-actions">
           <span class="save-msg" id="saveMsgEspec"></span>
           <button class="btn btn-ghost" onclick="fecharModalEspec()">Cancelar</button>
-          <button class="btn btn-accent" onclick="salvarEspecificacao()">Salvar especificação</button>
+          <button class="btn btn-accent" id="btnSalvarEspec" onclick="salvarEspecificacao()">Salvar EMP</button>
         </div>
       </div>
     </div>
@@ -958,7 +980,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <button class="modal-close" onclick="fecharModalFornecedor()" aria-label="Fechar">✕</button>
       <div class="modal-head">
         <h2 id="modalFornecedorTitulo">Novo fornecedor</h2>
-        <p class="tela-sub" style="margin-top:6px;">Cadastre o fornecedor e cada item que ele fornece. Especificações e recebimentos puxam fornecedor e tipo daqui.</p>
+        <p class="tela-sub" style="margin-top:6px;">Cadastre o fornecedor e cada produto que ele fornece, vinculando a EMP que define os critérios do recebimento. Sem EMP, o produto fica sem critérios (dá pra vincular depois).</p>
       </div>
       <div class="form-wrap" style="padding-top:10px; max-width:none;">
         <div class="section-title">Fornecedor</div>
@@ -968,7 +990,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
         <div class="section-title">O que ele fornece</div>
         <div class="table-scroll">
           <table class="occ itens-table">
-            <thead><tr><th>Matéria-prima / insumo</th><th>Tipo</th><th>Código</th><th>Último lote (só resina)</th><th></th></tr></thead>
+            <thead><tr><th>Matéria-prima / insumo</th><th>Tipo</th><th>Código</th><th>Último lote (só resina)</th><th>EMP (critérios)</th><th></th></tr></thead>
             <tbody id="tbodyItensForn"></tbody>
           </table>
         </div>
@@ -1012,13 +1034,14 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <button class="modal-close" onclick="fecharModalRotulo()" aria-label="Fechar">✕</button>
       <div class="modal-head">
         <h2 id="modalRotuloTitulo">Novo rótulo homologado</h2>
-        <p class="tela-sub" style="margin-top:6px;">A foto cadastrada aqui é a referência usada na conferência visual do recebimento.</p>
+        <p class="tela-sub" style="margin-top:6px;">Rótulos são enviados pelos clientes. No recebimento, escolher o rótulo já traz o cliente, a foto de referência e a EMP com os critérios.</p>
       </div>
       <div class="form-wrap" style="padding-top:10px; max-width:none;">
         <div class="form-grid">
-          <div class="field full"><label>Nome do modelo</label><input id="rotuloNomeInput" placeholder="Ex: Água Indaiá 500 mL"></div>
-          <div class="field"><label>Aplicação</label><input id="rotuloAplicacaoInput" placeholder="Ex: Garrafa 500 mL rotulada"></div>
-          <div class="field"><label>Fornecedor habitual</label><input id="rotuloFornecedorInput" list="listaFornecedores" placeholder="Nome do fornecedor"></div>
+          <div class="field full"><label>Nome do rótulo</label><input id="rotuloNomeInput" placeholder="Ex: Guaraná 2 L"></div>
+          <div class="field"><label>Volume (mL)</label><input id="rotuloVolumeInput" inputmode="numeric" placeholder="Ex: 2000"></div>
+          <div class="field"><label>Cliente</label><input id="rotuloClienteInput" list="listaClientesRotulo" placeholder="Nome do cliente"><datalist id="listaClientesRotulo"></datalist></div>
+          <div class="field full"><label>EMP (critérios do recebimento)</label><select id="rotuloEmpSelect"></select></div>
           <div class="field full"><label>Foto de referência</label>
             <button type="button" class="file-btn" onclick="document.getElementById('rotuloFotoFile').click()"><span class="ic"><svg><use href="#i-image"/></svg></span><span id="rotuloFotoLabel">Anexar foto do rótulo</span></button>
             <input type="file" id="rotuloFotoFile" accept="image/*" hidden onchange="document.getElementById('rotuloFotoLabel').textContent = this.files[0] ? this.files[0].name : 'Anexar foto do rótulo'">
@@ -1191,14 +1214,14 @@ const TABELAS = {
 // planilha (lerCabecalhos) e passa a usar a ordem/nomes de lá — assim, acrescentar uma coluna na
 // planilha não quebra a gravação. Se faltar alguma coluna esperada, aparece um aviso.
 const TABLE_COLS = {
-  resina: ['Lote Interno','Data Recebimento','Fornecedor','Tipo','Código Produto','Lote Fornecedor','Nota Fiscal','Quantidade','Unidade','Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Análise de Impureza','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições'],
-  rotulo: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Modelo do Rótulo','Quantidade','Unidade','Conferência Visual','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições'],
-  pigmento: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições'],
-  cinta: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições'],
-  tampa: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições'],
-  fornecedores: ['Fornecedor','Material','Tipo','Código','Último Lote Interno'],
-  especificacoes: ['Material','Fornecedor','Tipo','Código Documento','Revisão','Data Documento','Teste','Especificação/Tolerância','Unidade','NT','Critério'],
-  rotulosHomologados: ['ID','Nome do Modelo','Aplicação','Fornecedor Habitual','Arquivo da Foto','Status','Observações'],
+  resina: ['Lote Interno','Data Recebimento','Fornecedor','Tipo','Código Produto','Lote Fornecedor','Nota Fiscal','Quantidade','Unidade','Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Análise de Impureza','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições','EMP'],
+  rotulo: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Modelo do Rótulo','Quantidade','Unidade','Conferência Visual','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições','EMP'],
+  pigmento: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições','EMP'],
+  cinta: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições','EMP'],
+  tampa: ['Data','Nota Fiscal','Fornecedor','Tipo','Lote','Quantidade','Unidade','Laudo Anexado','Arquivo do Laudo','Status','Responsável','Observações','Medições','EMP'],
+  fornecedores: ['Fornecedor','Material','Tipo','Código','Último Lote Interno','EMP'],
+  especificacoes: ['Código Documento','Descrição','Material','Revisão','Data Documento','Teste','Especificação/Tolerância','Unidade','NT','Critério'],
+  rotulosHomologados: ['ID','Nome do Modelo','Aplicação','Fornecedor Habitual','Arquivo da Foto','Status','Observações','Volume (mL)','Cliente','EMP'],
   reclamacoes: ['RAC','Data','Cliente','Produto','Motivo','Classificação','Status','Responsável','Observações'],
   liberacoes: ['Número Registro','Data','Produto/Processo','Não Conformidade','Decisão','Quantidade Liberada','Responsável','Status','Observações'],
   listas: ['Responsaveis','Status Recebimento','Criterio','Unidades','Materiais','Sim Nao','Conferencia Visual','Status Reclamacao','Classificacao Reclamacao','Status Liberacao','Status Rotulo']
@@ -1590,14 +1613,20 @@ function parseEspecTexto(texto, unidade, criterio){
   return { tipoResultado: 'visual' };
 }
 function matKeyDeLabel(label){ return Object.keys(MAT_LABEL_PLANO).find(function(k){ return MAT_LABEL_PLANO[k] === String(label || '').trim(); }) || ''; }
-// Cada ficha de especificação = Material + Fornecedor + Tipo, com seus parâmetros.
+// EMP (Especificação de Matéria-Prima e Insumos) = Código + Descrição, independente de fornecedor.
+// Cada item do cadastro de Fornecedores escolhe a EMP que vale pra ele (coluna EMP); sem EMP, sem critérios.
+// Compatível com a planilha antiga (colunas Fornecedor/Tipo na aba de especificações): nesse caso a ficha
+// guarda o vínculo antigo em f.legado e o recebimento usa ele enquanto a planilha não for atualizada.
+function chaveEmp(doc, desc){ doc = String(doc || '').trim(); desc = String(desc || '').trim(); return desc ? doc + ' — ' + desc : doc; }
 function montarEspecificacoes(linhas){
   var mapa = {}, lista = [];
   linhas.forEach(function(l){
-    var mat = matKeyDeLabel(l['Material']) || slugify(l['Material']), forn = String(l['Fornecedor'] || '').trim(), tipo = String(l['Tipo'] || '').trim();
-    var chave = mat + '|' + forn + '|' + tipo;
+    var mat = matKeyDeLabel(l['Material']) || slugify(l['Material']), doc = String(l['Código Documento'] || '').trim(), desc, legado = null;
+    if (l['Descrição'] !== undefined) desc = String(l['Descrição'] || '').trim();
+    else { var fo = String(l['Fornecedor'] || '').trim(), ti = String(l['Tipo'] || '').trim(); legado = { forn: fo, tipo: ti }; desc = fo === TODOS ? (MAT_LABEL_PLANO[mat] || '') : ti; }
+    var chave = chaveEmp(doc, desc) + (legado ? '|' + mat : '');
     if (!mapa[chave]) {
-      mapa[chave] = { id: slugify(chave), mat: mat, forn: forn, tipo: tipo, doc: l['Código Documento'], rev: l['Revisão'], data: l['Data Documento'], parametros: [] };
+      mapa[chave] = { id: slugify(chave), key: chaveEmp(doc, desc), doc: doc, desc: desc, mat: mat, rev: l['Revisão'], data: l['Data Documento'], parametros: [], legado: legado };
       lista.push(mapa[chave]);
     }
     var parsed = parseEspecTexto(l['Especificação/Tolerância'], l['Unidade'], l['Critério']);
@@ -1605,20 +1634,40 @@ function montarEspecificacoes(linhas){
       teste: l['Teste'], unidade: l['Unidade'], nt: l['NT'] || '—', criterio: l['Critério'] || '-', especTexto: l['Especificação/Tolerância']
     }, parsed));
   });
-  return lista;
+  return lista.sort(function(x, y){ return x.key.localeCompare(y.key, 'pt-BR', { numeric: true }); });
 }
-// Ficha geral: Fornecedor e Tipo = "(Todos)" vale pra todos os recebimentos do material (ex.: EMP-016 Rótulos).
-// Uma ficha específica do fornecedor+tipo, se existir, tem prioridade sobre a geral.
 var TODOS = '(Todos)';
-function fichaExata(mat, forn, tipo){ return DATA.especificacoes.find(function(f){ return f.mat === mat && f.forn === forn && f.tipo === tipo; }); }
-function fichaDe(mat, forn, tipo){ return fichaExata(mat, forn, tipo) || DATA.especificacoes.find(function(f){ return f.mat === mat && f.forn === TODOS; }); }
-function tituloFicha(f){ return (MAT_LABEL_PLANO[f.mat] || f.mat) + ' · ' + (f.forn === TODOS ? 'todos os fornecedores e tipos' : (f.forn || '—') + ' — ' + (f.tipo || '—')); }
+// A planilha só aceita o cadastro de EMPs e de rótulos (com volume/cliente/EMP) depois de convertida pro formato novo.
+function planilhaFormatoNovo(){
+  return (TABLE_COLS.especificacoes || []).indexOf('Descrição') > -1 && (TABLE_COLS.fornecedores || []).indexOf('EMP') > -1 && (TABLE_COLS.rotulosHomologados || []).indexOf('Cliente') > -1;
+}
+function bloqueadoPlanilhaAntiga(){
+  if (planilhaFormatoNovo()) return false;
+  mostrarToast('A planilha ainda está no formato antigo. O cadastro de EMPs e de rótulos fica disponível depois que a planilha for atualizada.', true);
+  return true;
+}
+function planilhaComVinculoEmp(){ return (TABLE_COLS.fornecedores || []).indexOf('EMP') > -1; }
+function empPorChave(chave){ chave = String(chave || '').trim(); return chave ? DATA.especificacoes.find(function(f){ return f.key === chave; }) : null; }
+function fichaDe(mat, forn, tipo, modelo){
+  if (mat === 'rotulo' && (TABLE_COLS.rotulosHomologados || []).indexOf('EMP') > -1) {
+    var rot = rotuloHomologadoDe(modelo, forn, tipo);
+    if (rot) return String(rot['EMP'] || '').trim() ? (empPorChave(rot['EMP']) || null) : null;
+  }
+  var it = itemFornecedor(forn, mat, tipo);
+  if (planilhaComVinculoEmp()) return it && it.emp ? (empPorChave(it.emp) || null) : null;
+  // planilha antiga: vínculo pelo fornecedor+tipo gravado na própria especificação
+  return DATA.especificacoes.find(function(f){ return f.mat === mat && f.legado && f.legado.forn === forn && f.legado.tipo === tipo; }) ||
+         DATA.especificacoes.find(function(f){ return f.mat === mat && f.legado && f.legado.forn === TODOS; }) || null;
+}
+function tituloFicha(f){ return f.key; }
+function rotuloEmp(f){ return f ? [f.doc, f.rev ? 'Rev.' + String(f.rev).replace(/^rev\.?\s*/i, '') : '', f.desc].filter(function(x){ return x; }).join(' · ') : ''; }
+function vinculosDaEmp(f){ return itensFornecedores().filter(function(i){ return planilhaComVinculoEmp() ? i.emp === f.key : (f.legado && i.mat === f.mat && (f.legado.forn === TODOS || (i.forn === f.legado.forn && i.tipo === f.legado.tipo))); }); }
 
 /* ---- cadastro de fornecedores: cada linha da planilha = um item (fornecedor + material + tipo) ---- */
 function itensFornecedores(){
   return DATA.fornecedores.map(function(r){
     return { forn: String(r['Fornecedor'] || '').trim(), mat: matKeyDeLabel(r['Material']), matLabel: r['Material'] || '', tipo: String(r['Tipo'] || '').trim(),
-             cod: String(r['Código'] || '').trim().toUpperCase(), ult: r['Último Lote Interno'] || '', __index: r.__index };
+             cod: String(r['Código'] || '').trim().toUpperCase(), ult: r['Último Lote Interno'] || '', emp: String(r['EMP'] || '').trim(), __index: r.__index };
   }).filter(function(i){ return i.forn; });
 }
 function grupoFornecedores(){
@@ -1763,7 +1812,7 @@ function renderHome(){
 }
 // Quantas medições da ficha (critérios L/QA/C) já têm resultado — só Resina, que tem ficha.
 function progressoAnalises(mat, r){
-  var ficha = fichaDe(mat, String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim());
+  var ficha = fichaDe(mat, String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim(), r['Modelo do Rótulo']);
   if (!ficha) return null;
   var params = ficha.parametros.filter(function(p){ return p.criterio !== '-'; });
   if (!params.length) return null;
@@ -1806,7 +1855,8 @@ function fornecedoresDe(mat){
 function montarHead(mat){
   var cols;
   if (mat === 'resina') cols = ['Data','Lote interno','Lote fornecedor','Fornecedor / tipo','Quantidade','Viscosidade (Blowpet)','Nota fiscal','Laudo','Status','Responsável',''];
-  else { cols = ['Data','Nota fiscal','Fornecedor / tipo','Lote','Quantidade']; if (mat === 'rotulo') cols.push('Conferência'); cols.push('Laudo','Status','Responsável',''); }
+  else { cols = ['Data','Nota fiscal', mat === 'rotulo' ? 'Cliente / rótulo' : 'Fornecedor / tipo','Lote','Quantidade']; if (mat === 'rotulo') cols.push('Conferência'); cols.push('Laudo','Status','Responsável',''); }
+  var lf = document.getElementById('fFornecedorLabel'); if (lf) lf.textContent = mat === 'rotulo' ? 'Cliente' : 'Fornecedor';
   document.getElementById('theadRow').innerHTML = cols.map(function(c){ return '<th' + (c.indexOf('Viscosidade') === 0 ? ' class="c"' : '') + '>'+c+'</th>'; }).join('');
 }
 function botoesAcaoRecebimento(mat, idx){
@@ -1880,7 +1930,7 @@ function renderRecebimentoTabela(){
   if (!rows.length) { document.getElementById('tbody').innerHTML = '<tr><td colspan="12" class="empty-note">Nenhum recebimento encontrado com esses filtros.</td></tr>'; return; }
   if (mat === 'resina') { document.getElementById('tbody').innerHTML = rows.map(linhaResina).join(''); return; }
   document.getElementById('tbody').innerHTML = rows.map(function(r){
-    var cells = ['<td class="cell-dim tabular">'+(r['Data']||'')+'</td>','<td class="mono">'+(r['Nota Fiscal']||'')+'</td>','<td>'+escHtml(r['Fornecedor']||'')+'<div class="cell-dim" style="font-size:11px;">'+escHtml([r['Tipo'], codigoProdutoDe(mat, r['Fornecedor'], r['Tipo'])].filter(function(x){ return x; }).join(' · '))+'</div></td>','<td class="mono cell-dim">'+(r['Lote']||'')+'</td>','<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'];
+    var cells = ['<td class="cell-dim tabular">'+(r['Data']||'')+'</td>','<td class="mono">'+(r['Nota Fiscal']||'')+'</td>','<td>'+escHtml(r['Fornecedor']||'')+'<div class="cell-dim" style="font-size:11px;">'+escHtml((mat === 'rotulo' ? [r['Modelo do Rótulo'], r['Tipo']] : [r['Tipo'], codigoProdutoDe(mat, r['Fornecedor'], r['Tipo'])]).filter(function(x){ return x; }).join(' · '))+'</div></td>','<td class="mono cell-dim">'+(r['Lote']||'')+'</td>','<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'];
     if (mat === 'rotulo') cells.push('<td class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</td>');
     cells.push('<td>'+laudoIc(r['Arquivo do Laudo'])+'</td>','<td>'+badgeLabel(r['Status'])+'</td>','<td class="cell-dim">'+(r['Responsável']||'')+'</td>');
     return '<tr class="clicavel" onclick="abrirDetalhe(\''+mat+'\','+r.__index+')">'+cells.join('')+acoesRecebimentoHtml(mat, r.__index)+'</tr>';
@@ -1919,15 +1969,16 @@ function abrirDetalhe(mat, index){
   function kv(rot, val, cls){ return '<div><dt>' + rot + '</dt><dd' + (cls ? ' class="' + cls + '"' : '') + '>' + (val ? escHtml(val) : '<span class="res-pend">—</span>') + '</dd></div>'; }
   var html = '<div class="section-title">Dados</div><dl class="dw-kv">' +
     kv('Data', r['Data Recebimento'] || r['Data'], 'tabular') + kv('Nota fiscal', r['Nota Fiscal'], 'mono') +
-    kv('Fornecedor', r['Fornecedor']) + kv('Tipo', r['Tipo']) +
-    (ehResina ? kv('Lote do fornecedor', r['Lote Fornecedor'], 'mono') + kv('Código', r['Código Produto'], 'mono') : kv('Lote', r['Lote'], 'mono') + kv('Código do produto', codigoProdutoDe(mat, r['Fornecedor'], r['Tipo']), 'mono')) +
+    (mat === 'rotulo' ? kv('Cliente', r['Fornecedor']) + kv('Volume', r['Tipo']) : kv('Fornecedor', r['Fornecedor']) + kv('Tipo', r['Tipo'])) +
+    (ehResina ? kv('Lote do fornecedor', r['Lote Fornecedor'], 'mono') + kv('Código', r['Código Produto'], 'mono') : kv('Lote', r['Lote'], 'mono') + (mat === 'rotulo' ? '' : kv('Código do produto', codigoProdutoDe(mat, r['Fornecedor'], r['Tipo']), 'mono'))) +
     kv('Quantidade', [r['Quantidade'], r['Unidade']].filter(function(x){ return x; }).join(' '), 'tabular') + kv('Responsável', r['Responsável']) +
-    (mat === 'rotulo' ? kv('Modelo do rótulo', r['Modelo do Rótulo']) + kv('Conferência visual', r['Conferência Visual']) : '') +
+    (mat === 'rotulo' ? kv('Rótulo', r['Modelo do Rótulo']) + kv('Conferência visual', r['Conferência Visual']) : '') +
+    kv('EMP da análise', r['EMP']) +
     '<div><dt>Laudo</dt><dd>' + (r['Arquivo do Laudo'] ? '<a href="' + escHtml(r['Arquivo do Laudo']) + '" target="_blank">abrir laudo</a>' : '<span class="res-pend">sem laudo</span>') + '</dd></div></dl>';
-  var fichaDw = fichaDe(mat, String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim());
+  var fichaDw = fichaDe(mat, String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim(), r['Modelo do Rótulo']);
   if (ehResina || fichaDw) {
     var ficha = fichaDw;
-    html += '<div class="section-title">Medições' + (ficha ? ' <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">' + escHtml([ficha.doc, ficha.rev].filter(function(x){ return x; }).join(' · ')) + '</span>' : '') + '</div>';
+    html += '<div class="section-title">Medições' + (ficha ? ' <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">' + escHtml(rotuloEmp(ficha)) + '</span>' : '') + '</div>';
     if (ficha) {
       var med = medicoesDeLinha(r), params = ficha.parametros.filter(function(p){ return p.criterio !== '-'; }), rean = lerReanalises(r['Observações']);
       var prog = progressoAnalises(mat, r);
@@ -1941,7 +1992,7 @@ function abrirDetalhe(mat, index){
             '<td>' + (v ? '<span style="color:' + cor + '; font-weight:500;">' + (/Viscosidade/.test(PARAM_COL_MAP[p.teste] || '') ? viscosidade3(v) : escHtml(v)) + '</span>' : '<span class="res-pend">pendente</span>') + rotuloReanalise(rean[p.teste]) + '</td></tr>';
         }).join('') + '</tbody></table></div>';
     } else {
-      html += '<p class="dw-obs">Sem ficha de especificação cadastrada para esse fornecedor/tipo.</p>';
+      html += '<p class="dw-obs">Este produto não tem EMP vinculada no cadastro de Fornecedores.</p>';
     }
   }
   if (r['Observações']) html += '<div class="section-title">Observações</div><p class="dw-obs">' + escHtml(r['Observações']) + '</p>';
@@ -2217,15 +2268,14 @@ function preencherEdicaoRecebimento(mat, row){
     renderMedicoes(row); habilitarMedicoes(true);
   } else {
     document.getElementById('loteGenericoInput').value = row['Lote'] || '';
-    renderMedicoes(row); habilitarMedicoes(true);
     if (mat === 'rotulo') {
-      var modeloSel = document.getElementById('modeloRotuloSelect');
-      var modeloMatch = DATA.rotulosHomologados.find(function(r){ return r['Nome do Modelo'] === row['Modelo do Rótulo']; });
-      if (modeloMatch) modeloSel.value = modeloMatch['ID'];
-      atualizarPreviaRotulo();
+      var modeloMatch = rotuloHomologadoDe(row['Modelo do Rótulo'], row['Fornecedor'], row['Tipo']);
+      if (modeloMatch) escolherRotulo(modeloMatch['ID'], true);
+      else { limparSelecaoRotulo(); document.getElementById('rotuloBuscaInput').value = row['Modelo do Rótulo'] || ''; document.getElementById('clienteRotuloDisplay').value = row['Fornecedor'] || '—'; }
       var confSel = document.getElementById('conferenciaRotuloSelect'), alvoOk = confereOk(row['Conferência Visual']);
       for (var oi = 0; oi < confSel.options.length; oi++) { if (confereOk(confSel.options[oi].value) === alvoOk) { confSel.value = confSel.options[oi].value; break; } }
     }
+    renderMedicoes(row); habilitarMedicoes(true);
   }
   selecionarStatusPorChave(statusKey(row['Status']) === 'restricao' ? 'reprovado' : statusKey(row['Status']));
   atualizarCodigoProduto();
@@ -2294,21 +2344,120 @@ function medicoesDigitadasComoLinha(){
   return linha;
 }
 
+/* ---- Rótulo no recebimento: Volume → Nome do rótulo (pesquisa) → Cliente, foto e EMP vêm do cadastro ---- */
+// No rótulo não há fornecedor: quem manda é o cliente. Na aba de recebimento, "Fornecedor" guarda o cliente,
+// "Tipo" guarda o volume (ex.: 2000 mL) e "Modelo do Rótulo" o nome.
+function volumeDoRotulo(r){ return String(r['Volume (mL)'] || '').trim().replace(/\s*m[lL]$/, ''); }
+function rotuloVolumeTexto(v){ v = String(v || '').trim(); return v ? v.replace(/\s*m[lL]$/, '') + ' mL' : ''; }
+function rotulosAtivos(){ return DATA.rotulosHomologados.filter(function(r){ return String(r['Status'] || 'Ativo').toLowerCase() !== 'inativo'; }); }
+function rotuloPorId(id){ return id ? DATA.rotulosHomologados.find(function(r){ return r['ID'] === id; }) : null; }
+function rotuloHomologadoDe(modelo, cliente, tipo){
+  modelo = String(modelo || '').trim(); if (!modelo) return null;
+  var c = DATA.rotulosHomologados.filter(function(r){ return String(r['Nome do Modelo'] || '').trim() === modelo; });
+  return c.find(function(r){ return String(r['Cliente'] || '').trim() === String(cliente || '').trim() && rotuloVolumeTexto(volumeDoRotulo(r)) === String(tipo || '').trim(); }) ||
+         c.find(function(r){ return String(r['Cliente'] || '').trim() === String(cliente || '').trim(); }) || c[0] || null;
+}
+function rotuloSelecionado(){ return rotuloPorId(document.getElementById('modeloRotuloSelect').value); }
+function fornTipoAtual(){
+  var mat = document.getElementById('materialSelect').value;
+  if (mat !== 'rotulo') return { forn: document.getElementById('fornecedorSelect').value, tipo: document.getElementById('tipoSelect').value, modelo: '' };
+  var r = rotuloSelecionado();
+  if (r) return { forn: String(r['Cliente'] || '').trim(), tipo: rotuloVolumeTexto(volumeDoRotulo(r)), modelo: String(r['Nome do Modelo'] || '').trim(), rotulo: r };
+  // edição de um recebimento antigo cujo rótulo não está mais no cadastro: mantém o que estava gravado
+  var row = recebimentoEditando ? DATA.rotulo.find(function(x){ return x.__index === recebimentoEditando.index; }) : null;
+  return row ? { forn: row['Fornecedor'] || '', tipo: row['Tipo'] || '', modelo: row['Modelo do Rótulo'] || '' } : { forn: '', tipo: '', modelo: '' };
+}
 function popularOpcoesModeloRotulo(){
   var sel = document.getElementById('modeloRotuloSelect'), atual = sel.value;
-  sel.innerHTML = DATA.rotulosHomologados.map(function(r){ return '<option value="'+escHtml(r['ID'])+'">'+escHtml(r['Nome do Modelo'])+'</option>'; }).join('');
-  sel.value = DATA.rotulosHomologados.some(function(r){ return r['ID'] === atual; }) ? atual : (DATA.rotulosHomologados[0] ? DATA.rotulosHomologados[0]['ID'] : '');
+  sel.innerHTML = '<option value=""></option>' + DATA.rotulosHomologados.map(function(r){ return '<option value="'+escHtml(r['ID'])+'">'+escHtml(r['Nome do Modelo'])+'</option>'; }).join('');
+  sel.value = DATA.rotulosHomologados.some(function(r){ return r['ID'] === atual; }) ? atual : '';
+  var vSel = document.getElementById('volumeRotuloSelect'), vAtual = vSel.value;
+  var vols = unicos(rotulosAtivos().map(volumeDoRotulo).filter(function(v){ return v; })).sort(function(a, b){ return (parseFloat(a.replace(',', '.')) || 0) - (parseFloat(b.replace(',', '.')) || 0); });
+  vSel.innerHTML = '<option value="">Todos os volumes</option>' + vols.map(function(v){ return '<option value="' + escHtml(v) + '">' + escHtml(rotuloVolumeTexto(v)) + '</option>'; }).join('');
+  vSel.value = vols.indexOf(vAtual) > -1 ? vAtual : '';
+}
+function limparSelecaoRotulo(){
+  document.getElementById('modeloRotuloSelect').value = '';
+  document.getElementById('rotuloBuscaInput').value = '';
+  document.getElementById('volumeRotuloSelect').value = '';
+  document.getElementById('clienteRotuloDisplay').value = '—';
+  fecharListaRotulos();
+}
+function rotulosFiltrados(){
+  var vol = document.getElementById('volumeRotuloSelect').value, q = document.getElementById('rotuloBuscaInput').value.trim().toLowerCase();
+  var sel = rotuloSelecionado(); if (sel && q === String(sel['Nome do Modelo'] || '').toLowerCase()) q = '';
+  return rotulosAtivos().filter(function(r){
+    if (vol && volumeDoRotulo(r) !== vol) return false;
+    return !q || (String(r['Nome do Modelo'] || '') + ' ' + String(r['Cliente'] || '')).toLowerCase().indexOf(q) > -1;
+  }).sort(function(a, b){ return String(a['Nome do Modelo']).localeCompare(String(b['Nome do Modelo']), 'pt-BR'); });
+}
+function marcarTermo(txt, q){
+  txt = escHtml(txt); if (!q) return txt;
+  var i = txt.toLowerCase().indexOf(escHtml(q).toLowerCase()); if (i < 0) return txt;
+  return txt.slice(0, i) + '<mark>' + txt.slice(i, i + escHtml(q).length) + '</mark>' + txt.slice(i + escHtml(q).length);
+}
+var rotuloListaAtivo = -1;
+function abrirListaRotulos(){
+  var inp = document.getElementById('rotuloBuscaInput'), sel = rotuloSelecionado();
+  if (sel && inp.value.trim() !== String(sel['Nome do Modelo'] || '')) { document.getElementById('modeloRotuloSelect').value = ''; aoMudarRotulo(); }
+  var lista = rotulosFiltrados(), q = inp.value.trim(), el = document.getElementById('rotuloLista');
+  rotuloListaAtivo = -1;
+  el.innerHTML = lista.length ? lista.map(function(r){
+    return '<div class="combo-item" data-id="' + escHtml(r['ID']) + '" onmousedown="event.preventDefault(); escolherRotulo(this.dataset.id)"><span class="vol">' + escHtml(rotuloVolumeTexto(volumeDoRotulo(r)) || '—') + '</span>' +
+      '<span class="nm">' + marcarTermo(r['Nome do Modelo'] || '', q) + '</span><span class="cl">' + marcarTermo(r['Cliente'] || '', q) + '</span></div>';
+  }).join('') : '<div class="combo-vazio">' + (DATA.rotulosHomologados.length ? 'Nenhum rótulo encontrado' + (document.getElementById('volumeRotuloSelect').value ? ' nesse volume' : '') + '.' : 'Nenhum rótulo cadastrado ainda — cadastre em Rótulos homologados.') + '</div>';
+  el.classList.remove('hidden');
+}
+function fecharListaRotulos(){ document.getElementById('rotuloLista').classList.add('hidden'); rotuloListaAtivo = -1; }
+document.addEventListener('mousedown', function(e){ if (!e.target.closest || !e.target.closest('#comboRotulo')) fecharListaRotulos(); });
+function teclaListaRotulos(e){
+  var el = document.getElementById('rotuloLista'), itens = el.querySelectorAll('.combo-item');
+  if (e.key === 'Escape') { fecharListaRotulos(); return; }
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault(); if (el.classList.contains('hidden')) abrirListaRotulos();
+    itens = el.querySelectorAll('.combo-item'); if (!itens.length) return;
+    rotuloListaAtivo = (rotuloListaAtivo + (e.key === 'ArrowDown' ? 1 : -1) + itens.length) % itens.length;
+    itens.forEach(function(it, k){ it.classList.toggle('ativo', k === rotuloListaAtivo); });
+    itens[rotuloListaAtivo].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    var alvo = itens[rotuloListaAtivo > -1 ? rotuloListaAtivo : 0]; if (alvo) escolherRotulo(alvo.dataset.id);
+  }
+}
+function escolherRotulo(id, silencioso){
+  var r = rotuloPorId(id); if (!r) return;
+  document.getElementById('modeloRotuloSelect').value = id;
+  document.getElementById('rotuloBuscaInput').value = r['Nome do Modelo'] || '';
+  var vSel = document.getElementById('volumeRotuloSelect'), v = volumeDoRotulo(r);
+  if (v && !Array.prototype.some.call(vSel.options, function(o){ return o.value === v; })) vSel.insertAdjacentHTML('beforeend', '<option value="' + escHtml(v) + '">' + escHtml(rotuloVolumeTexto(v)) + '</option>');
+  vSel.value = v;
+  fecharListaRotulos();
+  if (!silencioso) aoMudarRotulo(); else { document.getElementById('clienteRotuloDisplay').value = r['Cliente'] || '—'; atualizarPreviaRotulo(); }
+}
+function aoMudarVolumeRotulo(){
+  var r = rotuloSelecionado(), vol = document.getElementById('volumeRotuloSelect').value;
+  if (r && vol && volumeDoRotulo(r) !== vol) { document.getElementById('modeloRotuloSelect').value = ''; document.getElementById('rotuloBuscaInput').value = ''; aoMudarRotulo(); }
+  document.getElementById('rotuloBuscaInput').focus();
+}
+function aoMudarRotulo(){
+  var r = rotuloSelecionado();
+  document.getElementById('clienteRotuloDisplay').value = r ? (r['Cliente'] || '—') : '—';
+  atualizarPreviaRotulo();
+  renderMedicoes(medicoesDigitadasComoLinha()); habilitarMedicoes(true);
+  sugerirStatusRecebimento();
 }
 function atualizarCamposMaterial(){
   var mat = document.getElementById('materialSelect').value;
   var ehResina = mat === 'resina';
-  document.getElementById('campoModeloRotulo').style.display = mat === 'rotulo' ? '' : 'none';
+  var ehRot = mat === 'rotulo';
+  ['campoVolumeRotulo', 'campoNomeRotulo', 'campoClienteRotulo'].forEach(function(id){ document.getElementById(id).style.display = ehRot ? '' : 'none'; });
+  ['campoFornecedorReceb', 'campoTipoReceb'].forEach(function(id){ document.getElementById(id).style.display = ehRot ? 'none' : ''; });
   document.getElementById('campoConferenciaRotulo').style.display = mat === 'rotulo' ? '' : 'none';
   document.getElementById('secaoRotulo').style.display = mat === 'rotulo' ? '' : 'none';
   // Lote do fornecedor + lote interno (código + sequencial) são da Resina PET; os demais materiais
   // usam um campo "Lote" simples.
   document.getElementById('campoLoteGenerico').style.display = ehResina ? 'none' : '';
-  document.getElementById('campoCodigoProduto').style.display = ehResina ? 'none' : '';
+  document.getElementById('campoCodigoProduto').style.display = (ehResina || ehRot) ? 'none' : '';
   document.getElementById('campoLoteFornecedorResina').style.display = ehResina ? '' : 'none';
   document.getElementById('campoLoteInternoResina').style.display = ehResina ? '' : 'none';
   // Só a aba de Resina PET tem colunas de medição (Viscosidade, Cor etc.) — por isso a seção de
@@ -2318,7 +2467,7 @@ function atualizarCamposMaterial(){
   document.getElementById('fornecedorSelect').disabled = false;
   document.getElementById('tipoSelect').disabled = false;
   if (!recebimentoEditando) { popularFornecedoresReceb(); popularTiposReceb(); }
-  if (mat === 'rotulo') { popularOpcoesModeloRotulo(); atualizarPreviaRotulo(); }
+  if (mat === 'rotulo') { popularOpcoesModeloRotulo(); if (!recebimentoEditando) limparSelecaoRotulo(); atualizarPreviaRotulo(); document.getElementById('notaSemFornecedor').classList.add('hidden'); }
   if (ehResina) {
     if (!recebimentoEditando) { document.getElementById('loteFornecedorInput').value = ''; verificarLoteExistente(); }
   } else {
@@ -2329,9 +2478,9 @@ function atualizarCamposMaterial(){
   sugerirStatusRecebimento();
 }
 function atualizarPreviaRotulo(){
-  var sel = document.getElementById('modeloRotuloSelect');
-  var r = DATA.rotulosHomologados.find(function(x){ return x['ID'] === sel.value; });
-  document.getElementById('previaRotuloNome').textContent = r ? r['Nome do Modelo'] : 'Nenhum rótulo homologado cadastrado ainda.';
+  var r = rotuloSelecionado();
+  document.getElementById('previaRotuloNome').textContent = r ? [r['Nome do Modelo'], rotuloVolumeTexto(volumeDoRotulo(r)), r['Cliente']].filter(function(x){ return x; }).join(' · ') :
+    (DATA.rotulosHomologados.length ? 'Escolha o rótulo pra ver a foto de referência.' : 'Nenhum rótulo homologado cadastrado ainda.');
   document.getElementById('previaRotuloImg').src = (r && r['Arquivo da Foto']) ? r['Arquivo da Foto'] : '';
   document.getElementById('previaRotuloImg').style.display = (r && r['Arquivo da Foto']) ? '' : 'none';
 }
@@ -2359,6 +2508,7 @@ function calcularResultado(escolhas){
   var paramsL = todos.filter(function(x){ return x.p.criterio === 'L'; }), paramsQA = todos.filter(function(x){ return x.p.criterio === 'QA'; });
   var qaObrig = !paramsL.length && paramsQA.length > 0;
   var fora = [], pend = [];
+  if (mat === 'rotulo' && !fornTipoAtual().modelo) return { chave: 'pendente', motivo: 'Escolha o rótulo.', pend: ['Rótulo'] };
   if (mat === 'rotulo') {
     var conf = document.getElementById('conferenciaRotuloSelect');
     if (!confereOk(conf.value)) fora.push('Conferência visual (' + (conf.options[conf.selectedIndex] ? conf.options[conf.selectedIndex].textContent : 'Divergente') + ')');
@@ -2489,20 +2639,21 @@ function avaliarParametro(p, valorRaw){
 }
 function renderMedicoes(entradaExistente){
   var mat = document.getElementById('materialSelect').value;
-  var forn = document.getElementById('fornecedorSelect').value, tipo = document.getElementById('tipoSelect').value;
-  var ficha = fichaDe(mat, forn, tipo);
+  var ft = fornTipoAtual(), forn = ft.forn, tipo = ft.tipo;
+  var ficha = fichaDe(mat, forn, tipo, ft.modelo);
   var tb = document.getElementById('tbodyMedicoes'), label = document.getElementById('medicoesFichaLabel');
   // Resina sempre mostra a seção (com aviso quando não há ficha); os demais materiais só quando há ficha.
-  document.getElementById('secaoMedicoes').style.display = (mat === 'resina' || ficha) ? '' : 'none';
+  document.getElementById('secaoMedicoes').style.display = (mat === 'resina' || ficha || (forn && tipo)) ? '' : 'none';
   if (!ficha) {
     ESPEC_PARAMS_ATUAL = []; label.textContent = '—';
-    tb.innerHTML = (forn && tipo) ? '<tr><td colspan="5" style="white-space:normal;"><div class="aviso-ficha">Nenhuma especificação cadastrada para <b>' + escHtml(forn) + ' — ' + escHtml(tipo) +
-      '</b>. O recebimento pode ser salvo normalmente, só sem as medições; elas aparecem aqui quando a ficha for cadastrada em <a href="#" onclick="fecharModalCadastro(); abrirCadastro(\'especificacoes\'); return false;">Especificações</a>.</div></td></tr>' : '';
+    tb.innerHTML = (mat === 'rotulo' && ft.modelo) ? '<tr><td colspan="5" style="white-space:normal;"><div class="aviso-ficha">O rótulo <b>' + escHtml(ft.modelo) + '</b> não tem EMP vinculada, então fica sem critérios. Vincule uma EMP ao rótulo em <a href="#" onclick="fecharModalCadastro(); abrirCadastro(\'rotulos\'); return false;">Rótulos homologados</a>.</div></td></tr>' :
+      (forn && tipo) ? '<tr><td colspan="5" style="white-space:normal;"><div class="aviso-ficha">O item <b>' + escHtml(forn) + ' — ' + escHtml(tipo) +
+      '</b> não tem EMP vinculada, então fica sem critérios. O recebimento pode ser salvo normalmente; pra ter as medições, vincule uma EMP ao item em <a href="#" onclick="fecharModalCadastro(); abrirCadastro(\'fornecedores\'); return false;">Fornecedores</a>.</div></td></tr>' : '';
     sugerirStatusRecebimento();
     return;
   }
   ESPEC_PARAMS_ATUAL = ficha.parametros.filter(function(p){ return p.criterio !== '-'; });
-  label.textContent = (ficha.doc || '') + (ficha.rev ? ' · ' + ficha.rev : '') + ' · ' + (ficha.forn === TODOS ? 'ficha geral de ' + (MAT_LABEL_PLANO[mat] || mat) : ficha.forn + ' — ' + ficha.tipo);
+  label.textContent = rotuloEmp(ficha);
   var reanalises = entradaExistente ? lerReanalises(entradaExistente['Observações']) : {};
   tb.innerHTML = ESPEC_PARAMS_ATUAL.map(function(p, idx){
     var lista = reanalises[p.teste];
@@ -2615,11 +2766,20 @@ function atualizarStatusMedicao(idx){
   sugerirStatusRecebimento();
 }
 
+// EMP usada na análise (código + revisão). Fica a que estava gravada; só preenche se ainda não tinha.
+function empDoRegistro(base, mat, forn, tipo, modelo){
+  if (base && String(base['EMP'] || '').trim()) return base['EMP'];
+  var f = fichaDe(mat, forn, tipo, modelo);
+  return f ? f.doc + (f.rev ? ' Rev.' + String(f.rev).replace(/^rev\.?\s*/i, '') : '') + (f.desc ? ' (' + f.desc + ')' : '') : '';
+}
 function validarRecebimento(){
   var mat = document.getElementById('materialSelect').value;
   if (!document.getElementById('dataRecebimentoInput').value) return 'Informe a data do recebimento.';
-  if (!document.getElementById('fornecedorSelect').value) return 'Escolha o fornecedor (se não aparecer, cadastre em Cadastros › Fornecedores).';
-  if (!document.getElementById('tipoSelect').value) return 'Escolha o tipo (se não aparecer, cadastre no fornecedor).';
+  if (mat === 'rotulo') { if (!fornTipoAtual().modelo) return 'Escolha o rótulo (se não aparecer, cadastre em Cadastros › Rótulos homologados).'; }
+  else {
+    if (!document.getElementById('fornecedorSelect').value) return 'Escolha o fornecedor (se não aparecer, cadastre em Cadastros › Fornecedores).';
+    if (!document.getElementById('tipoSelect').value) return 'Escolha o tipo (se não aparecer, cadastre no fornecedor).';
+  }
   if (mat === 'resina' && !document.getElementById('loteFornecedorInput').value.trim()) return 'Informe o lote do fornecedor.';
   return '';
 }
@@ -2634,7 +2794,7 @@ async function salvarRecebimento(statusFinal){
   var dataISO = document.getElementById('dataRecebimentoInput').value;
   var erroVal = validarRecebimento();
   if (erroVal) { msg.className = 'save-msg err'; msg.textContent = erroVal; return false; }
-  var forn = document.getElementById('fornecedorSelect').value, tipo = document.getElementById('tipoSelect').value;
+  var ftS = fornTipoAtual(), forn = ftS.forn, tipo = ftS.tipo;
   btn.disabled = true; btnC.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
   var editando = recebimentoEditando;
   var rowOriginal = editando ? DATA[editando.mat].find(function(x){ return x.__index === editando.index; }) : null;
@@ -2679,6 +2839,7 @@ async function salvarRecebimento(statusFinal){
       });
       Object.keys(medicoes).forEach(function(col){ row[col] = medicoes[col]; });
       if (temColMedR) row['Medições'] = extras.join('\n');
+      row['EMP'] = empDoRegistro(base, mat, forn, tipo, ftS.modelo);
       var sufixo = statusFinal ? ' concluído como ' + statusFinal + '.' : (editando ? ' atualizado (Em análise).' : ' salvo como Em análise.');
       if (editando) await atualizarLinha('resina', editando.index, row); else await adicionarLinha('resina', row);
       mostrarToast('Recebimento ' + loteInterno + sufixo);
@@ -2700,10 +2861,9 @@ async function salvarRecebimento(statusFinal){
         'Observações': [obs, (!temColMed && meds.length) ? MARCA_MEDICOES + meds.join('; ') : ''].concat(linhasRe2, [linhaRestricao(statusTexto)]).filter(function(x){ return x; }).join('\n')
       });
       if (temColMed) row2['Medições'] = meds.join('\n');
+      row2['EMP'] = empDoRegistro(base, mat, forn, tipo, ftS.modelo);
       if (mat === 'rotulo') {
-        var modeloSel = document.getElementById('modeloRotuloSelect');
-        var modeloNome = modeloSel.options[modeloSel.selectedIndex] ? modeloSel.options[modeloSel.selectedIndex].textContent : '';
-        row2['Modelo do Rótulo'] = modeloNome;
+        row2['Modelo do Rótulo'] = ftS.modelo;
         var confSel = document.getElementById('conferenciaRotuloSelect');
         row2['Conferência Visual'] = confSel.options[confSel.selectedIndex] ? confSel.options[confSel.selectedIndex].textContent : confSel.value;
       }
@@ -2762,14 +2922,15 @@ function concluirRecebimento(manterEscolhas){
     '<div class="res-restricao" style="margin-bottom:12px;"><label class="res-chk"><input type="checkbox"' + (chk ? ' checked' : '') + ' onchange="document.getElementById(\'chkRestricao\').checked = this.checked; sugerirStatusRecebimento(); concluirRecebimento(true);"> <span><b>Aprovar com restrição</b> — liberar o lote mesmo fora do especificado</span></label>' +
     (chk ? '<div class="field" style="margin-top:8px;"><label>Responsável pela liberação (obrigatório)</label><input id="concRespRestr" value="' + escHtml(document.getElementById('respRestricaoInput').value) + '" placeholder="Nome de quem autorizou a liberação" oninput="document.getElementById(\'respRestricaoInput\').value = this.value; atualizarBotaoConclusao();"></div>' : '') + '</div>' : '';
   if (st.r && st.r.motivo) avisos.push((k === 'aprovado' ? '' : '') + escHtml(st.r.motivo));
-  var html = '<dl class="dw-kv">' + kv('Produto', MAT_LABEL[mat]) + kv('Fornecedor / tipo', v('fornecedorSelect') + ' — ' + v('tipoSelect'));
+  var ftC = fornTipoAtual();
+  var html = '<dl class="dw-kv">' + kv('Produto', MAT_LABEL[mat]) + (mat === 'rotulo' ? kv('Rótulo', [ftC.modelo, ftC.tipo].filter(function(x){ return x; }).join(' · ')) + kv('Cliente', ftC.forn) : kv('Fornecedor / tipo', ftC.forn + ' — ' + ftC.tipo));
   if (mat === 'resina') html += kv('Lote interno', v('loteInternoDisplay'), 'mono') + kv('Lote do fornecedor', v('loteFornecedorInput'), 'mono');
   else html += kv('Lote', v('loteGenericoInput'), 'mono');
   html += kv('Nota fiscal', v('notaFiscalInput'), 'mono') + kv('Data do recebimento', formatarDataBR(v('dataRecebimentoInput')), 'tabular') +
     kv('Quantidade', [v('quantidadeInput'), v('unidadeSelect')].filter(function(x){ return x; }).join(' '), 'tabular') + kv('Responsável', v('responsavelInput')) +
-    kv('Laudo', laudo);
+    kv('Laudo', laudo) + kv('EMP', empDoRegistro(rowOrig, mat, ftC.forn, ftC.tipo, ftC.modelo));
   if (mat === 'rotulo') {
-    html += kv('Modelo do rótulo', txtSel('modeloRotuloSelect')) + kv('Conferência visual', txtSel('conferenciaRotuloSelect'));
+    html += kv('Conferência visual', txtSel('conferenciaRotuloSelect'));
   }
   html += '</dl>';
   if (!laudo) avisos.push('Nenhum laudo anexado.');
@@ -2820,11 +2981,11 @@ async function confirmarConclusao(){
   else { m.className = 'save-msg err'; m.textContent = document.getElementById('saveMsgRecebimento').textContent || 'Não foi possível concluir.'; }
 }
 
-/* ====================== ESPECIFICAÇÕES ====================== */
+/* ====================== EMPs (ESPECIFICAÇÕES DE MATÉRIA-PRIMA E INSUMOS) ====================== */
 function renderEspecificacoes(){
   var q = cadAtual === 'especificacoes' ? termoBuscaCadastro() : '';
   var lista = DATA.especificacoes.filter(function(f){
-    return !q || (tituloFicha(f) + ' ' + (f.doc || '') + ' ' + f.parametros.map(function(p){ return p.teste; }).join(' ')).toLowerCase().indexOf(q) > -1;
+    return !q || (f.key + ' ' + (MAT_LABEL_PLANO[f.mat] || '') + ' ' + f.parametros.map(function(p){ return p.teste; }).join(' ') + ' ' + vinculosDaEmp(f).map(function(i){ return i.forn + ' ' + i.tipo; }).join(' ')).toLowerCase().indexOf(q) > -1;
   });
   var cards = lista.map(function(f){
     var contagem = { L:0, C:0, QA:0 };
@@ -2833,16 +2994,17 @@ function renderEspecificacoes(){
       return '<tr><td>'+escHtml(p.teste)+'</td><td class="cell-dim">'+escHtml(p.especTexto||'')+'</td><td class="cell-dim">'+escHtml(p.unidade||'')+'</td><td class="cell-dim mono">'+escHtml(p.nt||'')+'</td>'+
         '<td>'+(p.criterio === '-' ? '<span class="cell-dim">—</span>' : '<span class="badge-crit '+p.criterio+'">'+p.criterio+'</span>')+'</td></tr>';
     }).join('');
-    var semCadastro = f.forn !== TODOS && !itemFornecedor(f.forn, f.mat, f.tipo);
-    return '<div class="spec-card"><div class="head"><div><div class="title">'+escHtml(tituloFicha(f))+'</div>'+
-      '<div class="doc">'+[f.doc, f.rev, f.data].filter(function(x){ return x; }).map(escHtml).join(' · ')+
-      (semCadastro ? ' · <span style="color:var(--warn);">fornecedor/tipo não está no cadastro de Fornecedores</span>' : '')+'</div></div>'+
+    var vinc = vinculosDaEmp(f);
+    return '<div class="spec-card"><div class="head"><div><div class="title"><span class="mono">'+escHtml(f.doc || '—')+'</span>'+(f.desc ? ' · '+escHtml(f.desc) : '')+'</div>'+
+      '<div class="doc">'+[MAT_LABEL_PLANO[f.mat] || f.mat, f.rev ? 'Rev. ' + f.rev : '', f.data].filter(function(x){ return x; }).map(escHtml).join(' · ')+'</div>'+
+      '<div class="emp-vinc">'+(vinc.length ? 'Usada por: ' + vinc.map(function(i){ return '<span class="pill">'+escHtml(i.forn + ' — ' + i.tipo)+'</span>'; }).join(' ')
+        : '<span style="color:var(--warn);">Não vinculada a nenhum produto de fornecedor</span>')+'</div></div>'+
       '<div class="card-actions"><div class="crit-count"><span class="L">'+contagem.L+' L</span><span class="QA">'+contagem.QA+' QA</span><span class="C">'+contagem.C+' C</span></div>'+
       '<button type="button" class="icon-btn" onclick="abrirModalEspec(\''+f.id+'\')"><svg><use href="#i-pencil"/></svg> Editar</button>'+
       '<button type="button" class="icon-btn danger" onclick="excluirEspecificacao(\''+f.id+'\')"><svg><use href="#i-trash"/></svg> Excluir</button></div></div>'+
       '<div class="table-scroll"><table class="occ"><thead><tr><th>Teste</th><th>Especificação</th><th>Unidade</th><th>NT</th><th>Critério</th></tr></thead><tbody>'+linhas+'</tbody></table></div></div>';
   });
-  document.getElementById('gridEspecificacoes').innerHTML = cards.length ? cards.join('') : '<div class="empty-note">' + (q ? 'Nenhuma especificação encontrada.' : 'Nenhuma especificação cadastrada ainda.') + '</div>';
+  document.getElementById('gridEspecificacoes').innerHTML = cards.length ? cards.join('') : '<div class="empty-note">' + (q ? 'Nenhuma EMP encontrada.' : 'Nenhuma EMP cadastrada ainda.') + '</div>';
 }
 function adicionarLinhaEspec(p){
   var tr = document.createElement('tr');
@@ -2855,98 +3017,109 @@ function adicionarLinhaEspec(p){
     '<td><button type="button" class="remove-linha-espec" onclick="this.closest(\'tr\').remove()">✕</button></td>';
   document.getElementById('tbodyNovaEspec').appendChild(tr);
 }
-// Material → Fornecedor → Tipo, sempre a partir do cadastro de Fornecedores.
-function popularCascataEspec(fornManter, tipoManter){
-  var mat = document.getElementById('especMaterialSelect').value;
-  var fSel = document.getElementById('especFornSelect'), tSel = document.getElementById('especTipoSelect');
-  var fAtual = fornManter !== undefined ? fornManter : fSel.value;
-  var fl = fornecedoresDoMaterial(mat).filter(function(f){ return f !== TODOS; });
-  if (fornManter && fornManter !== TODOS && fl.indexOf(fornManter) === -1) fl.push(fornManter);
-  fSel.innerHTML = '<option value="' + TODOS + '">Todos os fornecedores (ficha geral do material)</option>' + (fl.length ? opcoesHtml(fl, '') : '');
-  fSel.value = fAtual === TODOS || fl.indexOf(fAtual) > -1 ? fAtual : (fl[0] || TODOS);
-  var tAtual = tipoManter !== undefined ? tipoManter : tSel.value;
-  if (fSel.value === TODOS) { tSel.innerHTML = '<option value="' + TODOS + '">Todos os tipos</option>'; tSel.value = TODOS; tSel.disabled = true; return; }
-  tSel.disabled = false;
-  var tl = tiposDe(fSel.value, mat);
-  if (tipoManter && tipoManter !== TODOS && tl.indexOf(tipoManter) === -1) tl.push(tipoManter);
-  tSel.innerHTML = opcoesHtml(tl, '—');
-  if (tl.indexOf(tAtual) > -1) tSel.value = tAtual;
-}
-var especEditando = null;
-function abrirModalEspec(id){
+var especEditando = null, empImportFila = [], empImportPos = 0;
+function abrirModalEspec(id, rascunho){
   var ficha = id ? DATA.especificacoes.find(function(f){ return f.id === id; }) : null;
-  especEditando = ficha ? ficha.id : null;
-  document.getElementById('modalEspecTitulo').textContent = ficha ? 'Editar especificação' : 'Nova especificação';
-  document.getElementById('especMaterialSelect').value = ficha ? ficha.mat : 'resina';
-  document.getElementById('especMaterialSelect').disabled = !!ficha;
-  popularCascataEspec(ficha ? ficha.forn : undefined, ficha ? ficha.tipo : undefined);
-  document.getElementById('especDocInput').value = ficha ? (ficha.doc || '') : '';
-  document.getElementById('especRevInput').value = ficha ? (ficha.rev || '') : '';
-  document.getElementById('especDataInput').value = ficha ? dataBRparaISO(ficha.data) : '';
+  var d = ficha || rascunho || null;
+  especEditando = ficha ? ficha.id : (rascunho && rascunho.substitui ? rascunho.substitui : null);
+  if (!rascunho) { empImportFila = []; empImportPos = 0; }
+  document.getElementById('modalEspecTitulo').textContent = ficha ? 'Editar EMP' : (rascunho ? 'Conferir EMP importada' : 'Nova EMP');
+  document.getElementById('especMaterialSelect').value = d ? d.mat : 'resina';
+  document.getElementById('especDocInput').value = d ? (d.doc || '') : '';
+  document.getElementById('especDescInput').value = d ? (d.desc || '') : '';
+  document.getElementById('especRevInput').value = d ? (d.rev || '') : '';
+  document.getElementById('especDataInput').value = d ? dataBRparaISO(d.data || '') : '';
   document.getElementById('tbodyNovaEspec').innerHTML = '';
-  if (ficha) ficha.parametros.forEach(function(p){ adicionarLinhaEspec(p); }); else adicionarLinhaEspec();
+  if (d && d.parametros.length) d.parametros.forEach(function(p){ adicionarLinhaEspec(p); }); else adicionarLinhaEspec();
+  var ban = document.getElementById('empImportBanner');
+  if (rascunho) {
+    ban.innerHTML = '<b>Lido do arquivo ' + escHtml(rascunho.arquivo || '') + '</b>' + (empImportFila.length > 1 ? ' — tabela ' + (empImportPos + 1) + ' de ' + empImportFila.length + (rascunho.secao ? ' (' + escHtml(rascunho.secao) + ')' : '') : '') +
+      '. Confira os dados e os parâmetros antes de salvar' + (rascunho.removidos ? ' (' + rascunho.removidos + ' linha(s) de "Vida útil" ignorada(s))' : '') + '.' +
+      (rascunho.avisos && rascunho.avisos.length ? '<ul>' + rascunho.avisos.map(function(a){ return '<li>' + escHtml(a) + '</li>'; }).join('') + '</ul>' : '');
+    ban.classList.remove('hidden');
+  } else { ban.innerHTML = ''; ban.classList.add('hidden'); }
+  document.getElementById('btnSalvarEspec').textContent = rascunho && empImportPos < empImportFila.length - 1 ? 'Salvar e ver a próxima' : 'Salvar EMP';
   document.getElementById('saveMsgEspec').textContent = '';
   document.getElementById('modalEspec').classList.remove('hidden');
 }
-function fecharModalEspec(){ document.getElementById('modalEspec').classList.add('hidden'); }
+function fecharModalEspec(){ document.getElementById('modalEspec').classList.add('hidden'); empImportFila = []; empImportPos = 0; }
 document.getElementById('modalEspec').addEventListener('click', function(e){ if (e.target.id === 'modalEspec') fecharModalEspec(); });
 function linhasDaFicha(brutas, ficha){
   var matLabel = MAT_LABEL_PLANO[ficha.mat] || ficha.mat;
-  return brutas.filter(function(l){ return String(l['Material']).trim() === matLabel && String(l['Fornecedor'] || '').trim() === ficha.forn && String(l['Tipo'] || '').trim() === ficha.tipo; });
+  if (ficha.legado) return brutas.filter(function(l){ return String(l['Material']).trim() === matLabel && String(l['Fornecedor'] || '').trim() === ficha.legado.forn && String(l['Tipo'] || '').trim() === ficha.legado.tipo; });
+  return brutas.filter(function(l){ return chaveEmp(l['Código Documento'], l['Descrição']) === ficha.key; });
 }
 async function recarregarEspecificacoes(){
   DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes)));
   renderEspecificacoes(); renderFornecedores(); renderHome(); atualizarContagensCadastros();
 }
+// Atualiza (ou limpa) o vínculo dos produtos de fornecedor que apontam pra uma EMP
+async function trocarVinculoEmp(chaveAntiga, chaveNova){
+  if (!planilhaComVinculoEmp() || !chaveAntiga || chaveAntiga === chaveNova) return 0;
+  var brutas = linhasParaObjetos('fornecedores', await lerLinhasBrutas(TABELAS.fornecedores)), n = 0;
+  for (var i = 0; i < brutas.length; i++) {
+    if (String(brutas[i]['EMP'] || '').trim() === chaveAntiga) { await atualizarLinha('fornecedores', brutas[i].__index, Object.assign({}, brutas[i], { 'EMP': chaveNova || '' })); n++; }
+  }
+  if (n) DATA.fornecedores = linhasParaObjetos('fornecedores', await lerLinhasBrutas(TABELAS.fornecedores));
+  return n;
+}
 async function salvarEspecificacao(){
-  var msg = document.getElementById('saveMsgEspec');
+  if (bloqueadoPlanilhaAntiga()) return;
+  var msg = document.getElementById('saveMsgEspec'), btn = document.getElementById('btnSalvarEspec');
+  function erro(t){ msg.className = 'save-msg err'; msg.textContent = t; }
   var mat = document.getElementById('especMaterialSelect').value;
-  var forn = document.getElementById('especFornSelect').value, tipo = document.getElementById('especTipoSelect').value;
-  var doc = document.getElementById('especDocInput').value.trim(), rev = document.getElementById('especRevInput').value.trim();
-  var dataDoc = formatarDataBR(document.getElementById('especDataInput').value);
-  if (!forn || !tipo) { msg.className = 'save-msg err'; msg.textContent = 'Escolha fornecedor e tipo (se não aparecerem, cadastre em Fornecedores).'; return; }
-  var existente = fichaExata(mat, forn, tipo);
-  if (existente && existente.id !== especEditando) { msg.className = 'save-msg err'; msg.textContent = forn === TODOS ? 'Já existe uma ficha geral para ' + MAT_LABEL_PLANO[mat] + '. Edite a existente.' : 'Já existe uma ficha para ' + forn + ' — ' + tipo + '. Edite a existente.'; return; }
+  var doc = document.getElementById('especDocInput').value.trim().toUpperCase(), desc = document.getElementById('especDescInput').value.trim();
+  var rev = document.getElementById('especRevInput').value.trim(), dataDoc = formatarDataBR(document.getElementById('especDataInput').value);
+  if (!doc) return erro('Informe o código da EMP (ex.: EMP-002).');
+  if (!desc) return erro('Informe a descrição (ex.: Indorama Max Prime).');
+  var chave = chaveEmp(doc, desc), fichaAnt = especEditando ? DATA.especificacoes.find(function(f){ return f.id === especEditando; }) : null;
+  var existente = DATA.especificacoes.find(function(f){ return f.key === chave && !f.legado; });
+  if (existente && (!fichaAnt || existente.id !== fichaAnt.id)) return erro('Já existe a EMP "' + chave + '". Edite a existente ou mude a descrição.');
   var linhas = Array.prototype.map.call(document.querySelectorAll('#tbodyNovaEspec tr'), function(tr){
     return {
       teste: tr.querySelector('.espec-teste').value.trim(), especTexto: tr.querySelector('.espec-tolerancia').value.trim(),
       unidade: tr.querySelector('.espec-unidade').value.trim(), nt: tr.querySelector('.espec-nt').value.trim(), criterio: tr.querySelector('.espec-criterio').value
     };
   }).filter(function(p){ return p.teste; });
-  if (!linhas.length) { msg.className = 'save-msg err'; msg.textContent = 'Adicione ao menos um parâmetro.'; return; }
-  msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  if (!linhas.length) return erro('Adicione ao menos um parâmetro.');
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
   try {
     var indicesParaApagar = [];
-    if (especEditando) {
-      var fichaAnt = DATA.especificacoes.find(function(f){ return f.id === especEditando; });
+    if (fichaAnt) {
       var brutas = linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes));
-      if (fichaAnt) indicesParaApagar = linhasDaFicha(brutas, fichaAnt).map(function(l){ return l.__index; });
+      indicesParaApagar = linhasDaFicha(brutas, fichaAnt).map(function(l){ return l.__index; });
     }
     // Grava primeiro as linhas novas (vão pro fim da tabela, sem mudar o índice das antigas) e só
-    // depois apaga as antigas — assim, se algo falhar no meio, a especificação nunca some.
+    // depois apaga as antigas — assim, se algo falhar no meio, a EMP nunca some.
     for (var i = 0; i < linhas.length; i++) {
       var p = linhas[i];
       await adicionarLinha('especificacoes', {
-        'Material': MAT_LABEL_PLANO[mat], 'Fornecedor': forn, 'Tipo': tipo, 'Código Documento': doc, 'Revisão': rev, 'Data Documento': dataDoc,
+        'Código Documento': doc, 'Descrição': desc, 'Material': MAT_LABEL_PLANO[mat], 'Revisão': rev, 'Data Documento': dataDoc,
         'Teste': p.teste, 'Especificação/Tolerância': p.especTexto, 'Unidade': p.unidade, 'NT': p.nt, 'Critério': p.criterio
       });
     }
     if (indicesParaApagar.length) await excluirVariasLinhas('especificacoes', indicesParaApagar);
+    var n = fichaAnt ? await trocarVinculoEmp(fichaAnt.key, chave) : 0;
     await recarregarEspecificacoes();
-    mostrarToast('Especificação salva com sucesso.');
-    fecharModalEspec();
-  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+    mostrarToast('EMP ' + chave + ' salva' + (n ? ' (' + n + ' produto(s) de fornecedor atualizados).' : '.'));
+    if (empImportFila.length && empImportPos < empImportFila.length - 1) { empImportPos++; abrirModalEspec(null, empImportFila[empImportPos]); }
+    else fecharModalEspec();
+  } catch (e) { erro('Erro: ' + e.message); }
+  finally { btn.disabled = false; }
 }
 async function excluirEspecificacao(id){
+  if (bloqueadoPlanilhaAntiga()) return;
   var ficha = DATA.especificacoes.find(function(f){ return f.id === id; });
   if (!ficha) return;
-  if (!confirm('Excluir a especificação "' + tituloFicha(ficha) + '"? As medições dela deixam de aparecer no Novo Recebimento.')) return;
+  var vinc = vinculosDaEmp(ficha);
+  if (!confirm('Excluir a EMP "' + ficha.key + '"?' + (vinc.length ? ' Ela está vinculada a ' + vinc.length + ' produto(s) de fornecedor, que ficarão sem critérios até você vincular outra EMP.' : '') + ' Recebimentos já lançados não são alterados.')) return;
   try {
     var brutas = linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes));
     var indices = linhasDaFicha(brutas, ficha).map(function(l){ return l.__index; });
     if (indices.length) await excluirVariasLinhas('especificacoes', indices);
+    await trocarVinculoEmp(ficha.key, '');
     await recarregarEspecificacoes();
-    mostrarToast('Especificação excluída.');
+    mostrarToast('EMP excluída.');
   } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
 }
 
@@ -2955,14 +3128,18 @@ function renderRotulosHomologados(){
   var el = document.getElementById('gridRotulos');
   if (!DATA.rotulosHomologados.length) { el.innerHTML = '<div class="empty-note">Nenhum rótulo homologado cadastrado ainda.</div>'; return; }
   var q = cadAtual === 'rotulos' ? termoBuscaCadastro() : '';
-  var lista = DATA.rotulosHomologados.filter(function(r){ return !q || ((r['Nome do Modelo']||'') + ' ' + (r['Aplicação']||'') + ' ' + (r['Fornecedor Habitual']||'')).toLowerCase().indexOf(q) > -1; });
+  var lista = DATA.rotulosHomologados.filter(function(r){ return !q || ((r['Nome do Modelo']||'') + ' ' + (r['Cliente']||'') + ' ' + rotuloVolumeTexto(volumeDoRotulo(r)) + ' ' + (r['EMP']||'')).toLowerCase().indexOf(q) > -1; })
+    .sort(function(a, b){ return (parseFloat(volumeDoRotulo(a)) || 0) - (parseFloat(volumeDoRotulo(b)) || 0) || String(a['Nome do Modelo']).localeCompare(String(b['Nome do Modelo']), 'pt-BR'); });
   if (!lista.length) { el.innerHTML = '<div class="empty-note">Nenhum rótulo encontrado.</div>'; return; }
   el.innerHTML = lista.map(function(r){
-    return '<div class="photo-card"><div class="lbl"><span>'+r['Nome do Modelo']+'</span>'+badgeLabel(r['Status'])+'</div>'+
-      (r['Arquivo da Foto'] ? ('<img class="photo-ph" src="'+r['Arquivo da Foto']+'" alt="Foto de referência">') : '<div class="empty-note" style="padding:24px 12px;">Sem foto</div>')+
-      '<div class="meta">'+(r['Aplicação']||'')+
-        '<div class="card-actions" style="margin-top:9px;"><button type="button" class="icon-btn" onclick="abrirModalRotulo(\''+r['ID']+'\')"><svg><use href="#i-pencil"/></svg> Editar</button>'+
-        '<button type="button" class="icon-btn danger" onclick="excluirRotulo(\''+r['ID']+'\')"><svg><use href="#i-trash"/></svg> Excluir</button></div></div></div>';
+    var emp = String(r['EMP'] || '').trim();
+    var ativo = String(r['Status'] || 'Ativo').toLowerCase() !== 'inativo';
+    return '<div class="photo-card"><div class="lbl"><span>'+escHtml(r['Nome do Modelo'])+'</span><span class="badge '+(ativo ? 'aprovado' : 'nd')+'">'+(ativo ? 'Ativo' : 'Inativo')+'</span></div>'+
+      (r['Arquivo da Foto'] ? ('<img class="photo-ph" src="'+escHtml(r['Arquivo da Foto'])+'" alt="Foto de referência">') : '<div class="empty-note" style="padding:24px 12px;">Sem foto</div>')+
+      '<div class="meta"><div><b>' + escHtml(rotuloVolumeTexto(volumeDoRotulo(r)) || '— mL') + '</b> · ' + escHtml(r['Cliente'] || 'cliente não informado') + '</div>' +
+        '<div style="margin-top:3px;">' + (emp ? '<span class="ficha-ok"><svg><use href="#i-check"/></svg>' + escHtml(emp) + '</span>' : '<span class="ficha-no">sem EMP — sem critérios</span>') + '</div>' +
+        '<div class="card-actions" style="margin-top:9px;"><button type="button" class="icon-btn" onclick="abrirModalRotulo(\''+escHtml(r['ID'])+'\')"><svg><use href="#i-pencil"/></svg> Editar</button>'+
+        '<button type="button" class="icon-btn danger" onclick="excluirRotulo(\''+escHtml(r['ID'])+'\')"><svg><use href="#i-trash"/></svg> Excluir</button></div></div></div>';
   }).join('');
 }
 var rotuloEditando = null;
@@ -2970,42 +3147,59 @@ function abrirModalRotulo(id){
   rotuloEditando = id || null;
   var r = id ? DATA.rotulosHomologados.find(function(x){ return x['ID'] === id; }) : null;
   document.getElementById('modalRotuloTitulo').textContent = r ? 'Editar rótulo homologado' : 'Novo rótulo homologado';
-  document.getElementById('rotuloNomeInput').value = r ? r['Nome do Modelo'] : '';
-  document.getElementById('rotuloAplicacaoInput').value = r ? r['Aplicação'] : '';
-  document.getElementById('rotuloFornecedorInput').value = r ? r['Fornecedor Habitual'] : '';
-  document.getElementById('rotuloObsInput').value = r ? r['Observações'] : '';
+  document.getElementById('rotuloNomeInput').value = r ? (r['Nome do Modelo'] || '') : '';
+  document.getElementById('rotuloVolumeInput').value = r ? volumeDoRotulo(r) : '';
+  document.getElementById('rotuloClienteInput').value = r ? (r['Cliente'] || '') : '';
+  document.getElementById('listaClientesRotulo').innerHTML = unicos(DATA.rotulosHomologados.map(function(x){ return String(x['Cliente'] || '').trim(); })).map(function(c){ return '<option value="' + escHtml(c) + '">'; }).join('');
+  var emps = DATA.especificacoes.filter(function(f){ return f.mat === 'rotulo' && !f.legado; }), eSel = document.getElementById('rotuloEmpSelect');
+  var atualEmp = r ? String(r['EMP'] || '').trim() : (emps.length === 1 ? emps[0].key : '');
+  eSel.innerHTML = '<option value="">— sem EMP (sem critérios) —</option>' + emps.map(function(f){ return '<option value="' + escHtml(f.key) + '">' + escHtml(f.key) + '</option>'; }).join('') +
+    (atualEmp && !emps.some(function(f){ return f.key === atualEmp; }) ? '<option value="' + escHtml(atualEmp) + '">' + escHtml(atualEmp) + ' (não encontrada)</option>' : '');
+  eSel.value = atualEmp;
+  document.getElementById('rotuloObsInput').value = r ? (r['Observações'] || '') : '';
   document.getElementById('rotuloFotoFile').value = '';
-  document.getElementById('rotuloFotoLabel').textContent = 'Anexar foto do rótulo';
+  document.getElementById('rotuloFotoLabel').textContent = r && r['Arquivo da Foto'] ? 'Trocar a foto (já tem uma cadastrada)' : 'Anexar foto do rótulo';
   document.getElementById('saveMsgRotulo').textContent = '';
   document.getElementById('modalRotulo').classList.remove('hidden');
 }
 function fecharModalRotulo(){ document.getElementById('modalRotulo').classList.add('hidden'); }
 document.getElementById('modalRotulo').addEventListener('click', function(e){ if (e.target.id === 'modalRotulo') fecharModalRotulo(); });
 async function salvarRotulo(){
+  if (bloqueadoPlanilhaAntiga()) return;
+  var msg = document.getElementById('saveMsgRotulo');
+  function erro(t){ msg.className = 'save-msg err'; msg.textContent = t; }
   var nome = document.getElementById('rotuloNomeInput').value.trim();
-  if (!nome) { document.getElementById('saveMsgRotulo').className = 'save-msg err'; document.getElementById('saveMsgRotulo').textContent = 'Informe o nome do modelo.'; return; }
-  var msg = document.getElementById('saveMsgRotulo'); msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  var vol = document.getElementById('rotuloVolumeInput').value.trim().replace(/\s*m[lL]$/, '');
+  var cliente = document.getElementById('rotuloClienteInput').value.trim();
+  if (!nome) return erro('Informe o nome do rótulo.');
+  if (!vol || isNaN(parseFloat(vol.replace(',', '.')))) return erro('Informe o volume em mL (só o número, ex.: 2000).');
+  if (!cliente) return erro('Informe o cliente.');
+  var dup = DATA.rotulosHomologados.find(function(x){ return x['ID'] !== rotuloEditando && String(x['Nome do Modelo']).trim().toLowerCase() === nome.toLowerCase() && volumeDoRotulo(x) === vol && String(x['Cliente'] || '').trim().toLowerCase() === cliente.toLowerCase(); });
+  if (dup) return erro('Já existe esse rótulo (mesmo nome, volume e cliente).');
+  msg.className = 'save-msg'; msg.textContent = 'Salvando…';
   try {
     var r = rotuloEditando ? DATA.rotulosHomologados.find(function(x){ return x['ID'] === rotuloEditando; }) : null;
     var fotoUrl = r ? r['Arquivo da Foto'] : '';
     var fotoFile = document.getElementById('rotuloFotoFile').files[0];
-    if (fotoFile) { msg.textContent = 'Enviando foto…'; fotoUrl = await uploadArquivo(fotoFile, 'Rotulo_' + slugify(nome) + '_' + Date.now()); }
-    var obj = {
-      'ID': r ? r['ID'] : slugify(nome), 'Nome do Modelo': nome, 'Aplicação': document.getElementById('rotuloAplicacaoInput').value.trim(),
-      'Fornecedor Habitual': document.getElementById('rotuloFornecedorInput').value.trim(), 'Arquivo da Foto': fotoUrl,
-      'Status': r ? r['Status'] : 'Ativo', 'Observações': document.getElementById('rotuloObsInput').value.trim()
-    };
+    if (fotoFile) { msg.textContent = 'Enviando foto…'; fotoUrl = await uploadArquivo(fotoFile, 'Rotulo_' + slugify(nome + '-' + vol) + '_' + Date.now()); }
+    var id = r ? r['ID'] : slugify(nome + '-' + vol + '-' + cliente), n = 2;
+    while (!r && DATA.rotulosHomologados.some(function(x){ return x['ID'] === id; })) id = slugify(nome + '-' + vol + '-' + cliente) + '-' + (n++);
+    var obj = Object.assign({}, r || {}, {
+      'ID': id, 'Nome do Modelo': nome, 'Volume (mL)': vol, 'Cliente': cliente, 'EMP': document.getElementById('rotuloEmpSelect').value,
+      'Arquivo da Foto': fotoUrl, 'Status': r ? (r['Status'] || 'Ativo') : 'Ativo', 'Observações': document.getElementById('rotuloObsInput').value.trim()
+    });
     if (r) await atualizarLinha('rotulosHomologados', r.__index, obj); else await adicionarLinha('rotulosHomologados', obj);
     DATA.rotulosHomologados = linhasParaObjetos('rotulosHomologados', await lerLinhasBrutas(TABELAS.rotulosHomologados));
     renderRotulosHomologados(); renderHome(); popularOpcoesModeloRotulo();
     document.getElementById('ctRotulosHom').textContent = DATA.rotulosHomologados.length;
     mostrarToast('Rótulo homologado salvo.');
     fecharModalRotulo();
-  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+  } catch (e) { erro('Erro: ' + e.message); }
 }
 async function excluirRotulo(id){
+  if (bloqueadoPlanilhaAntiga()) return;
   var r = DATA.rotulosHomologados.find(function(x){ return x['ID'] === id; });
-  if (!confirm('Excluir o rótulo homologado "' + (r ? r['Nome do Modelo'] : id) + '"?')) return;
+  if (!confirm('Excluir o rótulo homologado "' + (r ? r['Nome do Modelo'] : id) + '"? Recebimentos já lançados não são alterados.')) return;
   try {
     await excluirLinhaPorIndice('rotulosHomologados', r.__index);
     DATA.rotulosHomologados = linhasParaObjetos('rotulosHomologados', await lerLinhasBrutas(TABELAS.rotulosHomologados));
@@ -3029,13 +3223,13 @@ function renderFornecedores(){
         '<td>' + escHtml(i.tipo) + '</td>' +
         '<td class="mono">' + (i.cod ? escHtml(i.cod) : '<span class="cell-dim">—</span>') + '</td>' +
         '<td class="mono cell-dim">' + (i.mat === 'resina' && i.cod ? proximoLoteInterno(i.cod) : '—') + '</td>' +
-        '<td>' + (ficha ? '<span class="ficha-ok"><svg><use href="#i-check"/></svg>' + escHtml([ficha.doc, ficha.rev].filter(function(x){ return x; }).join(' · ') || 'cadastrada') + '</span>' : '<span class="ficha-no">sem ficha</span>') + '</td></tr>';
+        '<td>' + (ficha ? '<span class="ficha-ok"><svg><use href="#i-check"/></svg>' + escHtml(ficha.key) + '</span>' : '<span class="ficha-no">sem EMP — sem critérios</span>') + '</td></tr>';
     }).join('');
     return '<div class="spec-card"><div class="head"><div><div class="title">' + escHtml(g.nome) + '</div>' +
       '<div class="forn-sub">' + g.itens.length + (g.itens.length === 1 ? ' item' : ' itens') + ' · ' + mats.map(escHtml).join(', ') + '</div></div>' +
       '<div class="card-actions"><button type="button" class="icon-btn" onclick="abrirModalFornecedor(' + gi + ')"><svg><use href="#i-pencil"/></svg> Editar</button>' +
       '<button type="button" class="icon-btn danger" onclick="excluirFornecedor(' + gi + ')"><svg><use href="#i-trash"/></svg> Excluir</button></div></div>' +
-      '<div class="table-scroll" style="border:none; border-radius:0;"><table class="occ"><thead><tr><th>Matéria-prima / insumo</th><th>Tipo</th><th>Código</th><th>Próximo lote interno</th><th>Ficha de especificação</th></tr></thead><tbody>' + linhas + '</tbody></table></div></div>';
+      '<div class="table-scroll" style="border:none; border-radius:0;"><table class="occ"><thead><tr><th>Matéria-prima / insumo</th><th>Tipo</th><th>Código</th><th>Próximo lote interno</th><th>EMP vinculada</th></tr></thead><tbody>' + linhas + '</tbody></table></div></div>';
   }).join('');
   document.getElementById('listaFornecedoresCad').innerHTML = html || '<div class="empty-note">' + (q ? 'Nenhum fornecedor encontrado.' : 'Nenhum fornecedor cadastrado ainda.') + '</div>';
 }
@@ -3053,13 +3247,14 @@ function abrirModalFornecedor(gi){
 function fecharModalFornecedor(){ document.getElementById('modalFornecedor').classList.add('hidden'); }
 document.getElementById('modalFornecedor').addEventListener('click', function(e){ if (e.target.id === 'modalFornecedor') fecharModalFornecedor(); });
 function adicionarItemForn(i, existente){
-  i = i || { mat: 'resina', tipo: '', cod: '', ult: '' };
+  i = i || { mat: 'resina', tipo: '', cod: '', ult: '', emp: '' };
   var tr = document.createElement('tr');
   if (existente) { tr.dataset.origTipo = i.tipo; tr.dataset.origMat = i.mat; }
   tr.innerHTML = '<td><select class="it-mat">' + Object.keys(MAT_LABEL_PLANO).map(function(k){ return '<option value="' + k + '"' + (k === i.mat ? ' selected' : '') + '>' + MAT_LABEL_PLANO[k] + '</option>'; }).join('') + '</select></td>' +
     '<td><input class="it-tipo" value="' + escHtml(i.tipo) + '"></td>' +
     '<td><input class="it-cod mono" value="' + escHtml(i.cod) + '"></td>' +
     '<td><input class="it-ult mono" placeholder="Ex: 270" inputmode="numeric" value="' + escHtml(i.ult) + '"></td>' +
+    '<td><select class="it-emp"></select></td>' +
     '<td><button type="button" class="remove-linha-espec" title="Remover item" onclick="this.closest(\'tr\').remove()">✕</button></td>';
   var sel = tr.querySelector('.it-mat');
   var EX_TIPO = { resina: 'Ex: Indorama Max Prime', rotulo: 'Ex: Rótulo 2 L', pigmento: 'Ex: Preto', cinta: 'Ex: Caixa 500 un', tampa: 'Ex: Tampa padrão' };
@@ -3068,6 +3263,12 @@ function adicionarItemForn(i, existente){
     tr.querySelector('.it-tipo').placeholder = EX_TIPO[sel.value] || 'Tipo';
     tr.querySelector('.it-cod').placeholder = r ? 'Ex: J02 (lote interno)' : 'Ex: KL433-12';
     ult.disabled = !r; ult.placeholder = r ? 'Ex: 270' : '—'; if (!r) ult.value = '';
+    // EMPs do material escolhido (sem EMP = produto sem critérios no recebimento)
+    var eSel = tr.querySelector('.it-emp'), atual = eSel.value || i.emp || '';
+    var emps = DATA.especificacoes.filter(function(f){ return f.mat === sel.value && !f.legado; });
+    eSel.innerHTML = '<option value="">— sem EMP (sem critérios) —</option>' + emps.map(function(f){ return '<option value="' + escHtml(f.key) + '">' + escHtml(f.key) + '</option>'; }).join('') +
+      (atual && !emps.some(function(f){ return f.key === atual; }) ? '<option value="' + escHtml(atual) + '">' + escHtml(atual) + ' (não encontrada)</option>' : '');
+    eSel.value = atual; i.emp = '';
   }
   sel.addEventListener('change', sync); sync();
   document.getElementById('tbodyItensForn').appendChild(tr);
@@ -3083,7 +3284,7 @@ async function salvarFornecedor(){
   var itens = Array.prototype.map.call(document.querySelectorAll('#tbodyItensForn tr'), function(tr){
     var m = tr.querySelector('.it-mat').value;
     return { mat: m, tipo: tr.querySelector('.it-tipo').value.trim(), cod: tr.querySelector('.it-cod').value.trim().toUpperCase(),
-             ult: m === 'resina' ? tr.querySelector('.it-ult').value.trim() : '', origTipo: tr.dataset.origTipo, origMat: tr.dataset.origMat };
+             ult: m === 'resina' ? tr.querySelector('.it-ult').value.trim() : '', emp: tr.querySelector('.it-emp').value, origTipo: tr.dataset.origTipo, origMat: tr.dataset.origMat };
   }).filter(function(i){ return i.tipo; });
   if (!nome) return erro('Informe o nome do fornecedor.');
   if (!itens.length) return erro('Adicione ao menos um item com o tipo preenchido.');
@@ -3103,20 +3304,9 @@ async function salvarFornecedor(){
     for (var k = 0; k < itens.length; k++) {
       var it = itens[k];
       await adicionarLinha('fornecedores', { 'Fornecedor': nome, 'Material': MAT_LABEL_PLANO[it.mat], 'Tipo': it.tipo, 'Código': it.cod,
-        'Último Lote Interno': it.ult ? String(numeroDoLote(it.ult)) : '' });
+        'Último Lote Interno': it.ult ? String(numeroDoLote(it.ult)) : '', 'EMP': it.emp });
     }
     if (indicesAntigos.length) await excluirVariasLinhas('fornecedores', indicesAntigos);
-    // Renomeou o fornecedor ou um tipo? Atualiza as fichas de especificação ligadas a eles.
-    var renomes = fornEditando ? itens.filter(function(i){ return i.origTipo && i.origMat === i.mat && (nome !== fornEditando || i.tipo !== i.origTipo); }) : [];
-    if (renomes.length) {
-      var brutasE = linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes));
-      for (var b = 0; b < brutasE.length; b++) {
-        var l = brutasE[b];
-        var r = renomes.find(function(x){ return MAT_LABEL_PLANO[x.mat] === String(l['Material']).trim() && String(l['Fornecedor']).trim() === fornEditando && String(l['Tipo']).trim() === x.origTipo; });
-        if (r) await atualizarLinha('especificacoes', l.__index, Object.assign({}, l, { 'Fornecedor': nome, 'Tipo': r.tipo }));
-      }
-      DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes)));
-    }
     await recarregarFornecedores();
     mostrarToast('Fornecedor salvo.');
     fecharModalFornecedor();
@@ -3125,8 +3315,7 @@ async function salvarFornecedor(){
 }
 async function excluirFornecedor(gi){
   var g = grupoFornecedores()[gi]; if (!g) return;
-  var fichas = DATA.especificacoes.filter(function(f){ return f.forn === g.nome; }).length;
-  if (!confirm('Excluir o fornecedor "' + g.nome + '" e os ' + g.itens.length + ' item(ns) dele?' + (fichas ? ' As ' + fichas + ' ficha(s) de especificação dele continuam cadastradas, mas deixam de aparecer no recebimento.' : '') + ' Recebimentos já lançados não são alterados.')) return;
+  if (!confirm('Excluir o fornecedor "' + g.nome + '" e os ' + g.itens.length + ' item(ns) dele? As EMPs continuam cadastradas. Recebimentos já lançados não são alterados.')) return;
   try {
     var brutas = linhasParaObjetos('fornecedores', await lerLinhasBrutas(TABELAS.fornecedores));
     var indices = brutas.filter(function(l){ return String(l['Fornecedor']).trim() === g.nome; }).map(function(l){ return l.__index; });
@@ -3139,8 +3328,8 @@ async function excluirFornecedor(gi){
 /* ====================== CADASTROS (navegação entre sub-telas) ====================== */
 var CAD_INFO = {
   fornecedores: { titulo:'Fornecedores', busca:'Fornecedor, tipo, código…', botao:'Novo fornecedor', acao:'abrirModalFornecedor()' },
-  especificacoes: { titulo:'Especificações', busca:'Fornecedor, tipo, teste…', botao:'Nova especificação', acao:'abrirModalEspec()' },
-  rotulos: { titulo:'Rótulos Homologados', busca:'Nome do modelo…', botao:'Novo rótulo homologado', acao:'abrirModalRotulo()' }
+  especificacoes: { titulo:'EMPs — Especificações de Matéria-Prima e Insumos', busca:'Código, descrição, teste, fornecedor…', botao:'Nova EMP (manual)', acao:'abrirModalEspec()' },
+  rotulos: { titulo:'Rótulos Homologados', busca:'Nome, cliente, volume…', botao:'Novo rótulo homologado', acao:'abrirModalRotulo()' }
 };
 var cadAtual = 'fornecedores';
 function termoBuscaCadastro(){ return document.getElementById('cadBusca').value.trim().toLowerCase(); }
@@ -3151,6 +3340,8 @@ function escolherCadastro(cad){
   document.getElementById('cadTitle').textContent = info.titulo;
   var busca = document.getElementById('cadBusca'); busca.placeholder = info.busca; busca.value = '';
   var btnNovo = document.getElementById('cadBtnNovo'); btnNovo.innerHTML = '<svg><use href="#i-plus"/></svg> ' + info.botao; btnNovo.setAttribute('onclick', info.acao);
+  document.getElementById('cadBtnImportar').classList.toggle('hidden', cad !== 'especificacoes');
+  btnNovo.style.marginLeft = cad === 'especificacoes' ? '0' : 'auto';
   document.getElementById('painelFornecedores').style.display = cad === 'fornecedores' ? '' : 'none';
   document.getElementById('painelEspecificacoes').style.display = cad === 'especificacoes' ? '' : 'none';
   document.getElementById('painelRotulos').style.display = cad === 'rotulos' ? '' : 'none';
@@ -3344,6 +3535,169 @@ function gerarPdfRecebimentos(){
   var nomeMat = { resina: 'Resina', rotulo: 'Rotulo', pigmento: 'Pigmento', cinta: 'Caixa_Cinta', tampa: 'Caixa_Tampa' }[mat];
   entregarPdf(doc, 'Recebimentos_' + nomeMat + '_' + hoje + '.pdf');
   fecharModalPdf();
+}
+
+/* ====================== IMPORTAR EMP (.docx) ======================
+   Lê o documento Word da EMP no próprio navegador (JSZip só é carregado quando precisa), monta uma ou
+   mais EMPs (uma por tabela: ex. Prime/Off Grade, Tampa/Cinta), ignora "Vida útil" e abre cada uma
+   preenchida na janela da EMP pra conferência antes de salvar. Nada é gravado sem o "Salvar". */
+function carregarJSZip(){
+  if (window.JSZip) return Promise.resolve();
+  return new Promise(function(res, rej){
+    var sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js';
+    sc.onload = function(){ res(); }; sc.onerror = function(){ rej(new Error('não foi possível carregar o leitor de arquivos Word (rede bloqueando cdn.jsdelivr.net?)')); };
+    document.head.appendChild(sc);
+  });
+}
+var W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+function wFilhos(el, nome){ return Array.prototype.filter.call(el.childNodes, function(n){ return n.namespaceURI === W_NS && n.localName === nome; }); }
+function wTexto(el){
+  return Array.prototype.map.call(el.getElementsByTagNameNS(W_NS, 'p'), function(p){
+    return Array.prototype.map.call(p.getElementsByTagNameNS(W_NS, 't'), function(t){ return t.textContent; }).join('');
+  }).join('\n').replace(/ /g, ' ').trim();
+}
+// Linhas da tabela com a coluna inicial de cada célula (respeitando células mescladas)
+function wLinhas(tbl){
+  return wFilhos(tbl, 'tr').map(function(tr){
+    var col = 0;
+    return wFilhos(tr, 'tc').map(function(tc){
+      var pr = wFilhos(tc, 'tcPr')[0], span = 1, cont = false;
+      if (pr) {
+        var gs = wFilhos(pr, 'gridSpan')[0]; if (gs) span = parseInt(gs.getAttributeNS(W_NS, 'val'), 10) || 1;
+        var vm = wFilhos(pr, 'vMerge')[0]; if (vm && vm.getAttributeNS(W_NS, 'val') !== 'restart') cont = true;
+      }
+      var c = { col: col, span: span, txt: cont ? '' : wTexto(tc) }; col += span; return c;
+    });
+  });
+}
+function tituloCaso(t){
+  var manter = /^(PET|PCR|RV\d*|[A-Z]{1,3}\d[\w\-]*|\d[\w\-]*|KL|CF\d[\w\-]*)$/;
+  return String(t || '').toLowerCase().split(/\s+/).map(function(w, i){
+    var pre = (w.match(/^[(\[]+/) || [''])[0], pos = (w.match(/[)\].,;:]+$/) || [''])[0], meio = w.slice(pre.length, w.length - pos.length), orig = meio.toUpperCase();
+    if (manter.test(orig)) return pre + orig + pos;
+    if (i > 0 && /^(de|da|do|das|dos|e|com)$/.test(meio)) return w;
+    return pre + meio.charAt(0).toUpperCase() + meio.slice(1) + pos;
+  }).join(' ');
+}
+function limparEspecImport(e){
+  e = String(e || '').replace(/\s*\n\s*/g, ' / ').trim();
+  e = e.replace(/^([\-\d.,]+)\s+a\s+([\-\d.,]+)$/, '$1 – $2');
+  e = e.replace(/\s*−\s*/g, ' – ');
+  e = e.replace(/(Máximo|Mínimo)\s*\+\s*/g, '$1 ');
+  e = e.replace(/(\d)\.(\d{3})(?!\d)/g, '$1$2');
+  return e;
+}
+var CANON_RESINA = [
+  [/^Viscosidade Intrínseca \(IV\) [–—-] Blowpet/i, 'Viscosidade Intrínseca (IV) — Blowpet'],
+  [/^Viscosidade Intrínseca \(IV\) [–—-] Fornecedor/i, 'Viscosidade Intrínseca (IV) — Fornecedor'],
+  [/^(Cor|Color) L\b/, 'Cor L'], [/^(Cor|Color) b\b/, 'Cor b'], [/^(Cor|Color) a\b/, 'Cor a'],
+  [/^Teor de Acetaldeído/i, 'Teor de Acetaldeído (AA)'], [/^Ponto de Fusão/i, 'Ponto de Fusão']
+];
+function materialDoTitulo(t, secao){
+  var x = (t + ' ' + (secao || '')).toUpperCase();
+  if (/CAIXA/.test(x)) return /CINTA/.test(String(secao || '').toUpperCase()) ? 'cinta' : 'tampa';
+  if (/R[ÓO]TULO/.test(x)) return 'rotulo';
+  if (/MICROBATCH|PIGMENTO|MASTERBATCH/.test(x)) return 'pigmento';
+  return 'resina';
+}
+async function lerEmpDocx(file){
+  var zip = await JSZip.loadAsync(file);
+  var xml = await zip.file('word/document.xml').async('string');
+  var doc = new DOMParser().parseFromString(xml, 'application/xml');
+  // cabeçalho: código, data, revisão e título do produto
+  var cab = [];
+  for (var nome in zip.files) {
+    if (/^word\/header\d*\.xml$/.test(nome)) {
+      var hx = new DOMParser().parseFromString(await zip.file(nome).async('string'), 'application/xml');
+      Array.prototype.forEach.call(hx.getElementsByTagNameNS(W_NS, 'tc'), function(tc){ var t = wTexto(tc); if (t && cab.indexOf(t) === -1) cab.push(t); });
+    }
+  }
+  var cabTxt = cab.join(' | '), avisos = [];
+  var codCab = (cabTxt.match(/EMP-\d{2,4}/i) || [''])[0].toUpperCase(), codArq = (file.name.match(/EMP-\d{2,4}/i) || [''])[0].toUpperCase();
+  var docCod = codArq || codCab;
+  if (codCab && codArq && codCab !== codArq) avisos.push('O cabeçalho do documento diz ' + codCab + ', mas o nome do arquivo diz ' + codArq + '. Usei ' + codArq + ' — confira.');
+  var data = (cabTxt.match(/\d{2}\/\d{2}\/\d{4}/) || [''])[0];
+  var rev = '', iRev = cab.findIndex(function(t){ return /^rev\.?:?$/i.test(t.trim()); });
+  if (iRev > -1 && cab[iRev + 1] && /^\d{1,3}$/.test(cab[iRev + 1].trim())) rev = cab[iRev + 1].trim();
+  var revArq = (file.name.match(/RV(\d{1,3})/i) || ['', ''])[1];
+  if (!rev) rev = revArq; else if (revArq && revArq !== rev) avisos.push('Revisão no cabeçalho: ' + rev + '; no nome do arquivo: ' + revArq + '. Usei ' + rev + '.');
+  var titulo = (cab.find(function(t){
+    return t.length > 3 && !/EMP-\d|Especifica[çc][ãa]o de Mat|^Unidade|^Data|^Rev|^\d{2}\/\d{2}\/\d{4}$|^\d{1,3}$/i.test(t);
+  }) || '').replace(/\s*\n\s*/g, ' ').replace(/\s*FORNECEDOR\s+/i, ' – ').trim();
+  // primeira tabela do corpo = especificações técnicas
+  var body = doc.getElementsByTagNameNS(W_NS, 'body')[0];
+  var tbl = wFilhos(body, 'tbl')[0];
+  if (!tbl) throw new Error(file.name + ': não encontrei a tabela de especificações.');
+  var secoes = [], atual = { nome: '', params: [], removidos: 0 }, mapa = null;
+  wLinhas(tbl).forEach(function(cel){
+    var txts = cel.map(function(c){ return c.txt; });
+    if (/^item$/i.test(txts[0] || '')) {
+      mapa = {};
+      cel.forEach(function(c){
+        var t = c.txt.toLowerCase();
+        if (/^teste/.test(t)) mapa.teste = c.col; else if (/^especifica/.test(t)) mapa.espec = c.col; else if (/^unidade/.test(t)) mapa.unid = c.col;
+        else if (/^nt$/.test(t)) mapa.nt = c.col; else if (/crit[ée]rio/.test(t)) mapa.crit = c.col;
+      });
+      return;
+    }
+    if (cel.length === 1 || (cel.length && !/^\d+$/.test(txts[0]) && cel.filter(function(c){ return c.txt; }).length === 1)) {
+      var t1 = (cel.find(function(c){ return c.txt; }) || {}).txt || '';
+      if (t1 && !/ESPECIFICA[ÇC][ÕO]ES T[ÉE]CNICAS/i.test(t1)) { if (atual.params.length || atual.nome) secoes.push(atual); atual = { nome: t1.trim(), params: [], removidos: 0 }; }
+      return;
+    }
+    if (!mapa || !/^\d+$/.test(txts[0] || '')) return;
+    function campo(col){ var c = cel.find(function(x){ return x.col === col; }); return c ? c.txt : ''; }
+    var teste = campo(mapa.teste).replace(/\s*[①②③④⑤⑥⑦⑧⑨]/g, '').trim();
+    if (!teste) return;
+    if (/^vida\s*[úu]til/i.test(teste)) { atual.removidos++; return; }
+    atual.params.push({ teste: teste, especTexto: limparEspecImport(campo(mapa.espec)), unidade: campo(mapa.unid).trim(), nt: campo(mapa.nt).trim(), criterio: (campo(mapa.crit).trim() || '-').toUpperCase() });
+  });
+  secoes.push(atual);
+  secoes = secoes.filter(function(s){ return s.params.length; });
+  if (!secoes.length) throw new Error(file.name + ': não encontrei parâmetros na tabela.');
+  var multi = secoes.length > 1;
+  return secoes.map(function(sec, k){
+    var mat = materialDoTitulo(titulo, sec.nome), descBase = tituloCaso(titulo);
+    var sufixo = /OFF/i.test(sec.nome) ? 'Off Grade' : (sec.nome ? tituloCaso(sec.nome) : (multi && mat === 'resina' ? 'Prime' : ''));
+    var params = sec.params.map(function(p){
+      var teste = p.teste;
+      if (mat === 'resina') CANON_RESINA.forEach(function(c){ if (c[0].test(teste)) teste = c[1]; });
+      var unid = p.unidade === '-' ? '' : p.unidade, espec = p.especTexto;
+      if (!unid && /^Cor [Lab]$/.test(teste)) unid = 'CIELAB';
+      if (!/^(≥|≤|>=|<=|Mínimo|Máximo|[\-\d])/i.test(espec) && (!unid || unid === '-')) unid = 'Visual';
+      var nt = p.nt === '-' ? '' : (/^\d+$/.test(p.nt) ? 'NT ' + p.nt : p.nt);
+      return { teste: teste, especTexto: espec, unidade: unid, nt: nt, criterio: ['L', 'C', 'QA'].indexOf(p.criterio) > -1 ? p.criterio : '-' };
+    });
+    var avisosSec = avisos.slice();
+    params.forEach(function(p){
+      if (p.criterio !== '-' && p.unidade !== 'Visual' && parseEspecTexto(p.especTexto, p.unidade, p.criterio).tipoResultado === 'visual')
+        avisosSec.push('"' + p.teste + '": a especificação "' + p.especTexto + '" não é um intervalo que o sistema calcule — vai virar Conforme/Não conforme. Se for um limite, ajuste (ex.: Máximo 20).');
+    });
+    var r = { arquivo: file.name, secao: sec.nome, doc: docCod, desc: descBase + (sufixo ? ' – ' + sufixo : ''), mat: mat, rev: rev, data: data, parametros: params, removidos: sec.removidos, avisos: avisosSec };
+    // já existe EMP com esse código e material? então é uma nova versão dela: substitui mantendo a descrição (e os vínculos)
+    var cands = DATA.especificacoes.filter(function(f){ return !f.legado && f.doc === docCod && f.mat === mat; });
+    var alvo = cands.length === 1 ? cands[0] : cands.find(function(f){ return /off/i.test(f.desc) === /off/i.test(r.desc); });
+    if (alvo) { r.substitui = alvo.id; r.desc = alvo.desc; r.avisos.unshift('Já existe a ' + alvo.key + ' (Rev. ' + (alvo.rev || '—') + '). Ao salvar, ela será atualizada com este documento, mantendo os vínculos com os fornecedores.'); }
+    return r;
+  });
+}
+async function importarEmpArquivos(input){
+  var arquivos = Array.prototype.slice.call(input.files || []); input.value = '';
+  if (!arquivos.length || bloqueadoPlanilhaAntiga()) return;
+  try {
+    mostrarCarregando(true, 'Lendo ' + (arquivos.length === 1 ? arquivos[0].name : arquivos.length + ' documentos') + '…');
+    await carregarJSZip();
+    var fila = [], erros = [];
+    for (var i = 0; i < arquivos.length; i++) {
+      if (!/\.docx$/i.test(arquivos[i].name)) { erros.push(arquivos[i].name + ': só arquivos Word (.docx).'); continue; }
+      try { fila = fila.concat(await lerEmpDocx(arquivos[i])); } catch (e) { erros.push(e.message); }
+    }
+    if (erros.length) mostrarToast(erros.join(' · '), true);
+    if (!fila.length) return;
+    empImportFila = fila; empImportPos = 0;
+    abrirModalEspec(null, fila[0]);
+  } catch (e) { mostrarToast('Erro ao ler a EMP: ' + e.message, true); }
+  finally { mostrarCarregando(false); }
 }
 </script>
 </body>
