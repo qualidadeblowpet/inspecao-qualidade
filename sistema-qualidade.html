@@ -519,6 +519,9 @@ footer.note{margin-top:34px; padding-top:18px; border-top:1px solid var(--border
 .a-item:hover{background:var(--surface-2); color:var(--fg);}
 .a-item.on{background:var(--accent-soft); color:var(--accent); font-weight:600;}
 .a-item.on svg{opacity:1;} .a-item.on .ct{color:var(--accent);}
+.a-versao{margin-top:auto; padding:10px 18px 10px; display:flex; flex-direction:column; gap:3px; font-size:11px; color:var(--fg-faint); line-height:1.35;}
+.a-versao b{color:var(--fg-dim); font-weight:600;}
+.a-versao + .a-user{margin-top:0;}
 .a-user{margin-top:auto; border-top:1px solid var(--border); padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px)); display:flex; gap:10px; align-items:center;}
 .a-user .av{width:32px; height:32px; border-radius:50%; background:var(--accent-soft); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;}
 .a-user .who{flex:1; min-width:0;} .a-user .who b{display:block; font-size:13px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
@@ -599,6 +602,27 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 .conc-op b{display:block; font-size:13.5px;}
 .conc-op small{display:block; font-size:11.5px; color:var(--fg-faint); line-height:1.4; margin-top:2px;}
 .conc-op:has(input:checked){border-color:var(--accent); background:var(--accent-soft);}
+.form-box{background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin:12px 0 4px; display:flex; flex-direction:column; gap:9px;}
+.form-box .fb-t{font-size:10px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--fg-faint);}
+.form-box .fb-btns{display:flex; flex-wrap:wrap; gap:8px;}
+.btn-wa{background:#1fa855; border-color:#1fa855; color:#fff;} .btn-wa:hover{filter:brightness(1.06);}
+.envio-l{display:flex; gap:8px; align-items:flex-start; font-size:12px; color:var(--fg-dim); line-height:1.4;}
+.envio-l .tg{font-size:9.5px; font-weight:700; border-radius:5px; padding:2px 6px; flex-shrink:0; margin-top:1px;}
+.envio-l .tg.m{background:var(--accent-soft); color:var(--accent);} .envio-l .tg.w{background:rgba(31,168,85,.15); color:#1a9a4d;}
+.envio-l b{color:var(--fg); font-weight:600;}
+.mail-campos{display:grid; grid-template-columns:70px minmax(0,1fr); gap:8px 10px; align-items:center;}
+.mail-campos label{font-size:12px; color:var(--fg-faint);}
+.mail-campos input{background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:8px; padding:8px 10px; font:13px var(--font-body); width:100%;}
+.mail-anexos{display:flex; flex-direction:column; gap:6px;}
+.mail-anexos label{display:flex; gap:8px; align-items:center; font-size:12.5px; border:1px solid var(--border); border-radius:8px; padding:7px 10px; background:var(--surface);}
+.mail-anexos input{accent-color:var(--accent); width:15px; height:15px;}
+.mail-anexos .tp{font-size:9.5px; font-weight:700; color:#fff; border-radius:4px; padding:2px 5px;} .mail-anexos .tp.pdf{background:#c00000;} .mail-anexos .tp.img{background:#157f99;}
+.mail-prev{border:1px solid var(--border); border-radius:10px; overflow:hidden; background:#fff;}
+.mail-prev iframe{display:block; width:100%; height:440px; border:0; background:#fff;}
+.mail-dica{font-size:12px; color:var(--fg-faint); line-height:1.5; margin:0;}
+.wa-txt-in{width:100%; min-height:150px; background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:8px; padding:10px; font:13px/1.45 var(--font-body);}
+.form-ok-ic{width:38px; height:38px; border-radius:50%; background:var(--ok-soft); color:var(--ok); display:flex; align-items:center; justify-content:center; margin-bottom:6px;}
+.form-ok-ic svg{width:20px; height:20px;}
 .drawer-f{padding:12px 20px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;}
 .dw-kv{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px 18px; margin:0; font-size:13px;}
 .dw-kv dt{font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--fg-faint); margin-bottom:3px;}
@@ -661,6 +685,8 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m3.5 7 8.5 6 8.5-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-whats" viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 0 1-12.6 7.4L3.5 20.6l1.2-4.2A8.5 8.5 0 1 1 20.5 12z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.6c.2-.4.5-.4.8-.4h.4c.2 0 .4.1.5.4l.6 1.4c.1.2 0 .5-.1.6l-.5.6c.6 1.1 1.5 2 2.6 2.6l.6-.5c.2-.1.4-.2.6-.1l1.4.6c.3.1.4.3.4.5v.4c0 .3 0 .6-.4.8-.6.4-1.6.6-2.8 0a9 9 0 0 1-4-4c-.6-1.2-.4-2.2 0-2.9z" fill="currentColor"/></symbol>
 <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v4a2 2 0 0 0 2 2h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 13H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 17H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
 </defs>
 </svg>
@@ -703,10 +729,12 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <button class="a-item cad-btn" data-nav="cadastros:clientes" data-cad="clientes"><svg><use href="#i-users"/></svg><span>Clientes</span><span class="ct" id="ctClientes">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:produtos" data-cad="produtos"><svg><use href="#i-package"/></svg><span>Produtos (preforma/frasco)</span><span class="ct" id="ctProdutos">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:statusRec" data-cad="statusRec"><svg><use href="#i-flag"/></svg><span>Status de reclamação</span><span class="ct" id="ctStatusRec">0</span></button>
+      <button class="a-item cad-btn" data-nav="cadastros:destinatarios" data-cad="destinatarios"><svg><use href="#i-mail"/></svg><span>Destinatários de e-mail</span><span class="ct" id="ctDestinatarios">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:fornecedores" data-cad="fornecedores"><svg><use href="#i-truck"/></svg><span>Fornecedores</span><span class="ct" id="ctFornecedores">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:especificacoes" data-cad="especificacoes"><svg><use href="#i-sliders"/></svg><span>EMPs</span><span class="ct" id="ctEspecificacoes">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:rotulos" data-cad="rotulos"><svg><use href="#i-image"/></svg><span>Rótulos homologados</span><span class="ct" id="ctRotulosHom">0</span></button>
     </nav>
+    <div class="a-versao" id="infoVersao"><span>Versão do sistema: <b id="versaoSistema"></b></span><span>Dados atualizados: <b id="dadosAtualizados">—</b></span></div>
     <div class="a-user">
       <span class="av" id="userAvatar">—</span>
       <div class="who"><b id="userNome">—</b><small id="userEmail">—</small></div>
@@ -834,6 +862,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           </div>
           <div id="painelClientes" style="display:none;"><div class="table-scroll"><table class="occ"><thead><tr><th>Cliente</th><th>Cidade</th><th>UF</th><th>Reclamações</th><th></th></tr></thead><tbody id="tbodyClientes"></tbody></table></div></div>
           <div id="painelStatusRec" style="display:none;"><p class="tela-sub" style="margin:0 0 12px;">Etapas da tratativa, na ordem em que a reclamação costuma andar. A primeira é a usada ao abrir uma reclamação. <b>Concluída</b> é fixa — é definida pelo botão <i>Concluir reclamação</i>, na ficha.</p><div class="table-scroll"><table class="occ"><thead><tr><th style="width:60px;">Ordem</th><th>Status</th><th>Em andamento</th><th></th></tr></thead><tbody id="tbodyStatusRec"></tbody></table></div></div>
+          <div id="painelDestinatarios" style="display:none;"><p class="tela-sub" style="margin:0 0 12px;">Quem recebe a formalização de cada tipo de registro. Ao clicar em <b>Enviar e-mail</b>, esses endereços já vêm preenchidos no e-mail (dá pra ajustar só naquele envio).</p><div class="table-scroll"><table class="occ"><thead><tr><th>Tipo</th><th>Para</th><th>Cópia (Cc)</th><th></th></tr></thead><tbody id="tbodyDestinatarios"></tbody></table></div></div>
           <div id="painelProdutos" style="display:none;"><div class="table-scroll"><table class="occ"><thead><tr><th>Tipo</th><th>Produto</th><th>Reclamações</th><th></th></tr></thead><tbody id="tbodyProdutos"></tbody></table></div></div>
           <div id="painelFornecedores" style="display:none;">
             <div id="listaFornecedoresCad" style="display:flex; flex-direction:column; gap:14px;"></div>
@@ -1222,6 +1251,80 @@ table.occ tbody tr.clicavel{cursor:pointer;}
     </div>
   </div>
 
+  <!-- ===================== JANELA — FORMALIZAR (após concluir) ===================== -->
+  <div class="modal-overlay hidden" id="modalPerguntaForm" style="z-index:225;">
+    <div class="modal-card" style="max-width:500px;">
+      <button class="modal-close" onclick="fecharPerguntaFormalizar()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><div class="form-ok-ic"><svg><use href="#i-check"/></svg></div><h2 id="pfTitulo">Recebimento concluído</h2><p class="tela-sub" style="margin-top:6px;">Quer formalizar agora? Também dá pra enviar depois, pelo detalhe do recebimento.</p></div>
+      <div class="form-wrap" style="padding-top:8px; max-width:none;">
+        <div class="form-actions" style="justify-content:flex-start; border-top:none; padding-top:6px;">
+          <button class="btn btn-accent" onclick="formalizarDaPergunta('email')"><svg><use href="#i-mail"/></svg> Enviar e-mail</button>
+          <button class="btn btn-wa" onclick="formalizarDaPergunta('whats')"><svg><use href="#i-whats"/></svg> WhatsApp</button>
+          <button class="btn btn-ghost" onclick="fecharPerguntaFormalizar()">Agora não</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — E-MAIL DE FORMALIZAÇÃO ===================== -->
+  <div class="modal-overlay hidden" id="modalEmailForm" style="z-index:226;">
+    <div class="modal-card" style="max-width:820px;">
+      <button class="modal-close" onclick="fecharEmailForm()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2>Formalizar por e-mail</h2><p class="tela-sub" style="margin-top:6px;" id="efSub"></p></div>
+      <div class="form-wrap" style="padding-top:10px; max-width:none; display:flex; flex-direction:column; gap:12px;">
+        <div class="mail-campos">
+          <label for="efPara">Para</label><input id="efPara" placeholder="email@empresa.com.br; outro@empresa.com.br">
+          <label for="efCc">Cc</label><input id="efCc" placeholder="opcional">
+          <label for="efAssunto">Assunto</label><input id="efAssunto">
+        </div>
+        <div><div class="section-title" style="margin:2px 0 8px;">Anexos</div><div class="mail-anexos" id="efAnexos"></div></div>
+        <div><div class="section-title" style="margin:2px 0 8px;">Como vai ficar</div><div class="mail-prev"><iframe id="efPrevia" title="Prévia do e-mail"></iframe></div></div>
+        <p class="mail-dica">Ao clicar em <b>Abrir no Outlook</b>, o sistema baixa um arquivo de e-mail (.eml) que abre no Outlook do computador como <b>e-mail novo</b>, já com destinatários, texto e anexos — é só conferir e clicar em Enviar. Ele sai pela conta que estiver no seu Outlook. Dica: no Chrome/Edge, na primeira vez marque “Sempre abrir arquivos deste tipo” no download, aí abre direto nas próximas.</p>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgEmailForm"></span>
+          <button class="btn btn-ghost" onclick="fecharEmailForm()">Cancelar</button>
+          <button class="btn btn-accent" id="btnAbrirOutlook" onclick="gerarEmailOutlook()"><svg><use href="#i-mail"/></svg> Abrir no Outlook</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — WHATSAPP ===================== -->
+  <div class="modal-overlay hidden" id="modalWhatsForm" style="z-index:226;">
+    <div class="modal-card" style="max-width:560px;">
+      <button class="modal-close" onclick="fecharWhatsForm()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2>Compartilhar no WhatsApp</h2><p class="tela-sub" style="margin-top:6px;">Vai o PDF com a ficha completa e o texto abaixo (pode ajustar). <span id="wfArquivo" class="mono"></span></p></div>
+      <div class="form-wrap" style="padding-top:10px; max-width:none; display:flex; flex-direction:column; gap:12px;">
+        <textarea id="wfTexto" class="wa-txt-in"></textarea>
+        <p class="mail-dica" id="wfDica">No celular abre a tela de compartilhar — escolha o WhatsApp e o contato/grupo. No computador, com o WhatsApp instalado, abre o compartilhar do Windows; sem ele, o sistema baixa o PDF, copia o texto e abre o WhatsApp — aí é colar o texto e anexar o PDF.</p>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgWhatsForm"></span>
+          <button class="btn btn-ghost" onclick="baixarPdfWhats()">Só baixar o PDF</button>
+          <button class="btn btn-wa" id="btnCompartilharWa" onclick="compartilharWhats()"><svg><use href="#i-whats"/></svg> Compartilhar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — DESTINATÁRIOS ===================== -->
+  <div class="modal-overlay hidden" id="modalDest" style="z-index:220;">
+    <div class="modal-card" style="max-width:520px;">
+      <button class="modal-close" onclick="fecharModalDest()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2 id="destTitulo">Destinatários</h2><p class="tela-sub" style="margin-top:6px;">Separe os e-mails com ponto e vírgula ( ; ).</p></div>
+      <div class="form-wrap" style="padding-top:12px; max-width:none;">
+        <div class="form-grid">
+          <div class="field full"><label>Para</label><input id="destParaInput" placeholder="compras@blowpet.com.br; producao@blowpet.com.br"></div>
+          <div class="field full"><label>Cópia (Cc)</label><input id="destCcInput" placeholder="opcional"></div>
+        </div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgDest"></span>
+          <button class="btn btn-ghost" onclick="fecharModalDest()">Cancelar</button>
+          <button class="btn btn-accent" id="btnSalvarDest" onclick="salvarDest()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== JANELA — CONFIRMAÇÃO ===================== -->
   <div class="modal-overlay hidden" id="modalConfirma" style="z-index:300;">
     <div class="modal-card" style="max-width:460px;">
@@ -1387,6 +1490,7 @@ const TABELAS = {
   recItens: "TabelaReclamacoesItens",
   recComent: "TabelaReclamacoesComentarios",
   statusRec: "TabelaStatusReclamacao",
+  destinatarios: "TabelaDestinatarios",
   listas:      "TabelaListas"
 };
 // Colunas PADRÃO de cada Tabela. Ao conectar, o app lê o cabeçalho real de cada Tabela na
@@ -1407,12 +1511,17 @@ const TABLE_COLS = {
   recItens: ['RAC','Data de Produção','Lote','Caixa','Quantidade','Observação'],
   recComent: ['RAC','Data/Hora','Autor','Comentário','Anexos'],
   statusRec: ['Ordem','Status'],
+  destinatarios: ['Tipo','Para','Cc'],
   listas: ['Responsaveis','Status Recebimento','Criterio','Unidades','Materiais','Sim Nao','Conferencia Visual','Status Reclamacao','Classificacao Reclamacao','Status Liberacao','Status Rotulo']
 };
 const TABLE_COLS_PADRAO = JSON.parse(JSON.stringify(TABLE_COLS));
+// Coluna opcional "Envios" (histórico da formalização) nas abas de recebimento: não entra no padrão pra não
+// acusar "coluna faltando" em planilha antiga; quando existe, o cabeçalho real (lerCabecalhos) já inclui.
 // Colunas gravadas como NÚMERO (o resto vai como texto, pra o Excel não converter datas/NF/lotes).
 const COLS_NUM_QTD = ['Quantidade'];
 const COLS_NUM_MED = ['Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)'];
+const VERSAO_SISTEMA = '11/11/2026 14:06';   // data/hora desta versão — atualizada a cada entrega
+document.getElementById('versaoSistema').textContent = VERSAO_SISTEMA;
 const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 // Teste (nome usado em Especificacoes_Parametros) -> coluna correspondente em
@@ -1432,8 +1541,8 @@ const PARAM_COL_MAP = {
 };
 
 /* ====================== ESTADO ====================== */
-var DATA = { resina:[], rotulo:[], pigmento:[], cinta:[], tampa:[], fornecedores:[], especificacoes:[], rotulosHomologados:[], reclamacoes:[], listas:{}, clientes:[], produtos:[], recItens:[], recComent:[], statusRec:[] };
-var TEM_TABELA = { clientes: false, produtos: false, recItens: false, recComent: false, statusRec: false };   // tabelas que só existem na planilha nova
+var DATA = { resina:[], rotulo:[], pigmento:[], cinta:[], tampa:[], fornecedores:[], especificacoes:[], rotulosHomologados:[], reclamacoes:[], listas:{}, clientes:[], produtos:[], recItens:[], recComent:[], statusRec:[], destinatarios:[] };
+var TEM_TABELA = { clientes: false, produtos: false, recItens: false, recComent: false, statusRec: false, destinatarios: false };   // tabelas que só existem na planilha nova
 var matAtual = 'resina', viewAtual = 'tabela', telaAtual = 'visao';
 var driveId = null, itemId = null;
 var msalInstance = null, msalPronto = null, contaAtual = null;
@@ -1780,7 +1889,7 @@ async function carregarTudo(){
   DATA.reclamacoes = linhasParaObjetos('reclamacoes', brutos[8]);
   DATA.listas = montarListas(linhasParaObjetos('listas', brutos[9]));
   // tabelas que só existem na planilha nova: se faltarem, o sistema segue sem elas
-  await Promise.all(['clientes', 'produtos', 'recItens', 'recComent', 'statusRec'].map(async function(k){
+  await Promise.all(['clientes', 'produtos', 'recItens', 'recComent', 'statusRec', 'destinatarios'].map(async function(k){
     try { DATA[k] = linhasParaObjetos(k, await lerLinhasBrutas(TABELAS[k])); TEM_TABELA[k] = true; }
     catch (e) { DATA[k] = []; TEM_TABELA[k] = false; }
   }));
@@ -1788,6 +1897,7 @@ async function carregarTudo(){
   popularDatalists();
   popularSelectsFixos();
   renderTudo();
+  document.getElementById('dadosAtualizados').textContent = agoraBR();
 }
 
 function montarListas(linhas){
@@ -2056,6 +2166,7 @@ function atualizarContagensCadastros(){
   document.getElementById('ctClientes').textContent = DATA.clientes.length;
   document.getElementById('ctProdutos').textContent = DATA.produtos.length;
   document.getElementById('ctStatusRec').textContent = etapasReclamacao().length;
+  document.getElementById('ctDestinatarios').textContent = TIPOS_DEST.filter(function(t){ return destinatariosDe(t[0]).para; }).length;
 }
 
 /* ====================== RECEBIMENTO ====================== */
@@ -2178,7 +2289,7 @@ function abrirDetalhe(mat, index){
   document.getElementById('dwSub').textContent = MAT_LABEL_PLANO[mat] + ' · ' + (r['Fornecedor'] || '—') + (r['Tipo'] ? ' — ' + r['Tipo'] : '');
   document.getElementById('dwBadge').innerHTML = badgeLabel(r['Status']);
   function kv(rot, val, cls){ return '<div><dt>' + rot + '</dt><dd' + (cls ? ' class="' + cls + '"' : '') + '>' + (val ? escHtml(val) : '<span class="res-pend">—</span>') + '</dd></div>'; }
-  var html = '<div class="section-title">Dados</div><dl class="dw-kv">' +
+  var html = formalizacaoBoxHtml(mat, r) + '<div class="section-title">Dados</div><dl class="dw-kv">' +
     kv('Data', r['Data Recebimento'] || r['Data'], 'tabular') + kv('Nota fiscal', r['Nota Fiscal'], 'mono') +
     (mat === 'rotulo' ? kv('Cliente', r['Fornecedor']) + kv('Volume', r['Tipo']) : kv('Fornecedor', r['Fornecedor']) + kv('Tipo', r['Tipo'])) +
     (ehResina ? kv('Lote do fornecedor', r['Lote Fornecedor'], 'mono') + kv('Código', r['Código Produto'], 'mono') : kv('Lote', r['Lote'], 'mono') + (mat === 'rotulo' ? '' : kv('Código do produto', codigoProdutoDe(mat, r['Fornecedor'], r['Tipo']), 'mono'))) +
@@ -2619,7 +2730,7 @@ function renderFichaReclamacao(){
   var cli = clientePorNome(r['Cliente']), preforma = String(r['Tipo de Produto']) === 'Preforma';
   function kv(rot, val){ return '<div><dt>' + rot + '</dt><dd>' + (val ? escHtml(val) : '<span class="res-pend">—</span>') + '</dd></div>'; }
   var html = '<div class="ficha-grid"><div class="ficha-col">' + statusCardHtml(r) +
-    '<div class="ficha-acoes"><button type="button" class="btn" onclick="abrirModalReclamacao(fichaRacAtual)"><svg><use href="#i-pencil"/></svg> Editar dados</button></div>' +
+    '<div class="ficha-acoes" style="gap:8px; flex-wrap:wrap;"><button type="button" class="btn" onclick="abrirEmailForm(\'reclamacao\', fichaRacAtual)"><svg><use href="#i-mail"/></svg> Enviar e-mail</button><button type="button" class="btn" onclick="abrirWhatsForm(\'reclamacao\', fichaRacAtual)"><svg><use href="#i-whats"/></svg> WhatsApp</button><button type="button" class="btn" onclick="abrirModalReclamacao(fichaRacAtual)"><svg><use href="#i-pencil"/></svg> Editar dados</button></div>' +
     '<dl class="dw-kv">' + kv('Entrada', r['Data']) + kv('Criticidade', r['Criticidade']) +
     kv('Cliente', r['Cliente']) + kv('Cidade / UF', cli ? textoCliente(cli) : '') +
     kv('Produto', [r['Tipo de Produto'], r['Produto']].filter(function(x){ return x; }).join(' — ')) + kv('Responsável', r['Responsável']) +
@@ -3433,6 +3544,7 @@ async function salvarRecebimento(statusFinal){
       if (editando) await atualizarLinha('resina', editando.index, row); else await adicionarLinha('resina', row);
       mostrarToast('Recebimento ' + loteInterno + sufixo);
       DATA.resina = linhasParaObjetos('resina', await lerLinhasBrutas(TABELAS.resina));
+      ultimoRecebimentoSalvo = { mat: 'resina', index: editando ? editando.index : maiorIndice(DATA.resina) };
     } else {
       var tableKey = mat;
       var escolhas2 = statusFinal ? (escolhasAnaliseConclusao || {}) : null, linhasRe2 = [];
@@ -3459,6 +3571,7 @@ async function salvarRecebimento(statusFinal){
       if (editando) await atualizarLinha(tableKey, editando.index, row2); else await adicionarLinha(tableKey, row2);
       mostrarToast('Recebimento' + (statusFinal ? ' concluído como ' + statusFinal + '.' : (editando ? ' atualizado (Em análise).' : ' salvo como Em análise.')));
       DATA[tableKey] = linhasParaObjetos(tableKey, await lerLinhasBrutas(TABELAS[tableKey]));
+      ultimoRecebimentoSalvo = { mat: tableKey, index: editando ? editando.index : maiorIndice(DATA[tableKey]) };
     }
     document.getElementById('ct' + mat.charAt(0).toUpperCase() + mat.slice(1)).textContent = DATA[mat].length;
     if (matAtual === mat) { atualizarFornecedoresFiltro(); renderRecebimento(); }
@@ -3566,7 +3679,7 @@ async function confirmarConclusao(){
   if (st.erro) { b.disabled = false; m.className = 'save-msg err'; m.textContent = st.erro; return; }
   var ok = await salvarRecebimento(st.texto);
   b.disabled = false;
-  if (ok) fecharModalConcluir();
+  if (ok) { fecharModalConcluir(); if (ultimoRecebimentoSalvo) abrirPerguntaFormalizar(ultimoRecebimentoSalvo.mat, ultimoRecebimentoSalvo.index); }
   else { m.className = 'save-msg err'; m.textContent = document.getElementById('saveMsgRecebimento').textContent || 'Não foi possível concluir.'; }
 }
 
@@ -3922,6 +4035,7 @@ var CAD_INFO = {
   clientes: { titulo:'Clientes', busca:'Nome, cidade, UF…', botao:'Novo cliente', acao:'abrirModalCliente()' },
   produtos: { titulo:'Produtos (preforma e frasco)', busca:'Tipo ou produto…', botao:'Novo produto', acao:'abrirModalProduto()' },
   statusRec: { titulo:'Status de reclamação', busca:'Status…', botao:'Novo status', acao:'abrirModalStatusRec()' },
+  destinatarios: { titulo:'Destinatários de e-mail', busca:'Tipo ou e-mail…', botao:'', acao:'' },
   rotulos: { titulo:'Rótulos Homologados', busca:'Nome, cliente, volume…', botao:'Novo rótulo homologado', acao:'abrirModalRotulo()' }
 };
 var cadAtual = 'fornecedores';
@@ -3933,6 +4047,7 @@ function escolherCadastro(cad){
   document.getElementById('cadTitle').textContent = info.titulo;
   var busca = document.getElementById('cadBusca'); busca.placeholder = info.busca; busca.value = '';
   var btnNovo = document.getElementById('cadBtnNovo'); btnNovo.innerHTML = '<svg><use href="#i-plus"/></svg> ' + info.botao; btnNovo.setAttribute('onclick', info.acao);
+  btnNovo.style.display = info.botao ? '' : 'none';
   document.getElementById('cadBtnImportar').classList.toggle('hidden', cad !== 'especificacoes');
   btnNovo.style.marginLeft = cad === 'especificacoes' ? '0' : 'auto';
   document.getElementById('painelFornecedores').style.display = cad === 'fornecedores' ? '' : 'none';
@@ -3941,12 +4056,13 @@ function escolherCadastro(cad){
   document.getElementById('painelClientes').style.display = cad === 'clientes' ? '' : 'none';
   document.getElementById('painelProdutos').style.display = cad === 'produtos' ? '' : 'none';
   document.getElementById('painelStatusRec').style.display = cad === 'statusRec' ? '' : 'none';
+  document.getElementById('painelDestinatarios').style.display = cad === 'destinatarios' ? '' : 'none';
   renderCadastroAtual();
   marcarMenu();
 }
 function renderCadastroAtual(){
   if (cadAtual === 'fornecedores') renderFornecedores(); else if (cadAtual === 'especificacoes') renderEspecificacoes();
-  else if (cadAtual === 'clientes') renderClientes(); else if (cadAtual === 'produtos') renderProdutos(); else if (cadAtual === 'statusRec') renderStatusRec(); else renderRotulosHomologados();
+  else if (cadAtual === 'clientes') renderClientes(); else if (cadAtual === 'produtos') renderProdutos(); else if (cadAtual === 'statusRec') renderStatusRec(); else if (cadAtual === 'destinatarios') renderDestinatarios(); else renderRotulosHomologados();
 }
 function abrirCadastro(cad){ if (!document.getElementById('tela-cadastros').classList.contains('active')) irPara('cadastros'); escolherCadastro(cad); toggleMenu(false); }
 document.querySelectorAll('.cad-btn').forEach(function(btn){ btn.addEventListener('click', function(){ abrirCadastro(btn.dataset.cad); }); });
@@ -4308,6 +4424,447 @@ function gerarPdfReclamacoes(){
   fecharModalPdfRec();
 }
 
+/* ====================== FORMALIZAÇÃO — e-mail (Outlook) e WhatsApp ======================
+   E-mail: o sistema monta um arquivo .eml (com X-Unsent) que abre no Outlook instalado no
+   computador como e-mail NOVO, já com destinatários, corpo em tabela e anexos. Sai pela conta
+   do Outlook — não precisa de permissão de e-mail no Microsoft 365.
+   WhatsApp: PDF de uma página com a ficha + texto curto, pelo compartilhar do aparelho. */
+var ultimoRecebimentoSalvo = null;
+function maiorIndice(lista){ return lista.reduce(function(m, x){ return Math.max(m, x.__index); }, -1); }
+var TIPOS_DEST = [['resina', 'Resina PET'], ['rotulo', 'Rótulo'], ['pigmento', 'Pigmento'], ['cinta', 'Cx. Preforma (Cinta)'], ['tampa', 'Cx. Preforma (Tampa)'], ['reclamacao', 'Reclamação de Cliente']];
+function rotuloTipoDest(chave){ var t = TIPOS_DEST.find(function(x){ return x[0] === chave; }); return t ? t[1] : chave; }
+function linhaDest(chave){ var nome = rotuloTipoDest(chave).toLowerCase(); return DATA.destinatarios.find(function(d){ return String(d['Tipo'] || '').trim().toLowerCase() === nome; }); }
+function destinatariosDe(chave){ var d = linhaDest(chave); return { para: d ? String(d['Para'] || '').trim() : '', cc: d ? String(d['Cc'] || '').trim() : '' }; }
+function listaEmails(txt){ return String(txt || '').split(/[;,\n]+/).map(function(x){ return x.trim(); }).filter(function(x){ return x; }); }
+function emailsInvalidos(txt){ return listaEmails(txt).filter(function(x){ return !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(x); }); }
+
+/* ---- cadastro de destinatários ---- */
+var destEditando = null;
+function renderDestinatarios(){
+  var tb = document.getElementById('tbodyDestinatarios'); if (!tb) return;
+  if (!TEM_TABELA.destinatarios) { tb.innerHTML = '<tr><td colspan="4" class="empty-note">A planilha ainda não tem a aba de Destinatários — fica disponível depois da atualização. Até lá, o e-mail abre sem destinatários e você preenche na hora.</td></tr>'; return; }
+  var q = cadAtual === 'destinatarios' ? termoBuscaCadastro() : '';
+  function chips(t){ var l = listaEmails(t); return l.length ? l.map(function(x){ return '<span class="pill" style="margin:0 4px 3px 0; display:inline-block;">' + escHtml(x) + '</span>'; }).join('') : '<span class="cell-dim">—</span>'; }
+  var linhas = TIPOS_DEST.filter(function(t){ var d = destinatariosDe(t[0]); return !q || (t[1] + ' ' + d.para + ' ' + d.cc).toLowerCase().indexOf(q) > -1; }).map(function(t){
+    var d = destinatariosDe(t[0]);
+    return '<tr><td>' + escHtml(t[1]) + '</td><td style="white-space:normal;">' + chips(d.para) + '</td><td style="white-space:normal;">' + chips(d.cc) + '</td>' +
+      '<td class="row-actions-cell"><span class="row-actions"><button type="button" class="icon-btn icon-only" title="Editar" onclick="abrirModalDest(\'' + t[0] + '\')"><svg><use href="#i-pencil"/></svg></button></span></td></tr>';
+  }).join('');
+  tb.innerHTML = linhas || '<tr><td colspan="4" class="empty-note">Nada encontrado.</td></tr>';
+}
+function abrirModalDest(chave){
+  if (cadastroIndisponivel('destinatarios')) return;
+  destEditando = chave; var d = destinatariosDe(chave);
+  document.getElementById('destTitulo').textContent = 'Destinatários — ' + rotuloTipoDest(chave);
+  document.getElementById('destParaInput').value = listaEmails(d.para).join('; ');
+  document.getElementById('destCcInput').value = listaEmails(d.cc).join('; ');
+  document.getElementById('saveMsgDest').textContent = '';
+  document.getElementById('modalDest').classList.remove('hidden');
+}
+function fecharModalDest(){ document.getElementById('modalDest').classList.add('hidden'); }
+document.getElementById('modalDest').addEventListener('click', function(e){ if (e.target.id === 'modalDest') fecharModalDest(); });
+async function salvarDest(){
+  var msg = document.getElementById('saveMsgDest'), btn = document.getElementById('btnSalvarDest');
+  var para = document.getElementById('destParaInput').value, cc = document.getElementById('destCcInput').value;
+  var inv = emailsInvalidos(para + ';' + cc);
+  if (inv.length) { msg.className = 'save-msg err'; msg.textContent = 'E-mail inválido: ' + inv.join(', '); return; }
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    var obj = { 'Tipo': rotuloTipoDest(destEditando), 'Para': listaEmails(para).join('; '), 'Cc': listaEmails(cc).join('; ') }, ant = linhaDest(destEditando);
+    if (ant) await atualizarLinha('destinatarios', ant.__index, Object.assign({}, ant, obj)); else await adicionarLinha('destinatarios', obj);
+    DATA.destinatarios = linhasParaObjetos('destinatarios', await lerLinhasBrutas(TABELAS.destinatarios));
+    renderDestinatarios(); atualizarContagensCadastros(); fecharModalDest(); mostrarToast('Destinatários salvos.');
+  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+  finally { btn.disabled = false; }
+}
+
+/* ---- o que vai em cada formalização (mesmo conteúdo no e-mail e no PDF) ---- */
+function resultadosDoRecebimento(mat, r){
+  var ficha = fichaDe(mat, String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim(), r['Modelo do Rótulo']);
+  if (!ficha) return null;
+  var med = medicoesDeLinha(r);
+  return { emp: r['EMP'] || rotuloEmp(ficha), linhas: ficha.parametros.filter(function(p){ return p.criterio !== '-'; }).map(function(p){
+    var v = med[p.teste], vv = String(v == null ? '' : v).toLowerCase(), raw = vv === 'não conforme' || vv === 'nao-conforme' ? 'nao-conforme' : (vv === 'conforme' ? 'conforme' : v), aval = avaliarParametro(p, raw);
+    if (p.tipoResultado === 'visual' && v) v = mostrarValorAnalise(p, raw) || v;
+    if (v && /Viscosidade/.test(PARAM_COL_MAP[p.teste] || '')) v = viscosidade3(v);
+    return { crit: p.criterio, teste: p.teste, espec: [p.especTexto, p.unidade && p.unidade !== 'Visual' && String(p.especTexto || '').indexOf(p.unidade) === -1 ? p.unidade : ''].filter(function(x){ return x; }).join(' '), valor: v ? String(v) : '', aval: aval };
+  }) };
+}
+function obsParaFormalizacao(obs){ return String(obs || '').split('\n').filter(function(l){ return l && l.indexOf(MARCA_MEDICOES) !== 0; }).join('\n'); }
+function modeloRecebimento(mat, r){
+  var res = mat === 'resina', rot = mat === 'rotulo', st = String(r['Status'] || 'Em análise');
+  var id = res ? (r['Lote Interno'] || '') : (r['Lote'] || ('NF ' + (r['Nota Fiscal'] || '—')));
+  var qtd = [r['Quantidade'], r['Unidade']].filter(function(x){ return x !== '' && x != null; }).join(' ');
+  var data = r['Data Recebimento'] || r['Data'] || '';
+  var kv = res ? [['Lote interno', r['Lote Interno']], ['Data de recebimento', data], ['Fornecedor', r['Fornecedor']], ['Tipo / código', [r['Tipo'], r['Código Produto']].filter(Boolean).join(' · ')], ['Lote do fornecedor', r['Lote Fornecedor']], ['Nota fiscal', r['Nota Fiscal']], ['Quantidade', qtd], ['Responsável', r['Responsável']]]
+    : rot ? [['Data', data], ['Cliente (dono do rótulo)', r['Fornecedor']], ['Volume / modelo', [r['Tipo'], r['Modelo do Rótulo']].filter(Boolean).join(' · ')], ['Lote', r['Lote']], ['Nota fiscal', r['Nota Fiscal']], ['Quantidade', qtd], ['Conferência visual', r['Conferência Visual']], ['Responsável', r['Responsável']]]
+    : [['Data', data], ['Fornecedor', r['Fornecedor']], ['Tipo / código', [r['Tipo'], codigoProdutoDe(mat, r['Fornecedor'], r['Tipo'])].filter(Boolean).join(' · ')], ['Lote', r['Lote']], ['Nota fiscal', r['Nota Fiscal']], ['Quantidade', qtd], ['Responsável', r['Responsável']]];
+  var resultados = resultadosDoRecebimento(mat, r), fotos = [], anexos = [];
+  if (rot) {
+    var h = rotuloHomologadoDe(r['Modelo do Rótulo'], r['Fornecedor'], r['Tipo']);
+    if (h && h['Arquivo da Foto']) { fotos.push({ link: h['Arquivo da Foto'], legenda: 'Rótulo homologado — ' + (h['Nome do Modelo'] || '') + (h['Volume (mL)'] ? ' ' + rotuloVolumeTexto(h['Volume (mL)']) : '') }); anexos.push({ link: h['Arquivo da Foto'], nome: 'Rotulo_homologado_' + nomeArquivoSeguro(h['Nome do Modelo'] || 'rotulo'), tipo: 'img' }); }
+  } else if (r['Arquivo do Laudo']) anexos.push({ link: r['Arquivo do Laudo'], nome: 'Laudo_' + nomeArquivoSeguro(id), tipo: ehPdf(r['Arquivo do Laudo']) ? 'pdf' : 'arq' });
+  var tituloRes = { resina: 'Resultados', rotulo: 'Dimensionais analisados', pigmento: 'Testes', cinta: 'Análises', tampa: 'Análises' }[mat];
+  var falhas = resultados ? resultados.linhas.filter(function(l){ return l.aval === 'fora'; }) : [];
+  var wpp = ['*Recebimento ' + MAT_LABEL[mat] + ' — ' + st.toUpperCase() + '*',
+    res ? 'Lote interno: *' + id + '*' : (rot ? (r['Modelo do Rótulo'] || '') + ' *' + (r['Tipo'] || '') + '* · ' + (r['Fornecedor'] || '') : (r['Fornecedor'] || '') + (r['Tipo'] ? ' · ' + r['Tipo'] : '')),
+    res ? [r['Fornecedor'], r['Tipo']].filter(Boolean).join(' · ') : '',
+    [rot || !res ? (r['Lote'] ? 'Lote ' + r['Lote'] : '') : '', r['Nota Fiscal'] ? 'NF ' + r['Nota Fiscal'] : '', qtd, data].filter(Boolean).join(' · '),
+    rot && r['Conferência Visual'] ? 'Conferência visual: ' + String(r['Conferência Visual']).toLowerCase() : '',
+    falhas.length ? 'Fora do especificado: ' + falhas.map(function(f){ return f.teste + ' (' + f.valor + '; ' + f.espec + ')'; }).join('; ') : '',
+    r['Responsável'] ? 'Responsável: ' + r['Responsável'] : '', '_Ficha completa no PDF._'].filter(Boolean).join('\n');
+  return {
+    tipo: mat, ref: r.__index, idTexto: id, statusTexto: st, statusChave: statusKey(st),
+    titulo: rot ? 'Recebimento de Rótulo — ' + [r['Modelo do Rótulo'], r['Tipo']].filter(Boolean).join(' ') : 'Recebimento de ' + MAT_LABEL[mat] + ' — ' + id,
+    sub: [r['Fornecedor'], rot ? '' : r['Tipo'], data ? 'recebido em ' + data : ''].filter(Boolean).join(' · '),
+    kv: kv.filter(function(x){ return x[1] !== '' && x[1] != null; }),
+    resultados: resultados, tituloResultados: tituloRes, observacoes: obsParaFormalizacao(r['Observações']),
+    fotos: fotos, anexos: anexos, tabelaExtra: null, conclusao: null,
+    assunto: '[Recebimento ' + MAT_LABEL[mat] + '] ' + (rot ? [r['Modelo do Rótulo'], r['Tipo']].filter(Boolean).join(' ') + ' · ' + (r['Fornecedor'] || '') : id + ' · ' + (r['Fornecedor'] || '')) + (r['Nota Fiscal'] ? ' · NF ' + r['Nota Fiscal'] : '') + ' · ' + st.toUpperCase(),
+    whats: wpp, nomeBase: 'Recebimento_' + ({ resina: 'Resina', rotulo: 'Rotulo', pigmento: 'Pigmento', cinta: 'Caixa-Cinta', tampa: 'Caixa-Tampa' }[mat]) + '_' + nomeArquivoSeguro(rot ? (r['Lote'] || r['Modelo do Rótulo'] || id) : id)
+  };
+}
+function modeloReclamacao(r){
+  var cli = clientePorNome(r['Cliente']), its = itensDaReclamacao(r['RAC']), conc = recConcluida(r);
+  var preforma = String(r['Tipo de Produto']) === 'Preforma';
+  var fotos = [], anexos = [], n = 0;
+  comentariosDaReclamacao(r['RAC']).slice().reverse().forEach(function(c){
+    anexosDe(c).forEach(function(l){ n++; var pdf = ehPdf(l); if (!pdf) fotos.push({ link: l, legenda: 'Foto ' + n }); anexos.push({ link: l, nome: r['RAC'] + '_' + (pdf ? 'arquivo' : 'foto') + n, tipo: pdf ? 'pdf' : 'img' }); });
+  });
+  var st = conc ? STATUS_CONCLUIDA : String(r['Status'] || '');
+  var lotes = its.map(function(i){ return i['Lote']; }).filter(Boolean).filter(function(v, k, a){ return a.indexOf(v) === k; });
+  var caixas = its.map(function(i){ return i['Caixa']; }).filter(Boolean);
+  return {
+    tipo: 'reclamacao', ref: r['RAC'], idTexto: r['RAC'], statusTexto: conc ? (r['Classificação'] || STATUS_CONCLUIDA) : st, statusChave: conc ? ({ procedente: 'reprovado', improcedente: 'aprovado', alerta: 'analise' }[chaveResultado(r['Classificação'])] || 'nd') : 'tratativa',
+    titulo: 'Reclamação de Cliente — ' + r['RAC'], sub: [(r['Cliente'] || '') + (cli && textoCliente(cli) ? ' (' + textoCliente(cli) + ')' : ''), 'entrada ' + (r['Data'] || '')].join(' · '),
+    kv: [['RAC', r['RAC']], ['Data de entrada', r['Data']], ['Cliente', (r['Cliente'] || '') + (cli && textoCliente(cli) ? ' — ' + textoCliente(cli) : '')], ['Produto', [r['Tipo de Produto'], r['Produto']].filter(Boolean).join(' — ')], ['Motivo', r['Motivo']], ['Criticidade', r['Criticidade']], ['Status', st], ['Responsável', r['Responsável']]].filter(function(x){ return x[1]; }),
+    resultados: null, tituloResultados: '',
+    tabelaExtra: its.length ? { titulo: 'Rastreabilidade', colunas: ['Produção', 'Lote'].concat(preforma ? ['Caixa'] : [], ['Qtd.', 'Obs.']), linhas: its.map(function(i){ return [i['Data de Produção'], i['Lote']].concat(preforma ? [i['Caixa']] : [], [i['Quantidade'], i['Observação']]).map(function(x){ return x || ''; }); }) } : null,
+    conclusao: conc ? { resultado: r['Classificação'] || '', data: r['Data de Conclusão'] || '', por: r['Concluído por'] || '', texto: r['Conclusão'] || '' } : null,
+    observacoes: r['Observações'] || '', fotos: fotos, anexos: anexos,
+    assunto: '[Reclamação de Cliente] ' + r['RAC'] + ' · ' + (r['Cliente'] || '') + (r['Motivo'] ? ' · ' + r['Motivo'] : '') + (r['Criticidade'] === 'Crítica' ? ' · CRÍTICA' : '') + (conc ? ' · CONCLUÍDA (' + String(r['Classificação'] || '').toUpperCase() + ')' : ''),
+    whats: ['*Reclamação de Cliente — ' + r['RAC'] + '*' + (r['Criticidade'] ? ' (' + r['Criticidade'].toLowerCase() + ')' : ''),
+      (r['Cliente'] || '') + (cli && textoCliente(cli) ? ' · ' + textoCliente(cli) : ''), r['Produto'] || '', r['Motivo'] ? 'Motivo: ' + r['Motivo'] : '',
+      lotes.length ? 'Lote' + (lotes.length > 1 ? 's ' : ' ') + lotes.join(', ') + (caixas.length ? ' · caixa' + (caixas.length > 1 ? 's ' : ' ') + caixas.join(', ') : '') : '',
+      conc ? 'Concluída: *' + (r['Classificação'] || '') + '*' + (r['Data de Conclusão'] ? ' em ' + r['Data de Conclusão'] : '') : 'Status: ' + st,
+      '_Ficha completa' + (fotos.length ? ' com fotos' : '') + ' no PDF._'].filter(Boolean).join('\n'),
+    nomeBase: 'Reclamacao_' + r['RAC']
+  };
+}
+function modeloDe(tipo, ref){
+  if (tipo === 'reclamacao') { var rc = reclamacaoPorRac(ref); return rc ? modeloReclamacao(rc) : null; }
+  var r = DATA[tipo].find(function(x){ return x.__index === ref; }); return r ? modeloRecebimento(tipo, r) : null;
+}
+function nomeArquivoSeguro(t){ return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w.-]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60) || 'arquivo'; }
+
+/* ---- arquivos: baixa do OneDrive (ou data:/blob: na prévia) ---- */
+var CACHE_ARQUIVOS = {};
+async function baixarArquivoLink(link){
+  if (CACHE_ARQUIVOS[link]) return CACHE_ARQUIVOS[link];
+  var res;
+  if (/^data:/.test(link)) res = { blob: dataUrlParaBlob(link), nome: '' };
+  else if (/^blob:/.test(link)) { var b = await (await fetch(link)).blob(); res = { blob: b, nome: '' }; }
+  else {
+    var token = await getToken();
+    var enc = 'u!' + btoa(unescape(encodeURIComponent(link))).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+    var meta = await (await fetch('https://graph.microsoft.com/v1.0/shares/' + enc + '/driveItem', { headers: { Authorization: 'Bearer ' + token } })).json();
+    var url = meta && meta['@microsoft.graph.downloadUrl'];
+    if (!url) throw new Error('não foi possível baixar o arquivo ' + ((meta && meta.name) || ''));
+    res = { blob: await (await fetch(url)).blob(), nome: meta.name || '' };
+  }
+  CACHE_ARQUIVOS[link] = res; return res;
+}
+function dataUrlParaBlob(u){
+  var i = u.indexOf(','), cab = u.slice(5, i), dados = u.slice(i + 1), tipo = cab.split(';')[0] || 'application/octet-stream';
+  if (/;base64/i.test(cab)) { var bin = atob(dados), arr = new Uint8Array(bin.length); for (var k = 0; k < bin.length; k++) arr[k] = bin.charCodeAt(k); return new Blob([arr], { type: tipo }); }
+  return new Blob([decodeURIComponent(dados)], { type: tipo });
+}
+function extensaoDe(tipoMime, nome){
+  var m = String(nome || '').match(/\.([a-z0-9]{2,5})$/i); if (m) return m[1].toLowerCase();
+  return ({ 'application/pdf': 'pdf', 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/svg+xml': 'svg', 'image/heic': 'heic' })[tipoMime] || 'bin';
+}
+// imagem -> JPEG reduzido (pra corpo do e-mail e PDF); devolve { dataUrl, w, h }
+function imagemReduzida(blob, maxLado, qualidade){
+  return new Promise(function(resolve){
+    var url = URL.createObjectURL(blob), img = new Image();
+    img.onload = function(){
+      var w = img.naturalWidth || 800, h = img.naturalHeight || 600, k = Math.min(1, maxLado / Math.max(w, h));
+      var c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k);
+      var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url); resolve({ dataUrl: c.toDataURL('image/jpeg', qualidade || 0.82), w: c.width, h: c.height });
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
+}
+
+/* ---- corpo do e-mail (tabelas com estilo inline, que o Outlook respeita) ---- */
+function emailHtml(m, srcFoto, srcLogo){
+  var E = escHtml, AZ = '#157f99';
+  function tit(t, extra){ return '<p style="margin:18px 0 6px;font:bold 11px Arial,sans-serif;letter-spacing:.5px;text-transform:uppercase;color:' + AZ + '">' + E(t) + (extra ? ' <span style="color:#88909c;font-weight:normal;text-transform:none;letter-spacing:0">· ' + E(extra) + '</span>' : '') + '</p>'; }
+  var td = 'padding:6px 10px;border-bottom:1px solid #e6e9ee;font:13px Arial,sans-serif;vertical-align:top;';
+  var th = 'text-align:left;padding:7px 10px;background:#1c2128;color:#ffffff;font:bold 11px Arial,sans-serif;';
+  var cores = { aprovado: ['#14804a', '#e6f4ec'], reprovado: ['#c00000', '#fdecec'], restricao: ['#157f99', '#e1f2f6'], quarentena: ['#6b46c1', '#efeafb'], analise: ['#a86b00', '#fdf3e1'], tratativa: ['#6b46c1', '#efeafb'], nd: ['#4b5563', '#eef0f3'] }[m.statusChave] || ['#4b5563', '#eef0f3'];
+  var h = '<div style="background:#ffffff;color:#15181d;font:13px Arial,sans-serif;max-width:720px;">' +
+    '<table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse"><tr><td style="vertical-align:middle"><img src="' + srcLogo + '" alt="BlowPet" width="54" height="43" style="display:block;width:54px;height:43px;"></td><td style="text-align:right;font:11px Arial,sans-serif;color:#88909c;vertical-align:middle">Sistema da Qualidade<br>BlowPet · Qualidade</td></tr></table>' +
+    '<div style="border-top:3px solid #c00000;margin:10px 0 14px;font-size:1px;line-height:1px">&nbsp;</div>' +
+    '<p style="margin:0 0 3px;font:bold 18px Arial,sans-serif">' + E(m.titulo) + '</p><p style="margin:0 0 10px;color:#5b6372">' + E(m.sub) + '</p>' +
+    '<span style="display:inline-block;padding:4px 12px;border-radius:12px;background:' + cores[1] + ';color:' + cores[0] + ';font:bold 12px Arial,sans-serif;letter-spacing:.4px">' + E(String(m.statusTexto).toUpperCase()) + '</span>';
+  h += tit(m.tipo === 'reclamacao' ? 'Dados da reclamação' : 'Dados da entrada') + '<table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;border:1px solid #e6e9ee">' +
+    m.kv.map(function(x){ return '<tr><td style="' + td + 'color:#5b6372;width:38%">' + E(x[0]) + '</td><td style="' + td + 'font-weight:bold;' + (x[0] === 'Criticidade' && x[1] === 'Crítica' ? 'color:#c00000;' : '') + '">' + E(x[1]) + '</td></tr>'; }).join('') + '</table>';
+  if (m.resultados) {
+    h += tit(m.tituloResultados, m.resultados.emp) + '<table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;border:1px solid #e6e9ee"><tr><th style="' + th + '">Teste</th><th style="' + th + '">Especificação</th><th style="' + th + '">Resultado</th><th style="' + th + '">Crit.</th><th style="' + th + '">Situação</th></tr>' +
+      m.resultados.linhas.map(function(l){ var c = l.aval === 'dentro' ? '#14804a' : l.aval === 'fora' ? '#c00000' : '#6b7280';
+        return '<tr><td style="' + td + '">' + E(l.teste) + '</td><td style="' + td + 'color:#5b6372">' + E(l.espec) + '</td><td style="' + td + 'font-weight:bold;color:' + c + '">' + E(l.valor || 'pendente') + '</td><td style="' + td + 'color:#5b6372">' + E(l.crit) + '</td><td style="' + td + 'font-weight:bold;color:' + c + '">' + (l.aval === 'dentro' ? 'Dentro' : l.aval === 'fora' ? 'Fora' : '—') + '</td></tr>'; }).join('') + '</table>';
+  } else if (m.tipo !== 'reclamacao') h += tit(m.tituloResultados) + '<p style="margin:0;color:#5b6372">Produto sem EMP vinculada — resultado definido manualmente.</p>';
+  if (m.tabelaExtra) h += tit(m.tabelaExtra.titulo) + '<table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;border:1px solid #e6e9ee"><tr>' + m.tabelaExtra.colunas.map(function(c){ return '<th style="' + th + '">' + E(c) + '</th>'; }).join('') + '</tr>' +
+    m.tabelaExtra.linhas.map(function(l){ return '<tr>' + l.map(function(c){ return '<td style="' + td + '">' + E(c) + '</td>'; }).join('') + '</tr>'; }).join('') + '</table>';
+  if (m.conclusao) h += tit('Conclusão — ' + m.conclusao.resultado, [m.conclusao.data, m.conclusao.por ? 'por ' + m.conclusao.por : ''].filter(Boolean).join(' ')) + '<p style="margin:0;padding:10px 12px;border:1px solid #e6e9ee;white-space:pre-wrap">' + E(m.conclusao.texto) + '</p>';
+  if (m.observacoes) h += tit('Observações') + '<p style="margin:0;white-space:pre-wrap;color:#33373d">' + E(m.observacoes) + '</p>';
+  if (m.fotos.length) {
+    var rot = m.tipo === 'rotulo';
+    h += tit(rot ? 'Rótulo homologado' : 'Fotos enviadas pelo cliente', rot ? '' : 'reduzidas; originais em anexo');
+    if (rot) h += m.fotos.map(function(f, i){ return '<img src="' + srcFoto(i) + '" alt="' + E(f.legenda) + '" width="420" style="display:block;width:420px;max-width:100%;border:1px solid #e6e9ee"><p style="margin:4px 0 0;font:11px Arial,sans-serif;color:#88909c">' + E(f.legenda) + '</p>'; }).join('');
+    else { h += '<table cellspacing="0" cellpadding="0" style="border-collapse:collapse"><tr>';
+      m.fotos.forEach(function(f, i){ if (i && i % 4 === 0) h += '</tr><tr>'; h += '<td style="padding:0 6px 6px 0;vertical-align:top"><img src="' + srcFoto(i) + '" alt="' + E(f.legenda) + '" width="160" style="display:block;width:160px;border:1px solid #e6e9ee"></td>'; });
+      h += '</tr></table>'; }
+  }
+  h += '<p style="margin:22px 0 0;padding-top:10px;border-top:1px solid #e6e9ee;font:11px Arial,sans-serif;color:#88909c">Registro gerado pelo Sistema da Qualidade BlowPet em ' + agoraBR() + ' por ' + E(autorAtual()) + '.' + (m.anexos.length ? ' Os anexos são os arquivos lançados no sistema.' : '') + '</p></div>';
+  return h;
+}
+
+/* ---- arquivo .eml (abre no Outlook como e-mail novo) ---- */
+function b64Utf8(s){ return btoa(unescape(encodeURIComponent(s))); }
+function linhas76(b){ return b.replace(/(.{76})/g, '$1\r\n'); }
+function cabecalhoUtf8(s){
+  s = String(s || '');
+  if (/^[\x20-\x7e]*$/.test(s)) return s;
+  var partes = [], atual = '';
+  Array.from(s).forEach(function(ch){ if (unescape(encodeURIComponent(atual + ch)).length > 42) { partes.push(atual); atual = ''; } atual += ch; });
+  if (atual) partes.push(atual);
+  return partes.map(function(p){ return '=?UTF-8?B?' + b64Utf8(p) + '?='; }).join('\r\n ');
+}
+function blobBase64(blob){ return new Promise(function(res, rej){ var fr = new FileReader(); fr.onload = function(){ res(String(fr.result).split(',')[1] || ''); }; fr.onerror = function(){ rej(new Error('não foi possível ler o arquivo')); }; fr.readAsDataURL(blob); }); }
+function montarEml(o){
+  var M = 'sq-mix-' + Date.now().toString(36), R = 'sq-rel-' + Math.random().toString(36).slice(2);
+  var L = [];
+  L.push('X-Unsent: 1');
+  if (o.para.length) L.push('To: ' + o.para.join(', '));
+  if (o.cc.length) L.push('Cc: ' + o.cc.join(', '));
+  L.push('Subject: ' + cabecalhoUtf8(o.assunto), 'MIME-Version: 1.0', 'Content-Type: multipart/mixed; boundary="' + M + '"', '', 'This is a multi-part message in MIME format.', '');
+  L.push('--' + M, 'Content-Type: multipart/related; boundary="' + R + '"', '');
+  L.push('--' + R, 'Content-Type: text/html; charset="utf-8"', 'Content-Transfer-Encoding: base64', '', linhas76(b64Utf8('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:16px;background:#ffffff">' + o.html + '</body></html>')), '');
+  o.inline.forEach(function(a){
+    L.push('--' + R, 'Content-Type: ' + a.tipo + '; name="' + a.nome + '"', 'Content-Transfer-Encoding: base64', 'Content-ID: <' + a.cid + '>', 'Content-Disposition: inline; filename="' + a.nome + '"', '', linhas76(a.b64), '');
+  });
+  L.push('--' + R + '--', '');
+  o.anexos.forEach(function(a){
+    var n = cabecalhoUtf8(a.nome);
+    L.push('--' + M, 'Content-Type: ' + (a.tipo || 'application/octet-stream') + '; name="' + n + '"', 'Content-Transfer-Encoding: base64', 'Content-Disposition: attachment; filename="' + n + '"', '', linhas76(a.b64), '');
+  });
+  L.push('--' + M + '--', '');
+  return new Blob([L.join('\r\n')], { type: 'message/rfc822' });
+}
+function entregarEml(blob, nome){
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nome;
+  document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 4000);
+}
+
+/* ---- janela do e-mail ---- */
+var emailFormAtual = null;
+async function abrirEmailForm(tipo, ref){
+  var m = modeloDe(tipo, ref); if (!m) return;
+  emailFormAtual = m;
+  var d = destinatariosDe(tipo === 'reclamacao' ? 'reclamacao' : tipo);
+  document.getElementById('efSub').textContent = m.titulo;
+  document.getElementById('efPara').value = listaEmails(d.para).join('; ');
+  document.getElementById('efCc').value = listaEmails(d.cc).join('; ');
+  document.getElementById('efAssunto').value = m.assunto;
+  document.getElementById('efAnexos').innerHTML = m.anexos.length ? m.anexos.map(function(a, i){
+    return '<label><input type="checkbox" checked data-i="' + i + '"><span class="tp ' + (a.tipo === 'pdf' ? 'pdf' : 'img') + '">' + (a.tipo === 'pdf' ? 'PDF' : a.tipo === 'img' ? 'IMG' : 'ARQ') + '</span><span>' + escHtml(a.nome) + '</span><span class="cell-dim" data-tam="' + i + '" style="margin-left:auto; font-size:11.5px;"></span></label>';
+  }).join('') : '<p class="mail-dica" style="margin:0;">Sem anexos neste registro.</p>';
+  document.getElementById('saveMsgEmailForm').textContent = '';
+  document.getElementById('modalEmailForm').classList.remove('hidden');
+  // prévia (fotos pelas miniaturas)
+  var previas = await Promise.all(m.fotos.map(function(f){ return urlMiniatura(f.link); }));
+  var fr = document.getElementById('efPrevia');
+  fr.srcdoc = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:16px;background:#fff">' + emailHtml(m, function(i){ return previas[i] || ''; }, LOGO_PDF) + '</body></html>';
+  // tamanho dos anexos (vai baixando em segundo plano)
+  m.anexos.forEach(function(a, i){ baixarArquivoLink(a.link).then(function(arq){ var el = document.querySelector('[data-tam="' + i + '"]'); if (el) el.textContent = formatarTamanho(arq.blob.size); }).catch(function(){ var el = document.querySelector('[data-tam="' + i + '"]'); if (el) el.textContent = 'não encontrado'; }); });
+}
+function fecharEmailForm(){ document.getElementById('modalEmailForm').classList.add('hidden'); }
+document.getElementById('modalEmailForm').addEventListener('click', function(e){ if (e.target.id === 'modalEmailForm') fecharEmailForm(); });
+async function gerarEmailOutlook(){
+  var m = emailFormAtual; if (!m) return;
+  var msg = document.getElementById('saveMsgEmailForm'), btn = document.getElementById('btnAbrirOutlook');
+  var para = document.getElementById('efPara').value, cc = document.getElementById('efCc').value;
+  var inv = emailsInvalidos(para + ';' + cc);
+  if (inv.length) { msg.className = 'save-msg err'; msg.textContent = 'E-mail inválido: ' + inv.join(', '); return; }
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Preparando…';
+  try {
+    var inline = [{ cid: 'logo-blowpet', nome: 'logo-blowpet.png', tipo: 'image/png', b64: LOGO_PDF.split(',')[1] }], anexos = [], total = 0;
+    for (var i = 0; i < m.fotos.length; i++) {
+      msg.textContent = 'Preparando fotos (' + (i + 1) + ' de ' + m.fotos.length + ')…';
+      var arqF = await baixarArquivoLink(m.fotos[i].link), red = await imagemReduzida(arqF.blob, m.tipo === 'rotulo' ? 1000 : 640, 0.8);
+      inline.push({ cid: 'foto' + i, nome: 'foto' + (i + 1) + '.jpg', tipo: 'image/jpeg', b64: red ? red.dataUrl.split(',')[1] : '' });
+    }
+    var marcados = Array.prototype.map.call(document.querySelectorAll('#efAnexos input:checked'), function(x){ return +x.dataset.i; });
+    for (var k = 0; k < marcados.length; k++) {
+      var a = m.anexos[marcados[k]];
+      msg.textContent = 'Anexando arquivos (' + (k + 1) + ' de ' + marcados.length + ')…';
+      var arq = await baixarArquivoLink(a.link); total += arq.blob.size;
+      var ext = extensaoDe(arq.blob.type, arq.nome);
+      anexos.push({ nome: arq.nome || (a.nome + '.' + ext), tipo: arq.blob.type || 'application/octet-stream', b64: await blobBase64(arq.blob) });
+    }
+    var html = emailHtml(m, function(i){ return 'cid:foto' + i; }, 'cid:logo-blowpet');
+    var eml = montarEml({ para: listaEmails(para), cc: listaEmails(cc), assunto: document.getElementById('efAssunto').value.trim() || m.assunto, html: html, inline: inline.filter(function(x){ return x.b64; }), anexos: anexos });
+    entregarEml(eml, 'Email_' + m.nomeBase + '.eml');
+    await registrarEnvio(m, 'E-mail', listaEmails(para).concat(listaEmails(cc).map(function(x){ return 'cc ' + x; })));
+    msg.className = 'save-msg'; msg.textContent = '';
+    fecharEmailForm();
+    mostrarToast('E-mail pronto — abra o arquivo baixado: ele abre no Outlook para você conferir e enviar.' + (total > 20 * 1048576 ? ' Atenção: anexos com ' + formatarTamanho(total) + ' — o servidor pode recusar.' : ''));
+  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+  finally { btn.disabled = false; }
+}
+
+/* ---- PDF da ficha (WhatsApp) ---- */
+async function pdfDaFicha(m){
+  var Ctor = window.jspdf && window.jspdf.jsPDF;
+  if (!Ctor) throw new Error('a biblioteca de PDF não carregou (rede bloqueando cdn.jsdelivr.net?)');
+  var doc = new Ctor({ unit: 'mm', format: 'a4' }), W = 210, H = 297, Mg = 14, y = Mg, larg = W - 2 * Mg, BASE = H - Mg - 6;
+  function novaPagina(){ doc.addPage(); y = Mg; }
+  function garante(h){ if (y + h > BASE) novaPagina(); }
+  function cor(c){ doc.setTextColor(c[0], c[1], c[2]); }
+  logoNoPdf(doc, Mg, y - 2, 13);
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8); cor([120, 120, 120]);
+  doc.text('Sistema da Qualidade · BlowPet', W - Mg, y + 3, { align: 'right' }); doc.text('emitido em ' + agoraBR() + ' por ' + autorAtual(), W - Mg, y + 7, { align: 'right' });
+  y += 14; doc.setDrawColor(192, 0, 0); doc.setLineWidth(0.8); doc.line(Mg, y, W - Mg, y); y += 8;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(15); cor([20, 20, 20]);
+  doc.splitTextToSize(m.titulo, larg).forEach(function(l){ doc.text(l, Mg, y); y += 6.4; });
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5); cor([95, 100, 110]); doc.text(doc.splitTextToSize(m.sub, larg), Mg, y); y += 6;
+  var cores = { aprovado: [20, 128, 74], reprovado: [192, 0, 0], restricao: [21, 127, 153], quarentena: [107, 70, 193], analise: [168, 107, 0], tratativa: [107, 70, 193], nd: [75, 85, 99] }[m.statusChave] || [75, 85, 99];
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); var stT = String(m.statusTexto).toUpperCase(), wst = doc.getTextWidth(stT) + 8;
+  doc.setFillColor(cores[0], cores[1], cores[2]); doc.roundedRect(Mg, y - 4, wst, 6.5, 3, 3, 'F'); doc.setTextColor(255, 255, 255); doc.text(stT, Mg + 4, y + 0.6); y += 9;
+  function titulo(t, extra){ garante(16); y += 7; doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(21, 127, 153); doc.text(t.toUpperCase(), Mg, y); if (extra) { var w = doc.getTextWidth(t.toUpperCase()); doc.setFont('helvetica', 'normal'); cor([140, 140, 140]); doc.text('  ·  ' + extra, Mg + w, y); } y += 3; }
+  function tabela(colunas, larguras, linhas, corDe){
+    var lh = 3.7, fs = 8.5;
+    function cab(){ doc.setFillColor(28, 33, 40); doc.rect(Mg, y, larg, 6.5, 'F'); doc.setFont('helvetica', 'bold'); doc.setFontSize(7.8); doc.setTextColor(255, 255, 255); var x = Mg; colunas.forEach(function(c, i){ doc.text(c, x + 2, y + 4.3); x += larguras[i]; }); y += 6.5; }
+    cab();
+    linhas.forEach(function(l, li){
+      doc.setFontSize(fs);
+      var cel = l.map(function(v, i){ doc.setFont('helvetica', 'normal'); return doc.splitTextToSize(String(v == null ? '' : v), larguras[i] - 4); });
+      var h = Math.max.apply(null, cel.map(function(c){ return c.length; })) * lh + 2.6;
+      if (y + h > BASE) { novaPagina(); cab(); }
+      if (li % 2) { doc.setFillColor(246, 246, 246); doc.rect(Mg, y, larg, h, 'F'); }
+      var x = Mg;
+      cel.forEach(function(c, i){ var k = corDe ? corDe(li, i) : null; doc.setFont('helvetica', k ? 'bold' : 'normal'); cor(k || [30, 30, 30]); doc.text(c, x + 2, y + 4, { lineHeightFactor: 1.15 }); x += larguras[i]; });
+      doc.setDrawColor(225, 225, 225); doc.setLineWidth(0.15); doc.line(Mg, y + h, W - Mg, y + h); y += h;
+    });
+  }
+  titulo(m.tipo === 'reclamacao' ? 'Dados da reclamação' : 'Dados da entrada');
+  tabela(['Campo', 'Informação'], [larg * 0.34, larg * 0.66], m.kv.map(function(x){ return [x[0], x[1]]; }), function(li, i){ return i === 1 && m.kv[li][0] === 'Criticidade' && m.kv[li][1] === 'Crítica' ? [192, 0, 0] : null; });
+  if (m.resultados) {
+    titulo(m.tituloResultados, m.resultados.emp);
+    var cs = { dentro: [20, 128, 74], fora: [192, 0, 0] };
+    tabela(['Teste', 'Especificação', 'Resultado', 'Crit.', 'Situação'], [larg * 0.34, larg * 0.28, larg * 0.15, larg * 0.08, larg * 0.15],
+      m.resultados.linhas.map(function(l){ return [l.teste, l.espec, l.valor || 'pendente', l.crit, l.aval === 'dentro' ? 'Dentro' : l.aval === 'fora' ? 'Fora' : '—']; }),
+      function(li, i){ return (i === 2 || i === 4) ? (cs[m.resultados.linhas[li].aval] || null) : null; });
+  }
+  if (m.tabelaExtra) { titulo(m.tabelaExtra.titulo); var n = m.tabelaExtra.colunas.length, pesos = n === 5 ? [0.17, 0.17, 0.12, 0.16, 0.38] : [0.2, 0.2, 0.18, 0.42]; tabela(m.tabelaExtra.colunas, pesos.map(function(p){ return larg * p; }), m.tabelaExtra.linhas); }
+  if (m.conclusao) { titulo('Conclusão — ' + m.conclusao.resultado, [m.conclusao.data, m.conclusao.por ? 'por ' + m.conclusao.por : ''].filter(Boolean).join(' ')); doc.setFont('helvetica', 'normal'); doc.setFontSize(9); cor([30, 30, 30]); doc.splitTextToSize(m.conclusao.texto || '—', larg).forEach(function(l){ garante(5); doc.text(l, Mg, y + 3.5); y += 4.3; }); y += 2; }
+  if (m.observacoes) { titulo('Observações'); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); cor([60, 60, 60]); doc.splitTextToSize(m.observacoes, larg).forEach(function(l){ garante(5); doc.text(l, Mg, y + 3.5); y += 4; }); y += 2; }
+  if (m.fotos.length) {
+    var rot = m.tipo === 'rotulo';
+    titulo(rot ? 'Rótulo homologado' : 'Fotos enviadas pelo cliente'); y += 1;
+    var colW = rot ? Math.min(larg, 120) : (larg - 9) / 4, x = Mg, linhaH = 0;
+    for (var i = 0; i < m.fotos.length; i++) {
+      var arq = null; try { arq = await baixarArquivoLink(m.fotos[i].link); } catch (e) {}
+      var red = arq ? await imagemReduzida(arq.blob, rot ? 1200 : 700, 0.8) : null; if (!red) continue;
+      var hImg = colW * red.h / red.w; if (!rot) hImg = Math.min(hImg, colW * 1.1);
+      if (x + colW > W - Mg + 0.1) { x = Mg; y += linhaH + 3; linhaH = 0; }
+      if (y + hImg > BASE) { novaPagina(); x = Mg; linhaH = 0; }
+      doc.addImage(red.dataUrl, 'JPEG', x, y, colW, hImg); doc.setDrawColor(220, 220, 220); doc.rect(x, y, colW, hImg);
+      linhaH = Math.max(linhaH, hImg); x += colW + 3;
+    }
+    y += linhaH + 3;
+  }
+  var nP = doc.getNumberOfPages();
+  for (var p = 1; p <= nP; p++) { doc.setPage(p); doc.setFont('helvetica', 'normal'); doc.setFontSize(7); cor([130, 130, 130]); doc.text('Sistema da Qualidade BlowPet · ' + m.idTexto, Mg, H - Mg + 2); doc.text('Página ' + p + ' de ' + nP, W - Mg, H - Mg + 2, { align: 'right' }); }
+  return doc;
+}
+var whatsAtual = null;
+async function abrirWhatsForm(tipo, ref){
+  var m = modeloDe(tipo, ref); if (!m) return;
+  whatsAtual = { m: m, doc: null, arquivo: m.nomeBase + '.pdf' };
+  document.getElementById('wfTexto').value = m.whats;
+  document.getElementById('wfArquivo').textContent = whatsAtual.arquivo;
+  var msg = document.getElementById('saveMsgWhatsForm'), btn = document.getElementById('btnCompartilharWa');
+  msg.className = 'save-msg'; msg.textContent = 'Montando o PDF…'; btn.disabled = true;
+  document.getElementById('modalWhatsForm').classList.remove('hidden');
+  try { whatsAtual.doc = await pdfDaFicha(m); msg.textContent = ''; }
+  catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro ao montar o PDF: ' + e.message; }
+  finally { btn.disabled = !whatsAtual.doc; }
+}
+function fecharWhatsForm(){ document.getElementById('modalWhatsForm').classList.add('hidden'); }
+document.getElementById('modalWhatsForm').addEventListener('click', function(e){ if (e.target.id === 'modalWhatsForm') fecharWhatsForm(); });
+function baixarPdfWhats(){ if (whatsAtual && whatsAtual.doc) entregarPdf(whatsAtual.doc, whatsAtual.arquivo); }
+async function compartilharWhats(){
+  if (!whatsAtual || !whatsAtual.doc) return;
+  var texto = document.getElementById('wfTexto').value, msg = document.getElementById('saveMsgWhatsForm');
+  var arquivo = new File([whatsAtual.doc.output('blob')], whatsAtual.arquivo, { type: 'application/pdf' });
+  if (navigator.canShare && navigator.share) {
+    var podeArquivo = false; try { podeArquivo = navigator.canShare({ files: [arquivo] }); } catch (e) {}
+    if (podeArquivo) {
+      try { await navigator.share({ files: [arquivo], text: texto, title: whatsAtual.m.titulo }); await registrarEnvio(whatsAtual.m, 'WhatsApp', []); fecharWhatsForm(); mostrarToast('Compartilhado.'); return; }
+      catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+  }
+  // sem o compartilhar do aparelho: baixa o PDF, copia o texto e abre o WhatsApp com o texto
+  entregarPdf(whatsAtual.doc, whatsAtual.arquivo);
+  var copiou = false; try { await navigator.clipboard.writeText(texto); copiou = true; } catch (e) {}
+  var w = null; try { w = window.open('https://wa.me/?text=' + encodeURIComponent(texto), '_blank', 'noopener'); } catch (e) {}
+  await registrarEnvio(whatsAtual.m, 'WhatsApp', []);
+  msg.className = 'save-msg'; msg.textContent = 'PDF baixado' + (copiou ? ' e texto copiado' : '') + '. ' + (w ? 'No WhatsApp, escolha o contato e anexe o PDF (' + whatsAtual.arquivo + ').' : 'Abra o WhatsApp, escolha o contato, cole o texto e anexe o PDF.');
+}
+
+/* ---- registro do envio (evidência) ---- */
+async function registrarEnvio(m, canal, destinos){
+  var linha = agoraBR() + ' · ' + canal + ' · ' + autorAtual() + (destinos.length ? ' · ' + destinos.join(', ') : '');
+  try {
+    if (m.tipo === 'reclamacao') {
+      if (!TEM_TABELA.recComent) return;
+      await registrarComentario(m.ref, canal === 'E-mail' ? 'E-mail de formalização gerado para o Outlook' + (destinos.length ? ' — ' + destinos.join(', ') : '') + '.' : 'Ficha compartilhada por WhatsApp (PDF).', [], true);
+      if (fichaAberta()) renderFichaReclamacao(); renderReclamacoes();
+      return;
+    }
+    if ((TABLE_COLS[m.tipo] || []).indexOf('Envios') === -1) return;
+    var r = DATA[m.tipo].find(function(x){ return x.__index === m.ref; }); if (!r) return;
+    await atualizarLinha(m.tipo, r.__index, Object.assign({}, r, { 'Envios': [r['Envios'], linha].filter(function(x){ return x; }).join('\n') }));
+    DATA[m.tipo] = linhasParaObjetos(m.tipo, await lerLinhasBrutas(TABELAS[m.tipo]));
+    if (detalheAtual && detalheAtual.mat === m.tipo && detalheAtual.index === m.ref && !document.getElementById('drawer').classList.contains('hidden')) abrirDetalhe(m.tipo, m.ref);
+  } catch (e) { mostrarToast('Não consegui registrar o envio: ' + e.message, true); }
+}
+function formalizacaoBoxHtml(mat, r){
+  var envios = String(r['Envios'] || '').split('\n').filter(function(x){ return x.trim(); }).reverse();
+  return '<div class="form-box"><span class="fb-t">Formalização</span><div class="fb-btns">' +
+    '<button type="button" class="btn btn-accent" onclick="abrirEmailForm(\'' + mat + '\', ' + r.__index + ')"><svg><use href="#i-mail"/></svg> Enviar e-mail</button>' +
+    '<button type="button" class="btn btn-wa" onclick="abrirWhatsForm(\'' + mat + '\', ' + r.__index + ')"><svg><use href="#i-whats"/></svg> WhatsApp</button></div>' +
+    (envios.length ? envios.map(function(l){ var p = l.split(' · '), mail = /e-mail/i.test(p[1] || '');
+      return '<div class="envio-l"><span class="tg ' + (mail ? 'm' : 'w') + '">' + (mail ? 'E-MAIL' : 'WHATSAPP') + '</span><span><b>' + escHtml(p[0] || '') + '</b> · ' + escHtml(p.slice(2).join(' · ')) + '</span></div>'; }).join('')
+      : '<div class="envio-l"><span>Ainda não formalizado.</span></div>') + '</div>';
+}
+
+/* ---- pergunta logo depois de concluir o recebimento ---- */
+var perguntaForm = null;
+function abrirPerguntaFormalizar(mat, index){
+  var r = DATA[mat].find(function(x){ return x.__index === index; }); if (!r) return;
+  perguntaForm = { mat: mat, index: index };
+  document.getElementById('pfTitulo').textContent = 'Recebimento ' + (mat === 'resina' ? r['Lote Interno'] : (r['Lote'] || MAT_LABEL[mat])) + ' concluído — ' + (r['Status'] || '');
+  document.getElementById('modalPerguntaForm').classList.remove('hidden');
+}
+function fecharPerguntaFormalizar(){ document.getElementById('modalPerguntaForm').classList.add('hidden'); }
+function formalizarDaPergunta(canal){ var p = perguntaForm; fecharPerguntaFormalizar(); if (!p) return; if (canal === 'email') abrirEmailForm(p.mat, p.index); else abrirWhatsForm(p.mat, p.index); }
+
 /* ====================== IMPORTAR EMP (.docx) ======================
    Lê o documento Word da EMP no próprio navegador (JSZip só é carregado quando precisa), monta uma ou
    mais EMPs (uma por tabela: ex. Prime/Off Grade, Tampa/Cinta), ignora "Vida útil" e abre cada uma
@@ -4524,7 +5081,7 @@ function textoCliente(c){ return [c['Cidade'], c['Estado']].filter(function(x){ 
 function clientePorNome(n){ n = String(n || '').trim().toLowerCase(); return DATA.clientes.find(function(c){ return String(c['Nome'] || '').trim().toLowerCase() === n; }); }
 function cadastroIndisponivel(qual){
   if (TEM_TABELA[qual]) return false;
-  mostrarToast('A planilha ainda não tem a aba de ' + ({ clientes: 'Clientes', produtos: 'Produtos', statusRec: 'Status de reclamação' }[qual] || qual) + '. O cadastro fica disponível depois que a planilha for atualizada.', true);
+  mostrarToast('A planilha ainda não tem a aba de ' + ({ clientes: 'Clientes', produtos: 'Produtos', statusRec: 'Status de reclamação', destinatarios: 'Destinatários de e-mail' }[qual] || qual) + '. O cadastro fica disponível depois que a planilha for atualizada.', true);
   return true;
 }
 var comboCliente = montarCombo('comboCliente', {
