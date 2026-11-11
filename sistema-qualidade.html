@@ -206,6 +206,51 @@ a{color:var(--accent);}
 .res-chk input{width:16px; height:16px; accent-color:var(--accent); margin-top:1px; flex-shrink:0;}
 .res-restricao .field{max-width:420px;}
 .combo{position:relative;}
+.combo-mais{display:flex; gap:8px; align-items:stretch;}
+.combo-mais .combo{flex:1; min-width:0;}
+.btn-mais{height:auto; padding:0 12px;}
+.btn-mais svg{width:16px; height:16px;}
+.ficha-acoes{display:flex; justify-content:flex-end; margin:10px 0 4px;}
+.ficha-sec{margin-top:6px;}
+.ficha-vazio{font-size:12.5px; color:var(--fg-faint); padding:8px 0;}
+.it-form{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px; margin-top:10px; padding:10px; border:1px dashed var(--border); border-radius:10px;}
+.it-form .field label{font-size:10px;}
+.it-form input{background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:7px; padding:7px 9px; font-size:12.5px; font-family:var(--font-body); width:100%;}
+.it-form .full{grid-column:1/-1;}
+.it-form[hidden], .it-add[hidden]{display:none;}
+.it-lista{border:1px solid var(--border); border-radius:10px; overflow:hidden;}
+.it-row{display:flex; gap:10px; align-items:center; padding:9px 12px;}
+.it-row + .it-row{border-top:1px solid var(--border);}
+.it-row .it-info{flex:1; min-width:0;}
+.it-row .it-l1{display:flex; flex-wrap:wrap; gap:4px 14px; font-size:13px; font-variant-numeric:tabular-nums;}
+.it-row .it-l1 span b{font-weight:500; color:var(--fg-faint); font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; margin-right:4px;}
+.it-row .it-l2{font-size:12px; color:var(--fg-dim); margin-top:2px;}
+.it-add{margin-top:8px;}
+.galeria{display:grid; grid-template-columns:repeat(auto-fill, minmax(88px, 1fr)); gap:8px;}
+.galeria a{display:block; aspect-ratio:1; border-radius:8px; overflow:hidden; border:1px solid var(--border); background:var(--surface-2); position:relative;}
+.galeria img{width:100%; height:100%; object-fit:cover; display:block;}
+.galeria .pdf{display:flex; align-items:center; justify-content:center; height:100%; font-size:11px; color:var(--fg-dim); gap:4px; flex-direction:column;}
+.galeria .pdf svg{width:22px; height:22px;}
+.galeria img.sem-mini{opacity:0;}
+.com-novo textarea{width:100%; min-height:70px; resize:vertical; background:var(--surface-2); border:1px solid var(--border); color:var(--fg); border-radius:8px; padding:9px 11px; font-size:13px; font-family:var(--font-body);}
+.com-barra{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px;}
+.com-barra .btn{height:30px; font-size:12px;}
+.com-barra .btn-accent{margin-left:auto;}
+.anx-pend{display:flex; gap:6px; flex-wrap:wrap; margin-top:8px;}
+.anx-pend span{display:inline-flex; align-items:center; gap:6px; font-size:11.5px; background:var(--surface-3); border-radius:999px; padding:3px 4px 3px 4px;}
+.anx-pend img{width:22px; height:22px; border-radius:50%; object-fit:cover;}
+.anx-pend button{border:none; background:transparent; color:var(--fg-faint); cursor:pointer; font-size:12px; padding:0 4px;}
+.timeline{display:flex; flex-direction:column; gap:12px; margin-top:14px;}
+.tl-item{border-left:2px solid var(--border); padding:0 0 0 12px; position:relative;}
+.tl-item::before{content:''; position:absolute; left:-6px; top:3px; width:10px; height:10px; border-radius:50%; background:var(--surface); border:2px solid var(--accent);}
+.tl-item.auto::before{border-color:var(--fg-faint);}
+.tl-cab{font-size:11.5px; color:var(--fg-faint);}
+.tl-cab b{color:var(--fg-dim); font-weight:600;}
+.tl-txt{font-size:13px; margin-top:3px; white-space:pre-wrap; overflow-wrap:anywhere;}
+.tl-item.auto .tl-txt{color:var(--fg-dim); font-style:italic;}
+.tl-item .galeria{margin-top:8px; grid-template-columns:repeat(auto-fill, minmax(64px, 1fr));}
+.rec-pend{display:inline-block; font-size:10.5px; color:var(--warn); background:var(--warn-soft); border-radius:999px; padding:1px 8px; margin-top:3px;}
+.combo-info{font-size:11.5px; color:var(--fg-faint); min-height:15px;}
 .combo-lista{position:absolute; left:0; right:0; top:calc(100% + 4px); z-index:30; max-height:260px; overflow:auto; background:var(--surface); border:1px solid var(--border); border-radius:10px; box-shadow:0 12px 30px rgba(0,0,0,.18);}
 .combo-item{display:flex; align-items:center; gap:10px; padding:9px 12px; cursor:pointer; font-size:13px; border-bottom:1px solid var(--border);}
 .combo-item:last-child{border-bottom:none;}
@@ -504,6 +549,44 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 .drawer-h h3{margin:0; font-size:17px; font-weight:600; font-variant-numeric:tabular-nums;}
 .drawer-h .sub{font-size:12px; color:var(--fg-faint); margin-top:3px;}
 .drawer-b{flex:1; overflow-y:auto; padding:4px 20px 20px;}
+.drawer.expandido{top:max(24px, env(safe-area-inset-top,0px)); bottom:24px; left:max(24px, calc(50vw - 600px)); right:max(24px, calc(50vw - 600px)); width:auto; border:1px solid var(--border); border-radius:14px; box-shadow:0 30px 90px rgba(0,0,0,.35); padding:0; overflow:hidden;}
+.drawer.expandido .drawer-b{padding:4px 28px 28px;}
+.drawer.expandido .drawer-h{padding:18px 28px 14px;}
+#dwExpandir{display:none;}
+@media (min-width:900px){ #dwExpandir{display:flex;} }
+@media (max-width:899px){ .drawer.expandido{top:0; bottom:0; left:auto; right:0; width:min(540px, 100vw); border-radius:0; border-width:0 0 0 1px;} }
+.ficha-grid{display:grid; gap:0 32px; grid-template-columns:minmax(0,1fr);}
+.drawer.expandido .ficha-grid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);}
+.drawer.expandido .ficha-col + .ficha-col{border-left:1px solid var(--border); padding-left:32px;}
+.rec-status{border:1px solid var(--border); border-radius:12px; background:var(--surface-2); padding:12px 14px; margin:12px 0 6px; display:flex; flex-direction:column; gap:10px;}
+.rec-status .rs-linha{display:flex; flex-wrap:wrap; gap:10px 16px; align-items:flex-end;}
+.rec-status .rs-bloco{display:flex; flex-direction:column; gap:5px; min-width:0;}
+.rec-status .rs-bloco.cresce{flex:1 1 220px;}
+.rec-status label{font-size:10px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--fg-faint);}
+.rec-status select{background:var(--surface); border:1px solid var(--border); color:var(--fg); border-radius:8px; padding:8px 10px; font-size:13px; font-family:var(--font-body); width:100%;}
+.rec-status .rs-acoes{display:flex; gap:8px; justify-content:space-between; align-items:center; flex-wrap:wrap;}
+.rec-status .rs-dica{font-size:11.5px; color:var(--fg-faint);}
+.rec-status .rs-cab{display:flex; flex-wrap:wrap; gap:6px; align-items:center;}
+.rec-status .rs-meta{font-size:12px; color:var(--fg-dim);}
+.rec-status .rs-texto{font-size:13.5px; line-height:1.5; white-space:pre-wrap; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 12px;}
+.rs-seg{display:inline-flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--surface);}
+.rs-seg button{border:none; background:transparent; color:var(--fg-dim); font:500 12.5px var(--font-body); padding:8px 12px; cursor:pointer; white-space:nowrap;}
+.rs-seg button + button{border-left:1px solid var(--border);}
+.rs-seg button.on.critica{background:var(--danger-soft); color:var(--danger); font-weight:600;}
+.rs-seg button.on.naocritica{background:var(--surface-3); color:var(--fg); font-weight:600;}
+.rs-seg button:disabled{cursor:default; opacity:.6;}
+.crit-chip{display:inline-block; font-size:10px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; border-radius:5px; padding:2px 6px; white-space:nowrap;}
+.crit-chip.critica{background:var(--danger-soft); color:var(--danger);}
+.crit-chip.naocritica{background:var(--surface-3); color:var(--fg-dim);}
+.res-rec{font-weight:600; font-size:12.5px;}
+.res-rec.procedente{color:var(--danger);} .res-rec.improcedente{color:var(--ok);} .res-rec.alerta{color:var(--warn);} .res-rec.inconclusivo{color:var(--fg-dim);}
+.conc-opcoes{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:8px;}
+@media (max-width:520px){ .conc-opcoes{grid-template-columns:minmax(0,1fr);} }
+.conc-op{display:flex; gap:10px; align-items:flex-start; border:1px solid var(--border); border-radius:10px; padding:10px 12px; cursor:pointer; background:var(--surface);}
+.conc-op input{margin-top:3px; accent-color:var(--accent);}
+.conc-op b{display:block; font-size:13.5px;}
+.conc-op small{display:block; font-size:11.5px; color:var(--fg-faint); line-height:1.4; margin-top:2px;}
+.conc-op:has(input:checked){border-color:var(--accent); background:var(--accent-soft);}
 .drawer-f{padding:12px 20px; border-top:1px solid var(--border); display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap;}
 .dw-kv{display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:12px 18px; margin:0; font-size:13px;}
 .dw-kv dt{font-size:10.5px; text-transform:uppercase; letter-spacing:.4px; color:var(--fg-faint); margin-bottom:3px;}
@@ -557,8 +640,12 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="m15 5 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="11" x2="10" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="11" x2="14" y2="17" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
 <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></g></symbol>
 <symbol id="i-truck" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></g></symbol>
 <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-expand" viewBox="0 0 24 24"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-shrink" viewBox="0 0 24 24"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 22V4M4 4h12l-2 4 2 4H4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
@@ -601,6 +688,9 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <button class="a-item" data-nav="reclamacao" onclick="irPara('reclamacao')"><svg><use href="#i-megaphone"/></svg><span>Reclamações de cliente</span><span class="ct" id="ctReclamacoes">0</span></button>
       <button class="a-item" data-nav="liberacao" onclick="irPara('liberacao')"><svg><use href="#i-shield-alert"/></svg><span>Liberações não conforme</span><span class="ct" id="ctLiberacoes">0</span></button>
       <div class="a-grp">Cadastros</div>
+      <button class="a-item cad-btn" data-nav="cadastros:clientes" data-cad="clientes"><svg><use href="#i-users"/></svg><span>Clientes</span><span class="ct" id="ctClientes">0</span></button>
+      <button class="a-item cad-btn" data-nav="cadastros:produtos" data-cad="produtos"><svg><use href="#i-package"/></svg><span>Produtos (preforma/frasco)</span><span class="ct" id="ctProdutos">0</span></button>
+      <button class="a-item cad-btn" data-nav="cadastros:statusRec" data-cad="statusRec"><svg><use href="#i-flag"/></svg><span>Status de reclamação</span><span class="ct" id="ctStatusRec">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:fornecedores" data-cad="fornecedores"><svg><use href="#i-truck"/></svg><span>Fornecedores</span><span class="ct" id="ctFornecedores">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:especificacoes" data-cad="especificacoes"><svg><use href="#i-sliders"/></svg><span>EMPs</span><span class="ct" id="ctEspecificacoes">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:rotulos" data-cad="rotulos"><svg><use href="#i-image"/></svg><span>Rótulos homologados</span><span class="ct" id="ctRotulosHom">0</span></button>
@@ -680,33 +770,28 @@ table.occ tbody tr.clicavel{cursor:pointer;}
   <!-- ===================== TELA 3 — RECLAMAÇÃO DE CLIENTE ===================== -->
   <section class="tela" id="tela-reclamacao">
     <div class="tela-head"><h2>Reclamação de cliente</h2></div>
-    <p class="tela-sub">Cliente, produto, motivo, classificação (procedente/improcedente) e andamento da tratativa.</p>
+    <p class="tela-sub">Cliente, produto, motivo, criticidade, andamento da tratativa e conclusão (procedente, improcedente, alerta ou inconclusivo).</p>
     <div class="screen">
       <div class="app-shell">
         <div class="app-main">
           <div class="app-topbar">
             <div class="material-title">Reclamação de Cliente</div>
-            <div class="tf"><label>Classificação</label>
-              <select id="fClassReclamacao">
-                <option value="">Todas</option>
-                <option value="procedente">Procedente</option>
-                <option value="improcedente">Improcedente</option>
-              </select>
+            <div class="tf"><label>Status</label><select id="fStatusReclamacao"></select></div>
+            <div class="tf"><label>Criticidade</label>
+              <select id="fCritReclamacao"><option value="">Todas</option><option value="Crítica">Crítica</option><option value="Não crítica">Não crítica</option></select>
             </div>
-            <div class="tf"><label>Status</label>
-              <select id="fStatusReclamacao">
-                <option value="">Todos</option>
-                <option value="aberta">Aberta</option>
-                <option value="tratativa">Em tratativa</option>
-                <option value="encerrada">Encerrada</option>
-              </select>
+            <div class="tf"><label>Conclusão</label>
+              <select id="fClassReclamacao"><option value="">Todas</option><option value="Procedente">Procedente</option><option value="Improcedente">Improcedente</option><option value="Alerta">Alerta</option><option value="Inconclusivo">Inconclusivo</option></select>
             </div>
-            <div class="tf"><label>Buscar</label><input type="search" id="fBuscaReclamacao" placeholder="RAC, cliente…"></div>
-            <button class="btn btn-accent" style="margin-left:auto;" onclick="abrirModalReclamacao()"><svg><use href="#i-plus"/></svg> Nova reclamação</button>
+            <div class="tf"><label>Entrada de</label><input type="date" id="fDeReclamacao"></div>
+            <div class="tf"><label>até</label><input type="date" id="fAteReclamacao"></div>
+            <div class="tf"><label>Buscar</label><input type="search" id="fBuscaReclamacao" placeholder="RAC, cliente, produto…"></div>
+            <button class="btn" style="margin-left:auto;" onclick="abrirModalPdfRec()"><svg><use href="#i-file-text"/></svg> Relatório PDF</button>
+            <button class="btn btn-accent" onclick="abrirModalReclamacao()"><svg><use href="#i-plus"/></svg> Nova reclamação</button>
           </div>
           <div class="table-scroll">
             <table class="occ">
-              <thead><tr><th>RAC</th><th>Data</th><th>Cliente</th><th>Produto</th><th>Motivo</th><th>Classificação</th><th>Status</th><th>Responsável</th></tr></thead>
+              <thead><tr><th>RAC</th><th>Entrada</th><th>Cliente</th><th>Produto</th><th>Motivo</th><th>Status</th><th>Conclusão</th><th>Responsável</th></tr></thead>
               <tbody id="tbodyReclamacao"></tbody>
             </table>
           </div>
@@ -749,7 +834,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
   <!-- ===================== TELA — CADASTROS ===================== -->
   <section class="tela" id="tela-cadastros">
     <div class="tela-head"><h2>Cadastros</h2></div>
-    <p class="tela-sub">Fornecedores e os produtos que cada um fornece, EMPs (especificações de matéria-prima e insumos) e rótulos homologados. O recebimento puxa fornecedor, tipo, código e a EMP vinculada daqui.</p>
+    <p class="tela-sub">Fornecedores e os produtos que cada um fornece, EMPs (especificações de matéria-prima e insumos) e rótulos homologados — usados no recebimento — e os cadastros das reclamações: clientes, produtos e status da tratativa.</p>
     <div class="screen">
       <div class="app-shell">
         <div class="app-main">
@@ -766,6 +851,9 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           <div id="painelEspecificacoes" style="display:none;">
             <div id="gridEspecificacoes" style="display:flex; flex-direction:column; gap:16px;"></div>
           </div>
+          <div id="painelClientes" style="display:none;"><div class="table-scroll"><table class="occ"><thead><tr><th>Cliente</th><th>Cidade</th><th>UF</th><th>Reclamações</th><th></th></tr></thead><tbody id="tbodyClientes"></tbody></table></div></div>
+          <div id="painelStatusRec" style="display:none;"><p class="tela-sub" style="margin:0 0 12px;">Etapas da tratativa, na ordem em que a reclamação costuma andar. A primeira é a usada ao abrir uma reclamação. <b>Concluída</b> é fixa — é definida pelo botão <i>Concluir reclamação</i>, na ficha.</p><div class="table-scroll"><table class="occ"><thead><tr><th style="width:60px;">Ordem</th><th>Status</th><th>Em andamento</th><th></th></tr></thead><tbody id="tbodyStatusRec"></tbody></table></div></div>
+          <div id="painelProdutos" style="display:none;"><div class="table-scroll"><table class="occ"><thead><tr><th>Tipo</th><th>Produto</th><th>Reclamações</th><th></th></tr></thead><tbody id="tbodyProdutos"></tbody></table></div></div>
           <div id="painelFornecedores" style="display:none;">
             <div id="listaFornecedoresCad" style="display:flex; flex-direction:column; gap:14px;"></div>
           </div>
@@ -788,6 +876,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <span class="mi" id="dwIc"></span>
       <div style="flex:1; min-width:0;"><h3 id="dwTitulo">—</h3><div class="sub" id="dwSub"></div></div>
       <span id="dwBadge"></span>
+      <button class="a-ic-btn" id="dwExpandir" onclick="alternarExpandirDrawer()" title="Expandir" aria-label="Expandir"><svg><use href="#i-expand"/></svg></button>
       <button class="a-ic-btn" onclick="fecharDetalhe()" aria-label="Fechar"><svg><use href="#i-x"/></svg></button>
     </div>
     <div class="drawer-b" id="dwBody"></div>
@@ -1062,28 +1151,163 @@ table.occ tbody tr.clicavel{cursor:pointer;}
     <div class="modal-card" style="max-width:620px;">
       <button class="modal-close" onclick="fecharModalReclamacao()" aria-label="Fechar">✕</button>
       <div class="modal-head">
-        <h2>Nova reclamação de cliente</h2>
-        <p class="tela-sub" style="margin-top:6px;">O número RAC é gerado automaticamente ao salvar.</p>
+        <h2 id="modalReclamacaoTitulo">Nova reclamação de cliente</h2>
+        <p class="tela-sub" style="margin-top:6px;" id="modalReclamacaoSub">O número RAC é gerado automaticamente. Depois de salvar, a ficha da reclamação abre pra você ir lançando a rastreabilidade (datas de produção, lotes, caixas), os comentários e as fotos.</p>
       </div>
       <div class="form-wrap" style="padding-top:10px; max-width:none;">
+        <div class="section-title" style="margin-top:6px;">Reclamação</div>
         <div class="form-grid">
-          <div class="field"><label>Data</label><input type="date" id="reclamacaoDataInput"></div>
-          <div class="field"><label>Cliente</label><input id="reclamacaoClienteInput" placeholder="Nome do cliente"></div>
-          <div class="field full"><label>Produto</label><input id="reclamacaoProdutoInput" placeholder="Ex: Garrafa 500 mL s/ rótulo"></div>
+          <div class="field"><label>Data de entrada da reclamação</label><input type="date" id="reclamacaoDataInput"></div>
+          <div class="field"><label>Criticidade</label>
+            <select id="reclamacaoCritSelect"><option value="">— escolher —</option><option value="Crítica">Reclamação crítica</option><option value="Não crítica">Reclamação não crítica</option></select>
+          </div>
+          <div class="field full"><label>Cliente</label>
+            <div class="combo-mais">
+              <div class="combo" id="comboCliente"><input id="reclamacaoClienteInput" autocomplete="off" placeholder="Digite pra pesquisar o cliente…"><div class="combo-lista hidden"></div></div>
+              <button type="button" class="btn btn-mais" title="Cadastrar novo cliente" onclick="abrirModalCliente(null, true)"><svg><use href="#i-plus"/></svg></button>
+            </div>
+            <div class="combo-info" id="reclamacaoClienteInfo"></div>
+          </div>
           <div class="field full"><label>Motivo</label><input id="reclamacaoMotivoInput" placeholder="Ex: Vazamento na tampa"></div>
-          <div class="field"><label>Classificação</label>
-            <select id="reclamacaoClassSelect"><option value="procedente">Procedente</option><option value="improcedente">Improcedente</option></select>
-          </div>
-          <div class="field"><label>Status</label>
-            <select id="reclamacaoStatusSelect"><option value="aberta">Aberta</option><option value="tratativa">Em tratativa</option><option value="encerrada">Encerrada</option></select>
-          </div>
-          <div class="field"><label>Responsável</label><input id="reclamacaoRespInput" list="listaResponsaveis" placeholder="Nome do responsável"></div>
-          <div class="field full"><label>Observações</label><textarea id="reclamacaoObsInput" placeholder="Detalhes da tratativa, contato com o cliente, etc."></textarea></div>
+          <div class="field full"><label>Responsável</label><input id="reclamacaoRespInput" list="listaResponsaveis" placeholder="Nome do responsável"></div>
         </div>
+        <div class="section-title">Produto</div>
+        <div class="form-grid">
+          <div class="field"><label>Tipo de produto</label>
+            <select id="reclamacaoTipoProdSelect" onchange="aoMudarTipoProduto()"><option value="">— escolher —</option><option value="Preforma">Preforma</option><option value="Frasco">Frasco</option></select>
+          </div>
+          <div class="field full"><label>Produto</label>
+            <div class="combo-mais">
+              <div class="combo" id="comboProduto"><input id="reclamacaoProdutoInput" autocomplete="off" placeholder="Escolha primeiro o tipo de produto"><div class="combo-lista hidden"></div></div>
+              <button type="button" class="btn btn-mais" title="Cadastrar novo produto" onclick="abrirModalProduto(null, true)"><svg><use href="#i-plus"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="section-title">Observações</div>
+        <div class="field full"><textarea id="reclamacaoObsInput" placeholder="Detalhes da tratativa, contato com o cliente, etc."></textarea></div>
         <div class="form-actions">
           <span class="save-msg" id="saveMsgReclamacao"></span>
           <button class="btn btn-ghost" onclick="fecharModalReclamacao()">Cancelar</button>
-          <button class="btn btn-accent" onclick="salvarReclamacao()">Salvar reclamação</button>
+          <button class="btn btn-accent" id="btnSalvarReclamacao" onclick="salvarReclamacao()">Salvar reclamação</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — CLIENTE ===================== -->
+  <div class="modal-overlay hidden" id="modalCliente" style="z-index:220;">
+    <div class="modal-card" style="max-width:480px;">
+      <button class="modal-close" onclick="fecharModalCliente()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2 id="modalClienteTitulo">Novo cliente</h2></div>
+      <div class="form-wrap" style="padding-top:14px; max-width:none;">
+        <div class="form-grid">
+          <div class="field full"><label>Nome do cliente</label><input id="clienteNomeInput" placeholder="Ex: Bebidas Exemplo Ltda"></div>
+          <div class="field"><label>Cidade</label><input id="clienteCidadeInput" placeholder="Ex: Botucatu"></div>
+          <div class="field"><label>Estado</label><select id="clienteUFSelect"></select></div>
+        </div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgCliente"></span>
+          <button class="btn btn-ghost" onclick="fecharModalCliente()">Cancelar</button>
+          <button class="btn btn-accent" id="btnSalvarCliente" onclick="salvarCliente()">Salvar cliente</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — CONCLUIR RECLAMAÇÃO ===================== -->
+  <div class="modal-overlay hidden" id="modalConcluirRec" style="z-index:220;">
+    <div class="modal-card" style="max-width:600px;">
+      <button class="modal-close" onclick="fecharModalConcluirRec()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2 id="concRecTitulo">Concluir reclamação</h2><p class="tela-sub" style="margin-top:6px;">Escolha o resultado e descreva a conclusão. Fica registrado com data, hora e quem concluiu.</p></div>
+      <div class="form-wrap" style="padding-top:12px; max-width:none;">
+        <div class="section-title" style="margin-top:4px;">Resultado</div>
+        <div class="conc-opcoes">
+          <label class="conc-op"><input type="radio" name="concRes" value="Procedente"><span><b>Procedente</b><small>Defeito confirmado, de responsabilidade da BlowPet.</small></span></label>
+          <label class="conc-op"><input type="radio" name="concRes" value="Improcedente"><span><b>Improcedente</b><small>Defeito não confirmado ou fora da responsabilidade da BlowPet.</small></span></label>
+          <label class="conc-op"><input type="radio" name="concRes" value="Alerta"><span><b>Alerta</b><small>Sem não conformidade confirmada, mas fica registrado como ponto de atenção.</small></span></label>
+          <label class="conc-op"><input type="radio" name="concRes" value="Inconclusivo"><span><b>Inconclusivo</b><small>Não foi possível concluir (sem amostras ou dados suficientes).</small></span></label>
+        </div>
+        <div class="form-grid" style="margin-top:14px;">
+          <div class="field"><label>Criticidade</label><select id="concCritSelect"><option value="">— escolher —</option><option value="Crítica">Reclamação crítica</option><option value="Não crítica">Reclamação não crítica</option></select></div>
+          <div class="field"><label>Data da conclusão</label><input type="date" id="concDataInput"></div>
+          <div class="field full"><label>Conclusão</label><textarea id="concTextoInput" style="min-height:120px;" placeholder="Descreva a análise, a causa e o que foi feito / comunicado ao cliente."></textarea></div>
+        </div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgConcRec"></span>
+          <button class="btn btn-ghost" onclick="fecharModalConcluirRec()">Cancelar</button>
+          <button class="btn btn-accent" id="btnConcluirRec" onclick="concluirReclamacao()"><svg><use href="#i-check"/></svg> Concluir reclamação</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — CONFIRMAÇÃO ===================== -->
+  <div class="modal-overlay hidden" id="modalConfirma" style="z-index:300;">
+    <div class="modal-card" style="max-width:460px;">
+      <div class="modal-head"><h2 id="confTitulo">Confirmar</h2><p class="tela-sub" style="margin-top:8px;" id="confTexto"></p></div>
+      <div class="form-wrap" style="padding-top:6px; max-width:none;">
+        <div class="form-actions">
+          <button class="btn btn-ghost" id="confNao">Cancelar</button>
+          <button class="btn btn-accent" id="confSim">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — RELATÓRIO PDF DE RECLAMAÇÕES ===================== -->
+  <div class="modal-overlay hidden" id="modalPdfRec" style="z-index:215;">
+    <div class="modal-card" style="max-width:520px;">
+      <button class="modal-close" onclick="fecharModalPdfRec()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2>Relatório de reclamações (PDF)</h2><p class="tela-sub" style="margin-top:6px;">Reclamações com data de entrada dentro do período escolhido.</p></div>
+      <div class="form-wrap" style="padding-top:12px; max-width:none;">
+        <div class="form-grid">
+          <div class="field"><label>Entrada de</label><input type="date" id="pdfRecDe"></div>
+          <div class="field"><label>até</label><input type="date" id="pdfRecAte"></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+          <label class="res-chk"><input type="checkbox" id="pdfRecFiltros" checked onchange="previaPdfRec()"> <span>Aplicar também os filtros da tela <span class="cell-dim" id="pdfRecFiltrosTxt"></span></span></label>
+          <label class="res-chk"><input type="checkbox" id="pdfRecDetalhe" checked> <span><b>Incluir o detalhamento</b> de cada reclamação — rastreabilidade, comentários do andamento e conclusão</span></label>
+        </div>
+        <p class="cell-dim" style="font-size:12.5px; margin:10px 0 0;" id="pdfRecResumo"></p>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgPdfRec"></span>
+          <button class="btn btn-ghost" onclick="fecharModalPdfRec()">Cancelar</button>
+          <button class="btn btn-accent" onclick="gerarPdfReclamacoes()"><svg><use href="#i-file-text"/></svg> Gerar PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — STATUS DE RECLAMAÇÃO ===================== -->
+  <div class="modal-overlay hidden" id="modalStatusRec" style="z-index:220;">
+    <div class="modal-card" style="max-width:440px;">
+      <button class="modal-close" onclick="fecharModalStatusRec()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2 id="modalStatusRecTitulo">Novo status</h2></div>
+      <div class="form-wrap" style="padding-top:14px; max-width:none;">
+        <div class="form-grid"><div class="field full"><label>Nome do status</label><input id="statusRecNomeInput" placeholder="Ex: Aguardando amostras"></div></div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgStatusRec"></span>
+          <button class="btn btn-ghost" onclick="fecharModalStatusRec()">Cancelar</button>
+          <button class="btn btn-accent" id="btnSalvarStatusRec" onclick="salvarStatusRec()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== JANELA — PRODUTO (PREFORMA/FRASCO) ===================== -->
+  <div class="modal-overlay hidden" id="modalProduto" style="z-index:220;">
+    <div class="modal-card" style="max-width:480px;">
+      <button class="modal-close" onclick="fecharModalProduto()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2 id="modalProdutoTitulo">Novo produto</h2></div>
+      <div class="form-wrap" style="padding-top:14px; max-width:none;">
+        <div class="form-grid">
+          <div class="field"><label>Tipo</label><select id="produtoTipoSelect"><option value="Preforma">Preforma</option><option value="Frasco">Frasco</option></select></div>
+          <div class="field full"><label>Produto</label><input id="produtoNomeInput" placeholder="Ex: Preforma 28 g PCO 1881 cristal"></div>
+        </div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgProduto"></span>
+          <button class="btn btn-ghost" onclick="fecharModalProduto()">Cancelar</button>
+          <button class="btn btn-accent" id="btnSalvarProduto" onclick="salvarProduto()">Salvar produto</button>
         </div>
       </div>
     </div>
@@ -1207,6 +1431,11 @@ const TABELAS = {
   especificacoes: "TabelaEspecificacoesParametros",
   rotulosHomologados: "TabelaRotulosHomologados",
   reclamacoes: "TabelaReclamacoesCliente",
+  clientes: "TabelaClientes",
+  produtos: "TabelaProdutos",
+  recItens: "TabelaReclamacoesItens",
+  recComent: "TabelaReclamacoesComentarios",
+  statusRec: "TabelaStatusReclamacao",
   liberacoes:  "TabelaLiberacoesNaoConforme",
   listas:      "TabelaListas"
 };
@@ -1222,7 +1451,12 @@ const TABLE_COLS = {
   fornecedores: ['Fornecedor','Material','Tipo','Código','Último Lote Interno','EMP'],
   especificacoes: ['Código Documento','Descrição','Material','Revisão','Data Documento','Teste','Especificação/Tolerância','Unidade','NT','Critério'],
   rotulosHomologados: ['ID','Nome do Modelo','Aplicação','Fornecedor Habitual','Arquivo da Foto','Status','Observações','Volume (mL)','Cliente','EMP'],
-  reclamacoes: ['RAC','Data','Cliente','Produto','Motivo','Classificação','Status','Responsável','Observações'],
+  reclamacoes: ['RAC','Data','Cliente','Produto','Motivo','Classificação','Status','Responsável','Observações','Tipo de Produto','Data de Produção','Criticidade','Conclusão','Data de Conclusão','Concluído por'],
+  clientes: ['Nome','Cidade','Estado'],
+  produtos: ['Tipo','Produto'],
+  recItens: ['RAC','Data de Produção','Lote','Caixa','Quantidade','Observação'],
+  recComent: ['RAC','Data/Hora','Autor','Comentário','Anexos'],
+  statusRec: ['Ordem','Status'],
   liberacoes: ['Número Registro','Data','Produto/Processo','Não Conformidade','Decisão','Quantidade Liberada','Responsável','Status','Observações'],
   listas: ['Responsaveis','Status Recebimento','Criterio','Unidades','Materiais','Sim Nao','Conferencia Visual','Status Reclamacao','Classificacao Reclamacao','Status Liberacao','Status Rotulo']
 };
@@ -1249,7 +1483,8 @@ const PARAM_COL_MAP = {
 };
 
 /* ====================== ESTADO ====================== */
-var DATA = { resina:[], rotulo:[], pigmento:[], cinta:[], tampa:[], fornecedores:[], especificacoes:[], rotulosHomologados:[], reclamacoes:[], liberacoes:[], listas:{} };
+var DATA = { resina:[], rotulo:[], pigmento:[], cinta:[], tampa:[], fornecedores:[], especificacoes:[], rotulosHomologados:[], reclamacoes:[], liberacoes:[], listas:{}, clientes:[], produtos:[], recItens:[], recComent:[], statusRec:[] };
+var TEM_TABELA = { clientes: false, produtos: false, recItens: false, recComent: false, statusRec: false };   // tabelas que só existem na planilha nova
 var matAtual = 'resina', viewAtual = 'tabela', telaAtual = 'visao';
 var driveId = null, itemId = null;
 var msalInstance = null, msalPronto = null, contaAtual = null;
@@ -1517,11 +1752,11 @@ async function excluirVariasLinhas(chaveTabela, indices){
 }
 
 /* ====================== GRAPH API — UPLOAD DE FOTO ====================== */
-async function uploadArquivo(file, nomeArquivo){
+async function uploadArquivo(file, nomeArquivo, subpasta){
   var token = await getToken();
   var ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
   var nomeFinal = nomeArquivo + '.' + ext;
-  var caminho = PASTA_FOTOS.split('/').map(encodeURIComponent).join('/') + '/' + encodeURIComponent(nomeFinal);
+  var caminho = (PASTA_FOTOS + (subpasta ? '/' + subpasta : '')).split('/').map(encodeURIComponent).join('/') + '/' + encodeURIComponent(nomeFinal);
   var sessionResp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/root:/' + caminho + ':/createUploadSession', {
     method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ item: { '@microsoft.graph.conflictBehavior': 'rename' } })
@@ -1534,6 +1769,30 @@ async function uploadArquivo(file, nomeArquivo){
   var uploadJson = await uploadResp.json();
   if (!uploadResp.ok) throw new Error((uploadJson.error && uploadJson.error.message) || 'falha no upload da foto');
   return uploadJson.webUrl || '';
+}
+
+// Fotos gravadas no OneDrive guardam o link (webUrl), que abre o visualizador e não serve direto num <img>.
+// Pra mostrar a miniatura, busca o thumbnail do arquivo pela Graph (com o login) e usa uma URL local.
+var CACHE_MINIATURAS = {};
+async function urlMiniatura(link){
+  link = String(link || '').trim(); if (!link) return '';
+  if (/^(data:|blob:)/.test(link)) return link;
+  if (CACHE_MINIATURAS[link]) return CACHE_MINIATURAS[link];
+  try {
+    var token = await getToken();
+    var enc = 'u!' + btoa(unescape(encodeURIComponent(link))).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+    var resp = await fetch('https://graph.microsoft.com/v1.0/shares/' + enc + '/driveItem/thumbnails/0/large/content', { headers: { Authorization: 'Bearer ' + token } });
+    if (!resp.ok) return '';
+    CACHE_MINIATURAS[link] = URL.createObjectURL(await resp.blob());
+    return CACHE_MINIATURAS[link];
+  } catch (e) { return ''; }
+}
+// Preenche todas as <img data-foto="link"> dentro de um elemento
+function carregarMiniaturas(raiz){
+  (raiz || document).querySelectorAll('img[data-foto]').forEach(function(img){
+    var link = img.getAttribute('data-foto'); img.removeAttribute('data-foto');
+    urlMiniatura(link).then(function(u){ if (u) img.src = u; else img.classList.add('sem-mini'); });
+  });
 }
 
 /* ====================== CARREGAR TUDO ====================== */
@@ -1572,6 +1831,11 @@ async function carregarTudo(){
   DATA.reclamacoes = linhasParaObjetos('reclamacoes', brutos[8]);
   DATA.liberacoes = linhasParaObjetos('liberacoes', brutos[9]);
   DATA.listas = montarListas(linhasParaObjetos('listas', brutos[10]));
+  // tabelas que só existem na planilha nova: se faltarem, o sistema segue sem elas
+  await Promise.all(['clientes', 'produtos', 'recItens', 'recComent', 'statusRec'].map(async function(k){
+    try { DATA[k] = linhasParaObjetos(k, await lerLinhasBrutas(TABELAS[k])); TEM_TABELA[k] = true; }
+    catch (e) { DATA[k] = []; TEM_TABELA[k] = false; }
+  }));
 
   popularDatalists();
   popularSelectsFixos();
@@ -1639,7 +1903,7 @@ function montarEspecificacoes(linhas){
 var TODOS = '(Todos)';
 // A planilha só aceita o cadastro de EMPs e de rótulos (com volume/cliente/EMP) depois de convertida pro formato novo.
 function planilhaFormatoNovo(){
-  return (TABLE_COLS.especificacoes || []).indexOf('Descrição') > -1 && (TABLE_COLS.fornecedores || []).indexOf('EMP') > -1 && (TABLE_COLS.rotulosHomologados || []).indexOf('Cliente') > -1;
+  return (TABLE_COLS.especificacoes || []).indexOf('Descrição') > -1 && (TABLE_COLS.fornecedores || []).indexOf('EMP') > -1 && (TABLE_COLS.rotulosHomologados || []).indexOf('Cliente') > -1 && TEM_TABELA.clientes;
 }
 function bloqueadoPlanilhaAntiga(){
   if (planilhaFormatoNovo()) return false;
@@ -1780,7 +2044,7 @@ function renderHome(){
   var mats = ['resina','rotulo','pigmento','cinta','tampa'];
   var ICS = { resina:'i-flask', rotulo:'i-tag', pigmento:'i-droplet', cinta:'i-package', tampa:'i-package-lid' };
   document.getElementById('kpiAnalise').textContent = mats.reduce(function(acc, m){ return acc + DATA[m].filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length; }, 0);
-  document.getElementById('kpiReclamacoes').textContent = DATA.reclamacoes.filter(function(r){ return statusKey(r['Status']) !== 'encerrada'; }).length;
+  document.getElementById('kpiReclamacoes').textContent = DATA.reclamacoes.filter(function(r){ return !recConcluida(r); }).length;
   document.getElementById('kpiLiberacoes').textContent = DATA.liberacoes.filter(function(r){ return statusKey(r['Status']) === 'analise'; }).length;
   document.getElementById('kpiQuarentena').textContent = mats.reduce(function(acc, m){ return acc + DATA[m].filter(function(r){ return statusKey(r['Status']) === 'quarentena'; }).length; }, 0);
 
@@ -1830,7 +2094,7 @@ function dataParaOrdenar(brStr){
 function renderTudo(){
   montarHead(matAtual); atualizarFornecedoresFiltro(); renderRecebimento();
   renderReclamacoes(); renderLiberacoes(); renderRotulosHomologados();
-  renderEspecificacoes(); renderFornecedores(); renderHome();
+  renderEspecificacoes(); renderFornecedores(); renderClientes(); renderProdutos(); renderHome(); atualizarContagensCadastros();
   document.getElementById('ctResina').textContent = DATA.resina.length;
   document.getElementById('ctRotulo').textContent = DATA.rotulo.length;
   document.getElementById('ctPigmento').textContent = DATA.pigmento.length;
@@ -1845,6 +2109,9 @@ function atualizarContagensCadastros(){
   document.getElementById('ctEspecificacoes').textContent = DATA.especificacoes.length;
   document.getElementById('ctFornecedores').textContent = grupoFornecedores().length;
   document.getElementById('ctRotulosHom').textContent = DATA.rotulosHomologados.length;
+  document.getElementById('ctClientes').textContent = DATA.clientes.length;
+  document.getElementById('ctProdutos').textContent = DATA.produtos.length;
+  document.getElementById('ctStatusRec').textContent = etapasReclamacao().length;
 }
 
 /* ====================== RECEBIMENTO ====================== */
@@ -2032,25 +2299,69 @@ document.querySelectorAll('.view-toggle button').forEach(function(btn){
 });
 
 /* ====================== RECLAMAÇÃO DE CLIENTE ====================== */
+/* ---- status / criticidade / conclusão da reclamação ---- */
+var ETAPAS_PADRAO = ['Aberta', 'Realizar contato com cliente', 'Aguardando dados do cliente', 'Em análise', 'Aguardando aprovação'];
+var STATUS_CONCLUIDA = 'Concluída';
+var RESULTADOS_REC = ['Procedente', 'Improcedente', 'Alerta', 'Inconclusivo'];
+function statusRecOrdenados(){ return DATA.statusRec.slice().sort(function(a, b){ return (parseFloat(a['Ordem']) || 999) - (parseFloat(b['Ordem']) || 999) || a.__index - b.__index; }); }
+function etapasReclamacao(){
+  if (TEM_TABELA.statusRec && DATA.statusRec.length) return statusRecOrdenados().map(function(x){ return String(x['Status'] || '').trim(); }).filter(function(x){ return x; });
+  var l = (DATA.listas['Status Reclamacao'] || []).filter(function(v){ return !/encerr|conclu/i.test(v); });
+  return l.length ? l : ETAPAS_PADRAO.slice();
+}
+function recConcluida(r){ return /conclu|encerr/i.test(String(r['Status'] || '')); }
+function temColRec(c){ return TABLE_COLS.reclamacoes.indexOf(c) > -1; }
+function chaveResultado(v){ v = String(v || '').toLowerCase(); return v.indexOf('improc') > -1 ? 'improcedente' : v.indexOf('proced') > -1 ? 'procedente' : v.indexOf('alert') > -1 ? 'alerta' : v.indexOf('inconc') > -1 ? 'inconclusivo' : ''; }
+function resultadoRecHtml(r){ var k = chaveResultado(r['Classificação']); return recConcluida(r) && k ? '<span class="res-rec ' + k + '">' + escHtml(r['Classificação']) + '</span>' : '<span class="cell-dim">—</span>'; }
+function badgeRec(r){
+  if (recConcluida(r)) return '<span class="badge encerrada">' + STATUS_CONCLUIDA + '</span>';
+  var st = String(r['Status'] || ''), primeira = etapasReclamacao()[0];
+  return '<span class="badge ' + (!st || st === primeira || /abert/i.test(st) ? 'aberta' : 'tratativa') + '" style="text-transform:none; letter-spacing:0; font-size:11px;">' + escHtml(st || primeira || '—') + '</span>';
+}
+function critChip(r){ var c = String(r['Criticidade'] || ''); if (!c) return ''; return '<span class="crit-chip ' + (/n[ãa]o/i.test(c) ? 'naocritica' : 'critica') + '">' + escHtml(c) + '</span>'; }
+function popularFiltroStatusRec(){
+  var sel = document.getElementById('fStatusReclamacao'), atual = sel.value;
+  sel.innerHTML = '<option value="">Todos</option><option value="__andamento">Em andamento</option>' +
+    etapasReclamacao().map(function(e){ return '<option value="' + escHtml(e) + '">— ' + escHtml(e) + '</option>'; }).join('') +
+    '<option value="__concluida">' + STATUS_CONCLUIDA + '</option>';
+  sel.value = Array.prototype.some.call(sel.options, function(o){ return o.value === atual; }) ? atual : '';
+}
 function renderReclamacoes(){
-  var status = document.getElementById('fStatusReclamacao').value, classif = document.getElementById('fClassReclamacao').value,
-      busca = document.getElementById('fBuscaReclamacao').value.trim().toLowerCase();
-  var rows = DATA.reclamacoes.filter(function(r){
-    if (status && statusKey(r['Status']) !== status) return false;
-    if (classif && String(r['Classificação']).toLowerCase() !== CLASS_RECLAMACAO_LABEL[classif].toLowerCase()) return false;
-    if (busca && !((r['RAC']||'').toLowerCase().indexOf(busca) > -1 || (r['Cliente']||'').toLowerCase().indexOf(busca) > -1 || (r['Produto']||'').toLowerCase().indexOf(busca) > -1)) return false;
-    return true;
-  });
+  popularFiltroStatusRec();
+  var rows = filtrarReclamacoes(document.getElementById('fDeReclamacao').value, document.getElementById('fAteReclamacao').value, true);
   var tbody = document.getElementById('tbodyReclamacao');
   if (!rows.length) { tbody.innerHTML = '<tr><td colspan="8" class="empty-note">Nenhuma reclamação encontrada com esses filtros.</td></tr>'; return; }
-  tbody.innerHTML = rows.map(function(r){
-    var improc = String(r['Classificação']||'').toLowerCase().indexOf('improc') > -1;
-    return '<tr><td class="mono">'+(r['RAC']||'')+'</td><td class="cell-dim tabular">'+(r['Data']||'')+'</td><td>'+(r['Cliente']||'')+'</td><td>'+(r['Produto']||'')+'</td><td class="cell-dim">'+(r['Motivo']||'')+'</td>'+
-      '<td class="conf '+(improc?'ok':'div')+'">'+(r['Classificação']||'')+'</td>'+
-      '<td>'+badgeLabel(r['Status'])+'</td><td class="cell-dim">'+(r['Responsável']||'')+'</td></tr>';
-  }).join('');
+  tbody.innerHTML = rows.map(linhaReclamacaoHtml).join('');
 }
-['fStatusReclamacao','fClassReclamacao'].forEach(function(id){ document.getElementById(id).addEventListener('change', renderReclamacoes); });
+// filtro da lista (e do relatório): período pela data de entrada + filtros da tela (opcional)
+function filtrarReclamacoes(de, ate, comFiltrosTela){
+  var status = comFiltrosTela ? document.getElementById('fStatusReclamacao').value : '', classif = comFiltrosTela ? document.getElementById('fClassReclamacao').value : '',
+      crit = comFiltrosTela ? document.getElementById('fCritReclamacao').value : '', busca = comFiltrosTela ? document.getElementById('fBuscaReclamacao').value.trim().toLowerCase() : '';
+  return DATA.reclamacoes.filter(function(r){
+    var conc = recConcluida(r), dIso = dataBRparaISO(r['Data'] || '');
+    if (de && (!dIso || dIso < de)) return false;
+    if (ate && (!dIso || dIso > ate)) return false;
+    if (status === '__andamento' && conc) return false;
+    if (status === '__concluida' && !conc) return false;
+    if (status && status.indexOf('__') !== 0 && (conc || String(r['Status']) !== status)) return false;
+    if (classif && (!conc || chaveResultado(r['Classificação']) !== chaveResultado(classif))) return false;
+    if (crit && String(r['Criticidade'] || '') !== crit) return false;
+    if (busca && !((r['RAC']||'').toLowerCase().indexOf(busca) > -1 || (r['Cliente']||'').toLowerCase().indexOf(busca) > -1 || (r['Produto']||'').toLowerCase().indexOf(busca) > -1)) return false;
+    return true;
+  }).sort(function(a, b){ return String(b['RAC']).localeCompare(String(a['RAC'])); });
+}
+function linhaReclamacaoHtml(r){
+    var conc = recConcluida(r);
+    var cli = clientePorNome(r['Cliente']), nIt = itensDaReclamacao(r['RAC']).length, nCom = DATA.recComent.filter(function(c){ return c['RAC'] === r['RAC'] && !/^\[sistema\]/.test(c['Autor'] || ''); }).length;
+    var prodSub = [r['Tipo de Produto'], TEM_TABELA.recItens ? (nIt ? nIt + (nIt === 1 ? ' item' : ' itens') + ' de rastreabilidade' : '') : (r['Data de Produção'] ? 'prod. ' + r['Data de Produção'] : '')].filter(function(x){ return x; }).join(' · ');
+    var pend = TEM_TABELA.recItens && !nIt && !conc ? '<div><span class="rec-pend">sem rastreabilidade</span></div>' : '';
+    return '<tr class="clicavel" onclick="abrirFichaReclamacao(this.dataset.rac)" data-rac="'+escHtml(r['RAC'])+'"><td class="mono">'+escHtml(r['RAC']||'')+(critChip(r) ? '<div style="margin-top:3px;">'+critChip(r)+'</div>' : '')+'</td><td class="cell-dim tabular">'+escHtml(r['Data']||'')+'</td>'+
+      '<td>'+escHtml(r['Cliente']||'')+(cli && textoCliente(cli) ? '<div class="cell-dim" style="font-size:11px;">'+escHtml(textoCliente(cli))+'</div>' : '')+'</td>'+
+      '<td style="white-space:normal;">'+escHtml(r['Produto']||'')+(prodSub ? '<div class="cell-dim" style="font-size:11px;">'+escHtml(prodSub)+'</div>' : '')+pend+'</td><td class="cell-dim" style="white-space:normal;">'+escHtml(r['Motivo']||'')+'</td>'+
+      '<td>'+badgeRec(r)+(nCom ? '<div class="cell-dim" style="font-size:11px; margin-top:3px;">'+nCom+(nCom === 1 ? ' comentário' : ' comentários')+'</div>' : '')+'</td>'+
+      '<td>'+resultadoRecHtml(r)+(conc && r['Data de Conclusão'] ? '<div class="cell-dim" style="font-size:11px;">'+escHtml(r['Data de Conclusão'])+'</div>' : '')+'</td><td class="cell-dim">'+escHtml(r['Responsável']||'')+'</td></tr>';
+}
+['fStatusReclamacao','fClassReclamacao','fCritReclamacao','fDeReclamacao','fAteReclamacao'].forEach(function(id){ document.getElementById(id).addEventListener('change', renderReclamacoes); });
 document.getElementById('fBuscaReclamacao').addEventListener('input', renderReclamacoes);
 
 function proximoNumero(lista, campo, prefixo, digitos){
@@ -2058,39 +2369,426 @@ function proximoNumero(lista, campo, prefixo, digitos){
   lista.forEach(function(r){ var v = r[campo]; if (v && String(v).indexOf(prefixo) === 0) { var n = parseInt(String(v).split('-')[1], 10); if (!isNaN(n) && n > max) max = n; } });
   return prefixo + '-' + String(max + 1).padStart(digitos, '0');
 }
-function abrirModalReclamacao(){
-  document.getElementById('reclamacaoDataInput').value = hojeISO();
-  document.getElementById('reclamacaoClienteInput').value = '';
-  document.getElementById('reclamacaoProdutoInput').value = '';
-  document.getElementById('reclamacaoMotivoInput').value = '';
-  document.getElementById('reclamacaoClassSelect').value = 'procedente';
-  document.getElementById('reclamacaoStatusSelect').value = 'aberta';
-  document.getElementById('reclamacaoRespInput').value = '';
-  document.getElementById('reclamacaoObsInput').value = '';
+var reclamacaoEditando = null;   // RAC em edição (null = nova)
+function reclamacaoPorRac(rac){ return DATA.reclamacoes.find(function(r){ return r['RAC'] === rac; }); }
+function abrirModalReclamacao(rac){
+  var r = rac ? reclamacaoPorRac(rac) : null;
+  reclamacaoEditando = r ? r['RAC'] : null;
+  document.getElementById('modalReclamacaoTitulo').textContent = r ? 'Editar reclamação ' + r['RAC'] : 'Nova reclamação de cliente';
+  document.getElementById('modalReclamacaoSub').style.display = r ? 'none' : '';
+  document.getElementById('reclamacaoDataInput').value = r ? dataBRparaISO(r['Data'] || '') : hojeISO();
+  comboCliente._definir(r ? r['Cliente'] : '');
+  document.getElementById('reclamacaoTipoProdSelect').value = r ? (r['Tipo de Produto'] || '') : '';
+  aoMudarTipoProduto();
+  if (r) comboProduto._definir(r['Produto'] || '');
+  document.getElementById('reclamacaoMotivoInput').value = r ? (r['Motivo'] || '') : '';
+  document.getElementById('reclamacaoCritSelect').value = r ? (r['Criticidade'] || '') : '';
+  document.getElementById('reclamacaoRespInput').value = r ? (r['Responsável'] || '') : '';
+  document.getElementById('reclamacaoObsInput').value = r ? (r['Observações'] || '') : '';
   document.getElementById('saveMsgReclamacao').textContent = '';
   document.getElementById('modalReclamacao').classList.remove('hidden');
 }
 function fecharModalReclamacao(){ document.getElementById('modalReclamacao').classList.add('hidden'); }
 document.getElementById('modalReclamacao').addEventListener('click', function(e){ if (e.target.id === 'modalReclamacao') fecharModalReclamacao(); });
+async function recarregarReclamacoes(){
+  DATA.reclamacoes = linhasParaObjetos('reclamacoes', await lerLinhasBrutas(TABELAS.reclamacoes));
+  renderReclamacoes(); renderHome(); renderClientes(); renderProdutos(); if (cadAtual === 'statusRec') renderStatusRec();
+  document.getElementById('ctReclamacoes').textContent = DATA.reclamacoes.length;
+}
 async function salvarReclamacao(){
-  var cliente = document.getElementById('reclamacaoClienteInput').value.trim();
-  if (!cliente) { document.getElementById('saveMsgReclamacao').textContent = 'Informe o cliente.'; document.getElementById('saveMsgReclamacao').className = 'save-msg err'; return; }
-  var msg = document.getElementById('saveMsgReclamacao'); msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  var msg = document.getElementById('saveMsgReclamacao'), btn = document.getElementById('btnSalvarReclamacao');
+  function erro(t){ msg.className = 'save-msg err'; msg.textContent = t; }
+  var txtCli = document.getElementById('reclamacaoClienteInput').value.trim(), txtProd = document.getElementById('reclamacaoProdutoInput').value.trim();
+  var ant = reclamacaoEditando ? reclamacaoPorRac(reclamacaoEditando) : null;
+  // com o cadastro disponível, cliente e produto precisam vir da lista; sem ele (planilha antiga), vale o texto digitado
+  var cliente = comboCliente._sel ? comboCliente._sel.valor : ((!TEM_TABELA.clientes || (ant && txtCli === ant['Cliente'])) ? txtCli : '');
+  var tipo = document.getElementById('reclamacaoTipoProdSelect').value;
+  var produto = comboProduto._sel ? comboProduto._sel.valor : ((!TEM_TABELA.produtos || (ant && txtProd === ant['Produto'])) ? txtProd : '');
+  var crit = document.getElementById('reclamacaoCritSelect').value;
+  if (!document.getElementById('reclamacaoDataInput').value) return erro('Informe a data de entrada da reclamação.');
+  if (!cliente) return erro(txtCli ? 'Cliente "' + txtCli + '" não está cadastrado — use o + ao lado pra cadastrar.' : 'Escolha o cliente.');
+  if (!crit && temColRec('Criticidade')) return erro('Classifique a criticidade (crítica ou não crítica).');
+  if (!tipo) return erro('Escolha o tipo de produto (preforma ou frasco).');
+  if (!produto) return erro(txtProd ? 'Produto "' + txtProd + '" não está cadastrado — use o + ao lado pra cadastrar.' : 'Escolha o produto.');
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
   try {
-    var rac = proximoNumero(DATA.reclamacoes, 'RAC', 'RAC', 4);
-    await adicionarLinha('reclamacoes', {
+    var rac = ant ? ant['RAC'] : proximoNumero(DATA.reclamacoes, 'RAC', 'RAC', 4);
+    var obj = Object.assign({}, ant || {}, {
       'RAC': rac, 'Data': formatarDataBR(document.getElementById('reclamacaoDataInput').value), 'Cliente': cliente,
-      'Produto': document.getElementById('reclamacaoProdutoInput').value.trim(), 'Motivo': document.getElementById('reclamacaoMotivoInput').value.trim(),
-      'Classificação': CLASS_RECLAMACAO_LABEL[document.getElementById('reclamacaoClassSelect').value],
-      'Status': STATUS_RECLAMACAO_LABEL[document.getElementById('reclamacaoStatusSelect').value],
+      'Tipo de Produto': tipo, 'Produto': produto, 'Criticidade': crit,
+      'Motivo': document.getElementById('reclamacaoMotivoInput').value.trim(),
+      'Status': ant ? ant['Status'] : etapasReclamacao()[0],
+      'Classificação': ant ? ant['Classificação'] : '',
       'Responsável': document.getElementById('reclamacaoRespInput').value.trim(), 'Observações': document.getElementById('reclamacaoObsInput').value.trim()
     });
-    DATA.reclamacoes = linhasParaObjetos('reclamacoes', await lerLinhasBrutas(TABELAS.reclamacoes));
-    renderReclamacoes(); renderHome();
-    document.getElementById('ctReclamacoes').textContent = DATA.reclamacoes.length;
-    mostrarToast(rac + ' salva com sucesso.');
+    if (ant) await atualizarLinha('reclamacoes', ant.__index, obj); else await adicionarLinha('reclamacoes', obj);
+    if (!ant) await registrarComentario(rac, 'Reclamação aberta — status ' + obj['Status'] + (crit ? ', ' + crit.toLowerCase() : '') + '.', [], true);
+    else if (String(ant['Criticidade'] || '') !== crit && crit) await registrarComentario(rac, 'Criticidade alterada para ' + crit + '.', [], true);
+    await recarregarReclamacoes();
+    mostrarToast(rac + (ant ? ' atualizada.' : ' salva com sucesso.'));
     fecharModalReclamacao();
+    abrirFichaReclamacao(rac);
+  } catch (e) { erro('Erro: ' + e.message); }
+  finally { btn.disabled = false; }
+}
+
+/* ---- mudança de status, criticidade, conclusão e reabertura (direto na ficha) ---- */
+async function gravarMudancaReclamacao(mudancas, textoAuto){
+  var r = reclamacaoPorRac(fichaRacAtual); if (!r) return;
+  await atualizarLinha('reclamacoes', r.__index, Object.assign({}, r, mudancas));
+  if (textoAuto) await registrarComentario(r['RAC'], textoAuto, [], true);
+  await recarregarReclamacoes();
+  var novo = reclamacaoPorRac(fichaRacAtual);
+  document.getElementById('dwBadge').innerHTML = novo ? badgeRec(novo) : '';
+  renderFichaReclamacao();
+}
+async function mudarStatusReclamacao(sel){
+  var r = reclamacaoPorRac(fichaRacAtual); if (!r) return;
+  var novo = sel.value, ant = r['Status'] || '—';
+  if (novo === r['Status']) return;
+  sel.disabled = true;
+  try { await gravarMudancaReclamacao({ 'Status': novo }, 'Status alterado de ' + ant + ' para ' + novo + '.'); mostrarToast('Status atualizado: ' + novo + '.'); }
+  catch (e) { mostrarToast('Erro ao mudar o status: ' + e.message, true); sel.value = r['Status']; sel.disabled = false; }
+}
+async function mudarCriticidadeReclamacao(valor){
+  var r = reclamacaoPorRac(fichaRacAtual); if (!r || r['Criticidade'] === valor) return;
+  if (!temColRec('Criticidade')) { mostrarToast('A planilha ainda não tem a coluna Criticidade — disponível depois da atualização.', true); return; }
+  try { await gravarMudancaReclamacao({ 'Criticidade': valor }, 'Criticidade ' + (r['Criticidade'] ? 'alterada de ' + r['Criticidade'] + ' para ' : 'definida como ') + valor + '.'); }
+  catch (e) { mostrarToast('Erro: ' + e.message, true); }
+}
+function abrirModalConcluirRec(){
+  var r = reclamacaoPorRac(fichaRacAtual); if (!r) return;
+  document.getElementById('concRecTitulo').textContent = 'Concluir ' + r['RAC'];
+  document.querySelectorAll('input[name="concRes"]').forEach(function(i){ i.checked = false; });
+  document.getElementById('concCritSelect').value = r['Criticidade'] || '';
+  document.getElementById('concDataInput').value = hojeISO();
+  document.getElementById('concTextoInput').value = '';
+  document.getElementById('saveMsgConcRec').textContent = '';
+  document.getElementById('modalConcluirRec').classList.remove('hidden');
+}
+function fecharModalConcluirRec(){ document.getElementById('modalConcluirRec').classList.add('hidden'); }
+document.getElementById('modalConcluirRec').addEventListener('click', function(e){ if (e.target.id === 'modalConcluirRec') fecharModalConcluirRec(); });
+async function concluirReclamacao(){
+  var msg = document.getElementById('saveMsgConcRec'), btn = document.getElementById('btnConcluirRec');
+  function erro(t){ msg.className = 'save-msg err'; msg.textContent = t; }
+  var r = reclamacaoPorRac(fichaRacAtual); if (!r) return;
+  var res = (document.querySelector('input[name="concRes"]:checked') || {}).value, crit = document.getElementById('concCritSelect').value,
+      dt = document.getElementById('concDataInput').value, txt = document.getElementById('concTextoInput').value.trim();
+  if (!res) return erro('Escolha o resultado: procedente, improcedente, alerta ou inconclusivo.');
+  if (!crit && temColRec('Criticidade')) return erro('Classifique a criticidade.');
+  if (!dt) return erro('Informe a data da conclusão.');
+  if (txt.length < 10) return erro('Escreva a conclusão (é obrigatória).');
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    var m = { 'Status': STATUS_CONCLUIDA, 'Classificação': res, 'Criticidade': crit, 'Conclusão': txt, 'Data de Conclusão': formatarDataBR(dt), 'Concluído por': autorAtual() };
+    // planilha antiga, sem a coluna de conclusão: guarda o texto nas observações
+    if (!temColRec('Conclusão')) m['Observações'] = (r['Observações'] ? r['Observações'] + '\n' : '') + '[Conclusão ' + formatarDataBR(dt) + ' — ' + res + '] ' + txt;
+    await gravarMudancaReclamacao(m, 'Reclamação concluída como ' + res.toUpperCase() + (crit ? ' (' + crit.toLowerCase() + ')' : '') + '.\n' + txt);
+    fecharModalConcluirRec();
+    mostrarToast(r['RAC'] + ' concluída como ' + res + '.');
+  } catch (e) { erro('Erro: ' + e.message); }
+  finally { btn.disabled = false; }
+}
+async function reabrirReclamacao(){
+  var r = reclamacaoPorRac(fichaRacAtual); if (!r) return;
+  if (!(await confirmar('Reabrir ' + r['RAC'] + '?', 'A reclamação está concluída como ' + (r['Classificação'] || '—') + '. Ao reabrir, ela volta para o status "' + etapasReclamacao()[0] + '" e a conclusão atual fica registrada no andamento.', 'Sim, reabrir'))) return;
+  try {
+    await gravarMudancaReclamacao({ 'Status': etapasReclamacao()[0], 'Classificação': '', 'Conclusão': '', 'Data de Conclusão': '', 'Concluído por': '' },
+      'Reclamação reaberta. Conclusão anterior: ' + (r['Classificação'] || '—') + (r['Data de Conclusão'] ? ' em ' + r['Data de Conclusão'] : '') + (r['Conclusão'] ? ' — ' + String(r['Conclusão']).replace(/[.\s]+$/, '') : '') + '.');
+    mostrarToast(r['RAC'] + ' reaberta.');
+  } catch (e) { mostrarToast('Erro ao reabrir: ' + e.message, true); }
+}
+function statusCardHtml(r){
+  if (recConcluida(r)) {
+    var k = chaveResultado(r['Classificação']);
+    return '<div class="rec-status"><div class="rs-cab"><span class="badge encerrada">' + STATUS_CONCLUIDA + '</span>' +
+      (k ? '<span class="badge ' + ({ procedente: 'reprovado', improcedente: 'aprovado', alerta: 'analise', inconclusivo: 'nd' })[k] + '">' + escHtml(r['Classificação']) + '</span>' : '') + critChip(r) + '</div>' +
+      '<div class="rs-meta">' + (r['Data de Conclusão'] ? 'Concluída em ' + escHtml(r['Data de Conclusão']) : 'Concluída') + (r['Concluído por'] ? ' por ' + escHtml(r['Concluído por']) : '') + '</div>' +
+      (r['Conclusão'] ? '<div class="rs-texto">' + escHtml(r['Conclusão']) + '</div>' : '') +
+      '<div class="rs-acoes"><span class="rs-dica">Precisa retomar a tratativa?</span><button type="button" class="btn" onclick="reabrirReclamacao()">Reabrir reclamação</button></div></div>';
+  }
+  var etapas = etapasReclamacao(), atual = r['Status'] || etapas[0];
+  if (etapas.indexOf(atual) === -1) etapas = [atual].concat(etapas);
+  var c = String(r['Criticidade'] || ''), semCol = !temColRec('Criticidade');
+  return '<div class="rec-status"><div class="rs-linha">' +
+    '<div class="rs-bloco cresce"><label for="fichaStatusSel">Status da tratativa</label><select id="fichaStatusSel" onchange="mudarStatusReclamacao(this)">' +
+      etapas.map(function(e){ return '<option' + (e === atual ? ' selected' : '') + ' value="' + escHtml(e) + '">' + escHtml(e) + '</option>'; }).join('') + '</select></div>' +
+    '<div class="rs-bloco"><label>Criticidade</label><div class="rs-seg">' +
+      '<button type="button"' + (semCol ? ' disabled' : '') + ' class="' + (c === 'Crítica' ? 'on critica' : '') + '" onclick="mudarCriticidadeReclamacao(\'Crítica\')">Crítica</button>' +
+      '<button type="button"' + (semCol ? ' disabled' : '') + ' class="' + (c === 'Não crítica' ? 'on naocritica' : '') + '" onclick="mudarCriticidadeReclamacao(\'Não crítica\')">Não crítica</button></div></div></div>' +
+    '<div class="rs-acoes"><span class="rs-dica">Cada mudança fica registrada no andamento.</span><button type="button" class="btn btn-accent" onclick="abrirModalConcluirRec()"><svg><use href="#i-check"/></svg> Concluir reclamação</button></div></div>';
+}
+
+/* ---- cadastro dos status de reclamação ---- */
+var statusRecEditando = null;
+function abrirModalStatusRec(idx){
+  if (cadastroIndisponivel('statusRec')) return;
+  var x = (idx !== undefined && idx !== null) ? DATA.statusRec.find(function(s){ return s.__index === idx; }) : null;
+  statusRecEditando = x ? x.__index : null;
+  document.getElementById('modalStatusRecTitulo').textContent = x ? 'Editar status' : 'Novo status';
+  document.getElementById('statusRecNomeInput').value = x ? x['Status'] : '';
+  document.getElementById('saveMsgStatusRec').textContent = '';
+  document.getElementById('modalStatusRec').classList.remove('hidden');
+  setTimeout(function(){ document.getElementById('statusRecNomeInput').focus(); }, 50);
+}
+function fecharModalStatusRec(){ document.getElementById('modalStatusRec').classList.add('hidden'); }
+document.getElementById('modalStatusRec').addEventListener('click', function(e){ if (e.target.id === 'modalStatusRec') fecharModalStatusRec(); });
+async function recarregarStatusRec(){
+  DATA.statusRec = linhasParaObjetos('statusRec', await lerLinhasBrutas(TABELAS.statusRec));
+  renderStatusRec(); atualizarContagensCadastros(); renderReclamacoes();
+  if (fichaAberta()) renderFichaReclamacao();
+}
+function fichaAberta(){ return fichaRacAtual && detalheAtual === null && !document.getElementById('drawer').classList.contains('hidden'); }
+
+/* ---- janela de confirmação (no lugar do confirm() do navegador) ---- */
+function confirmar(titulo, texto, rotuloSim, perigo){
+  return new Promise(function(resolve){
+    var m = document.getElementById('modalConfirma'), sim = document.getElementById('confSim'), nao = document.getElementById('confNao');
+    document.getElementById('confTitulo').textContent = titulo;
+    document.getElementById('confTexto').textContent = texto || '';
+    sim.textContent = rotuloSim || 'Confirmar';
+    sim.className = 'btn ' + (perigo ? 'btn-danger' : 'btn-accent');
+    function fim(v){ m.classList.add('hidden'); sim.onclick = nao.onclick = m.onclick = null; document.removeEventListener('keydown', tecla, true); resolve(v); }
+    function tecla(e){ if (e.key === 'Escape') { e.stopPropagation(); fim(false); } }
+    sim.onclick = function(){ fim(true); }; nao.onclick = function(){ fim(false); };
+    m.onclick = function(e){ if (e.target === m) fim(false); };
+    document.addEventListener('keydown', tecla, true);
+    m.classList.remove('hidden'); setTimeout(function(){ nao.focus(); }, 30);
+  });
+}
+async function salvarStatusRec(){
+  var msg = document.getElementById('saveMsgStatusRec'), btn = document.getElementById('btnSalvarStatusRec');
+  function erro(t){ msg.className = 'save-msg err'; msg.textContent = t; }
+  var nome = document.getElementById('statusRecNomeInput').value.trim().replace(/\s+/g, ' ');
+  if (!nome) return erro('Informe o nome do status.');
+  if (/^(conclu|encerr)/i.test(nome)) return erro('"' + STATUS_CONCLUIDA + '" é fixo — use o botão Concluir reclamação, na ficha.');
+  var ant = statusRecEditando !== null ? DATA.statusRec.find(function(s){ return s.__index === statusRecEditando; }) : null;
+  var dup = DATA.statusRec.find(function(s){ return String(s['Status']).toLowerCase() === nome.toLowerCase() && s !== ant; });
+  if (dup) return erro('Já existe o status "' + dup['Status'] + '".');
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    if (ant) {
+      await atualizarLinha('statusRec', ant.__index, Object.assign({}, ant, { 'Status': nome }));
+      if (ant['Status'] !== nome) {   // renomeou: as reclamações nesse status acompanham
+        for (var i = 0; i < DATA.reclamacoes.length; i++) { var r = DATA.reclamacoes[i]; if (r['Status'] === ant['Status']) await atualizarLinha('reclamacoes', r.__index, Object.assign({}, r, { 'Status': nome })); }
+        await recarregarReclamacoes();
+      }
+    } else {
+      var maior = DATA.statusRec.reduce(function(m, s){ return Math.max(m, parseFloat(s['Ordem']) || 0); }, 0);
+      await adicionarLinha('statusRec', { 'Ordem': maior + 1, 'Status': nome });
+    }
+    await recarregarStatusRec();
+    mostrarToast('Status "' + nome + '" salvo.');
+    fecharModalStatusRec();
+  } catch (e) { erro('Erro: ' + e.message); }
+  finally { btn.disabled = false; }
+}
+async function excluirStatusRec(idx){
+  if (cadastroIndisponivel('statusRec')) return;
+  var x = DATA.statusRec.find(function(s){ return s.__index === idx; }); if (!x) return;
+  var emUso = DATA.reclamacoes.filter(function(r){ return !recConcluida(r) && r['Status'] === x['Status']; }).length;
+  if (emUso) { mostrarToast('Há ' + emUso + ' reclamação(ões) em andamento nesse status. Mude o status delas antes de excluir.', true); return; }
+  if (DATA.statusRec.length <= 1) { mostrarToast('Mantenha pelo menos um status.', true); return; }
+  if (!(await confirmar('Excluir o status?', 'O status "' + x['Status'] + '" sai da lista. As reclamações já concluídas não são afetadas.', 'Excluir', true))) return;
+  try { await excluirLinhaPorIndice('statusRec', x.__index); await recarregarStatusRec(); mostrarToast('Status excluído.'); }
+  catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
+}
+async function moverStatusRec(idx, dir){
+  var lista = statusRecOrdenados(), pos = lista.findIndex(function(s){ return s.__index === idx; }), alvo = pos + dir;
+  if (pos < 0 || alvo < 0 || alvo >= lista.length) return;
+  var t = lista[pos]; lista[pos] = lista[alvo]; lista[alvo] = t;
+  try {
+    for (var i = 0; i < lista.length; i++) if (String(lista[i]['Ordem']) !== String(i + 1)) await atualizarLinha('statusRec', lista[i].__index, Object.assign({}, lista[i], { 'Ordem': i + 1 }));
+    await recarregarStatusRec();
+  } catch (e) { mostrarToast('Erro ao reordenar: ' + e.message, true); }
+}
+function renderStatusRec(){
+  desenharStatusRec(document.getElementById('tbodyStatusRec'), cadAtual === 'statusRec' ? termoBuscaCadastro() : '');
+}
+function desenharStatusRec(tb, q){
+  if (!tb) return;
+  if (!TEM_TABELA.statusRec) { tb.innerHTML = '<tr><td colspan="4" class="empty-note">A planilha ainda não tem a aba de Status de reclamação — fica disponível depois da atualização. Por enquanto valem: ' + escHtml(etapasReclamacao().join(', ')) + '.</td></tr>'; return; }
+  var lista = statusRecOrdenados(), n = lista.length;
+  var linhas = lista.map(function(x, i){
+    if (q && String(x['Status']).toLowerCase().indexOf(q) === -1) return '';
+    var uso = DATA.reclamacoes.filter(function(r){ return !recConcluida(r) && r['Status'] === x['Status']; }).length;
+    return '<tr><td class="tabular cell-dim">' + (i + 1) + '</td><td>' + escHtml(x['Status']) + (i === 0 ? ' <span class="cell-dim" style="font-size:11px;">(status inicial)</span>' : '') + '</td><td class="tabular">' + (uso || '—') + '</td>' +
+      '<td class="row-actions-cell"><span class="row-actions">' +
+      '<button type="button" class="icon-btn icon-only" title="Subir"' + (i === 0 ? ' disabled' : '') + ' onclick="moverStatusRec(' + x.__index + ',-1)">↑</button>' +
+      '<button type="button" class="icon-btn icon-only" title="Descer"' + (i === n - 1 ? ' disabled' : '') + ' onclick="moverStatusRec(' + x.__index + ',1)">↓</button>' +
+      '<button type="button" class="icon-btn icon-only" title="Editar" onclick="abrirModalStatusRec(' + x.__index + ')"><svg><use href="#i-pencil"/></svg></button>' +
+      '<button type="button" class="icon-btn icon-only danger" title="Excluir" onclick="excluirStatusRec(' + x.__index + ')"><svg><use href="#i-trash"/></svg></button></span></td></tr>';
+  }).join('');
+  var fixo = (!q || STATUS_CONCLUIDA.toLowerCase().indexOf(q) > -1) ? '<tr><td class="cell-dim">—</td><td><span class="badge encerrada">' + STATUS_CONCLUIDA + '</span> <span class="cell-dim" style="font-size:11px;">fixo · pelo botão Concluir reclamação</span></td><td class="tabular">' + (DATA.reclamacoes.filter(recConcluida).length || '—') + '</td><td></td></tr>' : '';
+  tb.innerHTML = (linhas || fixo) ? linhas + fixo : '<tr><td colspan="4" class="empty-note">Nenhum status encontrado.</td></tr>';
+}
+
+/* ---- painel lateral: expandir para o centro da tela ---- */
+var DRAWER_EXPANDIDO = false;
+try { DRAWER_EXPANDIDO = localStorage.getItem('sq_drawer_expandido') === '1'; } catch (e) {}
+function aplicarExpansaoDrawer(){
+  var d = document.getElementById('drawer'), b = document.getElementById('dwExpandir');
+  d.classList.toggle('expandido', DRAWER_EXPANDIDO);
+  b.title = DRAWER_EXPANDIDO ? 'Recolher para a lateral' : 'Expandir';
+  b.innerHTML = '<svg><use href="#i-' + (DRAWER_EXPANDIDO ? 'shrink' : 'expand') + '"/></svg>';
+}
+function alternarExpandirDrawer(){
+  DRAWER_EXPANDIDO = !DRAWER_EXPANDIDO;
+  try { localStorage.setItem('sq_drawer_expandido', DRAWER_EXPANDIDO ? '1' : '0'); } catch (e) {}
+  aplicarExpansaoDrawer();
+}
+aplicarExpansaoDrawer();
+
+/* ---- ficha da reclamação: dados, rastreabilidade, fotos e andamento ---- */
+var fichaRacAtual = null, anexosPendentes = [];
+function agoraBR(){ var d = new Date(); return pad2(d.getDate()) + '/' + pad2(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+function ordemDataHora(t){ var m = String(t || '').match(/(\d{2})\/(\d{2})\/(\d{4})(?:\s+(\d{2}):(\d{2}))?/); return m ? new Date(+m[3], +m[2] - 1, +m[1], +(m[4] || 0), +(m[5] || 0)).getTime() : 0; }
+function autorAtual(){ return (contaAtual && (contaAtual.name || String(contaAtual.username || '').split('@')[0])) || '—'; }
+function itensDaReclamacao(rac){ return DATA.recItens.filter(function(i){ return i['RAC'] === rac; }); }
+function comentariosDaReclamacao(rac){ return DATA.recComent.filter(function(c){ return c['RAC'] === rac; }).sort(function(a, b){ return ordemDataHora(b['Data/Hora']) - ordemDataHora(a['Data/Hora']) || b.__index - a.__index; }); }
+function anexosDe(c){ return String(c['Anexos'] || '').split('\n').map(function(x){ return x.trim(); }).filter(function(x){ return x; }); }
+function ehPdf(link){ return /\.pdf(\?|$)/i.test(link) || /^data:application\/pdf/.test(link); }
+function galeriaHtml(links){
+  return '<div class="galeria">' + links.map(function(l){
+    return '<a href="' + escHtml(l) + '" target="_blank" rel="noopener" title="Abrir">' + (ehPdf(l) ? '<span class="pdf"><svg><use href="#i-file-text"/></svg>PDF</span>' : '<img data-foto="' + escHtml(l) + '" alt="Foto">') + '</a>';
+  }).join('') + '</div>';
+}
+async function registrarComentario(rac, texto, anexos, automatico){
+  if (!TEM_TABELA.recComent) return;
+  await adicionarLinha('recComent', { 'RAC': rac, 'Data/Hora': agoraBR(), 'Autor': (automatico ? '[sistema] ' : '') + autorAtual(), 'Comentário': texto, 'Anexos': (anexos || []).join('\n') });
+  DATA.recComent = linhasParaObjetos('recComent', await lerLinhasBrutas(TABELAS.recComent));
+}
+function abrirFichaReclamacao(rac){
+  var r = reclamacaoPorRac(rac); if (!r) return;
+  fichaRacAtual = rac; anexosPendentes = [];
+  detalheAtual = null;
+  document.getElementById('dwIc').innerHTML = '<svg><use href="#i-megaphone"/></svg>';
+  document.getElementById('dwTitulo').textContent = r['RAC'];
+  document.getElementById('dwSub').textContent = (r['Cliente'] || '—') + ' · ' + [r['Tipo de Produto'], r['Produto']].filter(function(x){ return x; }).join(' — ');
+  document.getElementById('dwBadge').innerHTML = badgeRec(r);
+  renderFichaReclamacao();
+  document.getElementById('drawerScrim').classList.remove('hidden');
+  document.getElementById('drawer').classList.remove('hidden');
+}
+function renderFichaReclamacao(){
+  var r = reclamacaoPorRac(fichaRacAtual); if (!r) return;
+  var cli = clientePorNome(r['Cliente']), preforma = String(r['Tipo de Produto']) === 'Preforma';
+  function kv(rot, val){ return '<div><dt>' + rot + '</dt><dd>' + (val ? escHtml(val) : '<span class="res-pend">—</span>') + '</dd></div>'; }
+  var html = '<div class="ficha-grid"><div class="ficha-col">' + statusCardHtml(r) +
+    '<div class="ficha-acoes"><button type="button" class="btn" onclick="abrirModalReclamacao(fichaRacAtual)"><svg><use href="#i-pencil"/></svg> Editar dados</button></div>' +
+    '<dl class="dw-kv">' + kv('Entrada', r['Data']) + kv('Criticidade', r['Criticidade']) +
+    kv('Cliente', r['Cliente']) + kv('Cidade / UF', cli ? textoCliente(cli) : '') +
+    kv('Produto', [r['Tipo de Produto'], r['Produto']].filter(function(x){ return x; }).join(' — ')) + kv('Responsável', r['Responsável']) +
+    '<div style="grid-column:1/-1;"><dt>Motivo</dt><dd>' + (r['Motivo'] ? escHtml(r['Motivo']) : '<span class="res-pend">—</span>') + '</dd></div>' +
+    (r['Observações'] ? '<div style="grid-column:1/-1;"><dt>Observações</dt><dd style="white-space:pre-wrap;">' + escHtml(r['Observações']) + '</dd></div>' : '') + '</dl>';
+
+  // rastreabilidade
+  html += '<div class="section-title ficha-sec">Rastreabilidade <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">datas de produção, lotes' + (preforma ? ' e caixas' : '') + '</span></div>';
+  if (!TEM_TABELA.recItens) html += '<p class="ficha-vazio">Disponível depois que a planilha for atualizada.' + (r['Data de Produção'] ? ' Data de produção registrada: ' + escHtml(r['Data de Produção']) + '.' : '') + '</p>';
+  else {
+    var itens = itensDaReclamacao(r['RAC']);
+    html += itens.length ? '<div class="it-lista">' + itens.map(function(i){
+        var l2 = [i['Quantidade'], i['Observação']].filter(function(x){ return x; }).join(' — ');
+        return '<div class="it-row"><div class="it-info"><div class="it-l1">' +
+          '<span><b>Produção</b>' + escHtml(i['Data de Produção'] || '—') + '</span><span><b>Lote</b>' + escHtml(i['Lote'] || '—') + '</span>' +
+          (preforma ? '<span><b>Caixa</b>' + escHtml(i['Caixa'] || '—') + '</span>' : '') + '</div>' +
+          (l2 ? '<div class="it-l2">' + escHtml(l2) + '</div>' : '') + '</div>' +
+          '<button type="button" class="icon-btn icon-only danger" title="Remover" onclick="excluirItemReclamacao(' + i.__index + ')"><svg><use href="#i-trash"/></svg></button></div>';
+      }).join('') + '</div>'
+      : '<p class="ficha-vazio"><span class="rec-pend">sem rastreabilidade</span> — nenhuma data / lote lançado ainda.</p>';
+    html += '<div class="it-add" id="itAddBox"><button type="button" class="btn" onclick="document.getElementById(\'itAddBox\').hidden = true; document.getElementById(\'itForm\').hidden = false; document.getElementById(\'itDataProd\').focus();"><svg><use href="#i-plus"/></svg> Adicionar ' + (preforma ? 'data / lote / caixa' : 'data / lote') + '</button></div>' +
+      '<div class="it-form" id="itForm" hidden>' +
+      '<div class="field"><label>Data de produção</label><input type="date" id="itDataProd"></div>' +
+      '<div class="field"><label>Lote de produção</label><input id="itLote" placeholder="Ex: 2611-03"></div>' +
+      (preforma ? '<div class="field"><label>Nº da caixa</label><input id="itCaixa" placeholder="Ex: 1548"></div>' : '') +
+      '<div class="field"><label>Quantidade afetada</label><input id="itQtd" placeholder="Ex: 120 peças"></div>' +
+      '<div class="field' + (preforma ? ' full' : '') + '"><label>Observação</label><input id="itObs" placeholder="Opcional"></div>' +
+      '<div class="full" style="display:flex; justify-content:flex-end; gap:8px;"><button type="button" class="btn" onclick="document.getElementById(\'itForm\').hidden = true; document.getElementById(\'itAddBox\').hidden = false;">Cancelar</button>' +
+      '<button type="button" class="btn btn-accent" id="btnAddItem" onclick="adicionarItemReclamacao()">Adicionar</button></div></div>';
+  }
+
+  // fotos (todas as dos comentários)
+  var coms = TEM_TABELA.recComent ? comentariosDaReclamacao(r['RAC']) : [];
+  var todas = []; coms.slice().reverse().forEach(function(c){ todas = todas.concat(anexosDe(c)); });
+  html += '<div class="section-title ficha-sec">Fotos do cliente <span class="cell-dim" style="font-weight:500; text-transform:none; letter-spacing:0;">' + (todas.length ? todas.length + ' arquivo(s)' : '') + '</span></div>' +
+    (todas.length ? galeriaHtml(todas) : '<p class="ficha-vazio">' + (TEM_TABELA.recComent ? 'Nenhuma foto ainda — anexe junto com um comentário, abaixo.' : 'Disponível depois que a planilha for atualizada.') + '</p>');
+
+  // andamento (no modo expandido vai para a coluna da direita)
+  html += '</div><div class="ficha-col"><div class="section-title ficha-sec">Andamento</div>';
+  if (!TEM_TABELA.recComent) html += '<p class="ficha-vazio">Disponível depois que a planilha for atualizada.</p>';
+  else {
+    html += '<div class="com-novo"><textarea id="comTexto" placeholder="Escreva um comentário (contato com o cliente, análise, ação tomada…)"></textarea>' +
+      '<div class="anx-pend" id="anxPend"></div>' +
+      '<div class="com-barra"><button type="button" class="btn laudo-cam" onclick="document.getElementById(\'comFotoCam\').click()"><svg><use href="#i-camera"/></svg> Tirar foto</button>' +
+      '<button type="button" class="btn" onclick="document.getElementById(\'comFotoArq\').click()"><svg><use href="#i-paperclip"/></svg> Anexar fotos</button>' +
+      '<span class="save-msg" id="saveMsgCom"></span><button type="button" class="btn btn-accent" id="btnComentar" onclick="enviarComentario()">Comentar</button></div>' +
+      '<input type="file" id="comFotoCam" accept="image/*" capture="environment" hidden onchange="anexarNoComentario(this)">' +
+      '<input type="file" id="comFotoArq" accept="image/*,.pdf" multiple hidden onchange="anexarNoComentario(this)"></div>';
+    html += coms.length ? '<div class="timeline">' + coms.map(function(c){
+      var auto = /^\[sistema\]/.test(c['Autor'] || ''), anx = anexosDe(c);
+      return '<div class="tl-item' + (auto ? ' auto' : '') + '"><div class="tl-cab">' + escHtml(c['Data/Hora'] || '') + ' · <b>' + escHtml(String(c['Autor'] || '').replace(/^\[sistema\]\s*/, '')) + '</b></div>' +
+        '<div class="tl-txt">' + escHtml(c['Comentário'] || '') + '</div>' + (anx.length ? galeriaHtml(anx) : '') + '</div>';
+    }).join('') + '</div>' : '<p class="ficha-vazio">Nenhum comentário ainda.</p>';
+  }
+  html += '</div></div>';
+  var body = document.getElementById('dwBody');
+  body.innerHTML = html;
+  carregarMiniaturas(body);
+  desenharAnexosPendentes();
+}
+async function adicionarItemReclamacao(){
+  var r = reclamacaoPorRac(fichaRacAtual); if (!r) return;
+  function v(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+  var dp = v('itDataProd'), item = { 'RAC': r['RAC'], 'Data de Produção': dp ? formatarDataBR(dp) : '', 'Lote': v('itLote'), 'Caixa': v('itCaixa'), 'Quantidade': v('itQtd'), 'Observação': v('itObs') };
+  if (!item['Data de Produção'] && !item['Lote'] && !item['Caixa']) { mostrarToast('Informe ao menos a data de produção, o lote ou a caixa.', true); return; }
+  var btn = document.getElementById('btnAddItem'); btn.disabled = true;
+  try {
+    await adicionarLinha('recItens', item);
+    DATA.recItens = linhasParaObjetos('recItens', await lerLinhasBrutas(TABELAS.recItens));
+    renderFichaReclamacao(); renderReclamacoes();
+  } catch (e) { mostrarToast('Erro ao adicionar: ' + e.message, true); btn.disabled = false; }
+}
+async function excluirItemReclamacao(idx){
+  var it = DATA.recItens.find(function(i){ return i.__index === idx; }) || {};
+  if (!(await confirmar('Remover item da rastreabilidade?', [it['Data de Produção'] ? 'Produção ' + it['Data de Produção'] : '', it['Lote'] ? 'lote ' + it['Lote'] : '', it['Caixa'] ? 'caixa ' + it['Caixa'] : ''].filter(function(x){ return x; }).join(' · ') || 'Este item será removido.', 'Remover', true))) return;
+  try {
+    await excluirLinhaPorIndice('recItens', idx);
+    DATA.recItens = linhasParaObjetos('recItens', await lerLinhasBrutas(TABELAS.recItens));
+    renderFichaReclamacao(); renderReclamacoes();
+  } catch (e) { mostrarToast('Erro ao remover: ' + e.message, true); }
+}
+async function anexarNoComentario(input){
+  var arqs = Array.prototype.slice.call(input.files || []); input.value = '';
+  for (var i = 0; i < arqs.length; i++) {
+    var pronto = await reduzirImagem(arqs[i], 1600, 0.82);
+    anexosPendentes.push({ file: pronto, url: (pronto.type || '').indexOf('image/') === 0 ? URL.createObjectURL(pronto) : '' });
+  }
+  desenharAnexosPendentes();
+}
+function desenharAnexosPendentes(){
+  var el = document.getElementById('anxPend'); if (!el) return;
+  el.innerHTML = anexosPendentes.map(function(a, k){
+    return '<span>' + (a.url ? '<img src="' + a.url + '" alt="">' : '<svg style="width:16px;height:16px;"><use href="#i-file-text"/></svg>') + escHtml(a.file.name) +
+      '<button type="button" title="Remover" onclick="anexosPendentes.splice(' + k + ',1); desenharAnexosPendentes();">✕</button></span>';
+  }).join('');
+}
+async function enviarComentario(){
+  var txt = document.getElementById('comTexto').value.trim(), msg = document.getElementById('saveMsgCom'), btn = document.getElementById('btnComentar');
+  if (!txt && !anexosPendentes.length) { msg.className = 'save-msg err'; msg.textContent = 'Escreva um comentário ou anexe uma foto.'; return; }
+  btn.disabled = true; msg.className = 'save-msg';
+  try {
+    var links = [], rac = fichaRacAtual, carimbo = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
+    for (var i = 0; i < anexosPendentes.length; i++) {
+      msg.textContent = 'Enviando foto ' + (i + 1) + ' de ' + anexosPendentes.length + '…';
+      links.push(await uploadArquivo(anexosPendentes[i].file, rac + '_' + carimbo + '_' + (i + 1), 'Reclamacoes/' + rac));
+    }
+    msg.textContent = 'Salvando…';
+    await registrarComentario(rac, txt || '(fotos anexadas)', links, false);
+    anexosPendentes = [];
+    renderFichaReclamacao(); renderReclamacoes();
+    mostrarToast('Comentário registrado.');
   } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+  finally { var b = document.getElementById('btnComentar'); if (b) b.disabled = false; }
 }
 
 /* ====================== LIBERAÇÃO NÃO CONFORME ====================== */
@@ -2481,7 +3179,8 @@ function atualizarPreviaRotulo(){
   var r = rotuloSelecionado();
   document.getElementById('previaRotuloNome').textContent = r ? [r['Nome do Modelo'], rotuloVolumeTexto(volumeDoRotulo(r)), r['Cliente']].filter(function(x){ return x; }).join(' · ') :
     (DATA.rotulosHomologados.length ? 'Escolha o rótulo pra ver a foto de referência.' : 'Nenhum rótulo homologado cadastrado ainda.');
-  document.getElementById('previaRotuloImg').src = (r && r['Arquivo da Foto']) ? r['Arquivo da Foto'] : '';
+  var imgR = document.getElementById('previaRotuloImg'); imgR.src = '';
+  if (r && r['Arquivo da Foto']) urlMiniatura(r['Arquivo da Foto']).then(function(u){ if (rotuloSelecionado() === r) imgR.src = u; });
   document.getElementById('previaRotuloImg').style.display = (r && r['Arquivo da Foto']) ? '' : 'none';
 }
 
@@ -3135,12 +3834,13 @@ function renderRotulosHomologados(){
     var emp = String(r['EMP'] || '').trim();
     var ativo = String(r['Status'] || 'Ativo').toLowerCase() !== 'inativo';
     return '<div class="photo-card"><div class="lbl"><span>'+escHtml(r['Nome do Modelo'])+'</span><span class="badge '+(ativo ? 'aprovado' : 'nd')+'">'+(ativo ? 'Ativo' : 'Inativo')+'</span></div>'+
-      (r['Arquivo da Foto'] ? ('<img class="photo-ph" src="'+escHtml(r['Arquivo da Foto'])+'" alt="Foto de referência">') : '<div class="empty-note" style="padding:24px 12px;">Sem foto</div>')+
+      (r['Arquivo da Foto'] ? ('<img class="photo-ph" data-foto="'+escHtml(r['Arquivo da Foto'])+'" alt="Foto de referência">') : '<div class="empty-note" style="padding:24px 12px;">Sem foto</div>')+
       '<div class="meta"><div><b>' + escHtml(rotuloVolumeTexto(volumeDoRotulo(r)) || '— mL') + '</b> · ' + escHtml(r['Cliente'] || 'cliente não informado') + '</div>' +
         '<div style="margin-top:3px;">' + (emp ? '<span class="ficha-ok"><svg><use href="#i-check"/></svg>' + escHtml(emp) + '</span>' : '<span class="ficha-no">sem EMP — sem critérios</span>') + '</div>' +
         '<div class="card-actions" style="margin-top:9px;"><button type="button" class="icon-btn" onclick="abrirModalRotulo(\''+escHtml(r['ID'])+'\')"><svg><use href="#i-pencil"/></svg> Editar</button>'+
         '<button type="button" class="icon-btn danger" onclick="excluirRotulo(\''+escHtml(r['ID'])+'\')"><svg><use href="#i-trash"/></svg> Excluir</button></div></div></div>';
   }).join('');
+  carregarMiniaturas(el);
 }
 var rotuloEditando = null;
 function abrirModalRotulo(id){
@@ -3150,7 +3850,7 @@ function abrirModalRotulo(id){
   document.getElementById('rotuloNomeInput').value = r ? (r['Nome do Modelo'] || '') : '';
   document.getElementById('rotuloVolumeInput').value = r ? volumeDoRotulo(r) : '';
   document.getElementById('rotuloClienteInput').value = r ? (r['Cliente'] || '') : '';
-  document.getElementById('listaClientesRotulo').innerHTML = unicos(DATA.rotulosHomologados.map(function(x){ return String(x['Cliente'] || '').trim(); })).map(function(c){ return '<option value="' + escHtml(c) + '">'; }).join('');
+  document.getElementById('listaClientesRotulo').innerHTML = unicos(DATA.clientes.map(function(c){ return String(c['Nome'] || '').trim(); }).concat(DATA.rotulosHomologados.map(function(x){ return String(x['Cliente'] || '').trim(); }))).map(function(c){ return '<option value="' + escHtml(c) + '">'; }).join('');
   var emps = DATA.especificacoes.filter(function(f){ return f.mat === 'rotulo' && !f.legado; }), eSel = document.getElementById('rotuloEmpSelect');
   var atualEmp = r ? String(r['EMP'] || '').trim() : (emps.length === 1 ? emps[0].key : '');
   eSel.innerHTML = '<option value="">— sem EMP (sem critérios) —</option>' + emps.map(function(f){ return '<option value="' + escHtml(f.key) + '">' + escHtml(f.key) + '</option>'; }).join('') +
@@ -3329,6 +4029,9 @@ async function excluirFornecedor(gi){
 var CAD_INFO = {
   fornecedores: { titulo:'Fornecedores', busca:'Fornecedor, tipo, código…', botao:'Novo fornecedor', acao:'abrirModalFornecedor()' },
   especificacoes: { titulo:'EMPs — Especificações de Matéria-Prima e Insumos', busca:'Código, descrição, teste, fornecedor…', botao:'Nova EMP (manual)', acao:'abrirModalEspec()' },
+  clientes: { titulo:'Clientes', busca:'Nome, cidade, UF…', botao:'Novo cliente', acao:'abrirModalCliente()' },
+  produtos: { titulo:'Produtos (preforma e frasco)', busca:'Tipo ou produto…', botao:'Novo produto', acao:'abrirModalProduto()' },
+  statusRec: { titulo:'Status de reclamação', busca:'Status…', botao:'Novo status', acao:'abrirModalStatusRec()' },
   rotulos: { titulo:'Rótulos Homologados', busca:'Nome, cliente, volume…', botao:'Novo rótulo homologado', acao:'abrirModalRotulo()' }
 };
 var cadAtual = 'fornecedores';
@@ -3345,11 +4048,15 @@ function escolherCadastro(cad){
   document.getElementById('painelFornecedores').style.display = cad === 'fornecedores' ? '' : 'none';
   document.getElementById('painelEspecificacoes').style.display = cad === 'especificacoes' ? '' : 'none';
   document.getElementById('painelRotulos').style.display = cad === 'rotulos' ? '' : 'none';
+  document.getElementById('painelClientes').style.display = cad === 'clientes' ? '' : 'none';
+  document.getElementById('painelProdutos').style.display = cad === 'produtos' ? '' : 'none';
+  document.getElementById('painelStatusRec').style.display = cad === 'statusRec' ? '' : 'none';
   renderCadastroAtual();
   marcarMenu();
 }
 function renderCadastroAtual(){
-  if (cadAtual === 'fornecedores') renderFornecedores(); else if (cadAtual === 'especificacoes') renderEspecificacoes(); else renderRotulosHomologados();
+  if (cadAtual === 'fornecedores') renderFornecedores(); else if (cadAtual === 'especificacoes') renderEspecificacoes();
+  else if (cadAtual === 'clientes') renderClientes(); else if (cadAtual === 'produtos') renderProdutos(); else if (cadAtual === 'statusRec') renderStatusRec(); else renderRotulosHomologados();
 }
 function abrirCadastro(cad){ if (!document.getElementById('tela-cadastros').classList.contains('active')) irPara('cadastros'); escolherCadastro(cad); toggleMenu(false); }
 document.querySelectorAll('.cad-btn').forEach(function(btn){ btn.addEventListener('click', function(){ abrirCadastro(btn.dataset.cad); }); });
@@ -3537,6 +4244,176 @@ function gerarPdfRecebimentos(){
   fecharModalPdf();
 }
 
+/* ====================== RELATÓRIO PDF — reclamações de cliente por período ====================== */
+function descricaoFiltrosTela(){
+  var f = [], st = document.getElementById('fStatusReclamacao'), cr = document.getElementById('fCritReclamacao').value,
+      cl = document.getElementById('fClassReclamacao').value, bu = document.getElementById('fBuscaReclamacao').value.trim();
+  if (st.value) f.push('status: ' + st.options[st.selectedIndex].text.replace(/^—\s*/, ''));
+  if (cr) f.push('criticidade: ' + cr);
+  if (cl) f.push('conclusão: ' + cl);
+  if (bu) f.push('busca: "' + bu + '"');
+  return f;
+}
+function abrirModalPdfRec(){
+  var de = document.getElementById('fDeReclamacao').value, ate = document.getElementById('fAteReclamacao').value;
+  if (!de && !ate) { var h = new Date(); de = h.getFullYear() + '-' + pad2(h.getMonth() + 1) + '-01'; ate = hojeISO(); }
+  document.getElementById('pdfRecDe').value = de; document.getElementById('pdfRecAte').value = ate;
+  var f = descricaoFiltrosTela(), chk = document.getElementById('pdfRecFiltros');
+  chk.checked = f.length > 0; chk.disabled = !f.length;
+  document.getElementById('pdfRecFiltrosTxt').textContent = f.length ? '(' + f.join(' · ') + ')' : '(nenhum filtro ativo na tela)';
+  document.getElementById('saveMsgPdfRec').textContent = '';
+  previaPdfRec();
+  document.getElementById('modalPdfRec').classList.remove('hidden');
+}
+function fecharModalPdfRec(){ document.getElementById('modalPdfRec').classList.add('hidden'); }
+document.getElementById('modalPdfRec').addEventListener('click', function(e){ if (e.target.id === 'modalPdfRec') fecharModalPdfRec(); });
+['pdfRecDe', 'pdfRecAte'].forEach(function(id){ document.getElementById(id).addEventListener('change', previaPdfRec); });
+function reclamacoesDoRelatorio(){
+  return filtrarReclamacoes(document.getElementById('pdfRecDe').value, document.getElementById('pdfRecAte').value, document.getElementById('pdfRecFiltros').checked)
+    .sort(function(a, b){ return (dataBRparaISO(a['Data'] || '') || '').localeCompare(dataBRparaISO(b['Data'] || '') || '') || String(a['RAC']).localeCompare(String(b['RAC'])); });
+}
+function previaPdfRec(){
+  var lista = reclamacoesDoRelatorio(), conc = lista.filter(recConcluida).length;
+  document.getElementById('pdfRecResumo').textContent = lista.length ? lista.length + ' reclamação(ões) no relatório — ' + conc + ' concluída(s), ' + (lista.length - conc) + ' em andamento.' : 'Nenhuma reclamação nesse período.';
+}
+function gerarPdfReclamacoes(){
+  var msg = document.getElementById('saveMsgPdfRec');
+  var de = document.getElementById('pdfRecDe').value, ate = document.getElementById('pdfRecAte').value;
+  if (!de || !ate) { msg.className = 'save-msg err'; msg.textContent = 'Informe as duas datas do período.'; return; }
+  if (de > ate) { msg.className = 'save-msg err'; msg.textContent = 'A data inicial é depois da final.'; return; }
+  var lista = reclamacoesDoRelatorio();
+  if (!lista.length) { msg.className = 'save-msg err'; msg.textContent = 'Nenhuma reclamação nesse período.'; return; }
+  var Ctor = window.jspdf && window.jspdf.jsPDF;
+  if (!Ctor) { msg.className = 'save-msg err'; msg.textContent = 'A biblioteca de PDF não carregou (rede bloqueando cdn.jsdelivr.net?). Atualize a página e tente de novo.'; return; }
+  var detalhe = document.getElementById('pdfRecDetalhe').checked, filtros = document.getElementById('pdfRecFiltros').checked ? descricaoFiltrosTela() : [];
+  var doc = new Ctor({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  var W = 297, H = 210, M = 12, BASE = H - M - 6, agora = new Date();
+  var emitido = pad2(agora.getDate()) + '/' + pad2(agora.getMonth() + 1) + '/' + agora.getFullYear() + ' ' + pad2(agora.getHours()) + ':' + pad2(agora.getMinutes());
+  var periodo = formatarDataBR(de) + ' a ' + formatarDataBR(ate);
+  var COR = { txt: [30, 30, 30], dim: [115, 115, 115], linha: [210, 210, 210], proc: [192, 0, 0], improc: [22, 128, 61], alerta: [180, 110, 0], inc: [110, 110, 110], acento: [21, 101, 120] };
+  function cor(c){ doc.setTextColor(c[0], c[1], c[2]); }
+  function corResultado(r){ var k = chaveResultado(r['Classificação']); return !recConcluida(r) ? COR.dim : k === 'procedente' ? COR.proc : k === 'improcedente' ? COR.improc : k === 'alerta' ? COR.alerta : COR.inc; }
+  function cabecalho(sub){
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(14); cor(COR.txt);
+    doc.text('Relatório de Reclamações de Cliente', M, M + 4);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8); cor(COR.dim);
+    doc.text('BlowPet · Qualidade · emitido em ' + emitido, W - M, M + 4, { align: 'right' });
+    doc.setFontSize(9); cor(COR.txt);
+    doc.text('Período (data de entrada): ' + periodo + (sub ? '   ·   ' + sub : ''), M, M + 9.5);
+    doc.setDrawColor(COR.linha[0], COR.linha[1], COR.linha[2]); doc.setLineWidth(0.3); doc.line(M, M + 12, W - M, M + 12);
+    return M + 17;
+  }
+  var y = cabecalho('');
+  if (filtros.length) { doc.setFontSize(8); cor(COR.dim); doc.text('Filtros aplicados: ' + filtros.join(' · '), M, y - 1.5); y += 3; }
+
+  // resumo
+  var conc = lista.filter(recConcluida), cont = function(k){ return conc.filter(function(r){ return chaveResultado(r['Classificação']) === k; }).length; };
+  var cards = [['Reclamações', lista.length, COR.txt], ['Em andamento', lista.length - conc.length, COR.acento], ['Concluídas', conc.length, COR.txt],
+    ['Críticas', lista.filter(function(r){ return r['Criticidade'] === 'Crítica'; }).length, COR.proc],
+    ['Procedentes', cont('procedente'), COR.proc], ['Improcedentes', cont('improcedente'), COR.improc], ['Alerta', cont('alerta'), COR.alerta], ['Inconclusivas', cont('inconclusivo'), COR.inc]];
+  var gap = 3, cw = (W - 2 * M - gap * (cards.length - 1)) / cards.length;
+  cards.forEach(function(c, i){
+    var x = M + i * (cw + gap);
+    doc.setDrawColor(COR.linha[0], COR.linha[1], COR.linha[2]); doc.setFillColor(248, 248, 248); doc.roundedRect(x, y, cw, 15, 1.5, 1.5, 'FD');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(15); cor(c[2]); doc.text(String(c[1]), x + cw / 2, y + 7.5, { align: 'center' });
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); cor(COR.dim); doc.text(c[0].toUpperCase(), x + cw / 2, y + 12, { align: 'center' });
+  });
+  y += 21;
+
+  // tabela
+  var cols = [
+    { t: 'RAC', w: 20, v: function(r){ return r['RAC']; }, b: true },
+    { t: 'Entrada', w: 18, v: function(r){ return r['Data']; } },
+    { t: 'Cliente', w: 42, v: function(r){ var c = clientePorNome(r['Cliente']); return (r['Cliente'] || '') + (c && textoCliente(c) ? ' (' + textoCliente(c) + ')' : ''); } },
+    { t: 'Produto', w: 48, v: function(r){ return r['Produto'] || ''; } },
+    { t: 'Motivo', w: 50, v: function(r){ return r['Motivo'] || ''; } },
+    { t: 'Criticidade', w: 19, v: function(r){ return r['Criticidade'] || '—'; }, cor: function(r){ return r['Criticidade'] === 'Crítica' ? COR.proc : COR.txt; } },
+    { t: 'Status', w: 32, v: function(r){ return recConcluida(r) ? STATUS_CONCLUIDA : (r['Status'] || '—'); } },
+    { t: 'Conclusão', w: 24, v: function(r){ return recConcluida(r) ? (r['Classificação'] || '—') : '—'; }, cor: corResultado, b: true },
+    { t: 'Concluída em', w: 20, v: function(r){ return recConcluida(r) ? (r['Data de Conclusão'] || '') : ''; } }
+  ];
+  var fs = 8, lh = 3.5;
+  function cabTabela(){
+    doc.setFillColor(25, 25, 25); doc.rect(M, y, W - 2 * M, 7, 'F');
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(255, 255, 255);
+    var x = M; cols.forEach(function(c){ doc.text(c.t, x + 1.8, y + 4.7); x += c.w; });
+    y += 7;
+  }
+  cabTabela();
+  lista.forEach(function(r, i){
+    doc.setFontSize(fs);
+    var cel = cols.map(function(c){ doc.setFont('helvetica', c.b ? 'bold' : 'normal'); return doc.splitTextToSize(String(c.v(r) || ''), c.w - 3.6); });
+    var h = Math.max.apply(null, cel.map(function(l){ return l.length; })) * lh + 3;
+    if (y + h > BASE) { doc.addPage(); y = cabecalho('continuação'); cabTabela(); }
+    if (i % 2) { doc.setFillColor(246, 246, 246); doc.rect(M, y, W - 2 * M, h, 'F'); }
+    var x = M;
+    cols.forEach(function(c, ci){
+      doc.setFont('helvetica', c.b ? 'bold' : 'normal'); doc.setFontSize(fs); cor(c.cor ? c.cor(r) : COR.txt);
+      doc.text(cel[ci], x + 1.8, y + 4.3, { lineHeightFactor: 1.2 }); x += c.w;
+    });
+    doc.setDrawColor(COR.linha[0], COR.linha[1], COR.linha[2]); doc.setLineWidth(0.15); doc.line(M, y + h, W - M, y + h);
+    y += h;
+  });
+
+  // detalhamento: uma ficha por reclamação
+  if (detalhe) {
+    doc.addPage(); y = cabecalho('detalhamento');
+    var larg = W - 2 * M;
+    function linhas(txt, x, w, tam, estilo, c, recuo){
+      doc.setFont('helvetica', estilo || 'normal'); doc.setFontSize(tam); cor(c || COR.txt);
+      var ls = doc.splitTextToSize(String(txt), w), alt = tam * 0.42;
+      ls.forEach(function(l){
+        if (y + alt > BASE) { doc.addPage(); y = cabecalho('detalhamento (continuação)'); doc.setFont('helvetica', estilo || 'normal'); doc.setFontSize(tam); cor(c || COR.txt); }
+        doc.text(l, x, y + alt * 0.8); y += alt;
+      });
+      y += recuo || 0.8;
+    }
+    function rotulo(t){ linhas(t.toUpperCase(), M + 3, larg - 6, 7, 'bold', COR.acento, 0.4); }
+    lista.forEach(function(r){
+      if (y + 30 > BASE) { doc.addPage(); y = cabecalho('detalhamento (continuação)'); }
+      var c = clientePorNome(r['Cliente']), res = recConcluida(r) ? (r['Classificação'] || STATUS_CONCLUIDA) : 'Em andamento — ' + (r['Status'] || '');
+      doc.setFillColor(238, 243, 245); doc.rect(M, y, larg, 8, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10); cor(COR.txt);
+      doc.text(ajustarTexto(doc, r['RAC'] + '  ·  ' + (r['Cliente'] || '') + (c && textoCliente(c) ? ' (' + textoCliente(c) + ')' : '') + '  ·  entrada ' + (r['Data'] || ''), larg - 70, 10, 7), M + 3, y + 5.4);
+      doc.setFontSize(9); cor(corResultado(r)); doc.text(ajustarTexto(doc, res, 64, 9, 6.5), W - M - 3, y + 5.4, { align: 'right' });
+      y += 11;
+      linhas('Produto: ' + [r['Tipo de Produto'], r['Produto']].filter(function(x){ return x; }).join(' — ') + '     Criticidade: ' + (r['Criticidade'] || '—') + '     Responsável: ' + (r['Responsável'] || '—'), M + 3, larg - 6, 8.5);
+      linhas('Motivo: ' + (r['Motivo'] || '—'), M + 3, larg - 6, 8.5, 'normal', COR.txt, 1.6);
+      rotulo('Rastreabilidade');
+      var its = itensDaReclamacao(r['RAC']);
+      if (!its.length) linhas(TEM_TABELA.recItens ? 'Nenhuma data / lote lançado.' : (r['Data de Produção'] ? 'Data de produção: ' + r['Data de Produção'] : '—'), M + 6, larg - 9, 8.5, 'italic', COR.dim);
+      its.forEach(function(it){
+        linhas('• ' + ['Produção ' + (it['Data de Produção'] || '—'), 'lote ' + (it['Lote'] || '—'), it['Caixa'] ? 'caixa ' + it['Caixa'] : '', it['Quantidade']].filter(function(x){ return x; }).join(' · ') + (it['Observação'] ? ' — ' + it['Observação'] : ''), M + 6, larg - 9, 8.5);
+      });
+      y += 1;
+      var coms = comentariosDaReclamacao(r['RAC']).filter(function(x){ return !/^\[sistema\]/.test(x['Autor'] || ''); }).reverse();
+      if (coms.length) {
+        rotulo('Andamento');
+        coms.forEach(function(x){
+          var n = anexosDe(x).length;
+          linhas((x['Data/Hora'] || '') + ' — ' + (x['Autor'] || '') + ': ' + (x['Comentário'] || '') + (n ? '  [' + n + (n === 1 ? ' anexo]' : ' anexos]') : ''), M + 6, larg - 9, 8.5);
+        });
+        y += 1;
+      }
+      if (recConcluida(r)) {
+        rotulo('Conclusão — ' + (r['Classificação'] || '') + (r['Data de Conclusão'] ? ' em ' + r['Data de Conclusão'] : '') + (r['Concluído por'] ? ' por ' + r['Concluído por'] : ''));
+        linhas(r['Conclusão'] || '—', M + 6, larg - 9, 8.5);
+      }
+      y += 4;
+      doc.setDrawColor(COR.linha[0], COR.linha[1], COR.linha[2]); doc.setLineWidth(0.2); doc.line(M, y - 2, W - M, y - 2);
+    });
+  }
+  // rodapé com numeração
+  var n = doc.getNumberOfPages();
+  for (var pg = 1; pg <= n; pg++) {
+    doc.setPage(pg); doc.setFont('helvetica', 'normal'); doc.setFontSize(7); cor(COR.dim);
+    doc.text('Sistema da Qualidade · Reclamações de cliente · ' + periodo, M, H - M + 2);
+    doc.text('Página ' + pg + ' de ' + n, W - M, H - M + 2, { align: 'right' });
+  }
+  entregarPdf(doc, 'Reclamacoes_' + de + '_a_' + ate + '.pdf');
+  fecharModalPdfRec();
+}
+
 /* ====================== IMPORTAR EMP (.docx) ======================
    Lê o documento Word da EMP no próprio navegador (JSZip só é carregado quando precisa), monta uma ou
    mais EMPs (uma por tabela: ex. Prime/Off Grade, Tampa/Cinta), ignora "Vida útil" e abre cada uma
@@ -3698,6 +4575,218 @@ async function importarEmpArquivos(input){
     abrirModalEspec(null, fila[0]);
   } catch (e) { mostrarToast('Erro ao ler a EMP: ' + e.message, true); }
   finally { mostrarCarregando(false); }
+}
+
+/* ====================== LISTA SUSPENSA COM PESQUISA (genérica) ======================
+   cfg.itens() → [{ valor, rotulo, sub }] · cfg.aoEscolher(item ou null) · cfg.vazio() → texto quando não há itens
+   cfg.novo(texto) → opção "+ Cadastrar …" no fim da lista */
+function montarCombo(id, cfg){
+  var box = document.getElementById(id), inp = box.querySelector('input'), lista = box.querySelector('.combo-lista'), ativo = -1;
+  box._sel = null;
+  function render(){
+    var q = inp.value.trim(), ql = q.toLowerCase();
+    if (box._sel && q === box._sel.rotulo) ql = '';
+    var itens = cfg.itens().filter(function(i){ return !ql || (i.rotulo + ' ' + (i.sub || '')).toLowerCase().indexOf(ql) > -1; });
+    ativo = -1;
+    var html = itens.map(function(i, k){
+      return '<div class="combo-item" data-k="' + k + '"><span class="nm">' + marcarTermo(i.rotulo, ql ? q : '') + '</span>' + (i.sub ? '<span class="cl">' + marcarTermo(i.sub, ql ? q : '') + '</span>' : '') + '</div>';
+    }).join('');
+    var vazio = cfg.vazio && cfg.vazio();
+    if (vazio) html = '<div class="combo-vazio">' + escHtml(vazio) + '</div>';
+    else if (!itens.length) html = '<div class="combo-vazio">Nada encontrado' + (q ? ' para “' + escHtml(q) + '”' : '') + '.</div>';
+    if (!vazio && cfg.novo && q && !itens.some(function(i){ return i.rotulo.toLowerCase() === ql; })) html += '<div class="combo-item combo-novo" data-novo="1"><span class="nm">+ Cadastrar “' + escHtml(q) + '”</span></div>';
+    lista.innerHTML = html; lista.classList.remove('hidden');
+    lista._itens = itens;
+  }
+  function escolher(el){
+    if (!el) return;
+    if (el.dataset.novo) { lista.classList.add('hidden'); cfg.novo(inp.value.trim()); return; }
+    var it = lista._itens[+el.dataset.k]; box._sel = it; inp.value = it.rotulo; lista.classList.add('hidden'); cfg.aoEscolher && cfg.aoEscolher(it);
+  }
+  inp.addEventListener('focus', render);
+  inp.addEventListener('input', function(){ if (box._sel && inp.value !== box._sel.rotulo) { box._sel = null; cfg.aoEscolher && cfg.aoEscolher(null); } render(); });
+  inp.addEventListener('keydown', function(e){
+    var els = lista.querySelectorAll('.combo-item');
+    if (e.key === 'Escape') { lista.classList.add('hidden'); return; }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault(); if (lista.classList.contains('hidden')) render(); els = lista.querySelectorAll('.combo-item'); if (!els.length) return;
+      ativo = (ativo + (e.key === 'ArrowDown' ? 1 : -1) + els.length) % els.length;
+      els.forEach(function(x, k){ x.classList.toggle('ativo', k === ativo); }); els[ativo].scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') { e.preventDefault(); escolher(els[ativo > -1 ? ativo : 0]); }
+  });
+  lista.addEventListener('mousedown', function(e){ e.preventDefault(); escolher(e.target.closest('.combo-item')); });
+  document.addEventListener('mousedown', function(e){ if (!box.contains(e.target)) lista.classList.add('hidden'); });
+  box._definir = function(valor){
+    var it = cfg.itens().find(function(i){ return i.valor === valor; }) || null;
+    box._sel = it; inp.value = it ? it.rotulo : (valor || ''); lista.classList.add('hidden'); cfg.aoEscolher && cfg.aoEscolher(it);
+  };
+  box._render = render;
+  return box;
+}
+
+/* ====================== CLIENTES E PRODUTOS (usados na Reclamação) ====================== */
+var UFS = ['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'];
+function textoCliente(c){ return [c['Cidade'], c['Estado']].filter(function(x){ return x; }).join(' – '); }
+function clientePorNome(n){ n = String(n || '').trim().toLowerCase(); return DATA.clientes.find(function(c){ return String(c['Nome'] || '').trim().toLowerCase() === n; }); }
+function cadastroIndisponivel(qual){
+  if (TEM_TABELA[qual]) return false;
+  mostrarToast('A planilha ainda não tem a aba de ' + ({ clientes: 'Clientes', produtos: 'Produtos', statusRec: 'Status de reclamação' }[qual] || qual) + '. O cadastro fica disponível depois que a planilha for atualizada.', true);
+  return true;
+}
+var comboCliente = montarCombo('comboCliente', {
+  itens: function(){ return DATA.clientes.slice().sort(function(a, b){ return String(a['Nome']).localeCompare(String(b['Nome']), 'pt-BR'); }).map(function(c){ return { valor: c['Nome'], rotulo: c['Nome'], sub: textoCliente(c) }; }); },
+  vazio: function(){ return DATA.clientes.length ? '' : 'Nenhum cliente cadastrado ainda — use o + pra cadastrar.'; },
+  aoEscolher: function(it){ document.getElementById('reclamacaoClienteInfo').textContent = it ? (it.sub || '') : ''; },
+  novo: function(t){ abrirModalCliente(null, true, t); }
+});
+var comboProduto = montarCombo('comboProduto', {
+  itens: function(){
+    var tipo = document.getElementById('reclamacaoTipoProdSelect').value;
+    return DATA.produtos.filter(function(p){ return String(p['Tipo']) === tipo; }).sort(function(a, b){ return String(a['Produto']).localeCompare(String(b['Produto']), 'pt-BR'); }).map(function(p){ return { valor: p['Produto'], rotulo: p['Produto'], sub: '' }; });
+  },
+  vazio: function(){
+    var tipo = document.getElementById('reclamacaoTipoProdSelect').value;
+    if (!tipo) return 'Escolha primeiro o tipo de produto (preforma ou frasco).';
+    return DATA.produtos.some(function(p){ return String(p['Tipo']) === tipo; }) ? '' : 'Nenhum produto do tipo ' + tipo.toLowerCase() + ' cadastrado — use o + pra cadastrar.';
+  },
+  novo: function(t){ abrirModalProduto(null, true, t); }
+});
+function aoMudarTipoProduto(){
+  var tipo = document.getElementById('reclamacaoTipoProdSelect').value, inp = document.getElementById('reclamacaoProdutoInput');
+  comboProduto._definir('');
+  inp.placeholder = tipo ? 'Digite pra pesquisar o produto (' + tipo.toLowerCase() + ')…' : 'Escolha primeiro o tipo de produto';
+}
+
+// ---- cadastro de cliente ----
+var clienteEditando = null, clienteDaReclamacao = false;
+function abrirModalCliente(nome, daReclamacao, nomeSugerido){
+  if (cadastroIndisponivel('clientes')) return;
+  var c = nome ? clientePorNome(nome) : null;
+  clienteEditando = c ? c['Nome'] : null; clienteDaReclamacao = !!daReclamacao;
+  document.getElementById('modalClienteTitulo').textContent = c ? 'Editar cliente' : 'Novo cliente';
+  document.getElementById('clienteNomeInput').value = c ? c['Nome'] : (nomeSugerido || (daReclamacao ? document.getElementById('reclamacaoClienteInput').value.trim() : ''));
+  document.getElementById('clienteCidadeInput').value = c ? (c['Cidade'] || '') : '';
+  var uf = document.getElementById('clienteUFSelect');
+  uf.innerHTML = '<option value="">—</option>' + UFS.map(function(u){ return '<option value="' + u + '">' + u + '</option>'; }).join('');
+  uf.value = c ? (c['Estado'] || '') : 'SP';
+  document.getElementById('saveMsgCliente').textContent = '';
+  document.getElementById('modalCliente').classList.remove('hidden');
+  setTimeout(function(){ document.getElementById(c ? 'clienteCidadeInput' : 'clienteNomeInput').focus(); }, 50);
+}
+function fecharModalCliente(){ document.getElementById('modalCliente').classList.add('hidden'); }
+document.getElementById('modalCliente').addEventListener('click', function(e){ if (e.target.id === 'modalCliente') fecharModalCliente(); });
+async function salvarCliente(){
+  var msg = document.getElementById('saveMsgCliente'), btn = document.getElementById('btnSalvarCliente');
+  function erro(t){ msg.className = 'save-msg err'; msg.textContent = t; }
+  var nome = document.getElementById('clienteNomeInput').value.trim().replace(/\s+/g, ' ');
+  var cidade = document.getElementById('clienteCidadeInput').value.trim(), uf = document.getElementById('clienteUFSelect').value;
+  if (!nome) return erro('Informe o nome do cliente.');
+  if (!cidade) return erro('Informe a cidade.');
+  if (!uf) return erro('Escolha o estado.');
+  var dup = clientePorNome(nome);
+  if (dup && dup['Nome'] !== clienteEditando) return erro('Já existe o cliente "' + dup['Nome'] + '".');
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    var ant = clienteEditando ? clientePorNome(clienteEditando) : null, obj = { 'Nome': nome, 'Cidade': cidade, 'Estado': uf };
+    if (ant) await atualizarLinha('clientes', ant.__index, Object.assign({}, ant, obj)); else await adicionarLinha('clientes', obj);
+    // renomeou? atualiza as reclamações e os rótulos desse cliente
+    if (ant && ant['Nome'] !== nome) {
+      for (var i = 0; i < DATA.reclamacoes.length; i++) { var r = DATA.reclamacoes[i]; if (r['Cliente'] === ant['Nome']) await atualizarLinha('reclamacoes', r.__index, Object.assign({}, r, { 'Cliente': nome })); }
+      for (var j = 0; j < DATA.rotulosHomologados.length; j++) { var rt = DATA.rotulosHomologados[j]; if (rt['Cliente'] === ant['Nome']) await atualizarLinha('rotulosHomologados', rt.__index, Object.assign({}, rt, { 'Cliente': nome })); }
+      DATA.reclamacoes = linhasParaObjetos('reclamacoes', await lerLinhasBrutas(TABELAS.reclamacoes));
+      DATA.rotulosHomologados = linhasParaObjetos('rotulosHomologados', await lerLinhasBrutas(TABELAS.rotulosHomologados));
+    }
+    DATA.clientes = linhasParaObjetos('clientes', await lerLinhasBrutas(TABELAS.clientes));
+    renderClientes(); renderReclamacoes(); atualizarContagensCadastros();
+    if (clienteDaReclamacao) comboCliente._definir(nome);
+    mostrarToast('Cliente ' + nome + ' salvo.');
+    fecharModalCliente();
+  } catch (e) { erro('Erro: ' + e.message); }
+  finally { btn.disabled = false; }
+}
+async function excluirCliente(nome){
+  if (cadastroIndisponivel('clientes')) return;
+  var c = clientePorNome(nome); if (!c) return;
+  var n = DATA.reclamacoes.filter(function(r){ return r['Cliente'] === c['Nome']; }).length;
+  if (!confirm('Excluir o cliente "' + c['Nome'] + '"?' + (n ? ' Ele tem ' + n + ' reclamação(ões); elas não são apagadas.' : ''))) return;
+  try {
+    await excluirLinhaPorIndice('clientes', c.__index);
+    DATA.clientes = linhasParaObjetos('clientes', await lerLinhasBrutas(TABELAS.clientes));
+    renderClientes(); atualizarContagensCadastros(); mostrarToast('Cliente excluído.');
+  } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
+}
+function renderClientes(){
+  var q = cadAtual === 'clientes' ? termoBuscaCadastro() : '', tb = document.getElementById('tbodyClientes');
+  var lista = DATA.clientes.filter(function(c){ return !q || (c['Nome'] + ' ' + textoCliente(c)).toLowerCase().indexOf(q) > -1; })
+    .sort(function(a, b){ return String(a['Nome']).localeCompare(String(b['Nome']), 'pt-BR'); });
+  tb.innerHTML = lista.length ? lista.map(function(c){
+    var n = DATA.reclamacoes.filter(function(r){ return r['Cliente'] === c['Nome']; }).length, nm = escHtml(c['Nome']).replace(/'/g, '&#39;');
+    return '<tr><td>' + escHtml(c['Nome']) + '</td><td class="cell-dim">' + escHtml(c['Cidade'] || '') + '</td><td class="mono">' + escHtml(c['Estado'] || '') + '</td><td class="tabular">' + (n || '—') + '</td>' +
+      '<td class="row-actions-cell"><span class="row-actions"><button type="button" class="icon-btn icon-only" title="Editar" onclick="abrirModalCliente(this.dataset.n)" data-n="' + escHtml(c['Nome']) + '"><svg><use href="#i-pencil"/></svg></button>' +
+      '<button type="button" class="icon-btn icon-only danger" title="Excluir" onclick="excluirCliente(this.dataset.n)" data-n="' + escHtml(c['Nome']) + '"><svg><use href="#i-trash"/></svg></button></span></td></tr>';
+  }).join('') : '<tr><td colspan="5" class="empty-note">' + (q ? 'Nenhum cliente encontrado.' : (TEM_TABELA.clientes ? 'Nenhum cliente cadastrado ainda.' : 'A planilha ainda não tem a aba de Clientes — fica disponível depois da atualização.')) + '</td></tr>';
+}
+
+// ---- cadastro de produto (preforma / frasco) ----
+var produtoEditando = null, produtoDaReclamacao = false;
+function produtoPor(tipo, nome){ nome = String(nome || '').trim().toLowerCase(); return DATA.produtos.find(function(p){ return String(p['Tipo']) === tipo && String(p['Produto'] || '').trim().toLowerCase() === nome; }); }
+function abrirModalProduto(idx, daReclamacao, nomeSugerido){
+  if (cadastroIndisponivel('produtos')) return;
+  var p = (idx !== null && idx !== undefined) ? DATA.produtos.find(function(x){ return x.__index === idx; }) : null;
+  produtoEditando = p ? p.__index : null; produtoDaReclamacao = !!daReclamacao;
+  document.getElementById('modalProdutoTitulo').textContent = p ? 'Editar produto' : 'Novo produto';
+  var tipoRec = document.getElementById('reclamacaoTipoProdSelect').value;
+  document.getElementById('produtoTipoSelect').value = p ? p['Tipo'] : (daReclamacao && tipoRec ? tipoRec : 'Preforma');
+  document.getElementById('produtoNomeInput').value = p ? p['Produto'] : (nomeSugerido || (daReclamacao ? document.getElementById('reclamacaoProdutoInput').value.trim() : ''));
+  document.getElementById('saveMsgProduto').textContent = '';
+  document.getElementById('modalProduto').classList.remove('hidden');
+  setTimeout(function(){ document.getElementById('produtoNomeInput').focus(); }, 50);
+}
+function fecharModalProduto(){ document.getElementById('modalProduto').classList.add('hidden'); }
+document.getElementById('modalProduto').addEventListener('click', function(e){ if (e.target.id === 'modalProduto') fecharModalProduto(); });
+async function salvarProduto(){
+  var msg = document.getElementById('saveMsgProduto'), btn = document.getElementById('btnSalvarProduto');
+  function erro(t){ msg.className = 'save-msg err'; msg.textContent = t; }
+  var tipo = document.getElementById('produtoTipoSelect').value, nome = document.getElementById('produtoNomeInput').value.trim().replace(/\s+/g, ' ');
+  if (!nome) return erro('Informe o produto.');
+  var dup = produtoPor(tipo, nome);
+  if (dup && dup.__index !== produtoEditando) return erro('Já existe esse produto (' + tipo.toLowerCase() + ').');
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    var ant = produtoEditando !== null ? DATA.produtos.find(function(x){ return x.__index === produtoEditando; }) : null, obj = { 'Tipo': tipo, 'Produto': nome };
+    if (ant) await atualizarLinha('produtos', ant.__index, Object.assign({}, ant, obj)); else await adicionarLinha('produtos', obj);
+    if (ant && ant['Produto'] !== nome) {
+      for (var i = 0; i < DATA.reclamacoes.length; i++) { var r = DATA.reclamacoes[i]; if (r['Produto'] === ant['Produto'] && (r['Tipo de Produto'] || ant['Tipo']) === ant['Tipo']) await atualizarLinha('reclamacoes', r.__index, Object.assign({}, r, { 'Produto': nome, 'Tipo de Produto': tipo })); }
+      DATA.reclamacoes = linhasParaObjetos('reclamacoes', await lerLinhasBrutas(TABELAS.reclamacoes));
+    }
+    DATA.produtos = linhasParaObjetos('produtos', await lerLinhasBrutas(TABELAS.produtos));
+    renderProdutos(); renderReclamacoes(); atualizarContagensCadastros();
+    if (produtoDaReclamacao) { document.getElementById('reclamacaoTipoProdSelect').value = tipo; aoMudarTipoProduto(); comboProduto._definir(nome); }
+    mostrarToast('Produto salvo.');
+    fecharModalProduto();
+  } catch (e) { erro('Erro: ' + e.message); }
+  finally { btn.disabled = false; }
+}
+async function excluirProduto(idx){
+  if (cadastroIndisponivel('produtos')) return;
+  var p = DATA.produtos.find(function(x){ return x.__index === idx; }); if (!p) return;
+  if (!confirm('Excluir o produto "' + p['Produto'] + '"? Reclamações já lançadas não são alteradas.')) return;
+  try {
+    await excluirLinhaPorIndice('produtos', p.__index);
+    DATA.produtos = linhasParaObjetos('produtos', await lerLinhasBrutas(TABELAS.produtos));
+    renderProdutos(); atualizarContagensCadastros(); mostrarToast('Produto excluído.');
+  } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
+}
+function renderProdutos(){
+  var q = cadAtual === 'produtos' ? termoBuscaCadastro() : '', tb = document.getElementById('tbodyProdutos');
+  var lista = DATA.produtos.filter(function(p){ return !q || (p['Tipo'] + ' ' + p['Produto']).toLowerCase().indexOf(q) > -1; })
+    .sort(function(a, b){ return String(a['Tipo']).localeCompare(String(b['Tipo'])) || String(a['Produto']).localeCompare(String(b['Produto']), 'pt-BR'); });
+  tb.innerHTML = lista.length ? lista.map(function(p){
+    var n = DATA.reclamacoes.filter(function(r){ return r['Produto'] === p['Produto']; }).length;
+    return '<tr><td><span class="pill">' + escHtml(p['Tipo'] || '') + '</span></td><td>' + escHtml(p['Produto'] || '') + '</td><td class="tabular">' + (n || '—') + '</td>' +
+      '<td class="row-actions-cell"><span class="row-actions"><button type="button" class="icon-btn icon-only" title="Editar" onclick="abrirModalProduto(' + p.__index + ')"><svg><use href="#i-pencil"/></svg></button>' +
+      '<button type="button" class="icon-btn icon-only danger" title="Excluir" onclick="excluirProduto(' + p.__index + ')"><svg><use href="#i-trash"/></svg></button></span></td></tr>';
+  }).join('') : '<tr><td colspan="4" class="empty-note">' + (q ? 'Nenhum produto encontrado.' : (TEM_TABELA.produtos ? 'Nenhum produto cadastrado ainda.' : 'A planilha ainda não tem a aba de Produtos — fica disponível depois da atualização.')) + '</td></tr>';
 }
 </script>
 </body>
