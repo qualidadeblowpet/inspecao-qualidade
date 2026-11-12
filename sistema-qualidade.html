@@ -375,6 +375,8 @@ table.occ tr:hover td{background:var(--surface-2);}
 .laudo-preview .thumb{width:44px; height:44px; border-radius:6px; object-fit:cover; background:var(--surface-3); flex-shrink:0; cursor:zoom-in; display:flex; align-items:center; justify-content:center; color:var(--fg-dim);}
 .laudo-preview .thumb svg{width:20px; height:20px;}
 .laudo-preview .info{flex:1; min-width:0;}
+.laudo-girar{display:inline-flex; gap:4px;}
+.laudo-girar.hidden{display:none;}
 .laudo-preview .nome{font-size:12.5px; font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
 .laudo-preview .det{font-size:11px; color:var(--fg-faint);}
 .itens-table td{padding:6px 8px;}
@@ -602,6 +604,10 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 .conc-op b{display:block; font-size:13.5px;}
 .conc-op small{display:block; font-size:11.5px; color:var(--fg-faint); line-height:1.4; margin-top:2px;}
 .conc-op:has(input:checked){border-color:var(--accent); background:var(--accent-soft);}
+.dw-acoes{display:flex; justify-content:flex-end; gap:8px; margin:12px 0 0;}
+.link-btn{border:none; background:none; padding:0; color:var(--accent); font:inherit; cursor:pointer; text-decoration:underline; text-underline-offset:2px;}
+.girar-area{background:var(--surface-2); border:1px solid var(--border); border-radius:10px; height:360px; display:flex; align-items:center; justify-content:center; overflow:hidden;}
+.girar-area img{max-width:330px; max-height:330px; transition:transform .2s ease; box-shadow:0 2px 10px rgba(0,0,0,.2);}
 .form-box{background:var(--surface-2); border:1px solid var(--border); border-radius:12px; padding:12px 14px; margin:12px 0 4px; display:flex; flex-direction:column; gap:9px;}
 .form-box .fb-t{font-size:10px; font-weight:600; letter-spacing:.5px; text-transform:uppercase; color:var(--fg-faint);}
 .form-box .fb-btns{display:flex; flex-wrap:wrap; gap:8px;}
@@ -685,6 +691,8 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="13" r="3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-rot-dir" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-rot-esq" viewBox="0 0 24 24"><path d="M4 11a8 8 0 1 1 2.3 5.7M4 4v7h7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m3.5 7 8.5 6 8.5-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-whats" viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 0 1-12.6 7.4L3.5 20.6l1.2-4.2A8.5 8.5 0 1 1 20.5 12z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.6c.2-.4.5-.4.8-.4h.4c.2 0 .4.1.5.4l.6 1.4c.1.2 0 .5-.1.6l-.5.6c.6 1.1 1.5 2 2.6 2.6l.6-.5c.2-.1.4-.2.6-.1l1.4.6c.3.1.4.3.4.5v.4c0 .3 0 .6-.4.8-.6.4-1.6.6-2.8 0a9 9 0 0 1-4-4c-.6-1.2-.4-2.2 0-2.9z" fill="currentColor"/></symbol>
 <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v4a2 2 0 0 0 2 2h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 13H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 17H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
@@ -955,6 +963,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
             <div class="laudo-preview hidden" id="laudoPreview">
               <div class="thumb" id="laudoPreviewThumb" title="Ver em tamanho maior" onclick="verLaudoSelecionado()"></div>
               <div class="info"><div class="nome" id="laudoPreviewNome"></div><div class="det" id="laudoPreviewDet"></div></div>
+              <span class="laudo-girar" id="laudoGirar"><button type="button" class="icon-btn icon-only" title="Girar para a esquerda" onclick="girarLaudoSelecionado(-1)"><svg><use href="#i-rot-esq"/></svg></button><button type="button" class="icon-btn icon-only" title="Girar para a direita" onclick="girarLaudoSelecionado(1)"><svg><use href="#i-rot-dir"/></svg></button></span>
               <button type="button" class="icon-btn icon-only danger" title="Remover (pra trocar, remova e escolha de novo)" onclick="limparLaudoSelecionado()"><svg><use href="#i-trash"/></svg></button>
             </div>
             <div class="laudo-existente hidden" id="laudoExistente"></div>
@@ -1325,6 +1334,26 @@ table.occ tbody tr.clicavel{cursor:pointer;}
     </div>
   </div>
 
+  <!-- ===================== JANELA — GIRAR LAUDO JÁ SALVO ===================== -->
+  <div class="modal-overlay hidden" id="modalGirarLaudo" style="z-index:226;">
+    <div class="modal-card" style="max-width:480px;">
+      <button class="modal-close" onclick="fecharGirarLaudo()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2>Girar foto do laudo</h2><p class="tela-sub" style="margin-top:6px;">Gire até ficar de pé e salve — a foto é salva de novo no OneDrive já na posição certa.</p></div>
+      <div class="form-wrap" style="padding-top:10px; max-width:none; display:flex; flex-direction:column; gap:12px;">
+        <div class="girar-area" id="girarArea"><span class="cell-dim">Carregando…</span></div>
+        <div style="display:flex; justify-content:center; gap:10px;">
+          <button type="button" class="btn" onclick="girarLaudoSalvo(-1)"><svg><use href="#i-rot-esq"/></svg> Girar à esquerda</button>
+          <button type="button" class="btn" onclick="girarLaudoSalvo(1)"><svg><use href="#i-rot-dir"/></svg> Girar à direita</button>
+        </div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgGirar"></span>
+          <button class="btn btn-ghost" onclick="fecharGirarLaudo()">Cancelar</button>
+          <button class="btn btn-accent" id="btnSalvarGiro" onclick="salvarGiroLaudo()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== JANELA — CONFIRMAÇÃO ===================== -->
   <div class="modal-overlay hidden" id="modalConfirma" style="z-index:300;">
     <div class="modal-card" style="max-width:460px;">
@@ -1520,7 +1549,7 @@ const TABLE_COLS_PADRAO = JSON.parse(JSON.stringify(TABLE_COLS));
 // Colunas gravadas como NÚMERO (o resto vai como texto, pra o Excel não converter datas/NF/lotes).
 const COLS_NUM_QTD = ['Quantidade'];
 const COLS_NUM_MED = ['Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)'];
-const VERSAO_SISTEMA = '11/11/2026 14:06';   // data/hora desta versão — atualizada a cada entrega
+const VERSAO_SISTEMA = '12/11/2026 12:22';   // data/hora desta versão — atualizada a cada entrega
 document.getElementById('versaoSistema').textContent = VERSAO_SISTEMA;
 const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
@@ -1582,7 +1611,7 @@ if (typeof msal === 'undefined') {
     await msalPronto;
     var req = { scopes: graphScopes, account: contaAtual };
     try { var res = await msalInstance.acquireTokenSilent(req); return res.accessToken; }
-    catch (e) { var res2 = await msalInstance.acquireTokenPopup(req); return res2.accessToken; }
+    catch (e) { if (window.__semPopupLogin) throw e; var res2 = await msalInstance.acquireTokenPopup(req); return res2.accessToken; }
   }
   window.getToken = getToken;
 
@@ -1671,6 +1700,29 @@ async function conectarPlanilha(){
     mostrarCarregando(false);
   }
 }
+
+/* ---- atualização automática: a cada 30 min e ao voltar pro sistema (se passou de 5 min) ---- */
+var ULTIMA_LEITURA = 0, atualizandoAuto = false, avisoAutoFalhou = false;
+function algoAbertoNaTela(){
+  return !!document.querySelector('.modal-overlay:not(.hidden)') || !document.getElementById('loadingOverlay').classList.contains('hidden') ||
+         document.getElementById('app').classList.contains('hidden');
+}
+async function atualizacaoAutomatica(){
+  if (!contaAtual || atualizandoAuto || algoAbertoNaTela()) return;
+  atualizandoAuto = true; window.__semPopupLogin = true;
+  try {
+    await carregarTudo();
+    var dw = document.getElementById('drawer');
+    if (!dw.classList.contains('hidden')) { if (detalheAtual) abrirDetalhe(detalheAtual.mat, detalheAtual.index); else if (fichaAberta()) renderFichaReclamacao(); }
+    avisoAutoFalhou = false;
+  } catch (e) {
+    if (!avisoAutoFalhou) { mostrarToast('Não foi possível atualizar automaticamente — clique em Atualizar.', true); avisoAutoFalhou = true; }
+  } finally { atualizandoAuto = false; window.__semPopupLogin = false; }
+}
+setInterval(function(){ if (ULTIMA_LEITURA && Date.now() - ULTIMA_LEITURA >= 30 * 60 * 1000) atualizacaoAutomatica(); }, 60 * 1000);
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible' && ULTIMA_LEITURA && Date.now() - ULTIMA_LEITURA >= 5 * 60 * 1000) atualizacaoAutomatica();
+});
 
 function recarregarTudo(){
   mostrarCarregando(true, 'Atualizando…');
@@ -1898,6 +1950,7 @@ async function carregarTudo(){
   popularSelectsFixos();
   renderTudo();
   document.getElementById('dadosAtualizados').textContent = agoraBR();
+  ULTIMA_LEITURA = Date.now();
 }
 
 function montarListas(linhas){
@@ -2289,14 +2342,17 @@ function abrirDetalhe(mat, index){
   document.getElementById('dwSub').textContent = MAT_LABEL_PLANO[mat] + ' · ' + (r['Fornecedor'] || '—') + (r['Tipo'] ? ' — ' + r['Tipo'] : '');
   document.getElementById('dwBadge').innerHTML = badgeLabel(r['Status']);
   function kv(rot, val, cls){ return '<div><dt>' + rot + '</dt><dd' + (cls ? ' class="' + cls + '"' : '') + '>' + (val ? escHtml(val) : '<span class="res-pend">—</span>') + '</dd></div>'; }
-  var html = formalizacaoBoxHtml(mat, r) + '<div class="section-title">Dados</div><dl class="dw-kv">' +
+  var emAnalise = statusKey(r['Status']) === 'analise';
+  var html = '<div class="dw-acoes"><button type="button" class="btn' + (emAnalise ? ' btn-accent' : '') + '" onclick="atualizarDoDetalhe(\'' + mat + '\', ' + r.__index + ')"><svg><use href="#i-pencil"/></svg> ' + (emAnalise ? 'Lançar / atualizar análises' : 'Editar recebimento') + '</button></div>' +
+    formalizacaoBoxHtml(mat, r) + '<div class="section-title">Dados</div><dl class="dw-kv">' +
     kv('Data', r['Data Recebimento'] || r['Data'], 'tabular') + kv('Nota fiscal', r['Nota Fiscal'], 'mono') +
     (mat === 'rotulo' ? kv('Cliente', r['Fornecedor']) + kv('Volume', r['Tipo']) : kv('Fornecedor', r['Fornecedor']) + kv('Tipo', r['Tipo'])) +
     (ehResina ? kv('Lote do fornecedor', r['Lote Fornecedor'], 'mono') + kv('Código', r['Código Produto'], 'mono') : kv('Lote', r['Lote'], 'mono') + (mat === 'rotulo' ? '' : kv('Código do produto', codigoProdutoDe(mat, r['Fornecedor'], r['Tipo']), 'mono'))) +
     kv('Quantidade', [r['Quantidade'], r['Unidade']].filter(function(x){ return x; }).join(' '), 'tabular') + kv('Responsável', r['Responsável']) +
     (mat === 'rotulo' ? kv('Rótulo', r['Modelo do Rótulo']) + kv('Conferência visual', r['Conferência Visual']) : '') +
     kv('EMP da análise', r['EMP']) +
-    '<div><dt>Laudo</dt><dd>' + (r['Arquivo do Laudo'] ? '<a href="' + escHtml(r['Arquivo do Laudo']) + '" target="_blank">abrir laudo</a>' : '<span class="res-pend">sem laudo</span>') + '</dd></div></dl>';
+    '<div><dt>Laudo</dt><dd>' + (r['Arquivo do Laudo'] ? '<a href="' + escHtml(r['Arquivo do Laudo']) + '" target="_blank">abrir laudo</a>' +
+      (ehPdf(r['Arquivo do Laudo']) ? '' : ' · <button type="button" class="link-btn" onclick="abrirGirarLaudo(\'' + mat + '\', ' + r.__index + ')">girar</button>') : '<span class="res-pend">sem laudo</span>') + '</dd></div></dl>';
   var fichaDw = fichaDe(mat, String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim(), r['Modelo do Rótulo']);
   if (ehResina || fichaDw) {
     var ficha = fichaDw;
@@ -2848,30 +2904,93 @@ async function enviarComentario(){
 
 
 /* ====================== FOTO DO LAUDO (câmera ou arquivo) ====================== */
-var laudoArquivoPronto = null, laudoPreviewUrl = null;
+var laudoArquivoPronto = null, laudoPreviewUrl = null, laudoOriginal = null, laudoGiro = 0;
 function formatarTamanho(bytes){ return bytes >= 1048576 ? (bytes/1048576).toFixed(1).replace('.', ',') + ' MB' : Math.max(1, Math.round(bytes/1024)) + ' KB'; }
 // Reduz a foto pra no máximo 1600 px no lado maior (JPEG ~82%) — foto de celular tem 3–8 MB e fica
 // em ~300–500 KB, com o texto do laudo ainda legível. PDF e imagens já pequenas vão sem alteração.
 // Se o navegador não conseguir abrir a imagem (ex.: formato raro), envia o arquivo original.
-function reduzirImagem(file, maxLado, qualidade){
+// ---- orientação das fotos (EXIF) ----
+// O celular grava a foto "deitada" e anota no arquivo como girar. Alguns navegadores aplicam isso ao
+// desenhar no canvas, outros não — então o sistema testa uma vez e, se preciso, gira na mão.
+var EXIF_TESTE = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4QAiRXhpZgAATU0AKgAAAAgAAQESAAMAAAABAAYAAAAAAAD/2wBDAAIBAQEBAQIBAQECAgICAgQDAgICAgUEBAMEBgUGBgYFBgYGBwkIBgcJBwYGCAsICQoKCgoKBggLDAsKDAkKCgr/2wBDAQICAgICAgUDAwUKBwYHCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgr/wAARCAAIABADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD4vr5Door+qP2Zf/NV/wDcj/7uH9qftDP+aZ/7nf8A3UP/2Q==';
+var giroExifNavegador = null;   // Promise<boolean>: o navegador já desenha a foto girada?
+function navegadorAplicaExif(){
+  if (giroExifNavegador) return giroExifNavegador;
+  giroExifNavegador = new Promise(function(resolve){
+    var img = new Image();
+    img.onload = function(){
+      try {
+        var w = img.naturalWidth, h = img.naturalHeight, c = document.createElement('canvas'); c.width = w; c.height = h;
+        var g = c.getContext('2d'); g.drawImage(img, 0, 0);
+        var px = g.getImageData(Math.floor(w / 2), 1, 1, 1).data;   // em cima: vermelho se já veio girada
+        resolve(w < h && px[0] > 150 && px[2] < 100);
+      } catch (e) { resolve(true); }
+    };
+    img.onerror = function(){ resolve(true); };
+    img.src = EXIF_TESTE;
+  });
+  return giroExifNavegador;
+}
+function lerOrientacaoExif(file){
+  return new Promise(function(resolve){
+    if (!file || !/jpe?g/i.test(file.type || '')) { resolve(1); return; }
+    var fr = new FileReader();
+    fr.onload = function(){
+      try {
+        var v = new DataView(fr.result);
+        if (v.getUint16(0) !== 0xFFD8) { resolve(1); return; }
+        var off = 2, len = v.byteLength;
+        while (off + 4 < len) {
+          var marc = v.getUint16(off); off += 2;
+          if (marc === 0xFFE1) {
+            if (v.getUint32(off + 2) !== 0x45786966) { resolve(1); return; }   // "Exif"
+            var t = off + 8, le = v.getUint16(t) === 0x4949, ifd = t + v.getUint32(t + 4, le), n = v.getUint16(ifd, le);
+            for (var i = 0; i < n; i++) { var e = ifd + 2 + i * 12; if (v.getUint16(e, le) === 0x0112) { resolve(v.getUint16(e + 8, le) || 1); return; } }
+            resolve(1); return;
+          } else if ((marc & 0xFF00) !== 0xFF00) break;
+          else off += v.getUint16(off);
+        }
+      } catch (e) {}
+      resolve(1);
+    };
+    fr.onerror = function(){ resolve(1); };
+    fr.readAsArrayBuffer(file.slice(0, 131072));
+  });
+}
+// Desenha a imagem já de pé (orientação EXIF, se o navegador não aplica) + giro manual (0/90/180/270)
+function desenharDePe(img, orientacao, giro, maxLado){
+  var w = img.naturalWidth, h = img.naturalHeight;
+  var ops = { 1: [0, 1], 2: [0, -1], 3: [180, 1], 4: [180, -1], 5: [90, -1], 6: [90, 1], 7: [270, -1], 8: [270, 1] }[orientacao] || [0, 1];
+  var ang = (ops[0] + (giro || 0)) % 360, espelha = ops[1] < 0;
+  var escala = Math.min(1, maxLado / Math.max(w, h)), dw = Math.round(w * escala), dh = Math.round(h * escala);
+  var deitado = ang === 90 || ang === 270, c = document.createElement('canvas');
+  c.width = deitado ? dh : dw; c.height = deitado ? dw : dh;
+  var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+  g.translate(c.width / 2, c.height / 2); g.rotate(ang * Math.PI / 180); if (espelha) g.scale(-1, 1);
+  g.drawImage(img, -dw / 2, -dh / 2, dw, dh);
+  return c;
+}
+function reduzirImagem(file, maxLado, qualidade, giro){
+  giro = ((giro || 0) % 360 + 360) % 360;
   return new Promise(function(resolve){
     if (!file.type || file.type.indexOf('image/') !== 0) { resolve(file); return; }
-    var url = URL.createObjectURL(file), img = new Image();
-    img.onload = function(){
-      var w = img.naturalWidth, h = img.naturalHeight, maior = Math.max(w, h);
-      if (maior <= maxLado && file.size <= 700 * 1024) { URL.revokeObjectURL(url); resolve(file); return; }
-      var escala = Math.min(1, maxLado / maior), cw = Math.round(w * escala), ch = Math.round(h * escala);
-      var canvas = document.createElement('canvas'); canvas.width = cw; canvas.height = ch;
-      var ctx = canvas.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cw, ch); ctx.drawImage(img, 0, 0, cw, ch);
-      URL.revokeObjectURL(url);
-      canvas.toBlob(function(blob){
-        if (!blob || blob.size >= file.size) { resolve(file); return; }
-        var base = (file.name || 'laudo').replace(/\.[^.]+$/, '');
-        resolve(new File([blob], base + '.jpg', { type: 'image/jpeg' }));
-      }, 'image/jpeg', qualidade);
-    };
-    img.onerror = function(){ URL.revokeObjectURL(url); resolve(file); };
-    img.src = url;
+    Promise.all([navegadorAplicaExif(), lerOrientacaoExif(file)]).then(function(r){
+      var orient = r[0] ? 1 : r[1];   // se o navegador já gira sozinho, não gira de novo
+      var url = URL.createObjectURL(file), img = new Image();
+      img.onload = function(){
+        var maior = Math.max(img.naturalWidth, img.naturalHeight);
+        if (maior <= maxLado && file.size <= 700 * 1024 && orient === 1 && !giro) { URL.revokeObjectURL(url); resolve(file); return; }
+        var canvas = desenharDePe(img, orient, giro, maxLado);
+        URL.revokeObjectURL(url);
+        canvas.toBlob(function(blob){
+          if (!blob || (blob.size >= file.size && orient === 1 && !giro)) { resolve(file); return; }
+          var base = (file.name || 'laudo').replace(/\.[^.]+$/, '');
+          resolve(new File([blob], base + '.jpg', { type: 'image/jpeg' }));
+        }, 'image/jpeg', qualidade);
+      };
+      img.onerror = function(){ URL.revokeObjectURL(url); resolve(file); };
+      img.src = url;
+    });
   });
 }
 async function laudoEscolhido(input){
@@ -2880,7 +2999,7 @@ async function laudoEscolhido(input){
   var det = document.getElementById('laudoPreviewDet');
   mostrarPreviewLaudo(original, 'Preparando…');
   var pronto = await reduzirImagem(original, 1600, 0.82);
-  laudoArquivoPronto = pronto;
+  laudoArquivoPronto = pronto; laudoOriginal = original; laudoGiro = 0;
   mostrarPreviewLaudo(pronto, pronto === original ? formatarTamanho(pronto.size)
     : formatarTamanho(pronto.size) + ' (reduzida de ' + formatarTamanho(original.size) + ')');
 }
@@ -2895,12 +3014,20 @@ function mostrarPreviewLaudo(file, detalhe){
   }
   document.getElementById('laudoPreviewNome').textContent = file.name || 'Laudo';
   document.getElementById('laudoPreviewDet').textContent = detalhe || '';
+  document.getElementById('laudoGirar').classList.toggle('hidden', !(file.type && file.type.indexOf('image/') === 0));
   document.getElementById('laudoBtns').classList.add('hidden');
   document.getElementById('laudoPreview').classList.remove('hidden');
 }
 function verLaudoSelecionado(){ if (laudoPreviewUrl) window.open(laudoPreviewUrl, '_blank'); }
+async function girarLaudoSelecionado(sentido){
+  if (!laudoOriginal) return;
+  laudoGiro = (laudoGiro + (sentido > 0 ? 90 : 270)) % 360;
+  document.getElementById('laudoPreviewDet').textContent = 'Girando…';
+  laudoArquivoPronto = await reduzirImagem(laudoOriginal, 1600, 0.82, laudoGiro);
+  mostrarPreviewLaudo(laudoArquivoPronto, formatarTamanho(laudoArquivoPronto.size) + (laudoGiro ? ' · girada ' + laudoGiro + '°' : ''));
+}
 function limparLaudoSelecionado(){
-  laudoArquivoPronto = null;
+  laudoArquivoPronto = null; laudoOriginal = null; laudoGiro = 0;
   if (laudoPreviewUrl) { URL.revokeObjectURL(laudoPreviewUrl); laudoPreviewUrl = null; }
   document.getElementById('laudoCamera').value = ''; document.getElementById('laudoFile').value = '';
   document.getElementById('laudoPreview').classList.add('hidden');
@@ -2996,7 +3123,57 @@ async function excluirRecebimento(mat, index){
     mostrarToast('Recebimento excluído.');
   } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
 }
-function fecharModalCadastro(){ document.getElementById('modalCadastro').classList.add('hidden'); recebimentoEditando = null; document.getElementById('materialSelect').disabled = false; }
+function fecharModalCadastro(){
+  document.getElementById('modalCadastro').classList.add('hidden'); recebimentoEditando = null; document.getElementById('materialSelect').disabled = false;
+  if (voltarAoDetalhe) { var v = voltarAoDetalhe; voltarAoDetalhe = null; setTimeout(function(){ abrirDetalhe(v.mat, v.index); }, 0); }
+}
+// "Lançar / atualizar análises" pelo detalhe: abre a edição e, ao salvar ou cancelar, volta pro mesmo detalhe
+var voltarAoDetalhe = null;
+function atualizarDoDetalhe(mat, index){ fecharDetalhe(); voltarAoDetalhe = { mat: mat, index: index }; editarRecebimento(mat, index); }
+
+/* ---- girar a foto de um laudo já salvo ---- */
+var giroLaudo = null;
+async function abrirGirarLaudo(mat, index){
+  var r = DATA[mat].find(function(x){ return x.__index === index; }); if (!r || !r['Arquivo do Laudo']) return;
+  giroLaudo = { mat: mat, index: index, giro: 0, arquivo: null, url: '' };
+  var area = document.getElementById('girarArea'); area.innerHTML = '<span class="cell-dim">Carregando…</span>';
+  document.getElementById('saveMsgGirar').textContent = ''; document.getElementById('btnSalvarGiro').disabled = true;
+  document.getElementById('modalGirarLaudo').classList.remove('hidden');
+  try {
+    var arq = await baixarArquivoLink(r['Arquivo do Laudo']);
+    if (!arq.blob.type || arq.blob.type.indexOf('image/') !== 0) { area.innerHTML = '<span class="cell-dim">Este laudo não é uma foto — não dá pra girar.</span>'; return; }
+    giroLaudo.arquivo = new File([arq.blob], arq.nome || 'laudo.jpg', { type: arq.blob.type });
+    giroLaudo.url = URL.createObjectURL(arq.blob);
+    area.innerHTML = '<img id="girarImg" src="' + giroLaudo.url + '" alt="Laudo">';
+    document.getElementById('btnSalvarGiro').disabled = false;
+  } catch (e) { area.innerHTML = '<span class="cell-dim">Não foi possível abrir a foto: ' + escHtml(e.message) + '</span>'; }
+}
+function girarLaudoSalvo(sentido){
+  if (!giroLaudo || !giroLaudo.arquivo) return;
+  giroLaudo.giro = (giroLaudo.giro + (sentido > 0 ? 90 : 270)) % 360;
+  var img = document.getElementById('girarImg'); if (img) img.style.transform = 'rotate(' + giroLaudo.giro + 'deg)';
+}
+function fecharGirarLaudo(){
+  document.getElementById('modalGirarLaudo').classList.add('hidden');
+  if (giroLaudo && giroLaudo.url) URL.revokeObjectURL(giroLaudo.url);
+  giroLaudo = null;
+}
+async function salvarGiroLaudo(){
+  var g = giroLaudo, msg = document.getElementById('saveMsgGirar'), btn = document.getElementById('btnSalvarGiro');
+  if (!g || !g.arquivo) return;
+  if (!g.giro) { fecharGirarLaudo(); return; }
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    var girada = await reduzirImagem(g.arquivo, 2400, 0.88, g.giro);
+    var link = await uploadArquivo(girada, 'Laudo_' + g.mat + '_' + Date.now());
+    var r = DATA[g.mat].find(function(x){ return x.__index === g.index; });
+    await atualizarLinha(g.mat, g.index, Object.assign({}, r, { 'Arquivo do Laudo': link, 'Laudo Anexado': 'Sim' }));
+    DATA[g.mat] = linhasParaObjetos(g.mat, await lerLinhasBrutas(TABELAS[g.mat]));
+    if (matAtual === g.mat) renderRecebimento();
+    var mat = g.mat, idx = g.index;
+    fecharGirarLaudo(); abrirDetalhe(mat, idx); mostrarToast('Foto do laudo salva na posição certa.');
+  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; btn.disabled = false; }
+}
 document.getElementById('modalCadastro').addEventListener('click', function(e){ if (e.target.id === 'modalCadastro') fecharModalCadastro(); });
 
 /* ---- Fornecedor e Tipo (vêm do cadastro de Fornecedores, filtrados pelo material) ---- */
