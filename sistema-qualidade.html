@@ -903,7 +903,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
   </section>
 
   <footer class="note">
-    Sistema da Qualidade BlowPet — Recebimento (Resina PET, Rótulo, Pigmento, Caixa de Preforma Cinta/Tampa), Fornecedores, Especificações, Rótulos Homologados e Reclamação de Cliente. Dados gravados na planilha <span class="mono">sistema_qualidade_blowpet_base.xlsx</span> via Microsoft Graph API, mesmo padrão do app de Inspeção da Qualidade.
+    Sistema da Qualidade BlowPet — Recebimento (Resina PET, Rótulo, Pigmento, Caixa de Preforma Cinta/Tampa), Fornecedores, Especificações, Rótulos Homologados e Reclamação de Cliente. Dados gravados nas listas "SQ …" do Microsoft Lists (conta inspetor.qualidade) via Microsoft Graph API, mesmo padrão do app de Inspeção da Qualidade.
   </footer>
     </div>
   </main>
@@ -1485,8 +1485,13 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           </div>
         </div>
 
+        <div class="section-title">Base de dados (Microsoft Lists)</div>
+        <p class="tela-sub" style="margin:0 0 10px;">Os dados ficam nas listas "SQ …" da conta inspetor.qualidade. A planilha Excel antiga não é mais usada.</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;"><button class="btn" onclick="abrirPreparoDasConfig()">Verificar listas</button>
+        <a class="btn" style="text-decoration:none;" href="https://blowpet2-my.sharepoint.com/personal/inspetor_qualidade_blowpet_com_br/_layouts/15/Lists.aspx" target="_blank" rel="noopener">Abrir as listas</a></div>
+
         <div class="section-title">Listas suspensas</div>
-        <p class="tela-sub" style="margin:0;">Responsáveis e unidades de medida são cadastrados em Cadastros › Sistema. As demais opções de menu ficam na aba <span class="mono">Listas</span> da planilha no OneDrive. Fornecedores e tipos são cadastrados em Cadastros › Fornecedores.</p>
+        <p class="tela-sub" style="margin:0;">Responsáveis e unidades de medida são cadastrados em Cadastros › Sistema. As demais opções de menu ficam na lista <span class="mono">SQ Listas</span>. Fornecedores e tipos são cadastrados em Cadastros › Fornecedores.</p>
 
         <div class="form-actions">
           <button class="btn btn-accent" onclick="fecharConfiguracoes()">Fechar</button>
@@ -1521,7 +1526,7 @@ const msalConfig = {
     redirectUri: window.location.origin + window.location.pathname
   }
 };
-const graphScopes = ["Files.ReadWrite", "User.Read"];
+const graphScopes = ["Files.ReadWrite", "User.Read", "Sites.Manage.All"];   // + acesso às listas do Microsoft Lists
 
 // !!! TROCAR ANTES DE USAR !!! — link de compartilhamento (com permissão de edição) do
 // arquivo sistema_qualidade_blowpet_base.xlsx, igual à variável LINK_PLANILHA_PADRAO dos
@@ -1587,7 +1592,7 @@ const TABLE_COLS_PADRAO = JSON.parse(JSON.stringify(TABLE_COLS));
 // Colunas gravadas como NÚMERO (o resto vai como texto, pra o Excel não converter datas/NF/lotes).
 const COLS_NUM_QTD = ['Quantidade'];
 const COLS_NUM_MED = ['Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)'];
-const VERSAO_SISTEMA = '12/11/2026 21:57';   // data/hora desta versão — atualizada a cada entrega
+const VERSAO_SISTEMA = '12/11/2026 23:35';   // data/hora desta versão — atualizada a cada entrega
 document.getElementById('versaoSistema').textContent = VERSAO_SISTEMA;
 const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
@@ -1683,7 +1688,7 @@ function aposLogin(){
   var nomeUsuario = contaAtual.name || String(contaAtual.username || '').split('@')[0] || '—';
   document.getElementById('userNome').textContent = nomeUsuario;
   document.getElementById('userAvatar').textContent = nomeUsuario.split(/\s+/).filter(function(x){ return x; }).slice(0, 2).map(function(x){ return x.charAt(0).toUpperCase(); }).join('') || '?';
-  conectarPlanilha();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ conectarPlanilha(); }); else conectarPlanilha();
 }
 
 /* ====================== CONEXÃO COM A PLANILHA ====================== */
@@ -5704,5 +5709,345 @@ function renderProdutos(){
   }).join('') : '<tr><td colspan="4" class="empty-note">' + (q ? 'Nenhum produto encontrado.' : (TEM_TABELA.produtos ? 'Nenhum produto cadastrado ainda.' : 'A planilha ainda não tem a aba de Produtos — fica disponível depois da atualização.')) + '</td></tr>';
 }
 </script>
+<!-- ===================== BASE DE DADOS NO MICROSOFT LISTS ===================== -->
+<style>
+#faixaTeste{position:fixed; top:0; left:50%; transform:translateX(-50%); z-index:400; background:#7a3fd0; color:#fff; font:600 11.5px/1.2 Inter,system-ui,sans-serif; padding:4px 12px; border-radius:0 0 10px 10px; letter-spacing:.02em; pointer-events:none; box-shadow:0 4px 14px rgba(0,0,0,.2);}
+#prepLog{max-height:260px; overflow:auto; font:12px/1.5 ui-monospace,Menlo,Consolas,monospace; background:var(--surface-2, rgba(127,127,127,.08)); border-radius:8px; padding:10px 12px; white-space:pre-wrap; margin-top:12px;}
+#prepLog:empty{display:none;}
+</style>
+<div class="modal-overlay hidden" id="modalPreparo" style="z-index:250;">
+  <div class="modal-card" style="max-width:620px;">
+    <button class="modal-close" id="prepFechar" onclick="fecharPreparo()" aria-label="Fechar">✕</button>
+    <div class="modal-head"><h2>Preparar listas</h2><p class="tela-sub" style="margin-top:6px;" id="prepSub"></p></div>
+    <div class="form-wrap" style="max-width:none; padding-top:6px;">
+      <p class="tela-sub" style="margin:0;" id="prepTexto"></p>
+      <div id="prepLog"></div>
+      <div class="form-actions" style="flex-wrap:wrap;">
+        <span class="save-msg" id="prepMsg"></span>
+        <button class="btn" id="prepRecarregar" onclick="prepararListas(true)">Apagar dados das listas e copiar de novo</button>
+        <button class="btn btn-accent" id="prepCriar" onclick="prepararListas(false)">Criar listas e copiar dados</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+/* O sistema grava no Microsoft Lists (site pessoal da conta inspetor), e não mais no Excel.
+   As funções de leitura e gravação do Excel (mais acima) são substituídas pelas de baixo. Cada Tabela do Excel virou uma lista "SQ ..."; cada coluna da
+   tabela virou uma coluna de texto da lista, com o mesmo nome. */
+var LISTS_SITE = 'blowpet2-my.sharepoint.com:/personal/inspetor_qualidade_blowpet_com_br';
+var LISTS_SITE_URL = 'https://blowpet2-my.sharepoint.com/personal/inspetor_qualidade_blowpet_com_br/_layouts/15/Lists.aspx';
+var GRAPH = 'https://graph.microsoft.com/v1.0';
+// a janela de preparo fica junto das outras janelas (assim a confirmação aparece por cima dela)
+(function(){ var m = document.getElementById('modalPreparo'), c = document.getElementById('modalConfirma'); if (m && c) c.parentNode.insertBefore(m, c); })();
+var LISTS_SITE_ID = null, LISTA_ID = {}, COL_INTERNA = {};
+var NOME_LISTA = {
+  TabelaRecebimentoResinaPET: 'SQ Recebimento Resina PET',
+  TabelaRecebimentoRotulo: 'SQ Recebimento Rótulo',
+  TabelaRecebimentoPigmento: 'SQ Recebimento Pigmento',
+  TabelaRecebimentoCxCinta: 'SQ Recebimento Caixa Cinta',
+  TabelaRecebimentoCxTampa: 'SQ Recebimento Caixa Tampa',
+  TabelaFornecedores: 'SQ Fornecedores',
+  TabelaEspecificacoesParametros: 'SQ Especificações EMP',
+  TabelaRotulosHomologados: 'SQ Rótulos Homologados',
+  TabelaReclamacoesCliente: 'SQ Reclamações',
+  TabelaClientes: 'SQ Clientes',
+  TabelaProdutos: 'SQ Produtos',
+  TabelaReclamacoesItens: 'SQ Reclamações Itens',
+  TabelaReclamacoesComentarios: 'SQ Reclamações Comentários',
+  TabelaStatusReclamacao: 'SQ Status Reclamação',
+  TabelaDestinatarios: 'SQ Destinatários',
+  TabelaListas: 'SQ Listas'
+};
+// Colunas com texto longo (passam de 255 caracteres): viram "Várias linhas de texto".
+var COLS_LONGAS = ['Observações','Medições','Envios','Conclusão','Comentário','Anexos','Motivo','Para','Cc','Arquivo do Laudo','Arquivo da Foto','Observação'];
+var SNAPSHOT = null;
+var SNAPSHOT_DATA = '';
+var MODO_OFICIAL = true;   // oficial: sem cópia da planilha e sem "apagar e copiar de novo"
+
+function chaveDaTabela(nome){ return Object.keys(TABELAS).find(function(k){ return TABELAS[k] === nome; }); }
+function sitePath(){ return '/sites/' + LISTS_SITE_ID; }
+async function gget(path){
+  var token = await getToken();
+  var r = await graphFetch(/^https:/.test(path) ? path : GRAPH + path, { headers: { Authorization: 'Bearer ' + token } }, true);
+  var j = await r.json().catch(function(){ return {}; });
+  if (!r.ok) { var e = new Error((j.error && j.error.message) || ('erro ' + r.status)); e.status = r.status; throw e; }
+  return j;
+}
+async function gtodos(path){
+  var url = GRAPH + path, todos = [];
+  while (url) { var j = await gget(url); todos = todos.concat(j.value || []); url = j['@odata.nextLink'] || null; }
+  return todos;
+}
+async function gsend(method, path, body, repetivel){
+  var token = await getToken();
+  var r = await graphFetch(GRAPH + path, { method: method, headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: body === undefined ? undefined : JSON.stringify(body) }, !!repetivel);
+  var j = await r.json().catch(function(){ return {}; });
+  if (!r.ok) { var e = new Error((j.error && j.error.message) || ('erro ' + r.status)); e.status = r.status; throw e; }
+  return j;
+}
+// Até 20 chamadas num pacote só ($batch). sequencial=true: uma depois da outra, na ordem (mantém a
+// ordem dos registros); se uma falhar, as seguintes não rodam.
+async function gbatch(reqs, sequencial){
+  var token = await getToken();
+  var corpo = { requests: reqs.map(function(q, k){ var o = { id: String(k + 1), method: q.method, url: q.url }; if (q.body !== undefined) { o.body = q.body; o.headers = { 'Content-Type': 'application/json' }; } if (sequencial && k) o.dependsOn = [String(k)]; return o; }) };
+  var r = await graphFetch(GRAPH + '/$batch', { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify(corpo) }, false);
+  var j = await r.json().catch(function(){ return {}; });
+  if (!r.ok) throw new Error((j.error && j.error.message) || ('erro ' + r.status));
+  var porId = {}; (j.responses || []).forEach(function(x){ porId[x.id] = x; });
+  return reqs.map(function(q, k){ return porId[String(k + 1)] || { status: 0, body: {} }; });
+}
+function msgDe(res){ return (res.body && res.body.error && res.body.error.message) || ('erro ' + res.status); }
+
+/* ---- conexão ---- */
+async function mapearListas(){
+  var listas = await gtodos(sitePath() + '/lists?$select=id,displayName');
+  LISTA_ID = {};
+  listas.forEach(function(l){ var t = Object.keys(NOME_LISTA).find(function(k){ return NOME_LISTA[k] === l.displayName; }); if (t) LISTA_ID[t] = l.id; });
+}
+async function conectarPlanilha(){
+  var dot = document.getElementById('statusDot'), label = document.getElementById('statusText');
+  label.textContent = 'conectando…';
+  mostrarCarregando(true, 'Conectando às listas…');
+  try {
+    LISTS_SITE_ID = (await gget('/sites/' + LISTS_SITE + '?$select=id')).id;
+    try { driveId = (await gget('/me/drive?$select=id')).id; } catch (e) { driveId = null; }
+    await mapearListas();
+    var faltam = Object.keys(TABELAS).filter(function(k){ return !LISTA_ID[TABELAS[k]]; });
+    if (faltam.length) {
+      dot.className = 'status-dot offline'; label.textContent = 'listas não preparadas';
+      mostrarCarregando(false);
+      abrirPreparo();
+      return;
+    }
+    dot.className = 'status-dot online'; label.textContent = 'carregando dados…';
+    mostrarCarregando(true, 'Carregando os dados das listas…');
+    await carregarTudo();
+    label.textContent = 'conectado (Lists)';
+  } catch (err) {
+    dot.className = 'status-dot offline'; label.textContent = 'erro';
+    mostrarToast((err.status === 403 || err.status === 401 ? 'Sem permissão para acessar as listas: ' : 'Erro ao conectar às listas: ') + err.message, true);
+  } finally { mostrarCarregando(false); }
+}
+async function lerCabecalhos(){
+  var faltando = [];
+  await Promise.all(Object.keys(TABELAS).map(async function(k){
+    var nome = TABELAS[k]; if (!LISTA_ID[nome]) return;
+    var cols = await gtodos(sitePath() + '/lists/' + LISTA_ID[nome] + '/columns');
+    var nossas = cols.filter(function(c){ return /^sq/.test(c.name || '') && /^sq:\d+/.test(c.description || ''); })
+      .sort(function(a, b){ return parseInt(a.description.slice(3), 10) - parseInt(b.description.slice(3), 10); });
+    COL_INTERNA[nome] = {};
+    nossas.forEach(function(c){ COL_INTERNA[nome][c.displayName] = c.name; });
+    if (nossas.length) {
+      TABLE_COLS[k] = nossas.map(function(c){ return c.displayName; });
+      TABLE_COLS_PADRAO[k].forEach(function(h){ if (TABLE_COLS[k].indexOf(h) === -1) faltando.push(NOME_LISTA[nome] + ' → "' + h + '"'); });
+    }
+  }));
+  Object.keys(TEM_TABELA).forEach(function(k){ TEM_TABELA[k] = !!LISTA_ID[TABELAS[k]]; });
+  if (faltando.length) mostrarToast('As listas estão com colunas faltando (' + faltando.slice(0, 3).join('; ') + (faltando.length > 3 ? '…' : '') + '). Use Configurações › Preparar listas.', true);
+}
+
+/* ---- leitura e gravação (mesma "interface" das funções do Excel: o índice da linha é o ID do item) ---- */
+async function lerLinhasBrutas(nomeTabela){
+  var lid = LISTA_ID[nomeTabela];
+  if (!lid) throw new Error('lista "' + (NOME_LISTA[nomeTabela] || nomeTabela) + '" não encontrada');
+  var chave = chaveDaTabela(nomeTabela), cols = TABLE_COLS[chave], mapa = COL_INTERNA[nomeTabela] || {};
+  var itens = await gtodos(sitePath() + '/lists/' + lid + '/items?$expand=fields&$top=999');
+  var linhas = itens.map(function(it){
+    var f = it.fields || {};
+    return { index: Number(it.id), values: [cols.map(function(h){ var v = mapa[h] ? f[mapa[h]] : ''; return v == null ? '' : v; })] };
+  }).sort(function(a, b){ return a.index - b.index; });
+  var copia = {}; linhas.forEach(function(l){ copia[l.index] = l.values[0].slice(); });
+  LINHAS_LIDAS[nomeTabela] = copia;
+  return linhas;
+}
+// Grava sempre texto, já no formato em que o sistema mostra (ex.: quantidade "27.500", medição "0,83").
+function camposDoObjeto(chave, obj){
+  var nome = TABELAS[chave], mapa = COL_INTERNA[nome] || {}, f = {}, cols = TABLE_COLS[chave];
+  cols.forEach(function(h){ if (mapa[h]) f[mapa[h]] = valorDaPlanilha(h, valorParaPlanilha(h, obj[h])); });
+  f.Title = String(f[mapa[cols[0]]] || '').slice(0, 255) || '-';
+  return f;
+}
+async function criarItens(lid, listaCampos, progresso){
+  var ids = [], tentativas = 0;
+  for (var i = 0; i < listaCampos.length; ) {
+    var lote = listaCampos.slice(i, i + 20);
+    if (lote.length === 1) {
+      var j = await gsend('POST', sitePath() + '/lists/' + lid + '/items', { fields: lote[0] }, false);
+      ids.push(Number(j.id)); i++; if (progresso) progresso(i); continue;
+    }
+    var res = await gbatch(lote.map(function(f){ return { method: 'POST', url: sitePath() + '/lists/' + lid + '/items', body: { fields: f } }; }), true);
+    var ok = 0;
+    for (var k = 0; k < res.length; k++) { if (res[k].status === 201 || res[k].status === 200) { ids.push(Number(res[k].body.id)); ok++; } else break; }
+    if (!ok) {
+      var r0 = res[0];
+      if ((r0.status === 429 || r0.status === 503) && tentativas++ < 5) { await esperar(2000 * tentativas); continue; }
+      throw new Error(msgDe(r0));
+    }
+    i += ok; tentativas = 0;
+    if (progresso) progresso(i);
+  }
+  return ids;
+}
+async function adicionarVariasLinhas(chaveTabela, objs){
+  if (!objs.length) return {};
+  var ids = await criarItens(LISTA_ID[TABELAS[chaveTabela]], objs.map(function(o){ return camposDoObjeto(chaveTabela, o); }));
+  return { index: ids[0], indices: ids };
+}
+async function atualizarLinha(chaveTabela, index, obj){
+  var nome = TABELAS[chaveTabela], lid = LISTA_ID[nome], cache = LINHAS_LIDAS[nome] || {}, esperado = cache[index];
+  if (esperado) {
+    // Confere se ninguém alterou esse registro desde a última leitura (senão gravaria por cima).
+    var atual;
+    try { atual = await gget(sitePath() + '/lists/' + lid + '/items/' + index + '?$expand=fields'); }
+    catch (e) { if (e.status === 404) throw new Error('este registro foi excluído por outra pessoa — clique em Atualizar'); throw e; }
+    var mapa = COL_INTERNA[nome] || {}, f = atual.fields || {};
+    var agora = TABLE_COLS[chaveTabela].map(function(h){ var v = mapa[h] ? f[mapa[h]] : ''; return v == null ? '' : v; });
+    if (!linhaIgual(agora, esperado)) throw new Error('este registro foi alterado por outra pessoa enquanto a tela estava aberta — clique em Atualizar, confira e tente de novo');
+  }
+  await gsend('PATCH', sitePath() + '/lists/' + lid + '/items/' + index + '/fields', camposDoObjeto(chaveTabela, obj), true);
+  cache[index] = null;
+  return index;
+}
+async function excluirLinhaPorIndice(chaveTabela, index){
+  var nome = TABELAS[chaveTabela];
+  try { await gsend('DELETE', sitePath() + '/lists/' + LISTA_ID[nome] + '/items/' + index, undefined, false); }
+  catch (e) { if (e.status !== 404) throw e; }   // já não existia: tudo bem
+  if (LINHAS_LIDAS[nome]) delete LINHAS_LIDAS[nome][index];
+}
+async function excluirItensDaLista(lid, ids, progresso){
+  for (var i = 0; i < ids.length; i += 20) {
+    var lote = ids.slice(i, i + 20), tent = 0;
+    while (true) {
+      var res = await gbatch(lote.map(function(id){ return { method: 'DELETE', url: sitePath() + '/lists/' + lid + '/items/' + id }; }), false);
+      var resto = [], erro = null;
+      res.forEach(function(r, k){ if (r.status === 204 || r.status === 200 || r.status === 404) return; if (r.status === 429 || r.status === 503) resto.push(lote[k]); else erro = erro || msgDe(r); });
+      if (erro) throw new Error(erro);
+      if (!resto.length) break;
+      if (tent++ >= 5) throw new Error('o Lists está ocupado — tente de novo em instantes');
+      lote = resto; await esperar(2000 * tent);
+    }
+    if (progresso) progresso(Math.min(i + 20, ids.length));
+  }
+}
+async function excluirVariasLinhas(chaveTabela, indices){
+  var nome = TABELAS[chaveTabela], ids = indices.filter(function(x, k){ return indices.indexOf(x) === k; });
+  if (ids.length === 1) return excluirLinhaPorIndice(chaveTabela, ids[0]);
+  await excluirItensDaLista(LISTA_ID[nome], ids);
+  if (LINHAS_LIDAS[nome]) ids.forEach(function(id){ delete LINHAS_LIDAS[nome][id]; });
+}
+
+function recarregarTudo(){
+  if (!LISTS_SITE_ID) { conectarPlanilha(); return; }
+  mostrarCarregando(true, 'Atualizando…');
+  carregarTudo().then(function(){ mostrarToast('Dados atualizados.'); }).catch(function(e){ mostrarToast('Erro ao atualizar: ' + e.message, true); }).finally(function(){ mostrarCarregando(false); });
+}
+
+/* ---- preparar as listas: cria as que faltam, com as colunas, e copia os dados da planilha ---- */
+function nomeInterno(display, usados){
+  var b = 'sq' + String(display).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, ' ').trim()
+    .split(' ').map(function(w){ return w.charAt(0).toUpperCase() + w.slice(1); }).join('');
+  b = b.slice(0, 30); var n = b, k = 2;
+  while (usados[n.toLowerCase()]) n = b.slice(0, 28) + (k++);
+  usados[n.toLowerCase()] = 1; return n;
+}
+function defColuna(display, ordem, usados){
+  var longa = COLS_LONGAS.indexOf(display) > -1;
+  return { name: nomeInterno(display, usados), displayName: display, description: 'sq:' + String(ordem).padStart(3, '0'),
+           text: longa ? { allowMultipleLines: true, textType: 'plain', linesForEditing: 6 } : { allowMultipleLines: false, maxLength: 255 } };
+}
+function colunasDe(chave){ var s = SNAPSHOT && SNAPSHOT[TABELAS[chave]]; return (s && s.cols && s.cols.length) ? s.cols : TABLE_COLS_PADRAO[chave]; }
+function abrirPreparo(){
+  var existem = Object.keys(TABELAS).filter(function(k){ return LISTA_ID[TABELAS[k]]; }).length, total = Object.keys(TABELAS).length;
+  var criar = document.getElementById('prepCriar'), recarregar = document.getElementById('prepRecarregar');
+  if (MODO_OFICIAL) {
+    document.getElementById('prepSub').textContent = 'Listas "SQ …" da conta inspetor.qualidade';
+    document.getElementById('prepTexto').textContent = existem === total ? 'Todas as ' + total + ' listas existem. "Verificar colunas" inclui alguma coluna que esteja faltando, sem mexer nos dados.'
+      : 'Faltam ' + (total - existem) + ' de ' + total + ' listas. "Criar listas que faltam" cria só essas (vazias), com as colunas certas. Nenhum dado existente é alterado.';
+    criar.textContent = existem === total ? 'Verificar colunas' : 'Criar listas que faltam';
+    criar.style.display = ''; recarregar.style.display = 'none';
+  } else {
+    document.getElementById('prepSub').textContent = 'Site: listas da conta inspetor.qualidade · dados da planilha de ' + SNAPSHOT_DATA;
+    document.getElementById('prepTexto').textContent = existem === 0
+      ? 'As listas do sistema ainda não existem. O sistema vai criar ' + total + ' listas "SQ …" com as mesmas colunas da planilha e copiar os dados (' + totalSnapshot() + ' registros). Leva alguns minutos — não feche a página.'
+      : (existem < total ? 'Faltam ' + (total - existem) + ' de ' + total + ' listas. "Criar listas" cria só as que faltam (as que já existem e têm dados não são mexidas). '
+                         : 'Todas as listas já existem. ') + '"Apagar dados e copiar de novo" volta todas as listas para os dados da planilha de ' + SNAPSHOT_DATA + ' (o que foi lançado no teste é apagado).';
+    criar.style.display = existem === total ? 'none' : '';
+    recarregar.style.display = existem === 0 ? 'none' : '';
+  }
+  document.getElementById('prepLog').textContent = ''; document.getElementById('prepMsg').textContent = '';
+  document.getElementById('modalPreparo').classList.remove('hidden');
+}
+function fecharPreparo(){ document.getElementById('modalPreparo').classList.add('hidden'); }
+function totalSnapshot(){ return SNAPSHOT ? Object.keys(SNAPSHOT).reduce(function(s, k){ return s + SNAPSHOT[k].rows.length; }, 0) : 0; }
+async function abrirPreparoDasConfig(){
+  fecharConfiguracoes();
+  if (!LISTS_SITE_ID) { await conectarPlanilha(); if (!LISTS_SITE_ID || !document.getElementById('modalPreparo').classList.contains('hidden')) return; }
+  try { await mapearListas(); } catch (e) {}
+  abrirPreparo();
+}
+async function prepararListas(recarregar){
+  if (recarregar && MODO_OFICIAL) return;
+  if (recarregar && !(await confirmar('Apagar os dados das listas?', 'Todos os registros das listas "SQ …" serão apagados e substituídos pelos dados da planilha de ' + SNAPSHOT_DATA + '. O que foi lançado durante o teste se perde. As fotos no OneDrive não são apagadas.', 'Apagar e copiar de novo', true))) return;
+  var log = document.getElementById('prepLog'), msg = document.getElementById('prepMsg');
+  var botoes = ['prepCriar', 'prepRecarregar', 'prepFechar'].map(function(id){ return document.getElementById(id); });
+  function linha(t){ log.textContent += t + '\n'; log.scrollTop = log.scrollHeight; }
+  function trocarUltima(t){ var l = log.textContent.split('\n'); l[l.length - 2] = t; log.textContent = l.join('\n'); log.scrollTop = log.scrollHeight; }
+  botoes.forEach(function(b){ b.disabled = true; }); msg.className = 'save-msg'; msg.textContent = 'Trabalhando…'; log.textContent = '';
+  var inicio = Date.now();
+  try {
+    await mapearListas();
+    var chaves = Object.keys(TABELAS), novas = {};
+    // 1) listas e colunas
+    for (var i = 0; i < chaves.length; i++) {
+      var k = chaves[i], nome = TABELAS[k], cols = colunasDe(k);
+      if (!LISTA_ID[nome]) {
+        linha('Criando lista ' + NOME_LISTA[nome] + ' (' + cols.length + ' colunas)…');
+        var usados = { title: 1, id: 1 };
+        var nova = await gsend('POST', sitePath() + '/lists', { displayName: NOME_LISTA[nome], columns: cols.map(function(h, n){ return defColuna(h, n + 1, usados); }), list: { template: 'genericList' } }, false);
+        LISTA_ID[nome] = nova.id; novas[nome] = true;
+      } else {
+        var exist = await gtodos(sitePath() + '/lists/' + LISTA_ID[nome] + '/columns');
+        var temNome = {}, usados2 = { title: 1, id: 1 }, maior = 0;
+        exist.forEach(function(c){ usados2[String(c.name).toLowerCase()] = 1; if (/^sq:\d+/.test(c.description || '')) { temNome[c.displayName] = 1; maior = Math.max(maior, parseInt(c.description.slice(3), 10)); } });
+        var faltam = cols.filter(function(h){ return !temNome[h]; });
+        for (var f = 0; f < faltam.length; f++) {
+          linha('Lista ' + NOME_LISTA[nome] + ': incluindo coluna "' + faltam[f] + '"…');
+          await gsend('POST', sitePath() + '/lists/' + LISTA_ID[nome] + '/columns', defColuna(faltam[f], ++maior, usados2), false);
+        }
+      }
+    }
+    await lerCabecalhos();
+    // 2) dados (só no teste: o oficial nunca copia nem apaga dados)
+    for (var j = 0; j < (SNAPSHOT && !MODO_OFICIAL ? chaves.length : 0); j++) {
+      var k2 = chaves[j], nome2 = TABELAS[k2], lid = LISTA_ID[nome2], snap = SNAPSHOT && SNAPSHOT[nome2];
+      var atuais = novas[nome2] ? [] : await gtodos(sitePath() + '/lists/' + lid + '/items?$select=id&$top=999');
+      if (atuais.length) {
+        if (!recarregar) { linha(NOME_LISTA[nome2] + ': já tem ' + atuais.length + ' registro(s) — mantida.'); continue; }
+        linha(NOME_LISTA[nome2] + ': apagando ' + atuais.length + ' registro(s)…');
+        await excluirItensDaLista(lid, atuais.map(function(x){ return x.id; }), function(n){ trocarUltima(NOME_LISTA[nome2] + ': apagando ' + n + ' de ' + atuais.length + '…'); });
+      }
+      var linhasSnap = snap ? snap.rows : [];
+      if (!linhasSnap.length) { linha(NOME_LISTA[nome2] + ': sem dados na planilha.'); continue; }
+      var objs = linhasSnap.map(function(r){ var o = {}; snap.cols.forEach(function(h, n){ o[h] = valorDaPlanilha(h, r[n]); }); return camposDoObjeto(k2, o); });
+      linha(NOME_LISTA[nome2] + ': copiando 0 de ' + objs.length + '…');
+      await criarItens(lid, objs, function(n){ trocarUltima(NOME_LISTA[nome2] + ': copiando ' + n + ' de ' + objs.length + '…'); });
+      trocarUltima(NOME_LISTA[nome2] + ': ' + objs.length + ' registro(s) copiados.');
+    }
+    var seg = Math.round((Date.now() - inicio) / 1000);
+    linha('Pronto em ' + (seg >= 60 ? Math.floor(seg / 60) + ' min ' + (seg % 60) + ' s' : seg + ' s') + '.');
+    msg.textContent = 'Listas prontas.';
+    document.getElementById('prepTexto').textContent = MODO_OFICIAL ? 'Listas verificadas. Pode fechar esta janela.' : 'Listas criadas e dados copiados. Pode fechar esta janela.';
+    document.getElementById('prepCriar').style.display = 'none'; document.getElementById('prepRecarregar').style.display = MODO_OFICIAL ? 'none' : '';
+    mostrarCarregando(true, 'Carregando os dados das listas…');
+    await carregarTudo();
+    document.getElementById('statusDot').className = 'status-dot online'; document.getElementById('statusText').textContent = 'conectado (Lists)';
+    mostrarToast('Listas preparadas.');
+  } catch (e) {
+    msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message;
+    linha('ERRO: ' + e.message + (e.status === 403 ? ' (sem permissão para criar/editar listas neste site)' : ''));
+  } finally { mostrarCarregando(false); botoes.forEach(function(b){ b.disabled = false; }); }
+}
+</script>
+
 </body>
 </html>
