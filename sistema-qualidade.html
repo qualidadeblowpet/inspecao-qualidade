@@ -220,6 +220,7 @@ a{color:var(--accent);}
 .combo{position:relative;}
 .combo-mais{display:flex; gap:8px; align-items:stretch;}
 .combo-mais .combo{flex:1; min-width:0;}
+.combo-mais select{flex:1; min-width:0;}
 .btn-mais{height:auto; padding:0 12px;}
 .btn-mais svg{width:16px; height:16px;}
 .ficha-acoes{display:flex; justify-content:flex-end; margin:10px 0 4px;}
@@ -606,6 +607,12 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 .conc-op b{display:block; font-size:13.5px;}
 .conc-op small{display:block; font-size:11.5px; color:var(--fg-faint); line-height:1.4; margin-top:2px;}
 .conc-op:has(input:checked){border-color:var(--accent); background:var(--accent-soft);}
+.sel-resp{width:100%;}
+.sis-sec{margin-bottom:22px;}
+.sis-cab{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-bottom:10px;}
+.sis-cab b{display:block; font-size:15px;} .sis-cab span{font-size:12px; color:var(--fg-faint);}
+.sug-chips{display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:0 0 12px; font-size:12.5px; color:var(--fg-dim);}
+.sug-chips button{border:1px dashed var(--accent-border); background:var(--accent-soft); color:var(--accent); border-radius:999px; padding:3px 10px; font:500 12px var(--font-body); cursor:pointer;}
 .dw-acoes{display:flex; justify-content:flex-end; gap:8px; margin:12px 0 0;}
 .link-btn{border:none; background:none; padding:0; color:var(--accent); font:inherit; cursor:pointer; text-decoration:underline; text-underline-offset:2px;}
 .girar-area{background:var(--surface-2); border:1px solid var(--border); border-radius:10px; height:360px; display:flex; align-items:center; justify-content:center; overflow:hidden;}
@@ -695,6 +702,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 <symbol id="i-paperclip" viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-rot-dir" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-rot-esq" viewBox="0 0 24 24"><path d="M4 11a8 8 0 1 1 2.3 5.7M4 4v7h7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M4 20c1.5-3.5 4.5-5 8-5s6.5 1.5 8 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
 <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m3.5 7 8.5 6 8.5-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-whats" viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 0 1-12.6 7.4L3.5 20.6l1.2-4.2A8.5 8.5 0 1 1 20.5 12z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 8.6c.2-.4.5-.4.8-.4h.4c.2 0 .4.1.5.4l.6 1.4c.1.2 0 .5-.1.6l-.5.6c.6 1.1 1.5 2 2.6 2.6l.6-.5c.2-.1.4-.2.6-.1l1.4.6c.3.1.4.3.4.5v.4c0 .3 0 .6-.4.8-.6.4-1.6.6-2.8 0a9 9 0 0 1-4-4c-.6-1.2-.4-2.2 0-2.9z" fill="currentColor"/></symbol>
 <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v4a2 2 0 0 0 2 2h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M10 9H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 13H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M16 17H8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
@@ -743,6 +751,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <button class="a-item cad-btn" data-nav="cadastros:fornecedores" data-cad="fornecedores"><svg><use href="#i-truck"/></svg><span>Fornecedores</span><span class="ct" id="ctFornecedores">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:especificacoes" data-cad="especificacoes"><svg><use href="#i-sliders"/></svg><span>EMPs</span><span class="ct" id="ctEspecificacoes">0</span></button>
       <button class="a-item cad-btn" data-nav="cadastros:rotulos" data-cad="rotulos"><svg><use href="#i-image"/></svg><span>Rótulos homologados</span><span class="ct" id="ctRotulosHom">0</span></button>
+      <button class="a-item cad-btn" data-nav="cadastros:sistema" data-cad="sistema"><svg><use href="#i-gear"/></svg><span>Sistema</span></button>
     </nav>
     <div class="a-versao" id="infoVersao"><span>Versão do sistema: <b id="versaoSistema"></b></span><span>Dados atualizados: <b id="dadosAtualizados">—</b></span></div>
     <div class="a-user">
@@ -856,7 +865,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
   <!-- ===================== TELA — CADASTROS ===================== -->
   <section class="tela" id="tela-cadastros">
     <div class="tela-head"><h2>Cadastros</h2></div>
-    <p class="tela-sub">Fornecedores e os produtos que cada um fornece, EMPs (especificações de matéria-prima e insumos) e rótulos homologados — usados no recebimento — e os cadastros das reclamações: clientes, produtos e status da tratativa.</p>
+    <p class="tela-sub">Fornecedores e os produtos que cada um fornece, EMPs (especificações de matéria-prima e insumos) e rótulos homologados — usados no recebimento —, os cadastros das reclamações (clientes, produtos e status da tratativa) e as listas de responsáveis e unidades de medida.</p>
     <div class="screen">
       <div class="app-shell">
         <div class="app-main">
@@ -876,6 +885,14 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           <div id="painelClientes" style="display:none;"><div class="table-scroll"><table class="occ"><thead><tr><th>Cliente</th><th>Cidade</th><th>UF</th><th>Reclamações</th><th></th></tr></thead><tbody id="tbodyClientes"></tbody></table></div></div>
           <div id="painelStatusRec" style="display:none;"><p class="tela-sub" style="margin:0 0 12px;">Etapas da tratativa, na ordem em que a reclamação costuma andar. A primeira é a usada ao abrir uma reclamação. <b>Concluída</b> é fixa — é definida pelo botão <i>Concluir reclamação</i>, na ficha.</p><div class="table-scroll"><table class="occ"><thead><tr><th style="width:60px;">Ordem</th><th>Status</th><th>Em andamento</th><th></th></tr></thead><tbody id="tbodyStatusRec"></tbody></table></div></div>
           <div id="painelDestinatarios" style="display:none;"><p class="tela-sub" style="margin:0 0 12px;">Quem recebe a formalização de cada tipo de registro. Ao clicar em <b>Enviar e-mail</b>, esses endereços já vêm preenchidos no e-mail (dá pra ajustar só naquele envio).</p><div class="table-scroll"><table class="occ"><thead><tr><th>Tipo</th><th>Para</th><th>Cópia (Cc)</th><th></th></tr></thead><tbody id="tbodyDestinatarios"></tbody></table></div></div>
+          <div id="painelLista" style="display:none;">
+            <p class="tela-sub" style="margin:0 0 14px;">Listas usadas nos formulários. Mudar ou excluir um item não altera os registros já feitos.</p>
+            <div class="sis-sec"><div class="sis-cab"><div><b>Responsáveis</b><span>Lista suspensa de Responsável dos recebimentos e das reclamações</span></div><button type="button" class="btn btn-accent" onclick="abrirModalItemLista('responsaveis')"><svg><use href="#i-plus"/></svg> Novo responsável</button></div>
+              <div id="sugResponsaveis"></div>
+              <div class="table-scroll"><table class="occ" style="min-width:0;"><thead><tr><th>Nome</th><th>Usado em</th><th></th></tr></thead><tbody id="tbodyResponsaveis"></tbody></table></div></div>
+            <div class="sis-sec"><div class="sis-cab"><div><b>Unidades de medida</b><span>Campo Unidade do recebimento</span></div><button type="button" class="btn btn-accent" onclick="abrirModalItemLista('unidades')"><svg><use href="#i-plus"/></svg> Nova unidade</button></div>
+              <div class="table-scroll"><table class="occ" style="min-width:0;"><thead><tr><th>Unidade</th><th>Usado em</th><th></th></tr></thead><tbody id="tbodyUnidades"></tbody></table></div></div>
+          </div>
           <div id="painelProdutos" style="display:none;"><div class="table-scroll"><table class="occ"><thead><tr><th>Tipo</th><th>Produto</th><th>Reclamações</th><th></th></tr></thead><tbody id="tbodyProdutos"></tbody></table></div></div>
           <div id="painelFornecedores" style="display:none;">
             <div id="listaFornecedoresCad" style="display:flex; flex-direction:column; gap:14px;"></div>
@@ -956,7 +973,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           <div class="field" id="campoCodigoProduto"><label>Código do produto</label><input class="mono" id="codigoProdutoDisplay" value="—" disabled></div>
           <div class="field" id="campoLoteGenerico"><label>Lote</label><input class="mono" id="loteGenericoInput" placeholder="Código do lote"></div>
           <div class="field"><label>Data do recebimento</label><input type="date" id="dataRecebimentoInput"></div>
-          <div class="field"><label>Responsável pelo recebimento</label><input id="responsavelInput" list="listaResponsaveis" placeholder="Nome do responsável"></div>
+          <div class="field"><label>Responsável pelo recebimento</label><div class="combo-mais"><select id="responsavelInput" class="sel-resp"></select><button type="button" class="btn btn-mais" title="Cadastrar responsável" onclick="abrirModalItemLista('responsaveis', null, 'responsavelInput')"><svg><use href="#i-plus"/></svg></button></div></div>
           <div class="field"><label>Quantidade</label><input id="quantidadeInput" placeholder="Ex: 24.000"></div>
           <div class="field"><label>Unidade</label><select id="unidadeSelect"></select></div>
           <div class="field">
@@ -1007,7 +1024,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
           <div class="res-manual hidden" id="resManual"><label>Sem ficha de especificação — defina o resultado</label><select id="statusRecebimentoSelect" onchange="sugerirStatusRecebimento()"></select></div>
           <div class="res-restricao hidden" id="boxRestricao">
             <label class="res-chk"><input type="checkbox" id="chkRestricao" onchange="sugerirStatusRecebimento()"> <span><b>Aprovar com restrição</b> — liberar o lote mesmo fora do especificado</span></label>
-            <div class="field hidden" id="campoRespRestricao"><label>Responsável pela liberação (obrigatório)</label><input id="respRestricaoInput" placeholder="Nome de quem autorizou a liberação"></div>
+            <div class="field hidden" id="campoRespRestricao"><label>Responsável pela liberação (obrigatório)</label><input id="respRestricaoInput" list="listaResponsaveis" placeholder="Nome de quem autorizou a liberação"></div>
           </div>
         </div>
 
@@ -1193,7 +1210,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
             <div class="combo-info" id="reclamacaoClienteInfo"></div>
           </div>
           <div class="field full"><label>Motivo</label><input id="reclamacaoMotivoInput" placeholder="Ex: Vazamento na tampa"></div>
-          <div class="field full"><label>Responsável</label><input id="reclamacaoRespInput" list="listaResponsaveis" placeholder="Nome do responsável"></div>
+          <div class="field full"><label>Responsável</label><div class="combo-mais"><select id="reclamacaoRespInput" class="sel-resp"></select><button type="button" class="btn btn-mais" title="Cadastrar responsável" onclick="abrirModalItemLista('responsaveis', null, 'reclamacaoRespInput')"><svg><use href="#i-plus"/></svg></button></div></div>
         </div>
         <div class="section-title">Produto</div>
         <div class="form-grid">
@@ -1359,6 +1376,22 @@ table.occ tbody tr.clicavel{cursor:pointer;}
     </div>
   </div>
 
+  <!-- ===================== JANELA — ITEM DE LISTA (responsável / unidade) ===================== -->
+  <div class="modal-overlay hidden" id="modalItemLista" style="z-index:230;">
+    <div class="modal-card" style="max-width:420px;">
+      <button class="modal-close" onclick="fecharModalItemLista()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2 id="itemListaTitulo">Novo</h2><p class="tela-sub" style="margin-top:6px;" id="itemListaSub"></p></div>
+      <div class="form-wrap" style="padding-top:12px; max-width:none;">
+        <div class="form-grid"><div class="field full"><label id="itemListaRotulo">Nome</label><input id="itemListaInput"></div></div>
+        <div class="form-actions">
+          <span class="save-msg" id="saveMsgItemLista"></span>
+          <button class="btn btn-ghost" onclick="fecharModalItemLista()">Cancelar</button>
+          <button class="btn btn-accent" id="btnSalvarItemLista" onclick="salvarItemLista()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== JANELA — CONFIRMAÇÃO ===================== -->
   <div class="modal-overlay hidden" id="modalConfirma" style="z-index:300;">
     <div class="modal-card" style="max-width:460px;">
@@ -1453,7 +1486,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
         </div>
 
         <div class="section-title">Listas suspensas</div>
-        <p class="tela-sub" style="margin:0;">Responsáveis, unidades e as demais opções de menu são editados direto na aba <span class="mono">Listas</span> da planilha no OneDrive — mudou lá, aparece aqui na próxima vez que o app carregar os dados. Fornecedores e tipos são cadastrados em Cadastros › Fornecedores.</p>
+        <p class="tela-sub" style="margin:0;">Responsáveis e unidades de medida são cadastrados em Cadastros › Sistema. As demais opções de menu ficam na aba <span class="mono">Listas</span> da planilha no OneDrive. Fornecedores e tipos são cadastrados em Cadastros › Fornecedores.</p>
 
         <div class="form-actions">
           <button class="btn btn-accent" onclick="fecharConfiguracoes()">Fechar</button>
@@ -1554,7 +1587,7 @@ const TABLE_COLS_PADRAO = JSON.parse(JSON.stringify(TABLE_COLS));
 // Colunas gravadas como NÚMERO (o resto vai como texto, pra o Excel não converter datas/NF/lotes).
 const COLS_NUM_QTD = ['Quantidade'];
 const COLS_NUM_MED = ['Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)'];
-const VERSAO_SISTEMA = '12/11/2026 12:26';   // data/hora desta versão — atualizada a cada entrega
+const VERSAO_SISTEMA = '12/11/2026 21:23';   // data/hora desta versão — atualizada a cada entrega
 document.getElementById('versaoSistema').textContent = VERSAO_SISTEMA;
 const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
@@ -1944,7 +1977,8 @@ async function carregarTudo(){
   DATA.especificacoes = montarEspecificacoes(linhasParaObjetos('especificacoes', brutos[6]));
   DATA.rotulosHomologados = linhasParaObjetos('rotulosHomologados', brutos[7]);
   DATA.reclamacoes = linhasParaObjetos('reclamacoes', brutos[8]);
-  DATA.listas = montarListas(linhasParaObjetos('listas', brutos[9]));
+  DATA.listasLinhas = linhasParaObjetos('listas', brutos[9]);
+  DATA.listas = montarListas(DATA.listasLinhas);
   // tabelas que só existem na planilha nova: se faltarem, o sistema segue sem elas
   await Promise.all(['clientes', 'produtos', 'recItens', 'recComent', 'statusRec', 'destinatarios'].map(async function(k){
     try { DATA[k] = linhasParaObjetos(k, await lerLinhasBrutas(TABELAS[k])); TEM_TABELA[k] = true; }
@@ -2068,7 +2102,19 @@ function opcoesHtml(lista, vazio){
 
 function popularDatalists(){
   document.getElementById('listaFornecedores').innerHTML = grupoFornecedores().map(function(g){ return '<option value="' + escHtml(g.nome) + '">'; }).join('');
-  document.getElementById('listaResponsaveis').innerHTML = (DATA.listas['Responsaveis'] || []).map(function(f){ return '<option value="'+f+'">'; }).join('');
+  document.getElementById('listaResponsaveis').innerHTML = (DATA.listas['Responsaveis'] || []).map(function(f){ return '<option value="'+escHtml(f)+'">'; }).join('');
+  ['responsavelInput', 'reclamacaoRespInput'].forEach(function(id){ var el = document.getElementById(id); definirResponsavel(id, el ? el.value : ''); });
+}
+function responsaveisLista(){ return (DATA.listas['Responsaveis'] || []).slice().sort(function(a, b){ return String(a).localeCompare(String(b), 'pt-BR'); }); }
+// Monta a lista suspensa de responsáveis; se o registro tem um nome que não está mais no cadastro, mantém ele como opção
+function definirResponsavel(id, valor){
+  var el = document.getElementById(id); if (!el) return;
+  valor = String(valor || '').trim();
+  var nomes = responsaveisLista(), fora = valor && nomes.indexOf(valor) === -1;
+  el.innerHTML = '<option value="">' + (nomes.length ? '— escolher —' : '— cadastre no + ao lado —') + '</option>' +
+    nomes.map(function(n){ return '<option value="' + escHtml(n) + '">' + escHtml(n) + '</option>'; }).join('') +
+    (fora ? '<option value="' + escHtml(valor) + '">' + escHtml(valor) + ' (fora do cadastro)</option>' : '');
+  el.value = valor;
 }
 function popularSelect(sel, valores, manterSeExistir){
   var atual = sel.value;
@@ -2518,7 +2564,7 @@ function abrirModalReclamacao(rac){
   if (r) comboProduto._definir(r['Produto'] || '');
   document.getElementById('reclamacaoMotivoInput').value = r ? (r['Motivo'] || '') : '';
   document.getElementById('reclamacaoCritSelect').value = r ? (r['Criticidade'] || '') : '';
-  document.getElementById('reclamacaoRespInput').value = r ? (r['Responsável'] || '') : '';
+  definirResponsavel('reclamacaoRespInput', r ? r['Responsável'] : '');
   document.getElementById('reclamacaoObsInput').value = r ? (r['Observações'] || '') : '';
   document.getElementById('saveMsgReclamacao').textContent = '';
   document.getElementById('modalReclamacao').classList.remove('hidden');
@@ -3086,7 +3132,7 @@ function abrirModalCadastro(matEdit, indexEdit){
     document.getElementById('quantidadeInput').value = row['Quantidade'] || '';
     var uSel = document.getElementById('unidadeSelect'), uVal = String(row['Unidade'] || '').trim();
     if (uVal) { if (!Array.prototype.some.call(uSel.options, function(o){ return o.value === uVal; })) uSel.insertAdjacentHTML('beforeend', '<option value="' + escHtml(uVal) + '">' + escHtml(uVal) + '</option>'); uSel.value = uVal; }
-    document.getElementById('responsavelInput').value = row['Responsável'] || '';
+    definirResponsavel('responsavelInput', row['Responsável']);
     document.getElementById('observacoesInput').value = obsSemReanalise(row['Observações']);
     document.getElementById('dataRecebimentoInput').value = dataBRparaISO(row['Data Recebimento'] || row['Data'] || '');
   } else {
@@ -3096,7 +3142,7 @@ function abrirModalCadastro(matEdit, indexEdit){
     document.getElementById('notaFiscalInput').value = '';
     document.getElementById('loteGenericoInput').value = '';
     document.getElementById('quantidadeInput').value = '';
-    document.getElementById('responsavelInput').value = '';
+    definirResponsavel('responsavelInput', '');
     document.getElementById('observacoesInput').value = '';
     var cSel = document.getElementById('conferenciaRotuloSelect');
     for (var ci = 0; ci < cSel.options.length; ci++) { if (confereOk(cSel.options[ci].value)) { cSel.selectedIndex = ci; break; } }
@@ -4237,6 +4283,7 @@ var CAD_INFO = {
   produtos: { titulo:'Produtos (preforma e frasco)', busca:'Tipo ou produto…', botao:'Novo produto', acao:'abrirModalProduto()' },
   statusRec: { titulo:'Status de reclamação', busca:'Status…', botao:'Novo status', acao:'abrirModalStatusRec()' },
   destinatarios: { titulo:'Destinatários de e-mail', busca:'Tipo ou e-mail…', botao:'', acao:'' },
+  sistema: { titulo:'Sistema — responsáveis e unidades de medida', busca:'Nome ou unidade…', botao:'', acao:'' },
   rotulos: { titulo:'Rótulos Homologados', busca:'Nome, cliente, volume…', botao:'Novo rótulo homologado', acao:'abrirModalRotulo()' }
 };
 var cadAtual = 'fornecedores';
@@ -4258,12 +4305,13 @@ function escolherCadastro(cad){
   document.getElementById('painelProdutos').style.display = cad === 'produtos' ? '' : 'none';
   document.getElementById('painelStatusRec').style.display = cad === 'statusRec' ? '' : 'none';
   document.getElementById('painelDestinatarios').style.display = cad === 'destinatarios' ? '' : 'none';
+  document.getElementById('painelLista').style.display = cad === 'sistema' ? '' : 'none';
   renderCadastroAtual();
   marcarMenu();
 }
 function renderCadastroAtual(){
   if (cadAtual === 'fornecedores') renderFornecedores(); else if (cadAtual === 'especificacoes') renderEspecificacoes();
-  else if (cadAtual === 'clientes') renderClientes(); else if (cadAtual === 'produtos') renderProdutos(); else if (cadAtual === 'statusRec') renderStatusRec(); else if (cadAtual === 'destinatarios') renderDestinatarios(); else renderRotulosHomologados();
+  else if (cadAtual === 'clientes') renderClientes(); else if (cadAtual === 'produtos') renderProdutos(); else if (cadAtual === 'statusRec') renderStatusRec(); else if (cadAtual === 'destinatarios') renderDestinatarios(); else if (cadAtual === 'sistema') renderListaCad(); else renderRotulosHomologados();
 }
 function abrirCadastro(cad){ if (!document.getElementById('tela-cadastros').classList.contains('active')) irPara('cadastros'); escolherCadastro(cad); toggleMenu(false); }
 document.querySelectorAll('.cad-btn').forEach(function(btn){ btn.addEventListener('click', function(){ abrirCadastro(btn.dataset.cad); }); });
@@ -4274,6 +4322,102 @@ escolherCadastro('fornecedores');
 function abrirConfiguracoes(){ document.getElementById('modalConfig').classList.remove('hidden'); }
 function fecharConfiguracoes(){ document.getElementById('modalConfig').classList.add('hidden'); }
 document.getElementById('modalConfig').addEventListener('click', function(e){ if (e.target.id === 'modalConfig') fecharConfiguracoes(); });
+
+/* ====================== CADASTROS SIMPLES: RESPONSÁVEIS E UNIDADES ======================
+   Ficam na aba Listas da planilha (colunas "Responsaveis" e "Unidades") — sem mudar a estrutura. */
+var LISTA_CAD = {
+  responsaveis: { col: 'Responsaveis', nome: 'responsável', rotulo: 'Nome do responsável', ex: 'Ex: Nathália',
+    sub: 'Nomes que aparecem na lista suspensa de Responsável dos recebimentos e das reclamações. Mudar ou excluir um nome não altera os registros já feitos.' },
+  unidades: { col: 'Unidades', nome: 'unidade', rotulo: 'Unidade de medida', ex: 'Ex: Bags',
+    sub: 'Unidades que aparecem no campo Unidade do recebimento. Mudar ou excluir uma unidade não altera os registros já feitos.' }
+};
+var itemListaEdit = null;
+function usosDoValor(tipo, v){
+  var mats = ['resina','rotulo','pigmento','cinta','tampa'], n = 0;
+  if (tipo === 'responsaveis') { mats.forEach(function(m){ n += DATA[m].filter(function(r){ return r['Responsável'] === v; }).length; }); n += DATA.reclamacoes.filter(function(r){ return r['Responsável'] === v; }).length; }
+  else mats.forEach(function(m){ n += DATA[m].filter(function(r){ return r['Unidade'] === v; }).length; });
+  return n;
+}
+function renderListaCad(){
+  var q = cadAtual === 'sistema' ? termoBuscaCadastro() : '';
+  ['responsaveis', 'unidades'].forEach(function(tipo){
+    var cfg = LISTA_CAD[tipo], valores = (DATA.listas[cfg.col] || []).slice();
+    if (tipo === 'responsaveis') valores.sort(function(a, b){ return String(a).localeCompare(String(b), 'pt-BR'); });
+    var lista = valores.filter(function(v){ return !q || String(v).toLowerCase().indexOf(q) > -1; });
+    document.getElementById(tipo === 'responsaveis' ? 'tbodyResponsaveis' : 'tbodyUnidades').innerHTML = lista.length ? lista.map(function(v){
+      var n = usosDoValor(tipo, v), vv = escHtml(v);
+      return '<tr><td>' + vv + '</td><td class="tabular cell-dim">' + (n ? n + ' registro' + (n > 1 ? 's' : '') : '—') + '</td>' +
+        '<td class="row-actions-cell"><span class="row-actions"><button type="button" class="icon-btn icon-only" title="Editar" data-v="' + vv + '" onclick="abrirModalItemLista(\'' + tipo + '\', this.dataset.v)"><svg><use href="#i-pencil"/></svg></button>' +
+        '<button type="button" class="icon-btn icon-only danger" title="Excluir" data-v="' + vv + '" onclick="excluirItemLista(\'' + tipo + '\', this.dataset.v)"><svg><use href="#i-trash"/></svg></button></span></td></tr>';
+    }).join('') : '<tr><td colspan="3" class="empty-note">' + (q ? 'Nada encontrado.' : 'Nenhum cadastrado ainda.') + '</td></tr>';
+  });
+  // nomes já usados nos registros que não estão no cadastro: sugere incluir
+  var sug = document.getElementById('sugResponsaveis'), nomes = DATA.listas['Responsaveis'] || [], usados = {};
+  ['resina','rotulo','pigmento','cinta','tampa','reclamacoes'].forEach(function(m){ DATA[m].forEach(function(r){ var n = String(r['Responsável'] || '').trim(); if (n && n !== '-' && nomes.indexOf(n) === -1) usados[n] = true; }); });
+  var fora = Object.keys(usados).sort(function(a, b){ return a.localeCompare(b, 'pt-BR'); });
+  sug.innerHTML = fora.length ? '<div class="sug-chips"><span>Nomes já usados nos registros e fora do cadastro:</span>' + fora.map(function(n){ return '<button type="button" data-v="' + escHtml(n) + '" onclick="incluirItemLista(\'responsaveis\', this.dataset.v)">+ ' + escHtml(n) + '</button>'; }).join('') + '</div>' : '';
+}
+var itemListaDestino = null;
+function abrirModalItemLista(tipo, valor, campoDestino){
+  var cfg = LISTA_CAD[tipo];
+  itemListaEdit = { tipo: tipo, antigo: valor || null }; itemListaDestino = campoDestino || null;
+  document.getElementById('itemListaTitulo').textContent = (valor ? 'Editar ' : (tipo === 'unidades' ? 'Nova ' : 'Novo ')) + cfg.nome;
+  document.getElementById('itemListaSub').textContent = valor ? 'Os registros já feitos com "' + valor + '" continuam como estão.' : '';
+  document.getElementById('itemListaRotulo').textContent = cfg.rotulo;
+  var inp = document.getElementById('itemListaInput'); inp.value = valor || ''; inp.placeholder = cfg.ex;
+  document.getElementById('saveMsgItemLista').textContent = '';
+  document.getElementById('modalItemLista').classList.remove('hidden');
+  setTimeout(function(){ inp.focus(); }, 50);
+}
+function fecharModalItemLista(){ document.getElementById('modalItemLista').classList.add('hidden'); }
+document.getElementById('modalItemLista').addEventListener('click', function(e){ if (e.target.id === 'modalItemLista') fecharModalItemLista(); });
+document.getElementById('itemListaInput').addEventListener('keydown', function(e){ if (e.key === 'Enter') salvarItemLista(); });
+async function gravarItemLista(col, antigo, novo){
+  var linhas = DATA.listasLinhas || [];
+  if (antigo) {
+    var la = linhas.find(function(l){ return String(l[col] || '').trim() === antigo; });
+    if (la) { var o = Object.assign({}, la); o[col] = novo; await atualizarLinha('listas', la.__index, o); }
+  } else {
+    var vazia = linhas.find(function(l){ return String(l[col] || '').trim() === ''; });
+    if (vazia) { var o2 = Object.assign({}, vazia); o2[col] = novo; await atualizarLinha('listas', vazia.__index, o2); }
+    else { var n = {}; n[col] = novo; await adicionarLinha('listas', n); }
+  }
+  DATA.listasLinhas = linhasParaObjetos('listas', await lerLinhasBrutas(TABELAS.listas));
+  DATA.listas = montarListas(DATA.listasLinhas);
+  popularDatalists(); popularSelectsFixos(); atualizarContagensCadastros();
+  if (cadAtual === 'sistema') renderListaCad();
+}
+async function salvarItemLista(){
+  var e = itemListaEdit, cfg = LISTA_CAD[e.tipo], msg = document.getElementById('saveMsgItemLista'), btn = document.getElementById('btnSalvarItemLista');
+  var novo = document.getElementById('itemListaInput').value.trim().replace(/\s+/g, ' ');
+  if (!novo) { msg.className = 'save-msg err'; msg.textContent = 'Informe o ' + (e.tipo === 'unidades' ? 'nome da unidade' : 'nome') + '.'; return; }
+  var dup = (DATA.listas[cfg.col] || []).find(function(v){ return String(v).toLowerCase() === novo.toLowerCase() && v !== e.antigo; });
+  if (dup) { msg.className = 'save-msg err'; msg.textContent = '"' + dup + '" já está cadastrado.'; return; }
+  btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
+  try {
+    await gravarItemLista(cfg.col, e.antigo, novo);
+    if (itemListaDestino) definirResponsavel(itemListaDestino, novo);
+    if (e.tipo === 'unidades' && !e.antigo && !document.getElementById('modalCadastro').classList.contains('hidden')) document.getElementById('unidadeSelect').value = novo;
+    fecharModalItemLista(); mostrarToast((e.tipo === 'unidades' ? 'Unidade "' : 'Responsável "') + novo + '" salvo.');
+  } catch (err) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + err.message; }
+  finally { btn.disabled = false; }
+}
+async function incluirItemLista(tipo, valor){
+  try { await gravarItemLista(LISTA_CAD[tipo].col, null, valor); mostrarToast('"' + valor + '" incluído.'); }
+  catch (e) { mostrarToast('Erro: ' + e.message, true); }
+}
+async function excluirItemLista(tipo, valor){
+  var cfg = LISTA_CAD[tipo];
+  if (!(await confirmar('Excluir ' + cfg.nome + '?', '"' + valor + '" sai da lista suspensa. Os registros já feitos com esse ' + cfg.nome + ' não mudam.', 'Excluir', true))) return;
+  try {
+    var la = (DATA.listasLinhas || []).find(function(l){ return String(l[cfg.col] || '').trim() === valor; });
+    if (la) { var o = Object.assign({}, la); o[cfg.col] = ''; await atualizarLinha('listas', la.__index, o); }
+    DATA.listasLinhas = linhasParaObjetos('listas', await lerLinhasBrutas(TABELAS.listas));
+    DATA.listas = montarListas(DATA.listasLinhas);
+    popularDatalists(); popularSelectsFixos(); atualizarContagensCadastros(); renderListaCad();
+    mostrarToast('"' + valor + '" excluído.');
+  } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
+}
 
 /* ====================== EXPORTAR PDF — últimos 25 recebimentos por fornecedor ====================== */
 var PDF_QTD_LOTES = 25, PDF_MAX_GRUPOS = 4, PDF_CHAVE_SEL = 'pdf_selecao_';
