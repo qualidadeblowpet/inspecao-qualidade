@@ -910,7 +910,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
 </div>
 
   <!-- ===================== PAINEL LATERAL — DETALHE DO RECEBIMENTO ===================== -->
-  <div class="drawer-scrim hidden" id="drawerScrim" onclick="fecharDetalhe()"></div>
+  <div class="drawer-scrim hidden" id="drawerScrim" onclick="fecharDetalheSeLivre()"></div>
   <aside class="drawer hidden" id="drawer" aria-label="Detalhe do recebimento">
     <div class="drawer-h">
       <span class="mi" id="dwIc"></span>
@@ -1587,7 +1587,7 @@ const TABLE_COLS_PADRAO = JSON.parse(JSON.stringify(TABLE_COLS));
 // Colunas gravadas como NÚMERO (o resto vai como texto, pra o Excel não converter datas/NF/lotes).
 const COLS_NUM_QTD = ['Quantidade'];
 const COLS_NUM_MED = ['Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)'];
-const VERSAO_SISTEMA = '12/11/2026 21:23';   // data/hora desta versão — atualizada a cada entrega
+const VERSAO_SISTEMA = '12/11/2026 21:38';   // data/hora desta versão — atualizada a cada entrega
 document.getElementById('versaoSistema').textContent = VERSAO_SISTEMA;
 const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
@@ -2197,7 +2197,13 @@ function irParaStatus(chave){
   renderRecebimento();
 }
 function novoRecebimentoGlobal(){ toggleMenu(false); abrirModalCadastro(); }
-document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { fecharDetalhe(); toggleMenu(false); } });
+document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { if (!document.querySelector('.modal-overlay:not(.hidden)')) fecharDetalheSeLivre(); toggleMenu(false); } });
+// Clique fora / Esc só fecha o painel lateral se não houver nada digitado nele (comentário, item, fotos pendentes)
+function fecharDetalheSeLivre(){
+  var temTexto = Array.prototype.some.call(document.querySelectorAll('#dwBody textarea, #dwBody input'), function(el){ return el.type !== 'checkbox' && el.type !== 'file' && String(el.value || '').trim() !== ''; });
+  if (temTexto || (typeof anexosPendentes !== 'undefined' && anexosPendentes.length)) { mostrarToast('Há um texto não salvo — use o X para fechar.', true); return; }
+  fecharDetalhe();
+}
 
 /* ====================== RENDER GERAL (home, KPIs, atividade) ====================== */
 function contarStatus(lista, chave){ return lista.filter(function(r){ return statusKey(r[chave]) === 'analise'; }).length; }
@@ -2570,7 +2576,6 @@ function abrirModalReclamacao(rac){
   document.getElementById('modalReclamacao').classList.remove('hidden');
 }
 function fecharModalReclamacao(){ document.getElementById('modalReclamacao').classList.add('hidden'); }
-document.getElementById('modalReclamacao').addEventListener('click', function(e){ if (e.target.id === 'modalReclamacao') fecharModalReclamacao(); });
 async function recarregarReclamacoes(){
   DATA.reclamacoes = linhasParaObjetos('reclamacoes', await lerLinhasBrutas(TABELAS.reclamacoes));
   renderReclamacoes(); renderHome(); renderClientes(); renderProdutos(); if (cadAtual === 'statusRec') renderStatusRec();
@@ -2648,7 +2653,6 @@ function abrirModalConcluirRec(){
   document.getElementById('modalConcluirRec').classList.remove('hidden');
 }
 function fecharModalConcluirRec(){ document.getElementById('modalConcluirRec').classList.add('hidden'); }
-document.getElementById('modalConcluirRec').addEventListener('click', function(e){ if (e.target.id === 'modalConcluirRec') fecharModalConcluirRec(); });
 async function concluirReclamacao(){
   var msg = document.getElementById('saveMsgConcRec'), btn = document.getElementById('btnConcluirRec');
   function erro(t){ msg.className = 'save-msg err'; msg.textContent = t; }
@@ -2713,7 +2717,6 @@ function abrirModalStatusRec(idx){
   setTimeout(function(){ document.getElementById('statusRecNomeInput').focus(); }, 50);
 }
 function fecharModalStatusRec(){ document.getElementById('modalStatusRec').classList.add('hidden'); }
-document.getElementById('modalStatusRec').addEventListener('click', function(e){ if (e.target.id === 'modalStatusRec') fecharModalStatusRec(); });
 async function recarregarStatusRec(){
   DATA.statusRec = linhasParaObjetos('statusRec', await lerLinhasBrutas(TABELAS.statusRec));
   renderStatusRec(); atualizarContagensCadastros(); renderReclamacoes();
@@ -2732,7 +2735,6 @@ function confirmar(titulo, texto, rotuloSim, perigo){
     function fim(v){ m.classList.add('hidden'); sim.onclick = nao.onclick = m.onclick = null; document.removeEventListener('keydown', tecla, true); resolve(v); }
     function tecla(e){ if (e.key === 'Escape') { e.stopPropagation(); fim(false); } }
     sim.onclick = function(){ fim(true); }; nao.onclick = function(){ fim(false); };
-    m.onclick = function(e){ if (e.target === m) fim(false); };
     document.addEventListener('keydown', tecla, true);
     m.classList.remove('hidden'); setTimeout(function(){ nao.focus(); }, 30);
   });
@@ -2856,7 +2858,7 @@ function renderFichaReclamacao(){
   var cli = clientePorNome(r['Cliente']), preforma = String(r['Tipo de Produto']) === 'Preforma';
   function kv(rot, val){ return '<div><dt>' + rot + '</dt><dd>' + (val ? escHtml(val) : '<span class="res-pend">—</span>') + '</dd></div>'; }
   var html = '<div class="ficha-grid"><div class="ficha-col">' + statusCardHtml(r) +
-    '<div class="ficha-acoes" style="gap:8px; flex-wrap:wrap;"><button type="button" class="btn" onclick="abrirEmailForm(\'reclamacao\', fichaRacAtual)"><svg><use href="#i-mail"/></svg> Enviar e-mail</button><button type="button" class="btn" onclick="abrirWhatsForm(\'reclamacao\', fichaRacAtual)"><svg><use href="#i-whats"/></svg> WhatsApp</button><button type="button" class="btn" onclick="abrirModalReclamacao(fichaRacAtual)"><svg><use href="#i-pencil"/></svg> Editar dados</button></div>' +
+    '<div class="ficha-acoes" style="gap:8px; flex-wrap:wrap;"><button type="button" class="btn" onclick="abrirEmailForm(\'reclamacao\', fichaRacAtual)"><svg><use href="#i-mail"/></svg> Enviar e-mail</button><button type="button" class="btn" onclick="abrirWhatsForm(\'reclamacao\', fichaRacAtual)"><svg><use href="#i-whats"/></svg> WhatsApp</button><button type="button" class="btn" onclick="abrirModalReclamacao(fichaRacAtual)"><svg><use href="#i-pencil"/></svg> Editar dados</button><button type="button" class="icon-btn icon-only danger" title="Excluir reclamação" onclick="excluirReclamacao(fichaRacAtual)" style="align-self:center;"><svg><use href="#i-trash"/></svg></button></div>' +
     '<dl class="dw-kv">' + kv('Entrada', r['Data']) + kv('Criticidade', r['Criticidade']) +
     kv('Cliente', r['Cliente']) + kv('Cidade / UF', cli ? textoCliente(cli) : '') +
     kv('Produto', [r['Tipo de Produto'], r['Produto']].filter(function(x){ return x; }).join(' — ')) + kv('Responsável', r['Responsável']) +
@@ -2928,6 +2930,25 @@ async function adicionarItemReclamacao(){
     DATA.recItens = linhasParaObjetos('recItens', await lerLinhasBrutas(TABELAS.recItens));
     renderFichaReclamacao(); renderReclamacoes();
   } catch (e) { mostrarToast('Erro ao adicionar: ' + e.message, true); btn.disabled = false; }
+}
+async function excluirReclamacao(rac){
+  var r = reclamacaoPorRac(rac); if (!r) return;
+  var its = itensDaReclamacao(rac), coms = DATA.recComent.filter(function(c){ return c['RAC'] === rac; });
+  var extra = [its.length ? its.length + ' item(ns) de rastreabilidade' : '', coms.length ? coms.length + ' comentário(s) do andamento' : ''].filter(Boolean).join(' e ');
+  if (!(await confirmar('Excluir ' + rac + '?', 'A reclamação de ' + (r['Cliente'] || '—') + (r['Motivo'] ? ' (' + r['Motivo'] + ')' : '') + ' será apagada da planilha' + (extra ? ', junto com ' + extra : '') + '. As fotos continuam guardadas no OneDrive. Não dá pra desfazer.', 'Excluir reclamação', true))) return;
+  mostrarCarregando(true, 'Excluindo ' + rac + '…');
+  try {
+    if (coms.length && TEM_TABELA.recComent) await excluirVariasLinhas('recComent', coms.map(function(c){ return c.__index; }));
+    if (its.length && TEM_TABELA.recItens) await excluirVariasLinhas('recItens', its.map(function(i){ return i.__index; }));
+    var atual = linhasParaObjetos('reclamacoes', await lerLinhasBrutas(TABELAS.reclamacoes)).find(function(x){ return x['RAC'] === rac; });
+    if (atual) await excluirLinhaPorIndice('reclamacoes', atual.__index);
+    if (TEM_TABELA.recComent) DATA.recComent = linhasParaObjetos('recComent', await lerLinhasBrutas(TABELAS.recComent));
+    if (TEM_TABELA.recItens) DATA.recItens = linhasParaObjetos('recItens', await lerLinhasBrutas(TABELAS.recItens));
+    fecharDetalhe(); fichaRacAtual = null;
+    await recarregarReclamacoes();
+    mostrarToast(rac + ' excluída.');
+  } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
+  finally { mostrarCarregando(false); }
 }
 async function excluirItemReclamacao(idx){
   var it = DATA.recItens.find(function(i){ return i.__index === idx; }) || {};
@@ -3244,7 +3265,6 @@ async function salvarGiroLaudo(){
     fecharGirarLaudo(); abrirDetalhe(mat, idx); mostrarToast('Foto do laudo salva na posição certa.');
   } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; btn.disabled = false; }
 }
-document.getElementById('modalCadastro').addEventListener('click', function(e){ if (e.target.id === 'modalCadastro') fecharModalCadastro(); });
 
 /* ---- Fornecedor e Tipo (vêm do cadastro de Fornecedores, filtrados pelo material) ---- */
 // "manter" = valor que precisa continuar aparecendo mesmo se não estiver mais no cadastro
@@ -3992,7 +4012,6 @@ function abrirModalEspec(id, rascunho){
   document.getElementById('modalEspec').classList.remove('hidden');
 }
 function fecharModalEspec(){ document.getElementById('modalEspec').classList.add('hidden'); empImportFila = []; empImportPos = 0; }
-document.getElementById('modalEspec').addEventListener('click', function(e){ if (e.target.id === 'modalEspec') fecharModalEspec(); });
 function linhasDaFicha(brutas, ficha){
   var matLabel = MAT_LABEL_PLANO[ficha.mat] || ficha.mat;
   if (ficha.legado) return brutas.filter(function(l){ return String(l['Material']).trim() === matLabel && String(l['Fornecedor'] || '').trim() === ficha.legado.forn && String(l['Tipo'] || '').trim() === ficha.legado.tipo; });
@@ -4113,7 +4132,6 @@ function abrirModalRotulo(id){
   document.getElementById('modalRotulo').classList.remove('hidden');
 }
 function fecharModalRotulo(){ document.getElementById('modalRotulo').classList.add('hidden'); }
-document.getElementById('modalRotulo').addEventListener('click', function(e){ if (e.target.id === 'modalRotulo') fecharModalRotulo(); });
 async function salvarRotulo(){
   if (bloqueadoPlanilhaAntiga()) return;
   var msg = document.getElementById('saveMsgRotulo');
@@ -4195,7 +4213,6 @@ function abrirModalFornecedor(gi){
   document.getElementById('modalFornecedor').classList.remove('hidden');
 }
 function fecharModalFornecedor(){ document.getElementById('modalFornecedor').classList.add('hidden'); }
-document.getElementById('modalFornecedor').addEventListener('click', function(e){ if (e.target.id === 'modalFornecedor') fecharModalFornecedor(); });
 function adicionarItemForn(i, existente){
   i = i || { mat: 'resina', tipo: '', cod: '', ult: '', emp: '' };
   var tr = document.createElement('tr');
@@ -4321,7 +4338,6 @@ escolherCadastro('fornecedores');
 /* ====================== CONFIGURAÇÕES ====================== */
 function abrirConfiguracoes(){ document.getElementById('modalConfig').classList.remove('hidden'); }
 function fecharConfiguracoes(){ document.getElementById('modalConfig').classList.add('hidden'); }
-document.getElementById('modalConfig').addEventListener('click', function(e){ if (e.target.id === 'modalConfig') fecharConfiguracoes(); });
 
 /* ====================== CADASTROS SIMPLES: RESPONSÁVEIS E UNIDADES ======================
    Ficam na aba Listas da planilha (colunas "Responsaveis" e "Unidades") — sem mudar a estrutura. */
@@ -4370,7 +4386,6 @@ function abrirModalItemLista(tipo, valor, campoDestino){
   setTimeout(function(){ inp.focus(); }, 50);
 }
 function fecharModalItemLista(){ document.getElementById('modalItemLista').classList.add('hidden'); }
-document.getElementById('modalItemLista').addEventListener('click', function(e){ if (e.target.id === 'modalItemLista') fecharModalItemLista(); });
 document.getElementById('itemListaInput').addEventListener('keydown', function(e){ if (e.key === 'Enter') salvarItemLista(); });
 async function gravarItemLista(col, antigo, novo){
   var linhas = DATA.listasLinhas || [];
@@ -4479,7 +4494,6 @@ function montarListaPdf(){
   atualizarSelPdf();
 }
 function fecharModalPdf(){ document.getElementById('modalPdf').classList.add('hidden'); }
-document.getElementById('modalPdf').addEventListener('click', function(e){ if (e.target.id === 'modalPdf') fecharModalPdf(); });
 function codigosSelecionadosPdf(){ return Array.prototype.map.call(document.querySelectorAll('#pdfSelLista input:checked'), function(i){ return i.value; }); }
 function limparSelPdf(){ document.querySelectorAll('#pdfSelLista input').forEach(function(i){ i.checked = false; }); atualizarSelPdf(); }
 function atualizarSelPdf(){
@@ -4620,7 +4634,6 @@ function abrirModalPdfRec(){
   document.getElementById('modalPdfRec').classList.remove('hidden');
 }
 function fecharModalPdfRec(){ document.getElementById('modalPdfRec').classList.add('hidden'); }
-document.getElementById('modalPdfRec').addEventListener('click', function(e){ if (e.target.id === 'modalPdfRec') fecharModalPdfRec(); });
 ['pdfRecDe', 'pdfRecAte'].forEach(function(id){ document.getElementById(id).addEventListener('change', previaPdfRec); });
 function reclamacoesDoRelatorio(){
   return filtrarReclamacoes(document.getElementById('pdfRecDe').value, document.getElementById('pdfRecAte').value, document.getElementById('pdfRecFiltros').checked)
@@ -4807,7 +4820,6 @@ function abrirModalDest(chave){
   document.getElementById('modalDest').classList.remove('hidden');
 }
 function fecharModalDest(){ document.getElementById('modalDest').classList.add('hidden'); }
-document.getElementById('modalDest').addEventListener('click', function(e){ if (e.target.id === 'modalDest') fecharModalDest(); });
 async function salvarDest(){
   var msg = document.getElementById('saveMsgDest'), btn = document.getElementById('btnSalvarDest');
   var para = document.getElementById('destParaInput').value, cc = document.getElementById('destCcInput').value;
@@ -5038,7 +5050,6 @@ async function abrirEmailForm(tipo, ref){
   m.anexos.forEach(function(a, i){ baixarArquivoLink(a.link).then(function(arq){ var el = document.querySelector('[data-tam="' + i + '"]'); if (el) el.textContent = formatarTamanho(arq.blob.size); }).catch(function(){ var el = document.querySelector('[data-tam="' + i + '"]'); if (el) el.textContent = 'não encontrado'; }); });
 }
 function fecharEmailForm(){ document.getElementById('modalEmailForm').classList.add('hidden'); }
-document.getElementById('modalEmailForm').addEventListener('click', function(e){ if (e.target.id === 'modalEmailForm') fecharEmailForm(); });
 async function gerarEmailOutlook(){
   var m = emailFormAtual; if (!m) return;
   var msg = document.getElementById('saveMsgEmailForm'), btn = document.getElementById('btnAbrirOutlook');
@@ -5151,7 +5162,6 @@ async function abrirWhatsForm(tipo, ref){
   finally { btn.disabled = !whatsAtual.doc; }
 }
 function fecharWhatsForm(){ document.getElementById('modalWhatsForm').classList.add('hidden'); }
-document.getElementById('modalWhatsForm').addEventListener('click', function(e){ if (e.target.id === 'modalWhatsForm') fecharWhatsForm(); });
 function baixarPdfWhats(){ if (whatsAtual && whatsAtual.doc) entregarPdf(whatsAtual.doc, whatsAtual.arquivo); }
 async function compartilharWhats(){
   if (!whatsAtual || !whatsAtual.doc) return;
@@ -5470,7 +5480,6 @@ function abrirModalCliente(nome, daReclamacao, nomeSugerido){
   setTimeout(function(){ document.getElementById(c ? 'clienteCidadeInput' : 'clienteNomeInput').focus(); }, 50);
 }
 function fecharModalCliente(){ document.getElementById('modalCliente').classList.add('hidden'); }
-document.getElementById('modalCliente').addEventListener('click', function(e){ if (e.target.id === 'modalCliente') fecharModalCliente(); });
 async function salvarCliente(){
   var msg = document.getElementById('saveMsgCliente'), btn = document.getElementById('btnSalvarCliente');
   function erro(t){ msg.className = 'save-msg err'; msg.textContent = t; }
@@ -5539,7 +5548,6 @@ function abrirModalProduto(idx, daReclamacao, nomeSugerido){
   setTimeout(function(){ document.getElementById('produtoNomeInput').focus(); }, 50);
 }
 function fecharModalProduto(){ document.getElementById('modalProduto').classList.add('hidden'); }
-document.getElementById('modalProduto').addEventListener('click', function(e){ if (e.target.id === 'modalProduto') fecharModalProduto(); });
 async function salvarProduto(){
   var msg = document.getElementById('saveMsgProduto'), btn = document.getElementById('btnSalvarProduto');
   function erro(t){ msg.className = 'save-msg err'; msg.textContent = t; }
