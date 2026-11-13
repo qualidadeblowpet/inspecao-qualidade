@@ -1587,7 +1587,7 @@ const TABLE_COLS_PADRAO = JSON.parse(JSON.stringify(TABLE_COLS));
 // Colunas gravadas como NÚMERO (o resto vai como texto, pra o Excel não converter datas/NF/lotes).
 const COLS_NUM_QTD = ['Quantidade'];
 const COLS_NUM_MED = ['Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)'];
-const VERSAO_SISTEMA = '12/11/2026 21:38';   // data/hora desta versão — atualizada a cada entrega
+const VERSAO_SISTEMA = '12/11/2026 21:57';   // data/hora desta versão — atualizada a cada entrega
 document.getElementById('versaoSistema').textContent = VERSAO_SISTEMA;
 const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
@@ -1771,12 +1771,40 @@ function recarregarTudo(){
 function urlTabela(nomeTabela){
   return 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + nomeTabela;
 }
+// Chamada à Graph com nova tentativa automática quando o Excel Online responde "ocupado" (429/503) —
+// comum quando duas pessoas gravam ao mesmo tempo. Leituras e edições de célula (repetivel=true)
+// também repetem em erro 500/502/504 ou queda de rede; inclusão e exclusão de linha não, pra não
+// correr o risco de gravar/apagar duas vezes.
+function esperar(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+async function graphFetch(url, opt, repetivel){
+  for (var t = 0; ; t++) {
+    var resp;
+    try { resp = await fetch(url, opt || {}); }
+    catch (e) { if (repetivel && t < 3) { await esperar(1000 * (t + 1)); continue; } throw e; }
+    var st = resp.status;
+    if (t >= 3 || !(st === 429 || st === 503 || (repetivel && (st === 500 || st === 502 || st === 504)))) return resp;
+    var ra = parseFloat(resp.headers.get('Retry-After'));
+    await esperar(Math.min(isNaN(ra) ? 1000 * Math.pow(2, t) : ra * 1000, 10000));
+  }
+}
+// Cópia de cada linha como foi lida da planilha (por tabela e índice). Antes de editar ou excluir,
+// o sistema confere se a linha ainda é a mesma — se outra pessoa incluiu/excluiu linhas nesse meio
+// tempo, ele acha o registro certo pelo conteúdo em vez de gravar por cima de outro.
+var LINHAS_LIDAS = {};
 async function lerLinhasBrutas(nomeTabela){
   var token = await getToken();
-  var resp = await fetch(urlTabela(nomeTabela) + '/rows', { headers: { Authorization: 'Bearer ' + token } });
-  var json = await resp.json();
-  if (!resp.ok) throw new Error((json.error && json.error.message) || ('erro ao ler ' + nomeTabela));
-  return json.value || [];
+  var url = urlTabela(nomeTabela) + '/rows', todas = [];
+  while (url) {
+    var resp = await graphFetch(url, { headers: { Authorization: 'Bearer ' + token } }, true);
+    var json = await resp.json().catch(function(){ return {}; });
+    if (!resp.ok) throw new Error((json.error && json.error.message) || ('erro ao ler ' + nomeTabela));
+    todas = todas.concat(json.value || []);
+    url = json['@odata.nextLink'] || null;
+  }
+  var copia = [];
+  todas.forEach(function(l){ copia[l.index] = (l.values && l.values[0]) ? l.values[0].slice() : null; });
+  LINHAS_LIDAS[nomeTabela] = copia;
+  return todas;
 }
 function escHtml(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function pad2(n){ return (n < 10 ? '0' : '') + n; }
@@ -1832,71 +1860,146 @@ function linhasParaObjetos(chaveTabela, linhasBrutas){
 function objetoParaValores(chaveTabela, obj){
   return TABLE_COLS[chaveTabela].map(function(h){ return valorParaPlanilha(h, obj[h]); });
 }
-async function adicionarLinha(chaveTabela, obj){
+// Inclui uma ou várias linhas numa chamada só (vão pro fim da tabela, sem mudar o índice das outras).
+async function adicionarVariasLinhas(chaveTabela, objs){
+  if (!objs.length) return {};
   var token = await getToken();
-  var valores = objetoParaValores(chaveTabela, obj);
-  var resp = await fetch(urlTabela(TABELAS[chaveTabela]) + '/rows/add', {
+  var resp = await graphFetch(urlTabela(TABELAS[chaveTabela]) + '/rows/add', {
     method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [valores] })
-  });
-  var json = await resp.json();
+    body: JSON.stringify({ values: objs.map(function(o){ return objetoParaValores(chaveTabela, o); }) })
+  }, false);
+  var json = await resp.json().catch(function(){ return {}; });
   if (!resp.ok) throw new Error((json.error && json.error.message) || 'erro ao gravar linha');
+  var c = LINHAS_LIDAS[TABELAS[chaveTabela]];
+  if (c && typeof json.index === 'number') for (var i = 0; i < objs.length; i++) c[json.index + i] = null;
   return json;
+}
+function adicionarLinha(chaveTabela, obj){ return adicionarVariasLinhas(chaveTabela, [obj]); }
+// Inclui e já coloca o registro na lista da tela, sem reler a tabela inteira (mais rápido).
+async function incluirRegistro(chaveTabela, obj){
+  var json = await adicionarLinha(chaveTabela, obj);
+  if (typeof json.index === 'number') {
+    var valores = objetoParaValores(chaveTabela, obj).map(function(v){ return (typeof v === 'string' && v.charAt(0) === "'") ? v.slice(1) : v; });
+    var novo = linhasParaObjetos(chaveTabela, [{ index: json.index, values: [valores] }])[0];
+    if (novo) DATA[chaveTabela].push(novo);
+  } else DATA[chaveTabela] = linhasParaObjetos(chaveTabela, await lerLinhasBrutas(TABELAS[chaveTabela]));
 }
 // Editar e excluir linhas são feitos pelo ENDEREÇO da linha na aba (ex.: A5:X5), e não pela
 // rota rows/itemAt(...) da Tabela — essa rota é instável na API do Excel Online (a de excluir
 // devolve "Resource not found for the segment 'delete'"). O endereço é calculado a partir do
 // intervalo atual da Tabela: linha da planilha = linha do cabeçalho + 1 + índice da linha.
-async function localizarLinhaTabela(chaveTabela, index){
-  var token = await getToken();
-  var resp = await fetch(urlTabela(TABELAS[chaveTabela]) + '/range', { headers: { Authorization: 'Bearer ' + token } });
+function linhaIgual(a, b){
+  var n = Math.max(a.length, b.length);
+  for (var i = 0; i < n; i++) if (String(a[i] == null ? '' : a[i]) !== String(b[i] == null ? '' : b[i])) return false;
+  return true;
+}
+async function geometriaTabela(chaveTabela, token){
+  var base = urlTabela(TABELAS[chaveTabela]) + '/range', cab = { headers: { Authorization: 'Bearer ' + token } };
+  var resp = await graphFetch(base + '?$select=address', cab, true);   // só o endereço (sem baixar a tabela toda)
   var json = await resp.json().catch(function(){ return {}; });
+  if (!resp.ok || !json.address) { resp = await graphFetch(base, cab, true); json = await resp.json().catch(function(){ return {}; }); }
   if (!resp.ok || !json.address) throw new Error((json.error && json.error.message) || 'não consegui localizar a tabela na planilha');
   var addr = json.address, bang = addr.lastIndexOf('!');
-  var aba = addr.slice(0, bang).replace(/^'|'$/g, '').replace(/''/g, "'");
   var m = addr.slice(bang + 1).replace(/\$/g, '').match(/^([A-Z]+)(\d+):([A-Z]+)(\d+)$/);
   if (!m) throw new Error('endereço da tabela inesperado: ' + addr);
-  var linhaCab = parseInt(m[2], 10), ultima = parseInt(m[4], 10);
-  var linha = linhaCab + 1 + index;
-  if (index < 0 || linha > ultima) throw new Error('linha não encontrada na tabela (talvez já tenha sido alterada) — clique em Atualizar e tente de novo');
-  return {
-    token: token,
-    url: 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + encodeURIComponent(aba) +
-         "/range(address='" + m[1] + linha + ':' + m[3] + linha + "')",
-    linhasDeDados: ultima - linhaCab
-  };
+  var linhaCab = parseInt(m[2], 10);
+  return { aba: addr.slice(0, bang).replace(/^'|'$/g, '').replace(/''/g, "'"), colIni: m[1], colFim: m[3], linhaCab: linhaCab, linhasDeDados: parseInt(m[4], 10) - linhaCab };
+}
+function urlIntervalo(g, ini, fim){
+  return 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/worksheets/' + encodeURIComponent(g.aba) +
+         "/range(address='" + g.colIni + (g.linhaCab + 1 + ini) + ':' + g.colFim + (g.linhaCab + 1 + fim) + "')";
+}
+async function lerValoresIntervalo(g, ini, fim, token){
+  var resp = await graphFetch(urlIntervalo(g, ini, fim) + '?$select=values', { headers: { Authorization: 'Bearer ' + token } }, true);
+  var json = await resp.json().catch(function(){ return {}; });
+  return (resp.ok && json.values) ? json.values : null;
+}
+async function localizarLinhaTabela(chaveTabela, index, esperado){
+  var token = await getToken(), nome = TABELAS[chaveTabela];
+  if (esperado === undefined) esperado = (LINHAS_LIDAS[nome] || [])[index] || null;
+  var g = await geometriaTabela(chaveTabela, token);
+  var ok = index >= 0 && index < g.linhasDeDados;
+  if (ok && esperado) { var v = await lerValoresIntervalo(g, index, index, token); ok = !!(v && v[0] && linhaIgual(v[0], esperado)); }
+  if (!ok) {
+    if (!esperado) throw new Error('linha não encontrada na tabela (talvez já tenha sido alterada) — clique em Atualizar e tente de novo');
+    // A planilha mudou desde a última leitura: procura o mesmo registro pelo conteúdo.
+    var linhas = await lerLinhasBrutas(nome), achado = -1;
+    linhas.forEach(function(l){
+      var vl = l.values && l.values[0];
+      if (vl && linhaIgual(vl, esperado) && (achado < 0 || Math.abs(l.index - index) < Math.abs(achado - index))) achado = l.index;
+    });
+    if (achado < 0) throw new Error('este registro foi alterado ou excluído por outra pessoa enquanto a tela estava aberta — clique em Atualizar, confira e tente de novo');
+    index = achado; g.linhasDeDados = linhas.length;
+  }
+  return { token: token, nome: nome, index: index, url: urlIntervalo(g, index, index), linhasDeDados: g.linhasDeDados };
 }
 async function gravarValoresLinha(loc, valores){
-  var resp = await fetch(loc.url, {
+  var resp = await graphFetch(loc.url, {
     method: 'PATCH', headers: { Authorization: 'Bearer ' + loc.token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [valores] })
-  });
+    body: JSON.stringify({ values: Array.isArray(valores[0]) ? valores : [valores] })
+  }, true);
   var json = await resp.json().catch(function(){ return {}; });
   if (!resp.ok) throw new Error((json.error && json.error.message) || 'erro ao gravar a linha');
 }
+async function apagarIntervalo(url, token){
+  var resp = await graphFetch(url + '/delete', {
+    method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ shift: 'Up' })
+  }, false);
+  if (!resp.ok) { var json = await resp.json().catch(function(){ return {}; }); throw new Error((json.error && json.error.message) || 'erro ao excluir linha'); }
+}
+// Devolve o índice em que a linha estava de fato (muda se a planilha foi alterada por outra pessoa).
 async function atualizarLinha(chaveTabela, index, obj){
   var loc = await localizarLinhaTabela(chaveTabela, index);
   await gravarValoresLinha(loc, objetoParaValores(chaveTabela, obj));
+  var c = LINHAS_LIDAS[loc.nome]; if (c) c[loc.index] = null;   // conteúdo novo: só confere de novo depois da próxima leitura
+  return loc.index;
 }
-async function excluirLinhaPorIndice(chaveTabela, index){
-  var loc = await localizarLinhaTabela(chaveTabela, index);
+async function excluirLinhaPorIndice(chaveTabela, index, esperado){
+  var loc = await localizarLinhaTabela(chaveTabela, index, esperado), c = LINHAS_LIDAS[loc.nome];
   if (loc.linhasDeDados <= 1) {
     // Uma Tabela do Excel não pode ficar sem nenhuma linha de dados (o arquivo passa a ser
     // tratado como danificado). Se é a última, só limpa os valores — o app ignora linha vazia.
-    await gravarValoresLinha(loc, TABLE_COLS[chaveTabela].map(function(){ return ''; }));
+    var vazia = TABLE_COLS[chaveTabela].map(function(){ return ''; });
+    await gravarValoresLinha(loc, vazia);
+    if (c) c[loc.index] = vazia;
     return;
   }
-  var resp = await fetch(loc.url + '/delete', {
-    method: 'POST', headers: { Authorization: 'Bearer ' + loc.token, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ shift: 'Up' })
-  });
-  if (!resp.ok) { var json = await resp.json().catch(function(){ return {}; }); throw new Error((json.error && json.error.message) || 'erro ao excluir linha'); }
+  await apagarIntervalo(loc.url, loc.token);
+  if (c) c.splice(loc.index, 1);
+}
+// Apaga um bloco de linhas seguidas numa chamada só, depois de conferir que são as mesmas lidas.
+// Devolve false se não deu pra conferir — aí quem chamou apaga uma a uma.
+async function excluirBloco(chaveTabela, ini, fim, esperados){
+  var token = await getToken(), g = await geometriaTabela(chaveTabela, token), n = fim - ini + 1, nome = TABELAS[chaveTabela];
+  if (fim >= g.linhasDeDados || esperados.some(function(e){ return !e; })) return false;
+  var v = await lerValoresIntervalo(g, ini, fim, token);
+  if (!v || v.length !== n || v.some(function(l, k){ return !linhaIgual(l, esperados[k]); })) return false;
+  var manter = n >= g.linhasDeDados;   // apagaria todas: a tabela precisa ficar com uma linha (em branco)
+  await apagarIntervalo(urlIntervalo(g, manter ? ini + 1 : ini, fim), token);
+  var c = LINHAS_LIDAS[nome];
+  if (manter) {
+    var vazia = TABLE_COLS[chaveTabela].map(function(){ return ''; });
+    await gravarValoresLinha({ url: urlIntervalo(g, ini, ini), token: token }, vazia);
+    if (c) { c.splice(ini + 1, n - 1); c[ini] = vazia; }
+  } else if (c) c.splice(ini, n);
+  return true;
 }
 async function excluirVariasLinhas(chaveTabela, indices){
   // Apaga do maior índice pro menor — excluir de baixo pra cima evita que o índice das
-  // linhas seguintes mude no meio da operação.
-  var ordenado = indices.slice().sort(function(a,b){ return b - a; });
-  for (var i = 0; i < ordenado.length; i++) { await excluirLinhaPorIndice(chaveTabela, ordenado[i]); }
+  // linhas seguintes mude no meio da operação. Linhas seguidas (ex.: os testes de uma EMP)
+  // saem num bloco só.
+  var cache = LINHAS_LIDAS[TABELAS[chaveTabela]] || [], esperados = {};
+  var ordenado = indices.filter(function(x, k){ return indices.indexOf(x) === k; }).sort(function(a,b){ return b - a; });
+  ordenado.forEach(function(i){ esperados[i] = cache[i] || null; });   // guarda o conteúdo antes de mexer
+  var blocos = [];
+  ordenado.forEach(function(i){ var b = blocos[blocos.length - 1]; if (b && b.ini === i + 1) b.ini = i; else blocos.push({ ini: i, fim: i }); });
+  for (var k = 0; k < blocos.length; k++) {
+    var b = blocos[k], lista = [];
+    for (var i = b.ini; i <= b.fim; i++) lista.push(esperados[i]);
+    if (b.fim > b.ini && await excluirBloco(chaveTabela, b.ini, b.fim, lista)) continue;
+    for (var j = b.fim; j >= b.ini; j--) await excluirLinhaPorIndice(chaveTabela, j, esperados[j]);
+  }
 }
 
 /* ====================== GRAPH API — UPLOAD DE FOTO ====================== */
@@ -2598,6 +2701,7 @@ async function salvarReclamacao(){
   if (!produto) return erro(txtProd ? 'Produto "' + txtProd + '" não está cadastrado — use o + ao lado pra cadastrar.' : 'Escolha o produto.');
   btn.disabled = true; msg.className = 'save-msg'; msg.textContent = 'Salvando…';
   try {
+    if (!ant) DATA.reclamacoes = linhasParaObjetos('reclamacoes', await lerLinhasBrutas(TABELAS.reclamacoes));
     var rac = ant ? ant['RAC'] : proximoNumero(DATA.reclamacoes, 'RAC', 'RAC', 4);
     var obj = Object.assign({}, ant || {}, {
       'RAC': rac, 'Data': formatarDataBR(document.getElementById('reclamacaoDataInput').value), 'Cliente': cliente,
@@ -2838,8 +2942,7 @@ function galeriaHtml(links){
 }
 async function registrarComentario(rac, texto, anexos, automatico){
   if (!TEM_TABELA.recComent) return;
-  await adicionarLinha('recComent', { 'RAC': rac, 'Data/Hora': agoraBR(), 'Autor': (automatico ? '[sistema] ' : '') + autorAtual(), 'Comentário': texto, 'Anexos': (anexos || []).join('\n') });
-  DATA.recComent = linhasParaObjetos('recComent', await lerLinhasBrutas(TABELAS.recComent));
+  await incluirRegistro('recComent', { 'RAC': rac, 'Data/Hora': agoraBR(), 'Autor': (automatico ? '[sistema] ' : '') + autorAtual(), 'Comentário': texto, 'Anexos': (anexos || []).join('\n') });
 }
 function abrirFichaReclamacao(rac){
   var r = reclamacaoPorRac(rac); if (!r) return;
@@ -2872,7 +2975,7 @@ function renderFichaReclamacao(){
     var itens = itensDaReclamacao(r['RAC']);
     html += itens.length ? '<div class="it-lista">' + itens.map(function(i){
         var l2 = [i['Quantidade'], i['Observação']].filter(function(x){ return x; }).join(' — ');
-        return '<div class="it-row"><div class="it-info"><div class="it-l1">' +
+        return '<div class="it-row" data-idx="' + i.__index + '"><div class="it-info"><div class="it-l1">' +
           '<span><b>Produção</b>' + escHtml(i['Data de Produção'] || '—') + '</span><span><b>Lote</b>' + escHtml(i['Lote'] || '—') + '</span>' +
           (preforma ? '<span><b>Caixa</b>' + escHtml(i['Caixa'] || '—') + '</span>' : '') + '</div>' +
           (l2 ? '<div class="it-l2">' + escHtml(l2) + '</div>' : '') + '</div>' +
@@ -2924,12 +3027,19 @@ async function adicionarItemReclamacao(){
   function v(id){ var el = document.getElementById(id); return el ? el.value.trim() : ''; }
   var dp = v('itDataProd'), item = { 'RAC': r['RAC'], 'Data de Produção': dp ? formatarDataBR(dp) : '', 'Lote': v('itLote'), 'Caixa': v('itCaixa'), 'Quantidade': v('itQtd'), 'Observação': v('itObs') };
   if (!item['Data de Produção'] && !item['Lote'] && !item['Caixa']) { mostrarToast('Informe ao menos a data de produção, o lote ou a caixa.', true); return; }
-  var btn = document.getElementById('btnAddItem'); btn.disabled = true;
+  var btn = document.getElementById('btnAddItem'), rotulo = btn.innerHTML, rac = r['RAC'];
+  btn.disabled = true; btn.innerHTML = 'Salvando…';
+  document.querySelectorAll('#itForm input').forEach(function(i){ i.disabled = true; });
   try {
-    await adicionarLinha('recItens', item);
-    DATA.recItens = linhasParaObjetos('recItens', await lerLinhasBrutas(TABELAS.recItens));
-    renderFichaReclamacao(); renderReclamacoes();
-  } catch (e) { mostrarToast('Erro ao adicionar: ' + e.message, true); btn.disabled = false; }
+    await incluirRegistro('recItens', item);
+    if (fichaAberta() && fichaRacAtual === rac) renderFichaReclamacao();
+    renderReclamacoes();
+    mostrarToast('Item de rastreabilidade adicionado.');
+  } catch (e) {
+    mostrarToast('Erro ao adicionar: ' + e.message, true);
+    var b = document.getElementById('btnAddItem'); if (b) { b.disabled = false; b.innerHTML = rotulo; }
+    document.querySelectorAll('#itForm input').forEach(function(i){ i.disabled = false; });
+  }
 }
 async function excluirReclamacao(rac){
   var r = reclamacaoPorRac(rac); if (!r) return;
@@ -2953,11 +3063,15 @@ async function excluirReclamacao(rac){
 async function excluirItemReclamacao(idx){
   var it = DATA.recItens.find(function(i){ return i.__index === idx; }) || {};
   if (!(await confirmar('Remover item da rastreabilidade?', [it['Data de Produção'] ? 'Produção ' + it['Data de Produção'] : '', it['Lote'] ? 'lote ' + it['Lote'] : '', it['Caixa'] ? 'caixa ' + it['Caixa'] : ''].filter(function(x){ return x; }).join(' · ') || 'Este item será removido.', 'Remover', true))) return;
+  var linha = document.querySelector('.it-row[data-idx="' + idx + '"]');
+  if (linha) { linha.style.opacity = '.45'; linha.style.pointerEvents = 'none'; }
   try {
     await excluirLinhaPorIndice('recItens', idx);
     DATA.recItens = linhasParaObjetos('recItens', await lerLinhasBrutas(TABELAS.recItens));
-    renderFichaReclamacao(); renderReclamacoes();
-  } catch (e) { mostrarToast('Erro ao remover: ' + e.message, true); }
+    if (fichaAberta()) renderFichaReclamacao();
+    renderReclamacoes();
+    mostrarToast('Item removido.');
+  } catch (e) { mostrarToast('Erro ao remover: ' + e.message, true); if (linha) { linha.style.opacity = ''; linha.style.pointerEvents = ''; } }
 }
 async function anexarNoComentario(input){
   var arqs = Array.prototype.slice.call(input.files || []); input.value = '';
@@ -3204,7 +3318,7 @@ function preencherEdicaoRecebimento(mat, row){
 async function excluirRecebimento(mat, index){
   var row = DATA[mat].find(function(x){ return x.__index === index; });
   var ref = row ? (mat === 'resina' ? row['Lote Interno'] : (row['Nota Fiscal'] || row['Lote'] || '')) : '';
-  if (!confirm('Excluir este recebimento' + (ref ? (' (' + ref + ')') : '') + '? Essa ação não pode ser desfeita.')) return;
+  if (!(await confirmar('Excluir este recebimento?', (ref ? ref + ' — ' : '') + 'essa ação não pode ser desfeita.', 'Excluir', true))) return;
   try {
     await excluirLinhaPorIndice(mat, index);
     DATA[mat] = linhasParaObjetos(mat, await lerLinhasBrutas(TABELAS[mat]));
@@ -3785,6 +3899,7 @@ async function salvarRecebimento(statusFinal){
       var item = itemFornecedor(forn, 'resina', tipo);
       var codigo = loteResinaExistente ? String(loteResinaExistente['Código Produto']).toUpperCase() : ((item && item.cod) || (rowOriginal ? rowOriginal['Código Produto'] : ''));
       if (!codigo) throw new Error('O tipo "' + tipo + '" não tem código cadastrado — informe o código em Cadastros › Fornecedores.');
+      if (!editando && !loteResinaExistente) DATA.resina = linhasParaObjetos('resina', await lerLinhasBrutas(TABELAS.resina));   // numera com a tabela atualizada (evita lote repetido)
       var loteInterno = editando ? (rowOriginal['Lote Interno'] || document.getElementById('loteInternoDisplay').value) : (loteResinaExistente ? loteResinaExistente['Lote Interno'] : proximoLoteInterno(codigo));
       var medicoes = {}, extras = [], linhasReanalise = [], escolhas = statusFinal ? (escolhasAnaliseConclusao || {}) : null;
       ESPEC_PARAMS_ATUAL.forEach(function(p, idx){
@@ -3808,10 +3923,10 @@ async function salvarRecebimento(statusFinal){
       if (temColMedR) row['Medições'] = extras.join('\n');
       row['EMP'] = empDoRegistro(base, mat, forn, tipo, ftS.modelo);
       var sufixo = statusFinal ? ' concluído como ' + statusFinal + '.' : (editando ? ' atualizado (Em análise).' : ' salvo como Em análise.');
-      if (editando) await atualizarLinha('resina', editando.index, row); else await adicionarLinha('resina', row);
+      var idxSalvo = editando ? await atualizarLinha('resina', editando.index, row) : (await adicionarLinha('resina', row)).index;
       mostrarToast('Recebimento ' + loteInterno + sufixo);
       DATA.resina = linhasParaObjetos('resina', await lerLinhasBrutas(TABELAS.resina));
-      ultimoRecebimentoSalvo = { mat: 'resina', index: editando ? editando.index : maiorIndice(DATA.resina) };
+      ultimoRecebimentoSalvo = { mat: 'resina', index: typeof idxSalvo === 'number' ? idxSalvo : maiorIndice(DATA.resina) };
     } else {
       var tableKey = mat;
       var escolhas2 = statusFinal ? (escolhasAnaliseConclusao || {}) : null, linhasRe2 = [];
@@ -3835,10 +3950,10 @@ async function salvarRecebimento(statusFinal){
         var confSel = document.getElementById('conferenciaRotuloSelect');
         row2['Conferência Visual'] = confSel.options[confSel.selectedIndex] ? confSel.options[confSel.selectedIndex].textContent : confSel.value;
       }
-      if (editando) await atualizarLinha(tableKey, editando.index, row2); else await adicionarLinha(tableKey, row2);
+      var idxSalvo2 = editando ? await atualizarLinha(tableKey, editando.index, row2) : (await adicionarLinha(tableKey, row2)).index;
       mostrarToast('Recebimento' + (statusFinal ? ' concluído como ' + statusFinal + '.' : (editando ? ' atualizado (Em análise).' : ' salvo como Em análise.')));
       DATA[tableKey] = linhasParaObjetos(tableKey, await lerLinhasBrutas(TABELAS[tableKey]));
-      ultimoRecebimentoSalvo = { mat: tableKey, index: editando ? editando.index : maiorIndice(DATA[tableKey]) };
+      ultimoRecebimentoSalvo = { mat: tableKey, index: typeof idxSalvo2 === 'number' ? idxSalvo2 : maiorIndice(DATA[tableKey]) };
     }
     document.getElementById('ct' + mat.charAt(0).toUpperCase() + mat.slice(1)).textContent = DATA[mat].length;
     if (matAtual === mat) { atualizarFornecedoresFiltro(); renderRecebimento(); }
@@ -4059,13 +4174,10 @@ async function salvarEspecificacao(){
     }
     // Grava primeiro as linhas novas (vão pro fim da tabela, sem mudar o índice das antigas) e só
     // depois apaga as antigas — assim, se algo falhar no meio, a EMP nunca some.
-    for (var i = 0; i < linhas.length; i++) {
-      var p = linhas[i];
-      await adicionarLinha('especificacoes', {
-        'Código Documento': doc, 'Descrição': desc, 'Material': MAT_LABEL_PLANO[mat], 'Revisão': rev, 'Data Documento': dataDoc,
-        'Teste': p.teste, 'Especificação/Tolerância': p.especTexto, 'Unidade': p.unidade, 'NT': p.nt, 'Critério': p.criterio
-      });
-    }
+    await adicionarVariasLinhas('especificacoes', linhas.map(function(p){
+      return { 'Código Documento': doc, 'Descrição': desc, 'Material': MAT_LABEL_PLANO[mat], 'Revisão': rev, 'Data Documento': dataDoc,
+        'Teste': p.teste, 'Especificação/Tolerância': p.especTexto, 'Unidade': p.unidade, 'NT': p.nt, 'Critério': p.criterio };
+    }));
     if (indicesParaApagar.length) await excluirVariasLinhas('especificacoes', indicesParaApagar);
     var n = fichaAnt ? await trocarVinculoEmp(fichaAnt.key, chave) : 0;
     await recarregarEspecificacoes();
@@ -4080,7 +4192,7 @@ async function excluirEspecificacao(id){
   var ficha = DATA.especificacoes.find(function(f){ return f.id === id; });
   if (!ficha) return;
   var vinc = vinculosDaEmp(ficha);
-  if (!confirm('Excluir a EMP "' + ficha.key + '"?' + (vinc.length ? ' Ela está vinculada a ' + vinc.length + ' produto(s) de fornecedor, que ficarão sem critérios até você vincular outra EMP.' : '') + ' Recebimentos já lançados não são alterados.')) return;
+  if (!(await confirmar('Excluir a EMP "' + ficha.key + '"?', (vinc.length ? 'Ela está vinculada a ' + vinc.length + ' produto(s) de fornecedor, que ficarão sem critérios até você vincular outra EMP. ' : '') + 'Recebimentos já lançados não são alterados.', 'Excluir', true))) return;
   try {
     var brutas = linhasParaObjetos('especificacoes', await lerLinhasBrutas(TABELAS.especificacoes));
     var indices = linhasDaFicha(brutas, ficha).map(function(l){ return l.__index; });
@@ -4167,7 +4279,7 @@ async function salvarRotulo(){
 async function excluirRotulo(id){
   if (bloqueadoPlanilhaAntiga()) return;
   var r = DATA.rotulosHomologados.find(function(x){ return x['ID'] === id; });
-  if (!confirm('Excluir o rótulo homologado "' + (r ? r['Nome do Modelo'] : id) + '"? Recebimentos já lançados não são alterados.')) return;
+  if (!(await confirmar('Excluir o rótulo homologado?', '"' + (r ? r['Nome do Modelo'] : id) + '" sai do cadastro. Recebimentos já lançados não são alterados.', 'Excluir', true))) return;
   try {
     await excluirLinhaPorIndice('rotulosHomologados', r.__index);
     DATA.rotulosHomologados = linhasParaObjetos('rotulosHomologados', await lerLinhasBrutas(TABELAS.rotulosHomologados));
@@ -4268,11 +4380,10 @@ async function salvarFornecedor(){
       var brutas = linhasParaObjetos('fornecedores', await lerLinhasBrutas(TABELAS.fornecedores));
       indicesAntigos = brutas.filter(function(l){ return String(l['Fornecedor']).trim() === fornEditando; }).map(function(l){ return l.__index; });
     }
-    for (var k = 0; k < itens.length; k++) {
-      var it = itens[k];
-      await adicionarLinha('fornecedores', { 'Fornecedor': nome, 'Material': MAT_LABEL_PLANO[it.mat], 'Tipo': it.tipo, 'Código': it.cod,
-        'Último Lote Interno': it.ult ? String(numeroDoLote(it.ult)) : '', 'EMP': it.emp });
-    }
+    await adicionarVariasLinhas('fornecedores', itens.map(function(it){
+      return { 'Fornecedor': nome, 'Material': MAT_LABEL_PLANO[it.mat], 'Tipo': it.tipo, 'Código': it.cod,
+        'Último Lote Interno': it.ult ? String(numeroDoLote(it.ult)) : '', 'EMP': it.emp };
+    }));
     if (indicesAntigos.length) await excluirVariasLinhas('fornecedores', indicesAntigos);
     await recarregarFornecedores();
     mostrarToast('Fornecedor salvo.');
@@ -4282,7 +4393,7 @@ async function salvarFornecedor(){
 }
 async function excluirFornecedor(gi){
   var g = grupoFornecedores()[gi]; if (!g) return;
-  if (!confirm('Excluir o fornecedor "' + g.nome + '" e os ' + g.itens.length + ' item(ns) dele? As EMPs continuam cadastradas. Recebimentos já lançados não são alterados.')) return;
+  if (!(await confirmar('Excluir o fornecedor "' + g.nome + '"?', 'Saem também os ' + g.itens.length + ' item(ns) dele. As EMPs continuam cadastradas. Recebimentos já lançados não são alterados.', 'Excluir', true))) return;
   try {
     var brutas = linhasParaObjetos('fornecedores', await lerLinhasBrutas(TABELAS.fornecedores));
     var indices = brutas.filter(function(l){ return String(l['Fornecedor']).trim() === g.nome; }).map(function(l){ return l.__index; });
@@ -5513,7 +5624,7 @@ async function excluirCliente(nome){
   if (cadastroIndisponivel('clientes')) return;
   var c = clientePorNome(nome); if (!c) return;
   var n = DATA.reclamacoes.filter(function(r){ return r['Cliente'] === c['Nome']; }).length;
-  if (!confirm('Excluir o cliente "' + c['Nome'] + '"?' + (n ? ' Ele tem ' + n + ' reclamação(ões); elas não são apagadas.' : ''))) return;
+  if (!(await confirmar('Excluir o cliente "' + c['Nome'] + '"?', n ? 'Ele tem ' + n + ' reclamação(ões); elas não são apagadas.' : 'O cliente sai do cadastro.', 'Excluir', true))) return;
   try {
     await excluirLinhaPorIndice('clientes', c.__index);
     DATA.clientes = linhasParaObjetos('clientes', await lerLinhasBrutas(TABELAS.clientes));
@@ -5574,7 +5685,7 @@ async function salvarProduto(){
 async function excluirProduto(idx){
   if (cadastroIndisponivel('produtos')) return;
   var p = DATA.produtos.find(function(x){ return x.__index === idx; }); if (!p) return;
-  if (!confirm('Excluir o produto "' + p['Produto'] + '"? Reclamações já lançadas não são alteradas.')) return;
+  if (!(await confirmar('Excluir o produto "' + p['Produto'] + '"?', 'Reclamações já lançadas não são alteradas.', 'Excluir', true))) return;
   try {
     await excluirLinhaPorIndice('produtos', p.__index);
     DATA.produtos = linhasParaObjetos('produtos', await lerLinhasBrutas(TABELAS.produtos));
