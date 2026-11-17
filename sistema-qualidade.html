@@ -290,6 +290,16 @@ a{color:var(--accent);}
 table.occ th.c, table.occ td.c{text-align:center;}
 .pdf-sel-acoes{display:flex; align-items:center; gap:6px; margin-bottom:10px;}
 .seq-grade{display:flex; flex-direction:column; gap:6px;}
+table.occ th.ordenavel{cursor:pointer; user-select:none;}
+table.occ th.ordenavel:hover{color:var(--fg);}
+table.occ th.ordenavel.ativa{color:var(--accent);}
+table.occ th .seta{display:inline-block; margin-left:3px; font-size:9px;}
+.prox-lotes{display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:-6px 0 12px; font-size:12px; color:var(--fg-dim);}
+.prox-lotes:empty{display:none;}
+.prox-lotes .pl-rot{font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--fg-faint); margin-right:2px;}
+.prox-lotes .pl-chip{display:inline-flex; align-items:baseline; gap:6px; padding:3px 9px; border:1px solid var(--border); border-radius:999px; background:var(--surface);}
+.prox-lotes .pl-chip b{font-family:var(--font-mono, ui-monospace, monospace); font-weight:600; color:var(--fg); letter-spacing:.3px;}
+.prox-lotes .pl-chip span{font-size:11px; color:var(--fg-faint);}
 .seq-cab, .seq-linha{display:grid; grid-template-columns:34px minmax(0,1fr) 150px 82px 70px; gap:8px; align-items:center;}
 .seq-cab{font-size:11px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--text-dim);}
 .seq-n{font-weight:700; font-size:15px; text-align:center;}
@@ -322,6 +332,15 @@ table.occ tr:hover td{background:var(--surface-2);}
 .laudo-ic svg{width:13px; height:13px;}
 .laudo-ic.yes{background:var(--ok-soft); color:var(--ok);}
 .laudo-ic.no{background:var(--surface-3); color:var(--fg-faint);}
+.laudo-ic.fotos{width:auto; padding:0 6px; gap:3px; font-weight:600; font-size:11px; font-variant-numeric:tabular-nums;}
+.fotos-rec{display:grid; grid-template-columns:repeat(4, minmax(0, 120px)); gap:8px; margin-top:8px;}
+.fotos-rec:empty{display:none;}
+.fotos-rec .fr{position:relative; aspect-ratio:1; border-radius:8px; overflow:hidden; border:1px solid var(--border); background:var(--surface-2);}
+.fotos-rec .fr img{width:100%; height:100%; object-fit:cover; display:block; cursor:zoom-in;}
+.fotos-rec .fr button{position:absolute; top:4px; right:4px; width:22px; height:22px; border-radius:50%; border:none; background:rgba(0,0,0,.6); color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; padding:0;}
+.fotos-rec .fr button svg{width:12px; height:12px;}
+.fotos-rec .fr .nova{position:absolute; left:4px; bottom:4px; font-size:9.5px; font-weight:600; padding:1px 5px; border-radius:4px; background:var(--accent); color:#fff;}
+.fotos-rec-cont{font-size:11.5px; color:var(--fg-faint); margin-top:6px;}
 .badge{display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:999px; font-size:10.5px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; white-space:nowrap;}
 .badge::before{content:''; width:6px; height:6px; border-radius:50%; background:currentColor;}
 .badge.aprovado{background:var(--ok-soft); color:var(--ok);}
@@ -804,6 +823,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
   <section class="tela" id="tela-lista">
     <div class="tela-head"><h2>Recebimento</h2></div>
     <p class="tela-sub">Clique num recebimento pra ver os dados e as medições e completar a análise. Escolha o material no menu ao lado.</p>
+    <div class="prox-lotes" id="proxLotes"></div>
     <div class="screen">
       <div class="app-shell">
         <div class="app-main">
@@ -981,14 +1001,25 @@ table.occ tbody tr.clicavel{cursor:pointer;}
               <option value="div">Divergente</option>
             </select>
           </div>
-          <div class="field"><label>Nota fiscal</label><input class="mono" id="notaFiscalInput" placeholder="Nº da NF"></div>
+          <div class="field"><label id="notaFiscalRotulo">Nota fiscal</label><input class="mono" id="notaFiscalInput" placeholder="Nº da NF"></div>
           <div class="field" id="campoCodigoProduto"><label>Código do produto</label><input class="mono" id="codigoProdutoDisplay" value="—" disabled></div>
           <div class="field" id="campoLoteGenerico"><label>Lote</label><input class="mono" id="loteGenericoInput" placeholder="Código do lote"></div>
           <div class="field"><label>Data do recebimento</label><input type="date" id="dataRecebimentoInput"></div>
           <div class="field"><label>Responsável pelo recebimento</label><div class="combo-mais"><select id="responsavelInput" class="sel-resp"></select><button type="button" class="btn btn-mais" title="Cadastrar responsável" onclick="abrirModalItemLista('responsaveis', null, 'responsavelInput')"><svg><use href="#i-plus"/></svg></button></div></div>
           <div class="field"><label>Quantidade</label><input id="quantidadeInput" placeholder="Ex: 24.000"></div>
           <div class="field"><label>Unidade</label><select id="unidadeSelect"></select></div>
-          <div class="field">
+          <div class="field full" id="campoFotosRotulo" style="display:none;">
+            <label>Fotos do produto recebido <span style="text-transform:none; letter-spacing:0; font-weight:400;">· até 4</span></label>
+            <div class="laudo-btns" id="fotosRecBtns">
+              <button type="button" class="file-btn laudo-cam" onclick="document.getElementById('fotosRecCamera').click()"><span class="ic"><svg><use href="#i-camera"/></svg></span><span>Tirar foto</span></button>
+              <button type="button" class="file-btn" onclick="document.getElementById('fotosRecFile').click()"><span class="ic"><svg><use href="#i-paperclip"/></svg></span><span>Anexar fotos</span></button>
+            </div>
+            <div class="fotos-rec" id="fotosRecGrid"></div>
+            <div class="fotos-rec-cont" id="fotosRecCont"></div>
+            <input type="file" id="fotosRecCamera" accept="image/*" capture="environment" hidden onchange="fotosRecEscolhidas(this)">
+            <input type="file" id="fotosRecFile" accept="image/*" multiple hidden onchange="fotosRecEscolhidas(this)">
+          </div>
+          <div class="field" id="campoLaudo">
             <label>Foto do laudo</label>
             <div class="laudo-btns" id="laudoBtns">
               <button type="button" class="file-btn laudo-cam" onclick="document.getElementById('laudoCamera').click()"><span class="ic"><svg><use href="#i-camera"/></svg></span><span>Tirar foto</span></button>
@@ -1182,7 +1213,7 @@ table.occ tbody tr.clicavel{cursor:pointer;}
       <button class="modal-close" onclick="fecharModalPdf()" aria-label="Fechar">✕</button>
       <div class="modal-head">
         <h2>Exportar PDF</h2>
-        <p class="tela-sub" style="margin-top:6px;">Escolha o produto e até 4 fornecedores. Sai uma página A4 deitada com os últimos 25 recebimentos de cada um, lado a lado.</p>
+        <p class="tela-sub" style="margin-top:6px;">Escolha o produto e até 4 fornecedores. Sai uma página A4 deitada com os últimos 25 recebimentos de cada um, lado a lado (na resina: os últimos 25 lotes internos, um registro por lote, em ordem de lote).</p>
       </div>
       <div class="form-wrap" style="padding-top:14px; max-width:none;">
         <div class="field" style="margin-bottom:16px;"><label>Produto</label><select id="pdfProduto" onchange="montarListaPdf()"></select></div>
@@ -1633,7 +1664,7 @@ const TABLE_COLS_PADRAO = JSON.parse(JSON.stringify(TABLE_COLS));
 // Colunas gravadas como NÚMERO (o resto vai como texto, pra o Excel não converter datas/NF/lotes).
 const COLS_NUM_QTD = ['Quantidade'];
 const COLS_NUM_MED = ['Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)'];
-const VERSAO_SISTEMA = '13/11/2026 11:32';   // data/hora desta versão — atualizada a cada entrega
+const VERSAO_SISTEMA = '17/11/2026 08:57';   // data/hora desta versão — atualizada a cada entrega
 document.getElementById('versaoSistema').textContent = VERSAO_SISTEMA;
 const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
@@ -1657,6 +1688,7 @@ const PARAM_COL_MAP = {
 var DATA = { resina:[], rotulo:[], pigmento:[], cinta:[], tampa:[], fornecedores:[], especificacoes:[], rotulosHomologados:[], reclamacoes:[], listas:{}, clientes:[], produtos:[], recItens:[], recComent:[], statusRec:[], destinatarios:[] };
 var TEM_TABELA = { clientes: false, produtos: false, recItens: false, recComent: false, statusRec: false, destinatarios: false };   // tabelas que só existem na planilha nova
 var matAtual = 'resina', viewAtual = 'tabela', telaAtual = 'visao';
+var ORDEM_REC = 'lote';   // ordem da lista de recebimentos (ver ordenarRecebimento)
 var driveId = null, itemId = null;
 var msalInstance = null, msalPronto = null, contaAtual = null;
 
@@ -2296,6 +2328,7 @@ function statusKey(label){
 }
 function confereOk(label){ return String(label || '').toLowerCase().indexOf('diverg') === -1; }
 function badgeLabel(label){ return '<span class="badge ' + statusKey(label) + '">' + (label || '—') + '</span>'; }
+function fotosIc(v){ var n = linksDoCampo(v).length; return n ? '<span class="laudo-ic yes fotos" title="' + n + ' foto(s) do produto recebido"><svg><use href="#i-camera"/></svg>' + n + '</span>' : '<span class="laudo-ic no" title="Sem fotos">–</span>'; }
 function laudoIc(url){ return url ? ('<a class="laudo-ic yes" href="'+url+'" target="_blank" title="Abrir laudo"><svg><use href="#i-check"/></svg></a>') : '<span class="laudo-ic no" title="Sem laudo">–</span>'; }
 const CLASS_RECLAMACAO_LABEL = { procedente: 'Procedente', improcedente: 'Improcedente' };
 const STATUS_RECLAMACAO_LABEL = { aberta: 'Aberta', tratativa: 'Em tratativa', encerrada: 'Encerrada' };
@@ -2455,10 +2488,42 @@ function fornecedoresDe(mat){
 function montarHead(mat){
   var cols;
   if (mat === 'resina') cols = ['Data','Lote interno','Lote fornecedor','Fornecedor / tipo','Quantidade','Viscosidade (Blowpet)','Nota fiscal','Laudo','Status','Responsável',''];
-  else { cols = ['Data','Nota fiscal', mat === 'rotulo' ? 'Cliente / rótulo' : 'Fornecedor / tipo','Lote','Quantidade']; if (mat === 'rotulo') cols.push('Conferência'); cols.push('Laudo','Status','Responsável',''); }
+  else { cols = ['Data', mat === 'rotulo' ? 'NF / recibo' : 'Nota fiscal', mat === 'rotulo' ? 'Rótulo / cliente' : 'Fornecedor / tipo','Lote','Quantidade']; if (mat === 'rotulo') cols.push('Conferência'); cols.push(mat === 'rotulo' ? 'Fotos' : 'Laudo','Status','Responsável',''); }
   var lf = document.getElementById('fFornecedorLabel'); if (lf) lf.textContent = mat === 'rotulo' ? 'Cliente' : 'Fornecedor';
-  document.getElementById('theadRow').innerHTML = cols.map(function(c){ return '<th' + (c.indexOf('Viscosidade') === 0 ? ' class="c"' : '') + '>'+c+'</th>'; }).join('');
+  document.getElementById('theadRow').innerHTML = cols.map(function(c){
+    var ord = c === 'Data' ? 'data' : (mat === 'resina' && c === 'Lote interno' ? 'lote' : '');
+    var cls = [c.indexOf('Viscosidade') === 0 ? 'c' : '', ord ? 'ordenavel' : '', ord && ORDEM_REC.indexOf(ord) === 0 ? 'ativa' : ''].filter(Boolean).join(' ');
+    var seta = ord && ORDEM_REC.indexOf(ord) === 0 ? '<span class="seta">' + (ORDEM_REC === 'data-asc' ? '▲' : '▼') + '</span>' : '';
+    return '<th' + (cls ? ' class="' + cls + '"' : '') + (ord ? ' onclick="ordenarRecebimento(\'' + ord + '\')" title="' + (ord === 'data' ? 'Ordenar pela data (clique de novo para inverter)' : 'Ordenar pelo lote interno (padrão)') + '"' : '') + '>' + c + seta + '</th>';
+  }).join('');
 }
+// Ordem da lista de recebimentos. Resina: padrão pelo lote interno (recebimentos do mesmo lote ficam juntos);
+// clicando em "Data" passa a ordenar pela data (2º clique inverte). Ao trocar de material volta ao padrão.
+function ordemPadraoRec(mat){ return mat === 'resina' ? 'lote' : 'data-desc'; }
+function ordenarRecebimento(campo){
+  ORDEM_REC = campo === 'lote' ? 'lote' : (ORDEM_REC === 'data-desc' ? 'data-asc' : 'data-desc');
+  montarHead(matAtual); renderRecebimento();
+}
+// Próximo lote interno de cada código de resina (o mesmo número que o formulário vai sugerir).
+function renderProxLotes(){
+  var el = document.getElementById('proxLotes'); if (!el) return;
+  if (matAtual !== 'resina') { el.innerHTML = ''; return; }
+  var filtro = document.getElementById('fFornecedor').value, cods = {}, ordem = [];
+  itensFornecedores().forEach(function(i){
+    if (i.mat !== 'resina' || !i.cod) return;
+    if (!cods[i.cod]) { cods[i.cod] = { forns: [], usado: 0 }; ordem.push(i.cod); }
+    if (cods[i.cod].forns.indexOf(i.forn) === -1) cods[i.cod].forns.push(i.forn);
+  });
+  DATA.resina.forEach(function(r){ var c = String(r['Código Produto'] || '').toUpperCase(), d = dataParaOrdenar(r['Data Recebimento']); if (cods[c] && d > cods[c].usado) cods[c].usado = d; });
+  // sem filtro: só os códigos com recebimento nos últimos 120 dias (os parados ficam no "+ outros"); com fornecedor filtrado: todos os dele
+  var limite = Date.now() - 120 * 86400000, todos = ordem.filter(function(c){ return !filtro || cods[c].forns.indexOf(filtro) > -1; })
+    .sort(function(a, b){ return cods[b].usado - cods[a].usado || a.localeCompare(b); });
+  var lista = (filtro || PROX_LOTES_TODOS) ? todos : todos.filter(function(c){ return cods[c].usado >= limite; }), ocultos = todos.length - lista.length;
+  el.innerHTML = todos.length ? '<span class="pl-rot">Próximo lote interno</span>' + lista.map(function(c){
+    return '<span class="pl-chip" title="Código ' + escHtml(c) + ' — ' + escHtml(cods[c].forns.join(', ')) + '"><b>' + escHtml(proximoLoteInterno(c)) + '</b><span>' + escHtml(cods[c].forns.join(' · ')) + '</span></span>';
+  }).join('') + (ocultos ? '<button type="button" class="link-btn" style="font-size:11.5px;" onclick="PROX_LOTES_TODOS = true; renderProxLotes();">+ ' + ocultos + ' sem uso recente</button>' : (PROX_LOTES_TODOS && !filtro ? '<button type="button" class="link-btn" style="font-size:11.5px;" onclick="PROX_LOTES_TODOS = false; renderProxLotes();">mostrar menos</button>' : '')) : '';
+}
+var PROX_LOTES_TODOS = false;
 function botoesAcaoRecebimento(mat, idx){
   return '<button type="button" class="icon-btn icon-only" title="Editar" onclick="event.stopPropagation(); editarRecebimento(\''+mat+'\','+idx+')"><svg><use href="#i-pencil"/></svg></button>'+
     '<button type="button" class="icon-btn icon-only danger" title="Excluir" onclick="event.stopPropagation(); excluirRecebimento(\''+mat+'\','+idx+')"><svg><use href="#i-trash"/></svg></button>';
@@ -2477,12 +2542,33 @@ function linhasFiltradas(){
       if (!alvos.some(function(v){ return v && String(v).toLowerCase().indexOf(busca) > -1; })) return false;
     }
     return true;
-  }).sort(function(a, b){
-    // último recebimento primeiro: data mais recente no topo; mesma data (ou sem data) → o lançado por último primeiro; sem data vai pro fim
+  }).sort(ORDEM_REC === 'lote' && mat === 'resina' ? comparadorLoteResina() : function(a, b){
+    // por data: mais recente no topo (ou o contrário, se o usuário inverteu); mesma data → o lançado por último primeiro; sem data vai pro fim
     var da = dataParaOrdenar(a['Data Recebimento'] || a['Data']), db = dataParaOrdenar(b['Data Recebimento'] || b['Data']);
-    if (da !== db) { if (!da) return 1; if (!db) return -1; return db - da; }
+    if (da !== db) { if (!da) return 1; if (!db) return -1; return ORDEM_REC === 'data-asc' ? da - db : db - da; }
     return b.__index - a.__index;
   });
+}
+// Ordem pelo lote interno: cada lote fica na posição do 1º recebimento dele (assim a sequência J02-293, J02-292,
+// J02-291… se mantém) e os recebimentos seguintes do mesmo lote ficam agrupados logo abaixo, do mais novo pro mais antigo.
+function comparadorLoteResina(){
+  var primeiro = {};
+  DATA.resina.forEach(function(r){
+    var l = String(r['Lote Interno'] || '').trim(), d = dataParaOrdenar(r['Data Recebimento']) || 0;
+    if (!(l in primeiro) || (d && (!primeiro[l] || d < primeiro[l]))) primeiro[l] = d;
+  });
+  return function(a, b){
+    var la = String(a['Lote Interno'] || '').trim(), lb = String(b['Lote Interno'] || '').trim();
+    if (la !== lb) {
+      var pa = primeiro[la] || 0, pb = primeiro[lb] || 0;
+      if (pa !== pb) { if (!pa) return 1; if (!pb) return -1; return pb - pa; }
+      var na = numeroDoLote(la), nb = numeroDoLote(lb);
+      if (!isNaN(na) && !isNaN(nb) && na !== nb) return nb - na;
+      return la < lb ? 1 : -1;
+    }
+    var da = dataParaOrdenar(a['Data Recebimento']), db = dataParaOrdenar(b['Data Recebimento']);
+    return (db - da) || (b.__index - a.__index);
+  };
 }
 function viscosidade3(v){
   // mostra a viscosidade sempre com 3 casas depois da vírgula (0,88 → 0,880)
@@ -2530,9 +2616,9 @@ function renderRecebimentoTabela(){
   if (!rows.length) { document.getElementById('tbody').innerHTML = '<tr><td colspan="12" class="empty-note">Nenhum recebimento encontrado com esses filtros.</td></tr>'; return; }
   if (mat === 'resina') { document.getElementById('tbody').innerHTML = rows.map(linhaResina).join(''); return; }
   document.getElementById('tbody').innerHTML = rows.map(function(r){
-    var cells = ['<td class="cell-dim tabular">'+(r['Data']||'')+'</td>','<td class="mono">'+(r['Nota Fiscal']||'')+'</td>','<td>'+escHtml(r['Fornecedor']||'')+'<div class="cell-dim" style="font-size:11px;">'+escHtml((mat === 'rotulo' ? [r['Modelo do Rótulo'], r['Tipo']] : [r['Tipo'], codigoProdutoDe(mat, r['Fornecedor'], r['Tipo'])]).filter(function(x){ return x; }).join(' · '))+'</div></td>','<td class="mono cell-dim">'+(r['Lote']||'')+'</td>','<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'];
+    var cells = ['<td class="cell-dim tabular">'+(r['Data']||'')+'</td>','<td class="mono">'+(r['Nota Fiscal']||'')+'</td>','<td>'+escHtml((mat === 'rotulo' ? r['Modelo do Rótulo'] : r['Fornecedor'])||'')+'<div class="cell-dim" style="font-size:11px;">'+escHtml((mat === 'rotulo' ? [r['Fornecedor'], r['Tipo']] : [r['Tipo'], codigoProdutoDe(mat, r['Fornecedor'], r['Tipo'])]).filter(function(x){ return x; }).join(' · '))+'</div></td>','<td class="mono cell-dim">'+(r['Lote']||'')+'</td>','<td class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</td>'];
     if (mat === 'rotulo') cells.push('<td class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</td>');
-    cells.push('<td>'+laudoIc(r['Arquivo do Laudo'])+'</td>','<td>'+badgeLabel(r['Status'])+'</td>','<td class="cell-dim">'+(r['Responsável']||'')+'</td>');
+    cells.push('<td>'+(mat === 'rotulo' ? fotosIc(r['Arquivo do Laudo']) : laudoIc(r['Arquivo do Laudo']))+'</td>','<td>'+badgeLabel(r['Status'])+'</td>','<td class="cell-dim">'+(r['Responsável']||'')+'</td>');
     return '<tr class="clicavel" onclick="abrirDetalhe(\''+mat+'\','+r.__index+')">'+cells.join('')+acoesRecebimentoHtml(mat, r.__index)+'</tr>';
   }).join('');
 }
@@ -2541,9 +2627,9 @@ function renderRecebimentoCards(){
   if (!rows.length) { el.innerHTML = '<div class="empty-note" style="grid-column:1/-1;">Nenhum recebimento encontrado com esses filtros.</div>'; return; }
   if (mat === 'resina') { el.innerHTML = rows.map(cardResina).join(''); return; }
   el.innerHTML = rows.map(function(r){
-    var extra = mat === 'rotulo' ? ('<div><dt>Conferência</dt><dd class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</dd></div>') : ('<div><dt>Laudo</dt><dd>'+(r['Arquivo do Laudo']?'Anexado':'—')+'</dd></div>');
+    var extra = mat === 'rotulo' ? ('<div><dt>Conferência</dt><dd class="conf '+(confereOk(r['Conferência Visual'])?'ok':'div')+'">'+(r['Conferência Visual']||'—')+'</dd></div><div><dt>Fotos</dt><dd>'+(linksDoCampo(r['Arquivo do Laudo']).length || '—')+'</dd></div>') : ('<div><dt>Laudo</dt><dd>'+(r['Arquivo do Laudo']?'Anexado':'—')+'</dd></div>');
     return '<div class="rcard clicavel" onclick="abrirDetalhe(\''+mat+'\','+r.__index+')">'+
-      '<div class="top"><div><div class="fornecedor">'+escHtml(r['Fornecedor']||'')+'</div><div class="cell-dim" style="font-size:11.5px; margin:1px 0 2px;">'+escHtml(r['Tipo']||'')+'</div><div class="lote mono">'+(r['Lote']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
+      '<div class="top"><div><div class="fornecedor">'+escHtml((mat === 'rotulo' ? r['Modelo do Rótulo'] : r['Fornecedor'])||'')+'</div><div class="cell-dim" style="font-size:11.5px; margin:1px 0 2px;">'+escHtml((mat === 'rotulo' ? [r['Fornecedor'], r['Tipo']].filter(Boolean).join(' · ') : r['Tipo'])||'')+'</div><div class="lote mono">'+(r['Lote']||'')+'</div></div>'+badgeLabel(r['Status'])+'</div>'+
       '<dl><div><dt>Data</dt><dd class="tabular">'+(r['Data']||'')+'</dd></div><div><dt>Nota fiscal</dt><dd class="mono">'+(r['Nota Fiscal']||'')+'</dd></div>'+
       '<div><dt>Quantidade</dt><dd class="tabular">'+(r['Quantidade']||'')+' '+(r['Unidade']||'')+'</dd></div>'+extra+'</dl>'+
       '<div class="foot"><span class="cell-dim" style="font-size:11.5px;">Resp.: '+(r['Responsável']||'')+'</span><span class="row-actions">'+
@@ -2551,7 +2637,7 @@ function renderRecebimentoCards(){
     '</div>';
   }).join('');
 }
-function renderRecebimento(){ renderRecebimentoTabela(); renderRecebimentoCards(); }
+function renderRecebimento(){ renderRecebimentoTabela(); renderRecebimentoCards(); renderProxLotes(); }
 
 /* ---- painel lateral: detalhe do recebimento (abre ao clicar na linha/cartão) ---- */
 var detalheAtual = null;
@@ -2576,8 +2662,9 @@ function abrirDetalhe(mat, index){
     kv('Quantidade', [r['Quantidade'], r['Unidade']].filter(function(x){ return x; }).join(' '), 'tabular') + kv('Responsável', r['Responsável']) +
     (mat === 'rotulo' ? kv('Rótulo', r['Modelo do Rótulo']) + kv('Conferência visual', r['Conferência Visual']) : '') +
     kv('EMP da análise', r['EMP']) +
-    '<div><dt>Laudo</dt><dd>' + (r['Arquivo do Laudo'] ? '<a href="' + escHtml(r['Arquivo do Laudo']) + '" target="_blank">abrir laudo</a>' +
-      (ehPdf(r['Arquivo do Laudo']) ? '' : ' · <button type="button" class="link-btn" onclick="abrirGirarLaudo(\'' + mat + '\', ' + r.__index + ')">girar</button>') : '<span class="res-pend">sem laudo</span>') + '</dd></div></dl>';
+    (mat === 'rotulo' ? '<div><dt>Fotos do recebimento</dt><dd>' + (linksDoCampo(r['Arquivo do Laudo']).length || '<span class="res-pend">nenhuma</span>') + '</dd></div>' : '<div><dt>Laudo</dt><dd>' + (r['Arquivo do Laudo'] ? '<a href="' + escHtml(r['Arquivo do Laudo']) + '" target="_blank">abrir laudo</a>' +
+      (ehPdf(r['Arquivo do Laudo']) ? '' : ' · <button type="button" class="link-btn" onclick="abrirGirarLaudo(\'' + mat + '\', ' + r.__index + ')">girar</button>') : '<span class="res-pend">sem laudo</span>') + '</dd></div>') + '</dl>';
+  if (mat === 'rotulo' && linksDoCampo(r['Arquivo do Laudo']).length) html += '<div class="section-title">Fotos do produto recebido</div>' + galeriaHtml(linksDoCampo(r['Arquivo do Laudo']));
   var fichaDw = fichaDe(mat, String(r['Fornecedor'] || '').trim(), String(r['Tipo'] || '').trim(), r['Modelo do Rótulo']);
   if (ehResina || fichaDw) {
     var ficha = fichaDw;
@@ -2600,6 +2687,7 @@ function abrirDetalhe(mat, index){
   }
   if (r['Observações']) html += '<div class="section-title">Observações</div><p class="dw-obs">' + escHtml(r['Observações']) + '</p>';
   document.getElementById('dwBody').innerHTML = html;
+  carregarMiniaturas(document.getElementById('dwBody'));
   document.getElementById('drawerScrim').classList.remove('hidden');
   document.getElementById('drawer').classList.remove('hidden');
 }
@@ -2618,6 +2706,7 @@ function escolherMaterial(mat){
   document.querySelectorAll('.mat-btn').forEach(function(b){ b.classList.toggle('active', b.dataset.mat === mat); });
   document.getElementById('matTitle').textContent = MAT_LABEL[mat];
   document.getElementById('fStatus').value = ''; document.getElementById('fBusca').value = '';
+  ORDEM_REC = ordemPadraoRec(mat);
   montarHead(mat); atualizarFornecedoresFiltro(); renderRecebimento();
   document.getElementById('btnSeqResina').style.display = mat === 'resina' ? '' : 'none';
   marcarMenu();
@@ -3285,6 +3374,34 @@ function limparLaudoSelecionado(){
   document.getElementById('laudoPreview').classList.add('hidden');
   document.getElementById('laudoBtns').classList.remove('hidden');
 }
+/* ---- rótulo: até 4 fotos do produto recebido (gravadas na coluna "Arquivo do Laudo", uma por linha) ---- */
+var FOTOS_REC_MAX = 4, fotosRec = [];
+function linksDoCampo(v){ return String(v || '').split(/\r?\n/).map(function(x){ return x.trim(); }).filter(Boolean); }
+async function fotosRecEscolhidas(input){
+  var arqs = Array.prototype.slice.call(input.files || []); input.value = '';
+  var vagas = FOTOS_REC_MAX - fotosRec.length;
+  if (arqs.length > vagas) mostrarToast(vagas > 0 ? 'Máximo de ' + FOTOS_REC_MAX + ' fotos — só as ' + vagas + ' primeiras foram incluídas.' : 'Já tem ' + FOTOS_REC_MAX + ' fotos. Remova uma para incluir outra.', true);
+  arqs = arqs.slice(0, Math.max(vagas, 0));
+  document.getElementById('fotosRecCont').textContent = arqs.length ? 'Preparando…' : document.getElementById('fotosRecCont').textContent;
+  for (var i = 0; i < arqs.length; i++) {
+    var pronto = await reduzirImagem(arqs[i], 1600, 0.82);
+    fotosRec.push({ file: pronto, url: URL.createObjectURL(pronto) });
+  }
+  desenharFotosRec();
+}
+function removerFotoRec(i){ var f = fotosRec[i]; if (f && f.url) URL.revokeObjectURL(f.url); fotosRec.splice(i, 1); desenharFotosRec(); }
+function verFotoRec(i){ var f = fotosRec[i]; if (!f) return; window.open(f.url || f.link, '_blank'); }
+function desenharFotosRec(){
+  var grid = document.getElementById('fotosRecGrid'); if (!grid) return;
+  grid.innerHTML = fotosRec.map(function(f, i){
+    return '<div class="fr"><img ' + (f.url ? 'src="' + f.url + '"' : 'data-foto="' + escHtml(f.link) + '"') + ' alt="Foto ' + (i + 1) + '" onclick="verFotoRec(' + i + ')">' +
+      (f.file ? '<span class="nova">nova</span>' : '') +
+      '<button type="button" title="Remover esta foto" onclick="removerFotoRec(' + i + ')"><svg><use href="#i-x"/></svg></button></div>';
+  }).join('');
+  carregarMiniaturas(grid);
+  document.getElementById('fotosRecBtns').style.display = fotosRec.length >= FOTOS_REC_MAX ? 'none' : '';
+  document.getElementById('fotosRecCont').textContent = fotosRec.length ? fotosRec.length + ' de ' + FOTOS_REC_MAX + ' fotos' + (fotosRec.length >= FOTOS_REC_MAX ? ' — limite atingido' : '') : 'Nenhuma foto ainda (opcional).';
+}
 function mostrarLaudoExistente(url){
   var el = document.getElementById('laudoExistente');
   if (url) { el.innerHTML = 'Já tem laudo anexado — <a href="' + url + '" target="_blank">abrir</a>. Tirar/anexar outro substitui.'; el.classList.remove('hidden'); }
@@ -3305,6 +3422,8 @@ function abrirModalCadastro(matEdit, indexEdit){
   document.getElementById('materialSelect').disabled = !!recebimentoEditando;
   limparLaudoSelecionado();
   mostrarLaudoExistente(recebimentoEditando ? row['Arquivo do Laudo'] : '');
+  fotosRec.forEach(function(f){ if (f.url) URL.revokeObjectURL(f.url); });
+  fotosRec = (recebimentoEditando && matEdit === 'rotulo') ? linksDoCampo(row['Arquivo do Laudo']).map(function(l){ return { link: l }; }) : [];
   document.getElementById('saveMsgRecebimento').textContent = '';
   document.getElementById('chkRestricao').checked = false;
   document.getElementById('respRestricaoInput').value = '';
@@ -3581,6 +3700,12 @@ function atualizarCamposMaterial(){
   ['campoFornecedorReceb', 'campoTipoReceb'].forEach(function(id){ document.getElementById(id).style.display = ehRot ? 'none' : ''; });
   document.getElementById('campoConferenciaRotulo').style.display = mat === 'rotulo' ? '' : 'none';
   document.getElementById('secaoRotulo').style.display = mat === 'rotulo' ? '' : 'none';
+  // Rótulo não tem laudo nem NF obrigatória: no lugar do laudo, até 4 fotos do produto recebido
+  document.getElementById('campoLaudo').style.display = ehRot ? 'none' : '';
+  document.getElementById('campoFotosRotulo').style.display = ehRot ? '' : 'none';
+  document.getElementById('notaFiscalRotulo').textContent = ehRot ? 'Nota fiscal / recibo (opcional)' : 'Nota fiscal';
+  document.getElementById('notaFiscalInput').placeholder = ehRot ? 'Opcional' : 'Nº da NF';
+  if (ehRot) desenharFotosRec();
   // Lote do fornecedor + lote interno (código + sequencial) são da Resina PET; os demais materiais
   // usam um campo "Lote" simples.
   document.getElementById('campoLoteGenerico').style.display = ehResina ? 'none' : '';
@@ -3928,7 +4053,19 @@ async function salvarRecebimento(statusFinal){
   var rowOriginal = editando ? DATA[editando.mat].find(function(x){ return x.__index === editando.index; }) : null;
   try {
     var laudoUrl = rowOriginal ? (rowOriginal['Arquivo do Laudo'] || '') : '';
-    var laudoFile = laudoArquivoPronto;
+    var laudoFile = mat === 'rotulo' ? null : laudoArquivoPronto;
+    if (mat === 'rotulo') {
+      var linksFotos = [], novas = fotosRec.filter(function(f){ return f.file; }).length, nEnv = 0, carimbo = Date.now();
+      for (var fi = 0; fi < fotosRec.length; fi++) {
+        if (fotosRec[fi].link) { linksFotos.push(fotosRec[fi].link); continue; }
+        msg.textContent = 'Enviando foto ' + (++nEnv) + ' de ' + novas + '…';
+        fotosRec[fi].link = await uploadArquivo(fotosRec[fi].file, 'Rotulo_' + carimbo + '_' + (fi + 1), 'Rotulos');
+        fotosRec[fi].file = null;
+        linksFotos.push(fotosRec[fi].link);
+      }
+      laudoUrl = linksFotos.join('\n');
+      msg.textContent = 'Salvando…';
+    }
     if (laudoFile) {
       msg.textContent = 'Enviando foto do laudo…';
       var nomeBase = 'Laudo_' + mat + '_' + Date.now();
@@ -4024,7 +4161,7 @@ function concluirRecebimento(manterEscolhas){
   function txtSel(id){ var el = document.getElementById(id); return el && el.options[el.selectedIndex] ? el.options[el.selectedIndex].textContent : ''; }
   function kv(rot, val, cls){ return '<div><dt>' + rot + '</dt><dd' + (cls ? ' class="' + cls + '"' : '') + '>' + (val ? escHtml(val) : '<span class="res-pend">—</span>') + '</dd></div>'; }
   var rowOrig = recebimentoEditando ? DATA[recebimentoEditando.mat].find(function(x){ return x.__index === recebimentoEditando.index; }) : null;
-  var laudo = laudoArquivoPronto ? 'Novo arquivo anexado' : ((rowOrig && rowOrig['Arquivo do Laudo']) ? 'Já anexado' : '');
+  var laudo = mat === 'rotulo' ? (fotosRec.length ? fotosRec.length + ' foto(s) do produto' : '') : (laudoArquivoPronto ? 'Novo arquivo anexado' : ((rowOrig && rowOrig['Arquivo do Laudo']) ? 'Já anexado' : ''));
   // testes com mais de uma análise: escolher qual vale pra aprovação (padrão = a última lançada)
   if (!manterEscolhas) escolhasAnaliseConclusao = {};
   var escHtmlBlocos = '';
@@ -4059,7 +4196,7 @@ function concluirRecebimento(manterEscolhas){
   else html += kv('Lote', v('loteGenericoInput'), 'mono');
   html += kv('Nota fiscal', v('notaFiscalInput'), 'mono') + kv('Data do recebimento', formatarDataBR(v('dataRecebimentoInput')), 'tabular') +
     kv('Quantidade', [v('quantidadeInput'), v('unidadeSelect')].filter(function(x){ return x; }).join(' '), 'tabular') + kv('Responsável', v('responsavelInput')) +
-    kv('Laudo', laudo) + kv('EMP', empDoRegistro(rowOrig, mat, ftC.forn, ftC.tipo, ftC.modelo));
+    kv(mat === 'rotulo' ? 'Fotos' : 'Laudo', laudo) + kv('EMP', empDoRegistro(rowOrig, mat, ftC.forn, ftC.tipo, ftC.modelo));
   if (mat === 'rotulo') {
     html += kv('Conferência visual', txtSel('conferenciaRotuloSelect'));
   }
@@ -4623,7 +4760,21 @@ function gruposPdf(mat){
   return lista.sort(function(a, b){ return a.chave.localeCompare(b.chave, 'pt-BR'); });
 }
 function ultimosRecebimentos(mat, linhas, qtd){
-  // mesma ordem da lista (mais recente primeiro), pega os N últimos e devolve do mais antigo pro mais novo
+  // Resina: um registro por lote interno (o 1º recebimento dele), os N lotes mais altos, em ordem crescente de lote
+  if (mat === 'resina') {
+    var primeiro = {};
+    linhas.forEach(function(r){
+      var l = String(r['Lote Interno'] || '').trim(); if (!l) return;
+      var a = primeiro[l], d = dataParaOrdenar(r['Data Recebimento']) || Infinity;
+      if (!a || d < a.d || (d === a.d && r.__index < a.r.__index)) primeiro[l] = { r: r, d: d };
+    });
+    return Object.keys(primeiro).map(function(l){ return primeiro[l]; }).sort(function(a, b){
+      var na = numeroDoLote(a.r['Lote Interno']), nb = numeroDoLote(b.r['Lote Interno']);
+      if (!isNaN(na) && !isNaN(nb) && na !== nb) return nb - na;
+      return (b.d === Infinity ? 0 : b.d) - (a.d === Infinity ? 0 : a.d);
+    }).slice(0, qtd).reverse().map(function(x){ return x.r; });
+  }
+  // demais: mesma ordem da lista (mais recente primeiro), pega os N últimos e devolve do mais antigo pro mais novo
   var col = colDataPdf(mat);
   return linhas.slice().sort(function(a, b){
     var da = dataParaOrdenar(a[col]), db = dataParaOrdenar(b[col]);
@@ -4854,7 +5005,6 @@ function colunasPdf(mat, g){
   var c;
   if (mat === 'resina') {
     c = [{ t: 'LOTE INTERNO', p: 1.15, v: function(r){ return r['Lote Interno']; } },
-         { t: 'DATA', p: 1.15, v: function(r){ return r['Data Recebimento']; } },
          { t: 'LOTE FORNECEDOR', p: 1.6, v: function(r){ return r['Lote Fornecedor']; } }];
     if (multi) c.push({ t: 'PRIME ou OFF', p: 1.2, v: function(r){ return restoTipo(r).toUpperCase(); }, cor: function(r){ return /off/i.test(restoTipo(r)) ? [200, 0, 0] : null; } });
     c.push({ t: 'IV', p: 0.8, negrito: true, v: function(r){ var x = viscosidade3(r['Viscosidade IV Blowpet (dl/g)']); return x === '—' ? '' : x; }, cor: function(r){ return corIvPdf(r, cache); } });
