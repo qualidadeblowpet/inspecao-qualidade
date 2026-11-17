@@ -83,6 +83,12 @@
   #loginScreen .logo-bp { margin-bottom: 14px; }
   .sidebar-logo { height: 24px; width: auto; display: block; flex-shrink: 0; align-self: center; }
   .op-home .logo-bp { width: 120px; margin: 0 auto 6px; }
+  .vib-bloco { margin-top: 2px; }
+  .field.campo-erro .toggle-group, .field.campo-erro input[type=file] { border-radius: 8px; box-shadow: 0 0 0 2px var(--danger); }
+  .field.campo-erro > label { color: var(--danger); }
+  .vib-foto-label { font-size: 11px; color: var(--text-dim); margin-top: 5px; display: flex; align-items: center; gap: 6px; }
+  .vib-foto-label.ok { color: var(--ok); } .vib-foto-label.aviso { color: var(--warn); }
+  .vib-mini { width: 34px; height: 34px; object-fit: cover; border-radius: 5px; border: 1px solid var(--border); }
   #loginMsg { margin-top: 16px; font-size: 13px; color: var(--text-dim); max-width: 340px; }
   #loginMsg.err { color: var(--danger); }
 
@@ -1470,11 +1476,11 @@
           <table class="occ-table">
             <thead>
               <tr>
-                <th>Data</th><th>Hora</th><th>Equipamento</th><th>Responsável</th><th>Operador</th><th>Cor</th>
+                <th>Data</th><th>Hora</th><th>Equipamento</th><th>Face</th><th>Responsável</th><th>Operador</th><th>Cor</th>
                 <th>Gramatura</th><th>OP</th><th>N° Caixa</th><th>Resina</th>
                 <th>Defeito Detectado</th><th>Criticidade</th><th>Foto</th><th>Cavidade</th>
                 <th>°C Mín - Gate</th><th>°C Máx - Gate</th><th>°C Mín - Corpo</th><th>°C Max - Corpo</th>
-                <th>Organização Linha</th><th>Tonalidade</th><th>Alinhamento Etiqueta</th>
+                <th>Organização Linha</th><th>Tonalidade</th><th>Alinhamento Etiqueta</th><th>Vibrador Preforma</th>
                 <th>Operador Ciente</th><th>Status</th><th>Observação</th>
               </tr>
             </thead>
@@ -1937,9 +1943,9 @@ const LOGO_BLOWPET_BRANCO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAA
 const LOGO_BP_SIMBOLO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAABCCAYAAACchRIZAAAZ/ElEQVR42t2deZBcx33fP79+783MngD2PnADBMAFeAEEKV4B4NixHFfspBzQpA+WnUpJKVOpVK4qxkkFgJSUXak4kWXLZclSbKtckg2wTJGUFYm2hIVN0qRIUCTBE/e5BHEDi13s7LzuX/7ofrODxQKYWYDYqXTV7PF2ZvZ1//p3f789Qo1DQQT0HWgu3HPHb8YNDY1WVUUADJjK7wAycU3CJZP9seJ5Ri7/W/Z+ldcMcKkIaYqamASHeeu9c6OnTn19GRxVkM0gW8BxE4aCiIi+r9qS/NS6XYXe7nmlUuowfrYqBhFRf78S7llgimtijKqAIKhw2etUJEzXVLyu8u/+ZmgsqPnhS44f7dxFIfnigrHSVoDtEG+AdKo5xDXPeuNGw7ZtNjdv3oa5n3niP420zcGkqb+pyjH592lfL3/xwzn/KORxBw6TvvI6uSj6zEGR35I0/TLgtkL0KNgbFfA2MKjafEPDQPM/+ekFxdsWa3KpGJc34zSH1LDDLhtGKD79PDE8IJYHDhnzr0aM+c8Dafr36re/yqRX1S7gEycEIO5uv7/UPseOmihV1YpJ6/T0R/Uak9QrVSufI33vQ8ZHRsnnkr4W637voDG/cNq5X1sDhxQiuUEhb1y3TtixA71z4KGG9jbGzg1bnI3LG236lqHmF2gcwcUR7PETpIhDlRaRDai+tD+ON0uafl5BMgs7fQEPDjpEYG7vGpvPR3pxFDESYRWsq/H2ZXrb2zokteieAxhgXNFTYGeLrO+IohffN+YfS6m0S73hn74kBp9UZAeyYN7DrrkZGR2dcBeNjcHqaPU3P13Fdw7T3IT9YA9cHEHi2KDKsN/Apl11y/4oun2ntU88D1b9v9KaBawgEkduOxSku2tV0U+2fNvS2nx1U3s9razcrVNobPn56k2VjhVxe/f7/+tDgPgcpE0wt9G5F96HBwQOTlfIfq6P2d2QN33da4pGUKdGjIBzuDffgfHxoC96pX7q1X6/yrWpLFh2TRVyOdJn/mrCrysIRAp6Gkod8Jg1Jr/ZuV8AjIIT0Lhm9+FUu2BJ3NnRV7IWQcvRU/rMd9Gz5/wud87fWPZdFXVa/hl1cNnvGn53k36feH759SJw7gJ6/AREUXkhDMQjkLZAT2zMX7zu3MPb/LuI1G4ZBaeqSbIi7u6aVyyVVJwzNDXhXtlJ8bd/lxvzxLWbdQE/X6eVRkGA5BSUOkT+2e4o+p/Lrf33ChFgaxLw4Lp1hh07XKGr/a6W/l5zwVorEJFL0MPHKP3xN2v3LzcSlETRlZcgTqHULnJfbMzn7nXuf2/3liqt6Z+GuSYDt93f2t8j561NEWKJItwHe/yWyefA2huwvTWuQbbZp/57chrSZvh3u6LoBbH2+wpRTQJev3497NgBS5eujdrnQGoVBUkS7MHDYATJ5aYXgOj0fNPkRXDASxC9JeJug6cUvi4wXLMWP/mksmMHLF70CK0tcGkMjEHHS7i9BxANMYfTad78zR8OTAI6C35vN9wBlExN77B5swMw8/tWp4U8pFayFMft2e9NqHN+4rU+3DQel0+OHDAowrMi5hjoPpGul435eUAHvcmqXmMef8wqRNLbfV8xilDnDHGMnj2HHj46he+d+ZEH8yLY90VuS4x5XMCZGhRMJI7cK9BKd9dAEUCdwQhaLKL7DgUzMjOTy4zkWaAANIFeBD0o8rMAf1DDnSkYnLIPFsc9XYuLaQpODUmCHhlCLwxf5vtneiiQAD8U4WkReRp0p8hvaEVJqbqk3yodsCzf09lRSlMVESGO0TPncMeGZnRXZ0HIci3H4GYM5AysVJBtNeTEg+vWGVSRpYvua+nvjV2aWhGQOMLt3e/f30jdCDcGzgM/AlogKgFHRFYTx6urFvDGdesEFL1tyT3NPV1gnUWBnN/VXByZ0V0teAl2hN2sIBYYg3aggXJmUWWsAbB8ySPRnNmQOkUEtRa3e9+MWqqrCTnyJtonxuDOQvSGc5+u3geHSZuF89bS2opaCygSRbh9B+piV2cTlct9cxJkXkusYQGJ+vvuH09icNYQRXDhInrwyLUrbzOwsVOgFVgIlLxGyzngGDxkapw0pq/7nlIuQayV8q7ee6AudrUBRsOEZSJtSmtJkTaBEWN0F8w13Z0rxqwFp0IuQT86jp4+U1f+t1LQi4N7MiCXgDMiK02VmiESRfoBdNDduXzcKarqd/VwfezqTHuPTUhTjTdbZ4PcqSZN2rxxo6BKYW7vmpa5fQVrUyuCSBzj9h1EnYPI1J1wLTBnwlSJBS5AW1V3ug0MziHNhYGm3p6W1KZOECFJ0OMn6mJXG+9v+UCEOFQ886CzVPcI6MZq06SBAV8wun3Zw3F7G5Rs2XW7D/dRzyMO65Bl5kWRpCoB+wALcisGVjd0daCpdaBIEuMOHPb+eAZ3tQup0QdBg/PeF2kLyFz4AcBvVFtuCq6I/t4HS/mcd0WRQUdGcfsP+jdxWnfCleB/XYV7UpDqpPLkk77cP693rTY1IRXlObdnf10EViOhyBFKc+ogaoXiBueeBRisouGQuaI3oNP0dK0qOuddUZKgJ0752rcxded/sxTx4qRgw4GrqlQpjz9mN4GR7s67xiODOmckMuhYEc129QzOOQ88L8IJoNH7IzsL4iWqfylwqAYAgME529zWdk9zf1/LaJo6ASNJgj1wCEolSJIb6gV/khp8bkLYakAi1UvX1eBNoarzy9BnOtqWFK0DVV/gOHUGN/RxKHC4W75r1Ves+IEIPw7CVdASSD+Ufs7azwOysdrtt26T978rlz+U7+qA1PpJGcHt3uffRKjbcSq0ajW0CTvg6HUFvHkjgirS2bmqube7YP2u9gHWkaNw6RLE8S3TYA1+Jgp+9wURtodKhgJFSPshWg3/vQAfbK2lHzyY1dr7H0wbCpCmggmWqk5SwWsFmMdDoOVAG4FOePv6PviED7BkxdJ7cx1tYCd2td17AIvvLDs++Ufmb5uAS8DWINzCRJBRmgXJKvibf5imX9gK0cYqhRv8r9sNrfR03uNr7WpIYvT0GdzRj+qywZCVKk+FRxL8cDPQo/qj6/vgAFuJ5vff6xoa0OGLPqKOY9h7gNwtTH9dqLm+DrwswrlglvGaW2qGZLXqm49Z+2gQhVbbIgypoDWFwh2NfX3t48H/kiS+ezQ6CklcdxF01mjYHbS42V+LEijd4dwPridgkfgx+zokpqvzjjFVBKRp9ixe+f4Pee+93XRFEWmGsgjFDq2A7UwBZpny2vV+FmAYOOITeJJglh24ImgXJHervvxL1v5TgbO1QnUygJ25c+DBxt4uilmAFUW43b7BIFdgsGZ+ZBnEOyJZDd7mwcxR3ZmDd+Prmi2n2gALmdM6X6OIKIrk2a9+g7997ntoFKEhbShDSuSTi0IkCLYpCHbc9zvjpcAa1a/9jLX/WmBsOjisbaHBLwvnPeyammBkRBCDllLcnv116X9t0NiXgY+DNRsH7QFZqfqt62KyMohOfNttq9oWzo8OHxlKt33xD6N9H+7VplziUQ2fsH3WCuEqqAV3yZsg0wtmgeqHD8J/WWXt0+Vaco3CVRB5/DH7MjTQ07VmzEg5U+D8eW+iZ7gUO9W65IDTwN+JkJu4w6gdhjc49+dZdeuqI4Po5Bf0PmIbCvKH/2FzfPrESZryeUrWTmjtrQsmpAVMK9CnumuV6lcfcO7/CIxuhGjrRLxXu3Gwqh2wItfb0z9eKqmoGnIJbvdH6LnzIVOonwa/hOj5eRGGQ6BZAtsJ8YDqVwRObPJ3fY3x3hYFSN/9sOm13/rSmc4TJ9P5uVxk03QmEIXaAkf7Yfs9Is/Os/bFDNieFTKmfU/BUkV3rHigpb+H89ZaIJY4xu09gKoiRgLieGZHliImwLdF2D2R/zsHZqHqqU9b+9uBxnPtSpZs8wv4g48+/twvfvTxUz85a5Zy/vyMbdwCnC9WXMjSoBtlMGQAO1m86OEywE4EdQ7dve/KqG+GtFZDYDkWUsRdFVnEJbC3Q/KQ6r8ROL0Voi3VwmY/C6XPGnN2BoVbWVmLV/ru0I0LNssUHn/MbodY+nrWZgA7iSIYHsEdODwBWZ0hoWbBZQzsA/6vCB9VCHcMSnMhuUf1y3c5981NED8aytLVwmZF66D+KqBbasU3VxNgOdVeWBr3di8qpmkocCTo0SH05Klb1grVST42M8UKDAGvBq3VirLsGKR9kNyn+hc/Z+3nglWzW8J7VStgreMS7A2NLFPILVlyX2t/b3QhtalALEmM3X8ItRbJJYF3dXMEOJXFN0GgWU/XhXz/IPCuCPt8MYcGyg1+Ow7RYkjWqv7Rz1j72XEwwbJdn3ymIOjlct18+c+fyJY2cVyhKzqFDutl3RwFsw1k2nTRDMy/fPEjMmc2WhxHyg3+vTdkWrP0Tiqi3uxRed35CJgR4EzQ1sMiDIXKHfiOWVMQ7JjPJqLbYeRB5576lHO/j2cWXlG5+/9GMadLF1VVQYSD//JX32r5+U/fMXph2IkxBmMoPvV59MDhmlKkDICfmVYXasMlX4RgLNTRR4NAR4AzIpwOwhxhAlOWTGigS/0jagTpAW537vl/7txTAu9VpIhX3GQ8xUIZAXforttXxsuW/cF4HAmKeBA0qKhIYOsr4sl24pEDE8/Jyln+uxhByzR2PFiv4n088d3gUDHim1ci/mQADW+qqIiJUHWSPvNX6MenNDFGjOqxcWM+L2n68tVI0NcI2IwY4/bDgqinc3nRWl/gSGIPRRr6uKYGfxblHgbeF2E0CHI0CLUYhJyGKpSb5G/jsDnywU6l3sdGsc/9zRxgMbzwiOr/WuDc97WKFDG+Wk5o2zt/ct4Tj/6D00CkFSUNmb7fuRGfhXNIUxOlP/oGpZNnkDjGOUcisgrVf7RP5AuiumkqEvRVrfO6dWbLjh1O+3vubZ3Xnxu2qSfTJYkHEhaLVTf4NRQb3gSeE6E4yRRXmuYYNKk0IoFTGbQ9EpAcRLNDKbJdde9CeP4RkW+1pelr4W5MkMo1rVZ81ZywqeGB4TS1ly6NWTQA1tRdZ9m0KvnrdFyDApfGKL74qseABVLGmNdYaTfmv+6DpVj7q9u8kN31hJxV6mRFBrBLfU/fmHKDv1q6cw7YAzwTYEPNXkO9TQjzTSdkXT6BJAZJwusL4Xuj6sk2eK8PXlol8sI8a18Vb90BzNYQc1SziPFUNdl3IKc9XfcX4zgKdtigCoUGiKMb9pc1S9c5pKHB0zZPnkaiaHKgpaeg1A6/9GEUFR+19l9k/Nhrvu/mzZYtWzDz+h8o5XNIsegb/OPjNWG9AxaZ10SwE2VDGiBqqYiSzYQ22xiKOdXhBjjaonq4WWR/l+p7S415p8faPRGcdZPy/82hFPtoDUsXX7H2vnu0POnpWlC0VssE7yRB9x7AnTx1q3NfskVPn/2ex0VNykvFa2wy7BP+Xx8y5lVx7ivXCrwygN3b0E1356qxALCTJPFcqyPHqm7wR8HPVjTctQFknuqX7lV9O4KxBpHhZpHzLSLnOkqlkYJ/yXAOhkuTNnO2JzaBqSjqpFumsX7xVDmhdnevaZ3bJxesTVGNpbGB9DsvMP61P/MdpBkssBNPXXTIA/shelrE9cH/UHgOOL4JzFWOVTI4ZxvnzFndMq+vaSRr8OcS9MgxGL5YVfScNdw/xoPeYtBxD9cd+Y/W/qb4wPiae3gjmAGQ9cDJCYG6m3EclLnCJwFm6YL7TNtstOSPR1LrsC+/5oWbz/vA4xY/JEmmxH5lC/wy8Cci5sfgXhdp/W4U/VuZsJ5ThNAeYGcGlj+U65wA2FU2+KvhWmUwoo9ChGzA5YAO1feBsa9Ash1i9alMpD44Mpv8dwF0m688pRsgDb71pmmRucInAdLfu6aUL3jQdxLD2XPosYBJsnZ6ZO2b8ZhCmzI+0kshuJkF5jzoh/CEQvMWSKcM6jIy+8IMYBe4VqnF7amNQajA0RCNWdAmYDa8LmCHQDdAKmCD8MraKbeghWEm+6TXoUN6u1cUUc9qTxLc0SHfE61D0pULFZ4lIb90YCzoeZHuXVG0bqqNnAHsfgyztbv77jGfIRjiGC5cQA9Vz7UyIb/NEI023E+X6isA62d4fcoTz/hHrXG8srG/rzVNrRMC6WpPfZGepxr3qZIEgcfgLoLug58AGJykwdlcZxUKdzbN7Z2TVkCB3dBx9PTZqjZzhmg8Gx6JF3BUAHe3czuDgF1dCDjjH8mKZfc29HahaeowBrUWrUPSc2WUXQR6gf6QnkQgYyBnRFYCbJi0yNlcddWKhxp6wlwBSWJ070FUtSquVSbg46EEKb7BLq2qR5t9Wjzjq2YuK3AA8eL597mWZs8/CqRnd+Bw1SZrpiLsBM/uD6wpGQcuqi4K+XAlJ4ttg36uZtG8h2xTU9n/4hQ3jQb/UZGswaAFoF3kLYHiRp+m1YeA5fHH7FaI6Om6ezyKUGs9JmmofknPU6VKWV4cOjSzCX3xil6rPOqhwI309K4u+pPrDMagIyO4A4eqbvCbEDl/RLmqos1AF7wCNTAaP2kBZ6fK3AnzTVfHovHAapc4QfcdqEvS81SjOMkmuikKZ5n/nR3HA/n+7t5iqeRP+c0l6Mcnq2YQZunReTyyMRQ4TCOwUPVVQk5bFwIm8I+irq67Wvp7E2etFePr9eWeaB0rb3ZOxZkJk6Ti67pZI+dy/6tgVix7oLmvF1LrU8MkwR04hKbplCfoXc3/nghpmvH/0xTg4hJrd/llxdWHgAcCq27F0vuS9ja0lCpRhF4cwe0/NGOYpGpHhGc9nAqLrqFb0wRHIh93mbIvDLGGLF7wsLaGWAPfVSj7X6l+Yx0VyRy8ywNtqu8nXu4idaPBIemX+X1r00Jg1dVosmYyD06YoLSEXFQLvtjwniNQYDMxPu6pOPR1lwF2nkE4VhODMLMaQ2ER08Doa4fXU/8/o3pYH5Ml/W9Ck3R3rxoPBQ5JEn/oSJUma6aj6F0VfT2LP1ZogeoblcUG9c0UZsGyuK97QTFNPcA9STzX+djxqrjOWmE1Tk7kvzQD/ap/Xw8FjrKAs6CjMUmWJd0dPeNpqkb8ocS1mqyZEGweOArsrYiiHURzIF3r3OBlxYZwgp1ZMPf+1r5eg3XePieJr17VwHWOg3AvUs7DokZwdzn3Rj0UOMoCzpL+aOWy1c09XT7oiCJ0bAy370Bd+9+sk/CiiHe0fqFtM7BYdWcMuyu5SoOhmSLz5z4ss1sh9QhcicxEg6HKBv+kI5uyAseRXJ0UOCZ8cNZBWrDgftPS4k1ykqAnT6HHjvtzWurwVBkXEtxdwPv4JjuhorQUZI3q16zXpHJ+t2HzZqtg6Ou5fzyf97m+MWipVBODMDuX6phHlaG+/0u76psC4/VQ4JgQcHZsUG/3mvE48h2kXMAkjY3dFATHJ1W5Ogt8f+JkHRy4ApgVqkf7nPuW+h6rLef6UaS7YGHU031b0TMjhTiCsxmDUKoucIyEFClr8Lf4Aser9VLgKN+rREZ3Q6d0dSwvWocqRozBfbi3Lg8dycyy4vFPWeRsvD90D4KsVd0sMDJYoUmDIdZoSJK1rQvmJtYD7KTcLTt/4apggqny31Mhao9CgaMJWCTyavC/dWPyDE5J+rtXNvd2NaVp6iQy4jFJ9Ud6dpSBajwT0P6ZaR4FuxTie5x7qd25P94KUeWHRa1f5zuHsnTRw1F3J1LyVMEygxBqbvAHv68GTLPq8IJQ4KBOAqwsGERXDtxb6GhjNE0dSWL09Fnc4aG6OXQkA5AXQlCzrYJZp36hXQOYT6teuNO5X/Ntg0lghsFBiwhmfv+nSs1NMDIqiOBSi82OSNLq7+VogHmrdwtRO7wf+8BapI7UIgaQub1rXaGAXBhGczns4WO4ixfrhvQcB2EO4THHh5lg1qVBWx4FWQm/LLB3MthuExiJI7cT+qS3Z6Bo/GFuagy5sTHk4OHgqPWKYOpqAVbW4E9B53j/+5oNBY6bTZC7obXbDrHpaL9zHLCl1BTaG9C9+z3EswrSs9wC7T0L/K0Ir+IbChW0SZuH6BeBu517YpZz39kOsUxa4M0gW5zSAqtbF81vHLHWOuuilrY5fLDjZS6cPEVrHGOvworSSf53iDLAjvFQVOmvQHBsoX5GPD+XW0zb7EWXikVa2mbLnrff5d0XBpkXRaTu+hO+GX+7GuuuBAyJcDBUjfLBTFvQEbALIP5Z1Yt3wxNNzj1z1Q9pDCfoRB1tD8XdnRjrtKl9Nm9uf5GtX/46RWOIQ093qg02VSyQm/g5bgQ3UCcIjisErAPL1zR2deZpbHQ7/3rQPPOVP+XipTGiYJ51mqfm6E3SXhMWMzDr3Ai4BOL1ED+o+sqAtZ8R2HWtT+DcvH69Y8cOtG3Og9rbjR0ekef+9M/5u+e+R2QMDVGEU63JGgUYr0vAtKoexnOz6ywshTi6e9Wn8m2z9ZmvfsP98NvflVwU0RzHHrZS5ZBPyFJnnB0LOgpRA5g7wNyp+tG9qr/T5tzvikdNRnIV4SqI/LcvuDegM7r37jsuvPuB/f0vflX3njhpZyUJDhifZpxRCuTrVarvCIxvvQkfiHnTBdzU3PQTb+58W77z7e/Gs/M51GlVE9ZPSKMrebUxSN5zYWmHdJnqG2tU/6zPuW+K77NnbMirLqr/iFhsAea1qs45+/Vv8uCJk6zO5zlo7TQ+nfOy+4x+CuiF5wE667BqL4cWzX/zQ7T7rcND5I2IcyrWQ14kFBQyglymqeWfK863E/zvWE8PlcoYbPJzs89WrND8y54Xct1iQXVotuquhfDSWmO2F9L09Qy1EUyyrWbvhDlEu+FXmoyZ3xjH6XiayqUbWTiQRp8T7/6Sc3+5pcp7udXj/wFgMvZyi/MpjwAAAABJRU5ErkJggg==';
 const LOGO_PDF_PROP = 300 / 238; // largura/altura do logo
 function aplicarLogos() { const m = { preto: LOGO_BLOWPET_PRETO, branco: LOGO_BLOWPET_BRANCO, simbolo: LOGO_BP_SIMBOLO }; document.querySelectorAll('img[data-logo]').forEach(function(i) { if (!i.getAttribute('src')) i.src = m[i.dataset.logo]; }); }
-const ULTIMA_ATUALIZACAO_SISTEMA = '11/11/2026 14:20';
+const ULTIMA_ATUALIZACAO_SISTEMA = '17/11/2026 12:40';
 
-const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas'];
+const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas','face_injetora','vibrador_preforma','foto_vibrador_url'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
 
 /* ---------------- Cadastro de cavidades por gramatura (aba própria, histórico append-only) ---------------- */
@@ -2307,7 +2313,7 @@ async function garantirColunasInjecao(token) {
     const resp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/TabelaInjecao/columns', { headers: { Authorization: 'Bearer ' + token } });
     const json = await resp.json();
     const colunasExistentes = (json.value || []).map(function(c) { return c.name; });
-    const colunasNovas = ['op', 'numero_caixa', 'cavidade_todas'].filter(function(nome) { return colunasExistentes.indexOf(nome) === -1; });
+    const colunasNovas = ['op', 'numero_caixa', 'cavidade_todas', 'face_injetora', 'vibrador_preforma', 'foto_vibrador_url'].filter(function(nome) { return colunasExistentes.indexOf(nome) === -1; });
     // Uma coluna de cada vez, NUNCA em paralelo. O Excel sempre adiciona uma coluna nova no fim da
     // tabela, mas duas requisições de criação de coluna chegando ao mesmo tempo podem ser aplicadas
     // fora de ordem — e como o app lê TabelaInjecao por POSIÇÃO (CABECALHO_INJECAO[i]), uma coluna
@@ -3379,21 +3385,34 @@ async function salvarListas() {
 /* ---------------- Formulário genérico (Injeção / Sopro) ---------------- */
 function gerarIdSessao() { return 'S' + Date.now(); }
 
+// Foto do "Vibrador de Preforma - Altura da Preforma na Caixa" (Cadastro Injeção) — obrigatória.
+let fotoVibradorInjecao = null;
+function armazenarFotoVibrador(files) {
+  fotoVibradorInjecao = files && files[0] ? files[0] : null;
+  const lb = document.getElementById('inj_vibradorFotoLabel');
+  if (!lb) return;
+  if (!fotoVibradorInjecao) { lb.className = 'vib-foto-label'; lb.textContent = 'Nenhuma foto selecionada'; return; }
+  lb.className = 'vib-foto-label ok';
+  lb.innerHTML = '<img alt="" class="vib-mini"> 📷 ' + escaparHtmlFoto(fotoVibradorInjecao.name);
+  try { lb.querySelector('img').src = URL.createObjectURL(fotoVibradorInjecao); } catch (e) {}
+  const box = lb.closest('.field'); if (box) box.classList.remove('campo-erro');
+  if (typeof salvarRascunho === 'function') salvarRascunho('injecao');
+}
 function renderFormInjecao() {
   cavidadesAtivasAtual = null; isoladasAtuaisAtual = []; gramaturaCavResolvida = null;
   const el = document.getElementById('formInjecao');
   el.innerHTML =
     '<div id="alertaMaquinaInjecao"></div>' +
     '<div class="card"><h3>Dados da sessão</h3>' +
-      '<div class="grid-2">' +
-        '<div class="field"><label>Data</label><input type="date" id="inj_data"></div>' +
+      '<div class="grid-3">' +
         '<div class="field"><label>Equipamento</label>'+'<select id="inj_equipamento" onchange="atualizarAlertaMaquina(\'injecao\');"></select>'+'</div>' +
+        '<div class="field"><label>Face da Injetora</label><select id="inj_face"><option value="">Selecione…</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></div>' +
+        '<div class="field"><label>Responsável pela inspeção</label>'+'<select id="inj_responsavel"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-2 hidden">' +
         '<div class="field"><label>Hora início</label><input type="time" id="inj_hora_inicio"></div>' +
         '<div class="field"><label>Hora conclusão</label><input type="time" id="inj_hora_fim"></div>' +
       '</div>' +
-      '<div class="field"><label>Responsável pela inspeção</label>'+'<select id="inj_responsavel"></select>'+'</div>' +
       '<div class="grid-3">' +
         '<div class="field"><label>OP</label><input type="text" id="inj_op" placeholder="Ex: OP-2026-0451"></div>' +
         '<div class="field"><label>Nº Caixa</label><input type="text" id="inj_numeroCaixa" inputmode="numeric" placeholder="Ex: 0142"></div>' +
@@ -3408,6 +3427,11 @@ function renderFormInjecao() {
         toggleGroupHtml('inj_organizacaoLinha', 'Organização linha produtiva', ['APROVADO','REPROVADO'], 'APROVADO') +
         toggleGroupHtml('inj_tonalidadePreforma', 'Tonalidade da preforma', ['APROVADO','REPROVADO'], 'APROVADO') +
         toggleGroupHtml('inj_alinhamentoEtiqueta', 'Alinhamento etiqueta caixa', ['APROVADO','REPROVADO'], 'APROVADO') +
+      '</div>' +
+      // Vibrador de preforma: começa SEM opção marcada (precisa olhar a caixa e escolher) e a foto é sempre obrigatória
+      '<div class="grid-2 vib-bloco">' +
+        toggleGroupHtml('inj_vibrador', 'Vibrador de Preforma - Altura da Preforma na Caixa', ['APROVADO','REPROVADO'], '') +
+        '<div class="field"><label>Foto da caixa (obrigatória)</label><input type="file" accept="image/*" id="inj_vibradorFoto" onchange="armazenarFotoVibrador(this.files)"><div id="inj_vibradorFotoLabel" class="vib-foto-label">Nenhuma foto selecionada</div></div>' +
       '</div>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Temperatura Gate — °C Mínima</label><input type="number" step="0.1" id="inj_tempGateMin" placeholder="Ex: 240.0"></div>' +
@@ -3431,8 +3455,7 @@ function renderFormInjecao() {
   preencherSelect('inj_cor', listas.coresInjecao);
   preencherSelect('inj_gramatura', listas.gramaturas);
   preencherSelect('inj_resina', listas.resinas);
-  document.getElementById('inj_data').value = hojeISO();
-  document.getElementById('inj_hora_inicio').value = agoraHHMM();
+  fotoVibradorInjecao = null;
   renderDesvios('injecao');
   alternarSecaoDesvios('injecao', '');
 }
@@ -3443,14 +3466,13 @@ function renderFormSopro() {
     '<div id="alertaMaquinaSopro"></div>' +
     '<div class="card"><h3>Dados da sessão</h3>' +
       '<div class="grid-2">' +
-        '<div class="field"><label>Data</label><input type="date" id="sop_data"></div>' +
         '<div class="field"><label>Equipamento</label>'+'<select id="sop_equipamento" onchange="atualizarAlertaMaquina(\'sopro\');"></select>'+'</div>' +
+        '<div class="field"><label>Responsável pela inspeção</label>'+'<select id="sop_responsavel"></select>'+'</div>' +
       '</div>' +
       '<div class="grid-2 hidden">' +
         '<div class="field"><label>Hora início</label><input type="time" id="sop_hora_inicio"></div>' +
         '<div class="field"><label>Hora conclusão</label><input type="time" id="sop_hora_fim"></div>' +
       '</div>' +
-      '<div class="field"><label>Responsável pela inspeção</label>'+'<select id="sop_responsavel"></select>'+'</div>' +
       '<div class="field"><label>Operador</label><select id="sop_operador"></select></div>' +
       '<div class="grid-3">' +
         '<div class="field"><label>Cor</label>'+'<select id="sop_cor"></select>'+'</div>' +
@@ -3498,8 +3520,6 @@ function renderFormSopro() {
   preencherSelect('sop_fornecedorPreforma', listas.fornecedoresPreforma);
   preencherSelect('sop_gramaturaPreforma', listas.gramaturasPreforma);
   renderPostosMolde('4');
-  document.getElementById('sop_data').value = hojeISO();
-  document.getElementById('sop_hora_inicio').value = agoraHHMM();
   renderDesvios('sopro');
   alternarSecaoDesvios('sopro', '');
 }
@@ -3521,6 +3541,7 @@ function selecionarToggle(groupId, valor) {
   Array.prototype.forEach.call(group.querySelectorAll('.toggle-btn'), function(btn) {
     btn.classList.toggle('active', btn.textContent === valor);
   });
+  const campo = group.closest('.field'); if (campo) campo.classList.remove('campo-erro');
 }
 function getToggleValue(groupId) {
   const group = document.getElementById(groupId);
@@ -3768,7 +3789,7 @@ function salvarRascunho(processo) {
         criticidade: d.criticidade, operadorCiente: d.operadorCiente, status: d.status, observacao: d.observacao,
         temFotoPendente: !!d.fotoFile };
     });
-    localStorage.setItem('rascunho_cadastro_' + processo, JSON.stringify({ v: 2, campos: campos, desvios: desvios, salvoEm: new Date().toISOString() }));
+    localStorage.setItem('rascunho_cadastro_' + processo, JSON.stringify({ v: 2, campos: campos, desvios: desvios, fotoVibPendente: processo === 'injecao' && !!fotoVibradorInjecao, salvoEm: new Date().toISOString() }));
   } catch (e) { /* localStorage indisponível/cheio — rascunho é só um extra, não trava o app */ }
 }
 
@@ -3811,6 +3832,10 @@ function restaurarRascunho(processo) {
     const valor = rascunho.campos[grupo.id];
     if (valor) selecionarToggle(grupo.id, valor);
   });
+  if (processo === 'injecao' && rascunho.fotoVibPendente) {
+    const lb = document.getElementById('inj_vibradorFotoLabel');
+    if (lb) { lb.className = 'vib-foto-label aviso'; lb.textContent = '⚠ Rascunho recuperado — a foto anterior não pôde ser mantida, anexe novamente.'; }
+  }
 
   // Seção de desvios: reaplica "Foi identificado algum defeito?" pra desbloquear/bloquear a
   // seção do jeito certo, e então substitui a lista pela restaurada
@@ -3862,8 +3887,8 @@ function abrirRevisao(processo) {
 
   if (processo === 'injecao') {
     const camposObrigatorios = [
-      { id: 'inj_data', label: 'Data' },
       { id: 'inj_equipamento', label: 'Equipamento' },
+      { id: 'inj_face', label: 'Face da Injetora' },
       { id: 'inj_responsavel', label: 'Responsável pela Inspeção' },
       { id: 'inj_op', label: 'OP' },
       { id: 'inj_numeroCaixa', label: 'Nº Caixa' },
@@ -3880,6 +3905,16 @@ function abrirRevisao(processo) {
       mostrarToast('ATENÇÃO: É necessário preencher os dados nos campos: ' + faltando.join(', ') + '.', true);
       return;
     }
+    // Vibrador de Preforma: escolher Aprovado/Reprovado E anexar a foto (sempre obrigatória)
+    const vibFaltando = [];
+    if (!getToggleValue('inj_vibrador')) vibFaltando.push('Vibrador de Preforma (Aprovado ou Reprovado)');
+    if (!fotoVibradorInjecao) vibFaltando.push('foto da caixa do Vibrador de Preforma');
+    if (vibFaltando.length) {
+      const g = document.getElementById('inj_vibrador'), box = g && g.closest('.vib-bloco');
+      if (box) { box.querySelectorAll('.field').forEach(function(f) { f.classList.add('campo-erro'); }); box.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      mostrarToast('ATENÇÃO: falta preencher: ' + vibFaltando.join(' e ') + '.', true);
+      return;
+    }
     const opInjVal = document.getElementById('inj_op').value;
     if (/^0+$/.test(opInjVal.trim())) {
       mostrarToast('ATENÇÃO: o campo OP não pode conter apenas "0".', true);
@@ -3894,7 +3929,6 @@ function abrirRevisao(processo) {
 
   if (processo === 'sopro') {
     const camposObrigatorios = [
-      { id: 'sop_data', label: 'Data' },
       { id: 'sop_equipamento', label: 'Equipamento' },
       { id: 'sop_responsavel', label: 'Responsável pela Inspeção' },
       { id: 'sop_operador', label: 'Operador' },
@@ -3999,7 +4033,6 @@ function renderRevisaoHtml(processo, temDefeito, desvios) {
   let corpo = '';
 
   if (processo === 'sopro') {
-    const data = document.getElementById('sop_data').value;
     const equipamento = document.getElementById('sop_equipamento').value;
     const responsavel = document.getElementById('sop_responsavel').value;
     const operador = document.getElementById('sop_operador').value;
@@ -4021,7 +4054,7 @@ function renderRevisaoHtml(processo, temDefeito, desvios) {
     const numPostos = parseInt(document.getElementById('sop_numPostos').value, 10) || 0;
 
     corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Dados da sessão</div><div class="revisao-grid">' +
-      itemRevisao('Data', formatarDataBR(data)) + itemRevisao('Equipamento', equipamento) + itemRevisao('Responsável', responsavel) +
+      itemRevisao('Data e hora', 'registradas ao salvar') + itemRevisao('Equipamento', equipamento) + itemRevisao('Responsável', responsavel) +
       itemRevisao('Operador', operador) + itemRevisao('Cor', cor) + itemRevisao('Volume', ml) +
       '</div></div>';
 
@@ -4048,7 +4081,6 @@ function renderRevisaoHtml(processo, temDefeito, desvios) {
       corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Peso / Altura por posto</div><div class="revisao-grid">' + postosHtml + '</div></div>';
     }
   } else {
-    const data = document.getElementById('inj_data').value;
     const equipamento = document.getElementById('inj_equipamento').value;
     const responsavel = document.getElementById('inj_responsavel').value;
     const op = document.getElementById('inj_op').value;
@@ -4060,6 +4092,8 @@ function renderRevisaoHtml(processo, temDefeito, desvios) {
     const organizacaoLinha = getToggleValue('inj_organizacaoLinha');
     const tonalidadePreforma = getToggleValue('inj_tonalidadePreforma');
     const alinhamentoEtiqueta = getToggleValue('inj_alinhamentoEtiqueta');
+    const faceInj = document.getElementById('inj_face').value;
+    const vibrador = getToggleValue('inj_vibrador');
     const tempGateMinEl = document.getElementById('inj_tempGateMin');
     const tempGateMaxEl = document.getElementById('inj_tempGateMax');
     const tempCorpoMinEl = document.getElementById('inj_tempCorpoMin');
@@ -4070,8 +4104,8 @@ function renderRevisaoHtml(processo, temDefeito, desvios) {
     const tempCorpoMax = tempCorpoMaxEl && tempCorpoMaxEl.value ? tempCorpoMaxEl.value + ' °C' : '';
 
     corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Dados da sessão</div><div class="revisao-grid">' +
-      itemRevisao('Data', formatarDataBR(data)) + itemRevisao('Equipamento', equipamento) + itemRevisao('Responsável', responsavel) +
-      itemRevisao('OP', op) + itemRevisao('Nº Caixa', numeroCaixaInj) + itemRevisao('Operador principal', operador) +
+      itemRevisao('Data e hora', 'registradas ao salvar') + itemRevisao('Equipamento', equipamento) + itemRevisao('Responsável', responsavel) +
+      itemRevisao('Face da injetora', faceInj) + itemRevisao('OP', op) + itemRevisao('Nº Caixa', numeroCaixaInj) + itemRevisao('Operador principal', operador) +
       itemRevisao('Cor da preforma', cor) + itemRevisao('Gramatura', gramatura) +
       '</div></div>';
 
@@ -4081,7 +4115,7 @@ function renderRevisaoHtml(processo, temDefeito, desvios) {
       '</div></div>';
 
     corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Verificações de qualidade</div><div class="revisao-grid">' +
-      itemRevisao('Organização linha', porExtenso(organizacaoLinha)) + itemRevisao('Tonalidade preforma', porExtenso(tonalidadePreforma)) + itemRevisao('Alinhamento etiqueta', porExtenso(alinhamentoEtiqueta)) +
+      itemRevisao('Organização linha', porExtenso(organizacaoLinha)) + itemRevisao('Tonalidade preforma', porExtenso(tonalidadePreforma)) + itemRevisao('Alinhamento etiqueta', porExtenso(alinhamentoEtiqueta)) + itemRevisao('Vibrador de preforma', porExtenso(vibrador)) + itemRevisao('Foto da caixa', fotoVibradorInjecao ? '📷 ' + fotoVibradorInjecao.name : 'Não', !fotoVibradorInjecao) +
       '</div></div>';
   }
 
@@ -4133,9 +4167,12 @@ async function confirmarSalvarSessao(processo) {
   if (temDefeito === 'SIM' && desvios.length === 0) { mostrarToast('Adicione ao menos um desvio.', true); return; }
 
   const idSessao = gerarIdSessao();
-  const data = document.getElementById(pfx+'data').value;
-  const horaInicio = document.getElementById(pfx+'hora_inicio').value;
-  const horaFim = agoraHHMM();
+  // Data e hora = momento do SALVAMENTO (não há mais campo Data na tela nem horário de abertura).
+  // A coluna hora_inicio continua existindo na planilha e recebe a mesma hora, para nada ficar vazio.
+  const momento = new Date();
+  const data = momento.getFullYear() + '-' + String(momento.getMonth() + 1).padStart(2, '0') + '-' + String(momento.getDate()).padStart(2, '0');
+  const horaFim = String(momento.getHours()).padStart(2, '0') + ':' + String(momento.getMinutes()).padStart(2, '0');
+  const horaInicio = horaFim;
   document.getElementById(pfx+'hora_fim').value = horaFim;
   const equipamento = document.getElementById(pfx+'equipamento').value;
   const responsavel = document.getElementById(pfx+'responsavel').value;
@@ -4153,6 +4190,14 @@ async function confirmarSalvarSessao(processo) {
     // colunasInjecaoProntasPromise em conectarPlanilha), então normalmente essa espera já está
     // resolvida; isso só importa de verdade se alguém salvar nos primeiros instantes após logar.
     if (colunasInjecaoProntasPromise) { try { await colunasInjecaoProntasPromise; } catch (e) { /* segue mesmo assim — colunas podem já existir */ } }
+
+    // Foto do Vibrador de Preforma (Injeção) vai primeiro: é obrigatória, então se não subir nada é salvo
+    let fotoVibradorUrl = '';
+    if (processo === 'injecao' && fotoVibradorInjecao) {
+      btn.textContent = 'Enviando foto da caixa…';
+      try { fotoVibradorUrl = await uploadFoto(token, fotoVibradorInjecao, idSessao, 'vibrador'); }
+      catch (e) { mostrarToast('Não consegui enviar a foto do Vibrador de Preforma (' + e.message + '). Nada foi salvo — tente de novo.', true); return; }
+    }
 
     // Envia as fotos primeiro (quando houver) e guarda a URL de cada uma
     for (let i = 0; i < desvios.length; i++) {
@@ -4179,6 +4224,8 @@ async function confirmarSalvarSessao(processo) {
       const organizacaoLinha = getToggleValue('inj_organizacaoLinha');
       const tonalidadePreforma = getToggleValue('inj_tonalidadePreforma');
       const alinhamentoEtiqueta = getToggleValue('inj_alinhamentoEtiqueta');
+      const faceInj = document.getElementById('inj_face').value;
+      const vibrador = getToggleValue('inj_vibrador');
       const tempGateMin = document.getElementById('inj_tempGateMin').value;
       const tempGateMax = document.getElementById('inj_tempGateMax').value;
       const tempCorpoMin = document.getElementById('inj_tempCorpoMin').value;
@@ -4190,6 +4237,7 @@ async function confirmarSalvarSessao(processo) {
           organizacao_linha_produtiva: organizacaoLinha, tonalidade_preforma: tonalidadePreforma, alinhamento_etiqueta_caixa: alinhamentoEtiqueta,
           temperatura_gate_min: tempGateMin, temperatura_gate_max: tempGateMax, temperatura_corpo_min: tempCorpoMin, temperatura_corpo_max: tempCorpoMax,
           op: op, numero_caixa: numeroCaixaInj,
+          face_injetora: faceInj, vibrador_preforma: vibrador, foto_vibrador_url: fotoVibradorUrl,
           // Guarda que "Todas as ativas" foi marcado nesse desvio — mesmo gravando a lista real das
           // cavidades no banco (pra análises/relatórios ficarem corretos), isso permite mostrar só
           // "Todas" na mensagem do WhatsApp em vez da lista enorme (ver formatarCavidadesWpp).
@@ -5247,14 +5295,14 @@ function renderTabelaInjecao() {
       const statusClasse = statusUpper.indexOf('PENDENTE') > -1 ? 'pendente' : statusUpper.indexOf('SEM DESVIO') > -1 ? 'semdesvio' : 'corrigido';
     return '<tr>' +
       '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_fim||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
-      '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
+      '<td>'+(l.face_injetora||'—')+'</td>' + '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
       '<td>'+(l.gramatura||'—')+'</td>' + '<td>'+(l.op||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+(l.resina||'—')+'</td>' +
       '<td style="white-space:nowrap;">'+(l.defeito||'—')+'</td>' +
       '<td>'+(l.criticidade ? '<span class="badge '+critClasse+'">'+l.criticidade+'</span>' : '—')+'</td>' +
       '<td>'+(l.foto_url ? '<a href="'+l.foto_url+'" target="_blank" class="btn btn-outline" style="padding:5px 10px; font-size:11px;">📷 Ver</a>' : '—')+'</td>' +
       '<td style="white-space:nowrap;">'+(l.cavidade||'—')+'</td>' +
       '<td>'+formatarTemperatura(l.temperatura_gate_min)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_gate_max)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_corpo_min)+'</td>' + '<td>'+formatarTemperatura(l.temperatura_corpo_max)+'</td>' +
-      '<td>'+badgeAprovadoReprovado(l.organizacao_linha_produtiva)+'</td>' + '<td>'+badgeAprovadoReprovado(l.tonalidade_preforma)+'</td>' + '<td>'+badgeAprovadoReprovado(l.alinhamento_etiqueta_caixa)+'</td>' +
+      '<td>'+badgeAprovadoReprovado(l.organizacao_linha_produtiva)+'</td>' + '<td>'+badgeAprovadoReprovado(l.tonalidade_preforma)+'</td>' + '<td>'+badgeAprovadoReprovado(l.alinhamento_etiqueta_caixa)+'</td>' + '<td style="white-space:nowrap;">'+(l.vibrador_preforma ? badgeAprovadoReprovado(l.vibrador_preforma) : '—')+(l.foto_vibrador_url ? ' <a href="'+l.foto_vibrador_url+'" target="_blank" class="btn btn-outline" style="padding:4px 8px; font-size:11px;">📷</a>' : '')+'</td>' +
       '<td>'+porExtenso(l.operador_ciente)+'</td>' +
       '<td><span class="badge '+statusClasse+'">'+(l.status_correcao||'—')+'</span></td>' +
       '<td class="col-obs" title="'+(l.observacao||'').replace(/"/g,'&quot;')+'">'+(l.observacao||'')+'</td>' +
@@ -5325,44 +5373,49 @@ function montarTextoWhatsApp(processo, linhas, quando) {
   // em que o cadastro foi feito, não a de agora.
   const dataHora = quando || (String(agora.getDate()).padStart(2,'0') + '/' + String(agora.getMonth()+1).padStart(2,'0') + '/' + agora.getFullYear() + ' - ' + String(agora.getHours()).padStart(2,'0') + ':' + String(agora.getMinutes()).padStart(2,'0'));
 
-  let texto;
+  // Formato definido pelo Cleber (17/11/2026). Separadores: ' - - - - - - - ' entre blocos e a linha
+  // longa no fim de cada cadastro. Nome do equipamento em maiúsculas.
+  const SEP = ' - - - - - - - ', FIM = ' - - - - - - - - - - - - - - - - - - - - - - -';
+  let texto = '*Inspeção da Qualidade*\n_' + dataHora + '_\n\n';
   if (processo === 'injecao') {
-    texto = '*Inspeção da Qualidade*\n_' + dataHora + '_\n\n';
-    texto += '*Injetora*\n========\n';
+    texto += '*INJETORA*\n========\n';
     grupos.forEach(function(g, idx) {
       const s = g.sessao;
-      texto += '*_' + (s.equipamento || '—') + '_*\n';
+      texto += '*_' + String(s.equipamento || '—').toUpperCase() + '_*\n';
       texto += '*' + formatarGramaturaWpp(s.gramatura) + ' - ' + (s.cor || '—') + '*\n';
-      if (s.op || s.numero_caixa) {
-        texto += '*_OP: ' + (s.op || '—') + '-' + (s.numero_caixa || '—') + '_*\n';
-      }
-      texto += '*_Operador: ' + (s.operador_principal || '—') + '_*\n';
-      texto += '*_Responsável: ' + (s.responsavel || '—') + '_*\n';
-      g.itens.forEach(function(item) {
-        if (!item.defeito) return;
-        texto += item.defeito + ' - ' + (item.criticidade || '—') + '\n';
+      if (s.op || s.numero_caixa) texto += '*_OP:_* _' + (s.op || '—') + '-' + (s.numero_caixa || '—') + '_\n';
+      texto += '_*Operador* : ' + (s.operador_principal || '—') + '_\n';
+      texto += '_*Responsável* : ' + (s.responsavel || '—') + '_\n';
+      texto += SEP + '\n';
+      const desv = g.itens.filter(function(item) { return item.defeito; });
+      if (desv.length) desv.forEach(function(item) {
+        texto += item.defeito + ' - *' + (item.criticidade || '—') + '*\n';
         texto += '* CAV: ' + formatarCavidadesWpp(item.cavidade, item.cavidade_todas) + '\n';
       });
+      else texto += 'Sem desvio\n';
+      if (s.vibrador_preforma) texto += SEP + '\n' + ' Vibrador Preforma (Altura Caixa): *' + porExtenso(s.vibrador_preforma) + '*\n';
+      texto += FIM + '\n';
       if (idx < grupos.length - 1) texto += '\n';
     });
   } else {
-    texto = '*Inspeção da Qualidade*\n_' + dataHora + '_\n\n';
-    texto += '*Sopro*\n========\n';
+    texto += '*SOPRO*\n========\n';
     grupos.forEach(function(g, idx) {
       const s = g.sessao;
-      texto += '*_' + (s.equipamento || '—') + '_*\n';
+      texto += '*_' + String(s.equipamento || '—').toUpperCase() + '_*\n';
       texto += (s.tipo_frasco || '—') + ' - ' + (s.ml || '—') + '\n';
-      texto += '*_Operador: ' + (s.operador || '—') + '_*\n';
-      texto += '*_Responsável: ' + (s.responsavel || '—') + '_*\n';
-      g.itens.forEach(function(item) {
-        if (!item.defeito) return;
-        texto += item.defeito + ' - ' + (item.criticidade || '—') + '\n';
-      });
+      texto += '*_Operador:_* _' + (s.operador || '—') + '_\n';
+      texto += '*_Responsável:_* _' + (s.responsavel || '—') + '_\n';
+      texto += SEP + '\n';
+      const desv = g.itens.filter(function(item) { return item.defeito; });
+      if (desv.length) desv.forEach(function(item) { texto += item.defeito + ' - *' + (item.criticidade || '—') + '*\n'; });
+      else texto += 'Sem desvio\n';
+      // primeiro todos os pesos, depois todas as alturas
       const n = parseInt(s.num_postos_molde, 10) || 0;
-      for (let i = 1; i <= n; i++) {
-        if (s['peso_'+i]) texto += 'Peso - Posto ' + i + ': ' + s['peso_'+i] + ' gramas\n';
-        if (s['altura_'+i]) texto += 'Altura - Posto ' + i + ': ' + s['altura_'+i] + ' mm\n';
-      }
+      let medidas = '';
+      for (let i = 1; i <= n; i++) if (s['peso_' + i]) medidas += 'Peso - Posto ' + i + ': *' + s['peso_' + i] + '* gramas\n';
+      for (let i = 1; i <= n; i++) if (s['altura_' + i]) medidas += 'Altura - Posto ' + i + ': *' + s['altura_' + i] + '* mm\n';
+      if (medidas) texto += SEP + '\n' + medidas;
+      texto += FIM + '\n';
       if (idx < grupos.length - 1) texto += '\n';
     });
   }
@@ -5490,11 +5543,11 @@ async function gerarPDF(processo) {
     });
   } else {
     linhas = filtrarBuscaEData(linhasFiltradasPorProcesso('injecao'), 'tBuscaInjecao', 'tDataDeInjecao', 'tDataAteInjecao', ['defeito','equipamento','responsavel','observacao','operador_principal','cor','resina'], 500, 'tHoraDeInjecao', 'tHoraAteInjecao', 'tCadastrosInjecao');
-    colunas = ['Data','Hora','Equipamento','Resp.','Operador','Cor','Gramatura','Resina','Temperatura Gate Mín.','Temperatura Gate Máx.','Temperatura Corpo Mín.','Temperatura Corpo Máx.','Organização Linha','Tonalidade','Alinhamento Etiqueta','Defeito','Cavidade','Criticidade','Operador Ciente'];
+    colunas = ['Data','Hora','Equipamento','Face','Resp.','Operador','Cor','Gramatura','Resina','Temperatura Gate Mín.','Temperatura Gate Máx.','Temperatura Corpo Mín.','Temperatura Corpo Máx.','Organização Linha','Tonalidade','Alinhamento Etiqueta','Vibrador Preforma','Defeito','Cavidade','Criticidade','Operador Ciente'];
     corpo = linhas.map(function(l) {
-      return [formatarDataBR(l.data), l.hora_fim||'—', l.equipamento||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
+      return [formatarDataBR(l.data), l.hora_fim||'—', l.equipamento||'—', l.face_injetora||'—', l.responsavel||'—', l.operador_principal||'—', l.cor||'—',
         l.gramatura||'—', l.resina||'—', formatarTemperatura(l.temperatura_gate_min), formatarTemperatura(l.temperatura_gate_max), formatarTemperatura(l.temperatura_corpo_min), formatarTemperatura(l.temperatura_corpo_max),
-        porExtenso(l.organizacao_linha_produtiva), porExtenso(l.tonalidade_preforma), porExtenso(l.alinhamento_etiqueta_caixa),
+        porExtenso(l.organizacao_linha_produtiva), porExtenso(l.tonalidade_preforma), porExtenso(l.alinhamento_etiqueta_caixa), l.vibrador_preforma ? porExtenso(l.vibrador_preforma) : '—',
         l.defeito||'—', formatarCavidadePDF(l.cavidade, l.cavidade_todas), l.criticidade||'—', porExtenso(l.operador_ciente)];
     });
   }
@@ -5536,11 +5589,12 @@ async function gerarPDF(processo) {
       // Resina foi ampliada de 18mm pra 22mm (tirando 4mm da Cavidade) pra caber "PetPCR - Cirklo"
       // sem quebrar (16,1mm de texto + folga, contra ~19,6mm úteis na célula).
       columnStyles: {
-        0: { cellWidth: 15 }, 1: { cellWidth: 9 }, 2: { cellWidth: 14 }, 3: { cellWidth: 12 },
-        4: { cellWidth: 16 }, 5: { cellWidth: 11 }, 6: { cellWidth: 10 }, 7: { cellWidth: 22 },
-        8: { cellWidth: 9 }, 9: { cellWidth: 9 }, 10: { cellWidth: 9 }, 11: { cellWidth: 9 },
-        12: { cellWidth: 15 }, 13: { cellWidth: 15 }, 14: { cellWidth: 15 }, 15: { cellWidth: 42 },
-        16: { cellWidth: 27 }, 17: { cellWidth: 12 }, 18: { cellWidth: 10 }
+        // 21 colunas (com Face e Vibrador Preforma) — continuam somando ~281mm
+        0: { cellWidth: 14 }, 1: { cellWidth: 9 }, 2: { cellWidth: 14 }, 3: { cellWidth: 8 }, 4: { cellWidth: 12 },
+        5: { cellWidth: 16 }, 6: { cellWidth: 11 }, 7: { cellWidth: 10 }, 8: { cellWidth: 21 },
+        9: { cellWidth: 8 }, 10: { cellWidth: 8 }, 11: { cellWidth: 8 }, 12: { cellWidth: 8 },
+        13: { cellWidth: 15 }, 14: { cellWidth: 15 }, 15: { cellWidth: 15 }, 16: { cellWidth: 15 }, 17: { cellWidth: 34 },
+        18: { cellWidth: 20 }, 19: { cellWidth: 11 }, 20: { cellWidth: 9 }
       },
       tableWidth: 'auto', horizontalPageBreak: false,
       margin: { left: 8, right: 8 },
@@ -5923,7 +5977,8 @@ function opCorpoRegistro(r, inj, abrir) {
   if (inj) {
     h += '<div class="op-idg"><div><span>Responsável</span>' + opEsc(s.responsavel || '—') + '</div><div><span>Operador</span>' + opEsc(s.operador_principal || '—') + '</div>' +
       '<div><span>OP – Caixa</span>' + opEsc((s.op || '—') + (s.numero_caixa ? '-' + s.numero_caixa : '')) + '</div><div><span>Produto</span>' + opEsc(formatarGramaturaWpp(s.gramatura) + ' · ' + (s.cor || '—')) + '</div>' +
-      '<div><span>Resina</span>' + opEsc(s.resina || '—') + '</div><div><span>Registrado em</span>' + opEsc(opDataLonga(r.data) + ' ' + r.hora) + '</div></div>';
+      '<div><span>Resina</span>' + opEsc(s.resina || '—') + '</div><div><span>Registrado em</span>' + opEsc(opDataLonga(r.data) + ' ' + r.hora) + '</div>' +
+      '<div><span>Face da injetora</span>' + opEsc(s.face_injetora || '—') + '</div></div>';
   } else {
     h += '<div class="op-idg"><div><span>Responsável</span>' + opEsc(s.responsavel || '—') + '</div><div><span>Operador</span>' + opEsc(s.operador || '—') + '</div>' +
       '<div><span>Frasco</span>' + opEsc(s.tipo_frasco || '—') + '</div><div><span>Volume</span>' + opEsc(s.ml || '—') + '</div>' +
@@ -5944,7 +5999,8 @@ function opCorpoRegistro(r, inj, abrir) {
     });
   }
   if (inj) {
-    h += '<details class="op-grp"' + ab + '><summary>Verificações de qualidade</summary>' + opLinhaPar('Organização linha', porExtenso(s.organizacao_linha_produtiva)) + opLinhaPar('Tonalidade preforma', porExtenso(s.tonalidade_preforma)) + opLinhaPar('Alinhamento etiqueta', porExtenso(s.alinhamento_etiqueta_caixa)) + '</details>';
+    h += '<details class="op-grp"' + ab + '><summary>Verificações de qualidade</summary>' + opLinhaPar('Organização linha', porExtenso(s.organizacao_linha_produtiva)) + opLinhaPar('Tonalidade preforma', porExtenso(s.tonalidade_preforma)) + opLinhaPar('Alinhamento etiqueta', porExtenso(s.alinhamento_etiqueta_caixa)) + opLinhaPar('Vibrador de preforma', s.vibrador_preforma ? porExtenso(s.vibrador_preforma) : '—') +
+      (s.foto_vibrador_url ? '<a class="op-foto" href="' + opEsc(s.foto_vibrador_url) + '" target="_blank" rel="noopener">📷 <span>Foto da caixa (vibrador) — <b>' + (abrir ? 'clique' : 'toque') + ' para abrir</b></span></a>' : '') + '</details>';
     h += '<details class="op-grp"' + ab + '><summary>Temperaturas</summary>' + opLinhaPar('Gate mín. / máx.', formatarTemperatura(s.temperatura_gate_min) + ' / ' + formatarTemperatura(s.temperatura_gate_max) + ' °C') + opLinhaPar('Corpo mín. / máx.', formatarTemperatura(s.temperatura_corpo_min) + ' / ' + formatarTemperatura(s.temperatura_corpo_max) + ' °C') + '</details>';
   } else {
     h += '<details class="op-grp"' + ab + '><summary>Verificações de qualidade</summary>' + opLinhaPar('Fechamento do saco', porExtenso(s.condicao_fechamento_saco)) + opLinhaPar('Alinhamento dos paletes', porExtenso(s.alinhamento_paletes)) + opLinhaPar('Organização linha', porExtenso(s.organizacao_linha_produtiva)) +
@@ -6101,14 +6157,14 @@ function ivRender48h() {
   if (!alvo.inj || !alvo.sop) return;
   ['inj', 'sop'].forEach(function(proc) {
     const el = alvo[proc], tot = document.getElementById(proc === 'inj' ? 'ivTotInj' : 'ivTotSop');
-    const guardados = {}; el.querySelectorAll('.iv-lane').forEach(function(l) { const r = l.querySelector('.iv-rail'); if (r) guardados[l.dataset.c] = r.scrollLeft; });
+    const guardados = {}; el.querySelectorAll('.iv-lane').forEach(function(l) { const r = l.querySelector('.iv-rail'); if (r && r.clientWidth > 0 && r.dataset.fim !== '1') guardados[l.dataset.c] = r.scrollLeft; });
     if (!dadosHistoricoCarregados) { el.innerHTML = '<div class="iv-vazio" style="padding:14px">Carregando os cadastros…</div>'; tot.textContent = ''; return; }
     const cards = ivMontarCards(proc); IV.cards[proc] = cards;
     el.innerHTML = cards.map(function(c, ci) { return ivRenderLane(proc, ci, c); }).join('');
     let total = 0, comDesv = 0;
     cards.forEach(function(c) { total += c.sessoes.length; comDesv += c.sessoes.filter(function(x) { return x.desvios.length; }).length; });
     tot.textContent = total + ' cadastro' + (total === 1 ? '' : 's') + ' nas 48h · ' + comDesv + ' com desvio';
-    el.querySelectorAll('.iv-lane.open .iv-rail').forEach(function(r) { const l = r.parentNode; r.scrollLeft = guardados[l.dataset.c] !== undefined ? guardados[l.dataset.c] : r.scrollWidth; });
+    el.querySelectorAll('.iv-lane.open .iv-rail').forEach(function(r) { const l = r.parentNode; if (guardados[l.dataset.c] !== undefined) r.scrollLeft = guardados[l.dataset.c]; else ivRolarParaFim(r); });
   });
   ivRenderGeral();
   IV.turnoDesenhado = ivTurnoAtualChave();
@@ -6117,12 +6173,23 @@ function ivRender48h() {
 // Linha do tempo GERAL: todos os cadastros (Injeção + Sopro) em ordem de horário, com o tempo entre um
 // e outro, agrupados por turno (Dia 06:00–18:00 / Noite 18:00–06:00). Cada bolinha mostra a máquina;
 // clicar abre o mesmo cadastro da faixa da máquina. Intervalo de 2h ou mais sem nenhuma inspeção = laranja.
+// Rola uma faixa até o FIM (cadastros mais recentes). Se ela ainda estiver escondida (tela "Carregando…"
+// ao abrir o sistema), a rolagem é refeita assim que ela aparecer. Se a pessoa rolar para trás para ver
+// cadastros antigos, isso é respeitado até a faixa ser desenhada de novo.
+function ivRolarParaFim(r) {
+  if (!r) return;
+  r.dataset.fim = '1'; r.scrollLeft = r.scrollWidth;
+  if (r._obsFim || typeof ResizeObserver === 'undefined') return;
+  r._obsFim = new ResizeObserver(function() { if (r.dataset.fim === '1' && r.clientWidth > 0) r.scrollLeft = r.scrollWidth; });
+  r._obsFim.observe(r);
+  r.addEventListener('scroll', function() { if (r.clientWidth > 0) r.dataset.fim = (r.scrollLeft + r.clientWidth >= r.scrollWidth - 4) ? '1' : ''; }, { passive: true });
+}
 const IV_GERAL_LIMITE_MS = 2 * 3600000;
 function ivRenderGeral() {
   const el = document.getElementById('ivGeral'), tot = document.getElementById('ivTotGeral');
   if (!el) return;
   if (!dadosHistoricoCarregados) { el.innerHTML = '<div class="iv-vazio" style="padding:14px">Carregando os cadastros…</div>'; if (tot) tot.textContent = ''; return; }
-  const railAnt = el.querySelector('.iv-rail'), scrollAnt = railAnt ? railAnt.scrollLeft : null, fimAnt = railAnt ? railAnt.scrollLeft + railAnt.clientWidth >= railAnt.scrollWidth - 4 : true;
+  const railAnt = el.querySelector('.iv-rail'), scrollAnt = railAnt ? railAnt.scrollLeft : null, fimAnt = !railAnt || railAnt.dataset.fim === '1' || railAnt.clientWidth === 0;
   const todos = [];
   ['inj', 'sop'].forEach(function(proc) { (IV.cards[proc] || []).forEach(function(c, ci) { c.sessoes.forEach(function(x, i) { todos.push({ x: x, p: proc, c: ci, i: i, nome: c.nome }); }); }); });
   todos.sort(function(a, b) { return a.x.t - b.x.t || String(a.x.criado).localeCompare(String(b.x.criado)); });
@@ -6164,7 +6231,7 @@ function ivRenderGeral() {
     '<span>maior tempo sem nenhuma inspeção <b class="' + (maior >= IV_GERAL_LIMITE_MS ? 'w' : '') + '">' + ivDur(maior) + '</b> (' + (mAte ? 'das ' + ivHM(mDe) + ' ' + ivDM(mDe) + ' às ' + ivHM(mAte) + ' ' + ivDM(mAte) : 'desde as ' + ivHM(mDe) + ' ' + ivDM(mDe) + ', até agora') + ')</span>' +
     '<span>tracejado laranja = 2h ou mais sem nenhuma inspeção</span></div>';
   el.innerHTML = sum + '<div class="iv-rail ger">' + rail + '</div>';
-  const r = el.querySelector('.iv-rail'); r.scrollLeft = (fimAnt || scrollAnt === null) ? r.scrollWidth : scrollAnt;
+  const r = el.querySelector('.iv-rail'); if (fimAnt || scrollAnt === null) ivRolarParaFim(r); else r.scrollLeft = scrollAnt;
   if (tot) tot.textContent = todos.length + ' inspeções nas 48h';
 }
 function ivAlternarLane(lane, abrir) {
@@ -6174,7 +6241,7 @@ function ivAlternarLane(lane, abrir) {
   lane.querySelector('.iv-lh').setAttribute('aria-expanded', abre ? 'true' : 'false');
   if (abre) IV.abertas[c.chave] = 1; else delete IV.abertas[c.chave];
   ivSalvarAbertas();
-  if (abre) { const r = lane.querySelector('.iv-rail'); r.scrollLeft = r.scrollWidth; }
+  if (abre) ivRolarParaFim(lane.querySelector('.iv-rail'));
 }
 function ivTodas(proc, abrir) { document.querySelectorAll('#' + (proc === 'inj' ? 'ivInj' : 'ivSop') + ' .iv-lane').forEach(function(l) { ivAlternarLane(l, abrir); }); }
 function ivAtualizarAgora() {
@@ -6266,7 +6333,7 @@ const CABECALHO_RESUMO_TURNO = ['chave','data','turno','processo','equipamento',
 let ordemColunasResumoTurnoReal = CABECALHO_RESUMO_TURNO.slice(); // mesma lógica das outras abas: ordem REAL na planilha
 const RT_LIMITE_INTERVALO_H = 4;     // acima disso, alerta de "intervalo longo sem inspeção"
 const RT_VERIFICACOES = {
-  inj: [['organizacao_linha_produtiva', 'Organização da linha produtiva'], ['tonalidade_preforma', 'Tonalidade da preforma'], ['alinhamento_etiqueta_caixa', 'Alinhamento da etiqueta da caixa']],
+  inj: [['vibrador_preforma', 'Vibrador de preforma (altura na caixa)'], ['organizacao_linha_produtiva', 'Organização da linha produtiva'], ['tonalidade_preforma', 'Tonalidade da preforma'], ['alinhamento_etiqueta_caixa', 'Alinhamento da etiqueta da caixa']],
   sop: [['condicao_fechamento_saco', 'Fechamento do saco'], ['alinhamento_paletes', 'Alinhamento dos paletes'], ['organizacao_linha_produtiva', 'Organização da linha produtiva'], ['condicao_rotulo', 'Condição do rótulo']]
 };
 const RT = {
