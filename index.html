@@ -439,6 +439,19 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
     color: var(--text); font-size: 15px; font-weight: 600; text-align: center; padding: 20px;
   }
+
+  /* ---------- Microsoft Lists: janela de migração e status ---------- */
+  .lst-scrim { position: fixed; inset: 0; z-index: 8000; background: rgba(0,0,0,.6); display: flex; align-items: center; justify-content: center; padding: 16px; }
+  .lst-scrim.hidden { display: none; }
+  .lst-box { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 620px; padding: 20px; box-shadow: 0 10px 40px rgba(0,0,0,.5); }
+  .lst-box h3 { margin: 0 0 10px; font-family: var(--font-display); font-size: 22px; }
+  .lst-box p { font-size: 13.5px; line-height: 1.5; color: var(--text-dim); margin: 0 0 12px; }
+  .lst-log { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font: 12px/1.5 var(--font-mono); white-space: pre-wrap; max-height: 260px; min-height: 60px; overflow: auto; margin-bottom: 10px; }
+  .lst-msg { font-size: 13px; font-weight: 600; min-height: 18px; margin-bottom: 12px; color: var(--ok); }
+  .lst-msg.err { color: var(--danger); }
+  .lst-bts { display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; }
+  .lst-bts .hidden { display: none; }
+  #lstStatus div { font-size: 13px; padding: 3px 0; }
   body.tema-claro .carregamento-inicial-overlay { background: rgba(244,245,246,0.96); }
   .carregamento-inicial-overlay .spinner { width: 34px; height: 34px; border-width: 4px; }
 
@@ -1217,6 +1230,19 @@
 
 <div id="app" class="hidden">
 
+  <div class="lst-scrim hidden" id="lstModal">
+    <div class="lst-box" role="dialog" aria-modal="true">
+      <h3>Banco de dados no Microsoft Lists</h3>
+      <p id="lstTexto"></p>
+      <div class="lst-log" id="lstLog"></div>
+      <div class="lst-msg" id="lstMsg"></div>
+      <div class="lst-bts">
+        <button type="button" class="btn" id="lstBtnFechar" onclick="lstFecharPreparo()">Fechar</button>
+        <button type="button" class="btn btn-accent" id="lstBtnCopiar" onclick="lstPrepararTeste()">Copiar dados da planilha</button>
+      </div>
+    </div>
+  </div>
+
   <div id="opCadBar"><button type="button" class="op-back" onclick="opVoltarDoCadastro(false)" aria-label="Voltar">‹</button><div class="op-ttl" id="opCadTitulo">Cadastro</div></div>
 
   <div class="carregamento-inicial-overlay hidden" id="carregamentoInicialOverlay">
@@ -1771,13 +1797,14 @@
       </div>
 
       <div class="card">
-        <h3>Conexão com a planilha</h3>
-        <p class="config-note">
-          A conexão é automática — usa seu próprio login Microsoft, através de um link de
-          compartilhamento fixo já configurado no app. Cada pessoa que abrir este app precisa
-          ter permissão de edição nessa planilha (veja "Liberar acesso" abaixo). Se o link de
-          compartilhamento da planilha mudar no SharePoint, é preciso atualizar o código do app.
+        <h3>Banco de dados (Microsoft Lists)</h3>
+        <p class="config-note" style="margin-bottom:10px;">
+          Os dados do app ficam nas listas <b>INSP …</b> do Microsoft Lists da conta inspetor.qualidade
+          (correções de lançamentos podem ser feitas direto na lista, em "Editar no modo de grade").
+          A planilha antiga continua sendo usada como referência da pasta das fotos e para a migração —
+          não mova nem apague a planilha.
         </p>
+        <div id="lstStatus"></div>
       </div>
 
       <div class="card">
@@ -1886,7 +1913,7 @@ const msalConfig = {
     storeAuthStateInCookie: false
   }
 };
-const graphScopes = ["Files.ReadWrite", "User.Read"];
+const graphScopes = ["Files.ReadWrite", "User.Read", "Sites.Manage.All"];
 
 /* ---------------- Carregamento tardio (lazy) de bibliotecas pesadas ---------------- */
 /* Chart.js (Dashboard) e jsPDF/jspdf-autotable/html2canvas (exportação de PDF) só são
@@ -1943,7 +1970,7 @@ const LOGO_BLOWPET_BRANCO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAA
 const LOGO_BP_SIMBOLO = 'data:image/png;base64,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';
 const LOGO_PDF_PROP = 300 / 238; // largura/altura do logo
 function aplicarLogos() { const m = { preto: LOGO_BLOWPET_PRETO, branco: LOGO_BLOWPET_BRANCO, simbolo: LOGO_BP_SIMBOLO }; document.querySelectorAll('img[data-logo]').forEach(function(i) { if (!i.getAttribute('src')) i.src = m[i.dataset.logo]; }); }
-const ULTIMA_ATUALIZACAO_SISTEMA = '17/11/2026 12:40';
+const ULTIMA_ATUALIZACAO_SISTEMA = '17/11/2026 18:18';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas','face_injetora','vibrador_preforma','foto_vibrador_url'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -2064,6 +2091,7 @@ const statusCorrecao = ['CORRIGIDO', 'FICOU PENDENTE'];
 /* ---------------- Navegação ---------------- */
 function setPage(p) {
   paginaAtual = p;
+  if (p === 'config') setTimeout(lstRenderStatus, 0);
   document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.toggle('active', el.dataset.page === p); });
   ['dashboard','cadastroInjecao','ocorrenciaInjecao','cadastroSopro','ocorrenciaSopro','analiseEstatistica','config'].forEach(function(id) {
     document.getElementById('page' + id.charAt(0).toUpperCase() + id.slice(1)).classList.toggle('hidden', id !== p);
@@ -2104,6 +2132,427 @@ function alternarTema(valor, semSalvar) {
     btn.classList.toggle('active', (valor === 'claro') === (btn.textContent === 'Claro'));
   });
   if (itemId && paginaAtual === 'dashboard') atualizarDashboard();
+}
+
+/* =============================================================================
+   MICROSOFT LISTS — camada de dados
+   O app continua pedindo os dados exatamente como pedia à planilha (endereços .../workbook/...).
+   Esta camada intercepta esses pedidos e os atende nas listas do Microsoft Lists (site da conta
+   inspetor.qualidade). Nenhuma regra do app muda: só o LUGAR onde os dados ficam.
+   Cada tabela da planilha = uma lista; cada coluna = uma coluna de texto com o MESMO nome (o app
+   nunca mais depende da posição da coluna nem das conversões automáticas do Excel).
+   ============================================================================= */
+const LISTS_CFG = {
+  teste: false,                                  // versão oficial: listas "INSP …"
+  prefixo: 'INSP ',
+  site: 'blowpet2-my.sharepoint.com:/personal/inspetor_qualidade_blowpet_com_br'
+};
+const LISTS_TABELAS = [
+  { tabela: 'TabelaInjecao',      aba: 'Injecao_app',      nome: 'Injeção' },
+  { tabela: 'TabelaSopro',        aba: 'Sopro_app',        nome: 'Sopro' },
+  { tabela: 'TabelaListas',       aba: 'Listas_App',       nome: 'Listas' },
+  { tabela: 'TabelaCavidades',    aba: 'Cavidades_App',    nome: 'Cavidades' },
+  { tabela: 'TabelaModelosMolde', aba: 'ModelosMolde_App', nome: 'Modelos de Molde' },
+  { tabela: 'TabelaResumoTurno',  aba: 'ResumoTurno_App',  nome: 'Resumo do Turno' }
+];
+// Colunas que podem passar de 255 caracteres viram "Várias linhas de texto" (nunca cortam nada).
+const LISTS_LONGAS = ['observacao', 'foto_url', 'cavidade', 'motivo_caixa_vermelha', 'foto_vibrador_url', 'texto', 'cavidades_isoladas', 'chave'];
+const LST = { siteId: null, iniciado: null, listas: {}, colunas: {}, itens: {}, pendHeader: {}, pendSubst: {}, avisado: false, leituras: {} };
+const _fetchOriginal = window.fetch.bind(window);
+function lstRede(url, opt) { return (window._fetchRede || _fetchOriginal)(url, opt); }
+window.fetch = function(url, opt) {
+  const u = typeof url === 'string' ? url : (url && url.url) || '';
+  if (/^https:\/\/graph\.microsoft\.com\/v1\.0\/drives\/[^/]+\/items\/[^/]+\/workbook(\/|$|\?)/.test(u)) return lstWorkbook(u, opt || {});
+  return lstRede(url, opt);
+};
+function lstTabelaPor(chave) {
+  const k = String(chave || '').toLowerCase();
+  return LISTS_TABELAS.find(function(t) { return t.tabela.toLowerCase() === k || t.aba.toLowerCase() === k; }) || null;
+}
+function lstEsperar(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+function lstResp(obj, status) { return new Response(obj === null ? null : JSON.stringify(obj), { status: status || 200, headers: { 'Content-Type': 'application/json' } }); }
+function lstErroResp(e) { return lstResp({ error: { message: (e && e.message) || String(e) } }, (e && e.status) || 500); }
+
+/* ---- chamadas ao Microsoft Graph ---- */
+async function lstG(method, path, body) {
+  const token = await getToken();
+  const url = /^https:/.test(path) ? path : 'https://graph.microsoft.com/v1.0' + path;
+  for (let t = 0; ; t++) {
+    const h = { Authorization: 'Bearer ' + token };
+    if (body !== undefined) h['Content-Type'] = 'application/json';
+    let r;
+    try { r = await lstRede(url, { method: method, headers: h, body: body === undefined ? undefined : JSON.stringify(body) }); }
+    catch (e) { if (t < 3) { await lstEsperar(1000 * (t + 1)); continue; } throw e; }
+    if ((r.status === 429 || r.status === 503 || r.status === 504) && t < 5) {
+      const ra = parseFloat(r.headers && r.headers.get ? r.headers.get('Retry-After') : NaN);
+      await lstEsperar(Math.min(isNaN(ra) ? 1000 * Math.pow(2, t) : ra * 1000, 15000)); continue;
+    }
+    let j = {};
+    if (r.status !== 204) { try { j = await r.json(); } catch (e) { j = {}; } }
+    if (!r.ok) { const e = new Error((j.error && j.error.message) || ('erro ' + r.status)); e.status = r.status; throw e; }
+    return j;
+  }
+}
+function lstRetryAfter(r, tent) {
+  const h = r && r.headers ? (r.headers['Retry-After'] || r.headers['retry-after']) : null, ra = parseFloat(h);
+  return Math.min(isNaN(ra) ? 1000 * tent : Math.max(ra * 1000, 300), 15000);
+}
+async function lstTodos(path) {
+  let url = 'https://graph.microsoft.com/v1.0' + path, todos = [];
+  while (url) { const j = await lstG('GET', url); todos = todos.concat(j.value || []); url = j['@odata.nextLink'] || null; }
+  return todos;
+}
+// Até 20 chamadas num pacote só. sequencial=true mantém a ordem (a lista guarda a ordem de inclusão).
+async function lstBatch(reqs, sequencial) {
+  const corpo = { requests: reqs.map(function(q, k) {
+    const o = { id: String(k + 1), method: q.method, url: q.url };
+    if (q.body !== undefined) { o.body = q.body; o.headers = { 'Content-Type': 'application/json' }; }
+    if (sequencial && k) o.dependsOn = [String(k)];
+    return o;
+  }) };
+  const j = await lstG('POST', '/$batch', corpo);
+  const porId = {}; (j.responses || []).forEach(function(x) { porId[x.id] = x; });
+  return reqs.map(function(q, k) { return porId[String(k + 1)] || { status: 0, body: {} }; });
+}
+
+/* ---- conexão e estrutura ---- */
+function lstNomeLista(t) { return LISTS_CFG.prefixo + t.nome; }
+function lstSite() { return '/sites/' + LST.siteId; }
+async function lstIniciar() {
+  if (!LST.iniciado) {
+    LST.iniciado = (async function() {
+      LST.siteId = (await lstG('GET', '/sites/' + LISTS_CFG.site + '?$select=id')).id;
+      await lstMapear();
+    })().catch(function(e) { LST.iniciado = null; throw e; });
+  }
+  await LST.iniciado;
+  if (!LST.avisado && LISTS_TABELAS.some(function(t) { return !LST.listas[t.tabela]; })) {
+    LST.avisado = true;
+    setTimeout(function() { lstAbrirPreparo(); }, 0);
+  }
+}
+async function lstMapear() {
+  const ls = await lstTodos(lstSite() + '/lists?$select=id,displayName');
+  LST.listas = {};
+  LISTS_TABELAS.forEach(function(t) { const l = ls.find(function(x) { return x.displayName === lstNomeLista(t); }); if (l) LST.listas[t.tabela] = l.id; });
+}
+function lstNomeInterno(display, usados) {
+  let b = 'in' + String(display).normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z0-9]+/g, ' ').trim()
+    .split(' ').map(function(w) { return w.charAt(0).toUpperCase() + w.slice(1); }).join('');
+  b = b.slice(0, 30); let n = b, k = 2;
+  while (usados[n.toLowerCase()]) n = b.slice(0, 28) + (k++);
+  usados[n.toLowerCase()] = 1; return n;
+}
+function lstDefColuna(display, ordem, usados) {
+  const longa = LISTS_LONGAS.indexOf(display) > -1;
+  return { name: lstNomeInterno(display, usados), displayName: display, description: 'in:' + String(ordem).padStart(3, '0'),
+    text: longa ? { allowMultipleLines: true, textType: 'plain', linesForEditing: 4 } : { allowMultipleLines: false, maxLength: 255 } };
+}
+async function lstColunas(tabela, forcar) {
+  if (LST.colunas[tabela] && !forcar) return LST.colunas[tabela];
+  const cols = await lstTodos(lstSite() + '/lists/' + LST.listas[tabela] + '/columns');
+  const nossas = cols.filter(function(c) { return /^in:\d+/.test(c.description || ''); })
+    .sort(function(a, b) { return parseInt(a.description.slice(3), 10) - parseInt(b.description.slice(3), 10); });
+  const info = { ordem: nossas.map(function(c) { return c.displayName; }), interno: {}, maior: 0, usados: { title: 1, id: 1 } };
+  cols.forEach(function(c) { info.usados[String(c.name).toLowerCase()] = 1; });
+  nossas.forEach(function(c) { info.interno[c.displayName] = c.name; info.maior = Math.max(info.maior, parseInt(c.description.slice(3), 10)); });
+  LST.colunas[tabela] = info;
+  return info;
+}
+async function lstCriarLista(t, cabecalho) {
+  const usados = { title: 1, id: 1 };
+  const nova = await lstG('POST', lstSite() + '/lists', { displayName: lstNomeLista(t), columns: cabecalho.map(function(h, n) { return lstDefColuna(h, n + 1, usados); }), list: { template: 'genericList' } });
+  LST.listas[t.tabela] = nova.id; delete LST.colunas[t.tabela]; LST.itens[t.tabela] = { ts: Date.now(), itens: [] };
+  return nova.id;
+}
+
+/* ---- leitura (todas as linhas, na ordem em que foram incluídas) ---- */
+async function lstItens(tabela) {
+  const cache = LST.itens[tabela];
+  if (cache && Date.now() - cache.ts < 4000) return cache.itens;   // junta pedidos quase simultâneos (contagem + linhas)
+  if (cache && cache.promessa) return cache.promessa;
+  const p = (async function() {
+    const c = await lstColunas(tabela), ini = Date.now();
+    const sel = ['Title'].concat(c.ordem.map(function(h) { return c.interno[h]; })).join(',');
+    const brutos = await lstTodos(lstSite() + '/lists/' + LST.listas[tabela] + '/items?$expand=fields($select=' + sel + ')&$top=999');
+    const itens = brutos.map(function(it) {
+      const f = it.fields || {};
+      return { id: Number(it.id), valores: c.ordem.map(function(h) { const v = f[c.interno[h]]; return v == null ? '' : String(v); }) };
+    }).sort(function(a, b) { return a.id - b.id; });
+    LST.leituras[tabela] = { linhas: itens.length, ms: Date.now() - ini, quando: Date.now() };
+    LST.itens[tabela] = { ts: Date.now(), itens: itens };
+    return itens;
+  })();
+  LST.itens[tabela] = { ts: 0, promessa: p };
+  try { return await p; } catch (e) { delete LST.itens[tabela]; throw e; }
+}
+function lstInvalidar(tabela) { delete LST.itens[tabela]; }
+
+/* ---- gravação ---- */
+function lstCampos(c, valores) {
+  const f = {};
+  c.ordem.forEach(function(h, i) { const v = valores[i]; f[c.interno[h]] = v == null ? '' : String(v); });
+  f.Title = String(valores[0] == null ? '' : valores[0]).slice(0, 255) || '-';
+  return f;
+}
+async function lstAdicionar(tabela, linhas) {
+  const c = await lstColunas(tabela), lid = LST.listas[tabela], url = lstSite() + '/lists/' + lid + '/items';
+  const criados = [];
+  try {
+    for (let i = 0; i < linhas.length; ) {
+      const lote = linhas.slice(i, i + 20).map(function(v) { return lstCampos(c, v); });
+      if (lote.length === 1) { const j = await lstG('POST', url, { fields: lote[0] }); criados.push(Number(j.id)); i++; continue; }
+      let res, tent = 0;
+      while (true) {
+        res = await lstBatch(lote.map(function(f) { return { method: 'POST', url: url, body: { fields: f } }; }), true);
+        let ok = 0; for (let k = 0; k < res.length; k++) { if (res[k].status === 201 || res[k].status === 200) { criados.push(Number(res[k].body.id)); ok++; } else break; }
+        if (ok === lote.length) break;
+        const r0 = res[ok];
+        if (ok) tent = 0;   // andou: só conta tentativas seguidas sem nenhum avanço
+        if ((r0.status === 429 || r0.status === 503 || r0.status === 424 || r0.status === 0) && tent++ < 6) { lote.splice(0, ok); await lstEsperar(lstRetryAfter(r0, tent)); continue; }
+        throw new Error((r0.body && r0.body.error && r0.body.error.message) || ('erro ' + r0.status));
+      }
+      i += 20;
+    }
+  } catch (e) {
+    // não deixa cadastro pela metade: desfaz o que chegou a ser incluído desta vez
+    if (criados.length) { try { await lstExcluirIds(tabela, criados); } catch (e2) {} }
+    lstInvalidar(tabela);
+    throw e;
+  }
+  lstInvalidar(tabela);
+  return criados;
+}
+async function lstExcluirIds(tabela, ids) {
+  const lid = LST.listas[tabela];
+  for (let i = 0; i < ids.length; i += 20) {
+    let lote = ids.slice(i, i + 20), tent = 0;
+    while (true) {
+      const res = await lstBatch(lote.map(function(id) { return { method: 'DELETE', url: lstSite() + '/lists/' + lid + '/items/' + id }; }), false);
+      const resto = []; let erro = null;
+      res.forEach(function(r, k) { if (r.status === 204 || r.status === 200 || r.status === 404) return; if (r.status === 429 || r.status === 503 || r.status === 0) resto.push(lote[k]); else erro = erro || ((r.body && r.body.error && r.body.error.message) || ('erro ' + r.status)); });
+      if (erro) throw new Error(erro);
+      if (!resto.length) break;
+      if (tent++ >= 5) throw new Error('o Microsoft Lists está ocupado — tente de novo em instantes');
+      lote = resto; await lstEsperar(1000 * tent);
+    }
+  }
+  lstInvalidar(tabela);
+}
+// Regravar a tabela inteira (ex.: listas suspensas: "apaga tudo + grava tudo") vira uma troca
+// posição a posição: só as linhas que mudaram são alteradas, as que sobram são apagadas e as que
+// faltam são incluídas no fim. Resultado final idêntico (mesmos valores, mesma ordem), bem mais rápido.
+async function lstSubstituirTudo(tabela, linhas) {
+  const c = await lstColunas(tabela), itens = await lstItens(tabela), lid = LST.listas[tabela];
+  const patches = [];
+  for (let i = 0; i < Math.min(itens.length, linhas.length); i++) {
+    const novo = linhas[i].map(function(v) { return v == null ? '' : String(v); });
+    if (novo.join('\u0001') !== itens[i].valores.join('\u0001')) patches.push({ method: 'PATCH', url: lstSite() + '/lists/' + lid + '/items/' + itens[i].id + '/fields', body: lstCampos(c, linhas[i]) });
+  }
+  for (let i = 0; i < patches.length; i += 20) {
+    let lote = patches.slice(i, i + 20), tent = 0;
+    while (true) {
+      const res = await lstBatch(lote, false), resto = []; let erro = null;
+      res.forEach(function(r, k) { if (r.status === 200 || r.status === 204) return; if (r.status === 429 || r.status === 503 || r.status === 0) resto.push(lote[k]); else erro = erro || ((r.body && r.body.error && r.body.error.message) || ('erro ' + r.status)); });
+      if (erro) { lstInvalidar(tabela); throw new Error(erro); }
+      if (!resto.length) break;
+      if (tent++ >= 5) { lstInvalidar(tabela); throw new Error('o Microsoft Lists está ocupado — tente de novo em instantes'); }
+      lote = resto; await lstEsperar(1000 * tent);
+    }
+  }
+  if (itens.length > linhas.length) await lstExcluirIds(tabela, itens.slice(linhas.length).map(function(x) { return x.id; }));
+  if (linhas.length > itens.length) await lstAdicionar(tabela, linhas.slice(itens.length));
+  lstInvalidar(tabela);
+}
+async function lstAtualizarLinha(tabela, indice, valores) {
+  const itens = await lstItens(tabela), it = itens[indice];
+  if (!it) { const e = new Error('linha não encontrada'); e.status = 404; throw e; }
+  const c = await lstColunas(tabela);
+  await lstG('PATCH', lstSite() + '/lists/' + LST.listas[tabela] + '/items/' + it.id + '/fields', lstCampos(c, valores));
+  lstInvalidar(tabela);
+}
+async function lstAdicionarColuna(tabela, nome) {
+  const c = await lstColunas(tabela, true);
+  if (c.interno[nome]) return;
+  await lstG('POST', lstSite() + '/lists/' + LST.listas[tabela] + '/columns', lstDefColuna(nome, c.maior + 1, c.usados));
+  await lstColunas(tabela, true); lstInvalidar(tabela);
+}
+
+/* ---- tradução dos pedidos "de planilha" para as listas ---- */
+function lstLinhaDoEndereco(end) {   // "Aba!A15:L15" -> {ini: 15, fim: 15}
+  const m = String(decodeURIComponent(end || '')).split('!').pop().match(/^\$?[A-Z]+\$?(\d+)(?::\$?[A-Z]+\$?(\d+))?$/);
+  return m ? { ini: parseInt(m[1], 10), fim: parseInt(m[2] || m[1], 10) } : null;
+}
+function lstLetra(n) { let s = ''; n++; while (n > 0) { const r = (n - 1) % 26; s = String.fromCharCode(65 + r) + s; n = Math.floor((n - 1) / 26); } return s; }
+async function lstWorkbook(url, opt) {
+  try {
+    await lstIniciar();
+    const metodo = (opt.method || 'GET').toUpperCase();
+    const corpo = opt.body ? JSON.parse(opt.body) : {};
+    let caminho = url.replace(/^.*?\/workbook/, '');
+    const q = caminho.indexOf('?'), query = q > -1 ? caminho.slice(q + 1) : '';
+    if (q > -1) caminho = caminho.slice(0, q);
+    caminho = decodeURIComponent(caminho);
+    const params = {}; query.split('&').forEach(function(p) { const kv = p.split('='); if (kv[0]) params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1] || ''); });
+    let m;
+    // versão de teste sem as listas ainda: nada é criado pelo app (quem cria e copia é o "Preparar listas de teste")
+    if (metodo !== 'GET' && LISTS_TABELAS.some(function(t) { return !LST.listas[t.tabela]; })) {
+      return lstResp({ error: { message: (LISTS_CFG.teste ? 'listas de teste ainda não preparadas' : 'migração para o Microsoft Lists ainda não concluída') + ' — use "Copiar dados da planilha"' } }, 503);
+    }
+    // lista de abas
+    if (caminho === '/worksheets' && metodo === 'GET') {
+      return lstResp({ value: LISTS_TABELAS.filter(function(t) { return LST.listas[t.tabela] || LST.pendHeader[t.aba.toLowerCase()]; }).map(function(t) { return { name: t.aba, id: t.aba }; }) });
+    }
+    if (caminho === '/worksheets/add' && metodo === 'POST') { const t = lstTabelaPor(corpo.name); if (t) LST.pendHeader[t.aba.toLowerCase()] = LST.pendHeader[t.aba.toLowerCase()] || []; return lstResp({ name: corpo.name, id: corpo.name }, 201); }
+    // renomear tabela (depois de criada) — o nome já é o certo
+    if ((m = caminho.match(/^\/tables\/([^/]+)$/)) && metodo === 'PATCH') return lstResp({ name: corpo.name || m[1], id: m[1] });
+    // tabelas de uma aba
+    if ((m = caminho.match(/^\/worksheets\/([^/]+)\/tables$/)) && metodo === 'GET') {
+      const t = lstTabelaPor(m[1]); return lstResp({ value: t && LST.listas[t.tabela] ? [{ name: t.tabela, id: t.tabela }] : [] });
+    }
+    if ((m = caminho.match(/^\/worksheets\/([^/]+)\/tables\/add$/)) && metodo === 'POST') {
+      const t = lstTabelaPor(m[1]); if (!t) return lstResp({ error: { message: 'aba desconhecida' } }, 400);
+      if (!LST.listas[t.tabela]) await lstCriarLista(t, LST.pendHeader[t.aba.toLowerCase()] || []);
+      return lstResp({ id: t.tabela, name: t.tabela }, 201);
+    }
+    // intervalos de uma aba: cabeçalho de tabela nova, formatação (ignorada) ou atualização de uma linha
+    if ((m = caminho.match(/^\/worksheets\/([^/]+)\/range\(address='([^']*)'\)(\/delete)?$/))) {
+      const t = lstTabelaPor(m[1]), lin = lstLinhaDoEndereco(m[2]);
+      if (m[3] && metodo === 'POST') {          // apagar linhas (ex.: regravar as listas suspensas)
+        if (!t || !LST.listas[t.tabela] || !lin) return lstResp({}, 200);
+        const itens = await lstItens(t.tabela), ids = itens.slice(Math.max(0, lin.ini - 2), Math.max(0, lin.fim - 1)).map(function(x) { return x.id; });
+        if (!ids.length) return lstResp({}, 200);
+        if (lin.ini === 2 && ids.length === itens.length) {
+          // apagou a tabela inteira: espera o "grava tudo de novo" que vem logo em seguida (ver lstSubstituirTudo);
+          // se ele não vier em 20 s, apaga de verdade.
+          const marca = {}; LST.pendSubst[t.tabela] = marca;
+          setTimeout(function() { if (LST.pendSubst[t.tabela] === marca) { delete LST.pendSubst[t.tabela]; lstExcluirIds(t.tabela, ids).catch(function(e) { console.error('[Lists]', e); }); } }, 20000);
+          return lstResp({}, 200);
+        }
+        await lstExcluirIds(t.tabela, ids);
+        return lstResp({}, 200);
+      }
+      if (metodo === 'PATCH') {
+        if (!corpo.values) return lstResp({}, 200);                       // só formatação: nada a fazer
+        if (t && lin && lin.ini === 1) { LST.pendHeader[t.aba.toLowerCase()] = corpo.values[0]; return lstResp({}, 200); }
+        if (t && lin && LST.listas[t.tabela]) { await lstAtualizarLinha(t.tabela, lin.ini - 2, corpo.values[0]); return lstResp({}, 200); }
+      }
+      return lstResp({}, 200);
+    }
+    // pedidos sobre uma tabela (com ou sem a aba no caminho)
+    m = caminho.match(/^(?:\/worksheets\/[^/]+)?\/tables\/([^/]+)(\/.*)?$/);
+    if (m) {
+      const t = lstTabelaPor(m[1]), resto = m[2] || '';
+      if (!t || !LST.listas[t.tabela]) return lstResp({ error: { code: 'ItemNotFound', message: 'lista não encontrada: ' + (t ? lstNomeLista(t) : m[1]) } }, 404);
+      if (resto === '/columns' && metodo === 'GET') { const c = await lstColunas(t.tabela); return lstResp({ value: c.ordem.map(function(h, i) { return { name: h, index: i }; }) }); }
+      if (resto === '/columns/add' && metodo === 'POST') { await lstAdicionarColuna(t.tabela, corpo.name); return lstResp({ name: corpo.name }, 201); }
+      if (resto === '/rows/add' && metodo === 'POST') {
+        if (LST.pendSubst[t.tabela]) { delete LST.pendSubst[t.tabela]; await lstSubstituirTudo(t.tabela, corpo.values || []); return lstResp({}, 201); }
+        await lstAdicionar(t.tabela, corpo.values || []); return lstResp({}, 201);
+      }
+      const c = await lstColunas(t.tabela), ultimaCol = lstLetra(Math.max(0, c.ordem.length - 1));
+      if (resto === '/rows' && metodo === 'GET') {
+        let itens = await lstItens(t.tabela);
+        const skip = parseInt(params['$skip'], 10) || 0, top = params['$top'] ? parseInt(params['$top'], 10) : null;
+        const fatia = itens.slice(skip, top === null ? undefined : skip + top);
+        return lstResp({ value: fatia.map(function(it, k) { return { index: skip + k, values: [it.valores.slice()] }; }) });
+      }
+      if (resto === '/range' && metodo === 'GET') { const n = (await lstItens(t.tabela)).length; return lstResp({ address: t.aba + '!A1:' + ultimaCol + (n + 1), rowCount: n + 1 }); }
+      if (resto === '/dataBodyRange' && metodo === 'GET') { const n = (await lstItens(t.tabela)).length; return lstResp(n ? { address: t.aba + '!A2:' + ultimaCol + (n + 1) } : {}); }
+      if ((m = resto.match(/^\/rows\/itemAt\(index=(\d+)\)\/range$/)) && metodo === 'GET') { const r = parseInt(m[1], 10) + 2; return lstResp({ address: t.aba + '!A' + r + ':' + ultimaCol + r }); }
+    }
+    console.warn('[Lists] pedido de planilha não tratado:', metodo, caminho);
+    return lstResp({ error: { message: 'operação não suportada no modo Lists: ' + metodo + ' ' + caminho } }, 501);
+  } catch (e) {
+    console.error('[Lists]', e);
+    return lstErroResp(e);
+  }
+}
+
+/* ---- preparo: cria as listas e copia a planilha (versão de teste: a qualquer momento; oficial: só a migração inicial) ---- */
+function lstTextoCelula(tabela, campo, v) {
+  if (tabela === 'TabelaInjecao' || tabela === 'TabelaSopro') return textoDaCelulaExcel(normalizarValorDataHora(campo, v));
+  return normalizarValorLido(v);
+}
+function lstAbrirPreparo() {
+  const m = document.getElementById('lstModal'); if (!m) return;
+  const faltam = LISTS_TABELAS.filter(function(t) { return !LST.listas[t.tabela]; }).length;
+  if (!LISTS_CFG.teste) {
+    // versão oficial: só migra enquanto faltar alguma lista (depois disso as listas são a base oficial e nunca são recriadas por aqui)
+    document.getElementById('lstTexto').textContent = faltam
+      ? 'MIGRAÇÃO PARA O MICROSOFT LISTS — faltam ' + faltam + ' de ' + LISTS_TABELAS.length + ' listas. "Copiar dados da planilha" cria as listas "' + LISTS_CFG.prefixo + '…" e copia TODO o histórico da planilha (a planilha só é lida, nada é alterado nela). Leva alguns minutos — não feche a página e não faça cadastros até terminar.'
+      : 'A migração já foi concluída: os dados do app estão nas listas "' + LISTS_CFG.prefixo + '…".';
+    document.getElementById('lstBtnCopiar').classList.toggle('hidden', !faltam);
+    document.getElementById('lstLog').textContent = ''; document.getElementById('lstMsg').textContent = '';
+    m.classList.remove('hidden');
+    return;
+  }
+  document.getElementById('lstTexto').textContent = faltam
+    ? 'Faltam ' + faltam + ' de ' + LISTS_TABELAS.length + ' listas de teste. "Copiar dados da planilha" cria as listas "' + LISTS_CFG.prefixo + '…" e copia TODO o histórico da planilha oficial (a planilha só é lida, nada é alterado nela). Leva alguns minutos — não feche a página.'
+    : 'As listas de teste já existem. "Copiar dados da planilha" APAGA as listas de teste e copia de novo todos os dados atuais da planilha oficial (o que foi lançado só no teste se perde). A planilha oficial não é alterada.';
+  document.getElementById('lstLog').textContent = ''; document.getElementById('lstMsg').textContent = '';
+  m.classList.remove('hidden');
+}
+function lstFecharPreparo() { document.getElementById('lstModal').classList.add('hidden'); }
+async function lstPrepararTeste() {
+  if (!LISTS_CFG.teste) {
+    await lstMapear();
+    if (LISTS_TABELAS.every(function(t) { return LST.listas[t.tabela]; })) { lstAbrirPreparo(); return; }   // nunca recopia por cima da base oficial
+  }
+  const log = document.getElementById('lstLog'), msg = document.getElementById('lstMsg'), btn = document.getElementById('lstBtnCopiar'), btnF = document.getElementById('lstBtnFechar');
+  const linha = function(t) { log.textContent += t + '\n'; log.scrollTop = log.scrollHeight; };
+  const trocar = function(t) { const l = log.textContent.split('\n'); l[l.length - 2] = t; log.textContent = l.join('\n'); };
+  btn.disabled = true; btnF.disabled = true; msg.className = 'lst-msg'; msg.textContent = 'Trabalhando…'; log.textContent = '';
+  const inicio = Date.now();
+  try {
+    if (!itemId || !driveId) throw new Error('a planilha oficial ainda não foi localizada — aguarde conectar e tente de novo');
+    await lstIniciar(); await lstMapear();
+    const token = await getToken(), H = { headers: { Authorization: 'Bearer ' + token } };
+    const wb = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook';
+    const resumo = [];
+    for (const t of LISTS_TABELAS) {
+      linha(lstNomeLista(t) + ': lendo a planilha…');
+      const rc = await lstRede(wb + '/tables/' + t.tabela + '/columns', H);
+      if (rc.status === 404) { trocar(lstNomeLista(t) + ': tabela ' + t.tabela + ' não existe na planilha — criada vazia.'); }
+      const jc = rc.ok ? await rc.json() : { value: [] };
+      let nomes = nomesColunasPorIndiceReal(jc.value);
+      let linhas = [];
+      if (rc.ok) {
+        const rr = await lstRede(wb + '/tables/' + t.tabela + '/rows', H);
+        if (!rr.ok) throw new Error('não consegui ler ' + t.tabela + ' da planilha (erro ' + rr.status + ')');
+        const jr = await rr.json();
+        linhas = (jr.value || []).map(function(r) { return r.values[0].map(function(v, i) { return lstTextoCelula(t.tabela, nomes[i], v); }); });
+      }
+      if (!nomes.length) nomes = (t.tabela === 'TabelaInjecao' ? CABECALHO_INJECAO : t.tabela === 'TabelaSopro' ? CABECALHO_SOPRO : t.tabela === 'TabelaListas' ? ['tipo', 'valor'] : t.tabela === 'TabelaCavidades' ? CABECALHO_CAVIDADES : t.tabela === 'TabelaModelosMolde' ? CABECALHO_MODELOS_MOLDE : CABECALHO_RESUMO_TURNO).slice();
+      if (LST.listas[t.tabela]) { trocar(lstNomeLista(t) + ': apagando a cópia anterior (incompleta)…'); await lstG('DELETE', lstSite() + '/lists/' + LST.listas[t.tabela]); delete LST.listas[t.tabela]; }
+      trocar(lstNomeLista(t) + ': criando a lista (' + nomes.length + ' colunas)…');
+      await lstCriarLista(t, nomes);
+      const tc = Date.now(); let feitos = 0;
+      for (let i = 0; i < linhas.length; i += 200) {
+        await lstAdicionar(t.tabela, linhas.slice(i, i + 200));
+        feitos = Math.min(i + 200, linhas.length);
+        trocar(lstNomeLista(t) + ': copiando ' + feitos + ' de ' + linhas.length + '…');
+      }
+      trocar(lstNomeLista(t) + ': ' + linhas.length + ' registro(s) copiados (' + Math.round((Date.now() - tc) / 1000) + ' s).');
+      resumo.push(t.nome + ' ' + linhas.length);
+    }
+    const seg = Math.round((Date.now() - inicio) / 1000);
+    linha('Pronto em ' + (seg >= 60 ? Math.floor(seg / 60) + ' min ' + (seg % 60) + ' s' : seg + ' s') + '. Recarregue a página (F5) para usar os dados copiados.');
+    msg.textContent = (LISTS_CFG.teste ? 'Listas de teste prontas: ' : 'Migração concluída: ') + resumo.join(' · ');
+    LST.colunas = {}; LST.itens = {};
+    btn.textContent = 'Recarregar a página'; btn.onclick = function() { location.reload(); };
+  } catch (e) {
+    msg.className = 'lst-msg err'; msg.textContent = 'Erro: ' + e.message;
+    linha('ERRO: ' + e.message + (e.status === 403 || e.status === 401 ? ' (sem permissão para criar listas neste site)' : ''));
+  } finally { btn.disabled = false; btnF.disabled = false; }
+}
+function lstRenderStatus() {
+  const el = document.getElementById('lstStatus'); if (!el) return;
+  const linhas = LISTS_TABELAS.map(function(t) {
+    const l = LST.leituras[t.tabela];
+    return '<div>' + (LST.listas[t.tabela] ? '✓' : '✗') + ' <b>' + escaparHtmlFoto(lstNomeLista(t)) + '</b>' + (l ? ' — última leitura: ' + l.linhas + ' registros em ' + (l.ms / 1000).toFixed(1) + ' s' : '') + '</div>';
+  });
+  el.innerHTML = linhas.join('');
 }
 
 /* ---------------- Login (MSAL) ---------------- */
