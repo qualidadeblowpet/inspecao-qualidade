@@ -1,0 +1,27 @@
+{
+  "id": "portal.html",
+  "name": "Portal da Qualidade — BlowPet",
+  "short_name": "Portal Qualidade",
+  "description": "Inspeção de Qualidade e Sistema da Qualidade em um só lugar",
+  "start_url": "portal.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b0e13",
+  "theme_color": "#b80000",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "sq-icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "sq-icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
