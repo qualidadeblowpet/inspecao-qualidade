@@ -9,15 +9,17 @@
   // no tema errado por uma fração de segundo. Fica logo no início do <head>, de propósito.
   (function(){
     try {
-      var tema = localStorage.getItem('processoTema');
-      if (tema === 'claro') document.documentElement.setAttribute('data-theme', 'claro');
+      // Mesma chave da Inspeção e do Portal da Qualidade ('claro'/'escuro'): o app abre no tema que a
+      // pessoa já usa nos outros. Sem escolha salva, o padrão é o claro (padrão do Sistema da Qualidade).
+      var tema = localStorage.getItem('inspecaoTema') || localStorage.getItem('processoTema') || 'claro';
+      if (tema !== 'escuro') document.documentElement.setAttribute('data-theme', 'claro');
     } catch (e) {}
   })();
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;650;700&family=JetBrains+Mono:wght@500&display=swap');
   :root{
     /* Tema escuro (padrão) */
     --bg:#0c0d0f; --sidebar:#111214; --surface:#17181b; --surface-2:#1e2023; --border:#2a2d31;
@@ -557,6 +559,186 @@
   .iqr-aviso-recalculo{background:var(--blue-bg);border:1px solid var(--blue);border-radius:10px;padding:10px 14px;font-size:12px;
     color:var(--text-dim);margin-bottom:16px;}
   .iqr-aviso-recalculo b{color:var(--blue);}
+
+  /* =====================================================================================
+     ESQUELETO DO SISTEMA DA QUALIDADE (18/11/2026) — aprovado pelo Cleber na prévia.
+     Bloco no fim do CSS que sobrescreve só a APARÊNCIA (cores, fonte, menu, faixa superior,
+     tabelas). Regras, cálculos e telas continuam como estavam. Tema claro é o padrão.
+     ===================================================================================== */
+  :root{
+    /* escuro */
+    --bg:#0b0e13; --sidebar:#12161d; --surface:#12161d; --surface-2:#1a1f28; --surface-3:#212733; --border:#262d3a;
+    --text:#e7eaf0; --text-dim:#8b93a3; --text-faint:#596273;
+    --fg:#e7eaf0; --fg-dim:#8b93a3; --fg-faint:#596273;
+    --accent:#3bb0cf; --accent-ink:#06181c; --accent-soft:#0f2b33; --accent-border:#1f5866;
+    --ok:#3fb68b; --warn:#e0a83b; --danger:#e2585e; --blue:#5b9bf2; --purple:#9c7bd9;
+    --ok-bg:rgba(63,182,139,.14); --danger-bg:rgba(226,88,94,.15); --warn-bg:rgba(224,168,59,.15);
+    --dim-bg:rgba(139,147,163,.13); --blue-bg:rgba(91,155,242,.16);
+    --bp-red:#c8202f;
+    --font-display:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif; --font-body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+    --font-mono:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  }
+  :root[data-theme="claro"]{
+    --bg:#f2f3f5; --sidebar:#ffffff; --surface:#ffffff; --surface-2:#eef0f3; --surface-3:#e3e6eb; --border:#d7dbe2;
+    --text:#15181d; --text-dim:#5b6372; --text-faint:#88909c;
+    --fg:#15181d; --fg-dim:#5b6372; --fg-faint:#88909c;
+    --accent:#157f99; --accent-ink:#ffffff; --accent-soft:#e1f2f6; --accent-border:#bfe3ea;
+    --ok:#2f9e76; --warn:#c98a1b; --danger:#d4474d; --blue:#2e6f9e; --purple:#7c5cb8;
+    --ok-bg:#dff3ea; --danger-bg:#fbe5e5; --warn-bg:#fbf0d9; --dim-bg:#eceef1; --blue-bg:#dfebf5;
+    --shadow-dropdown:rgba(21,24,29,.14); --shadow-toast:rgba(21,24,29,.18); --shadow-drawer:rgba(21,24,29,.16); --shadow-overlay:rgba(21,24,29,.32);
+  }
+  html,body{font-family:var(--font-body);font-variant-numeric:tabular-nums;}
+  .hidden{display:none !important;}
+
+  /* textos sobre o destaque */
+  .btn-accent,.step.active,.dm-chip.on,.op-cta,.viewtoggle button.ativo,.tema-opcao .tema-check,.dv3-btnfiltrar{color:var(--accent-ink);}
+
+  /* ---- moldura: menu lateral ---- */
+  #app{display:flex;min-height:100vh;background:var(--bg);}
+  .mobile-topbar{display:none !important;}
+  .sidebar{width:264px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;
+    padding:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .a-brand{display:flex;gap:11px;align-items:center;padding:18px 18px 10px;}
+  .a-logo{height:30px;width:auto;flex:none;display:block;}
+  .a-logo-svg{display:none;}
+  .a-brand b{display:block;font-size:14.5px;font-weight:600;color:var(--fg);}
+  .a-brand small{font-size:11.5px;color:var(--fg-faint);}
+  .portal-volta{display:flex;align-items:center;gap:10px;margin:2px 10px 6px;padding:9px 10px;border-radius:10px;border:1px solid var(--border);
+    background:var(--surface);color:var(--fg);text-decoration:none;font-size:13px;font-weight:600;}
+  .portal-volta:hover{border-color:var(--accent);}
+  .portal-volta .pv-seta{color:var(--fg-dim);font-size:16px;line-height:1;}
+  .portal-volta .pv-ic{display:flex;gap:3px;}
+  .portal-volta .pv-ic i{width:13px;height:13px;border-radius:4px;display:block;}
+  .portal-volta .pv-ic i:first-child{background:linear-gradient(145deg,#f6b955,#d98a14);}
+  .portal-volta .pv-ic i:last-child{background:linear-gradient(145deg,#4cc3e0,#1b8aa6);}
+  .portal-volta small{display:block;font-size:10.5px;font-weight:500;color:var(--fg-dim);}
+  .a-nav{display:flex;flex-direction:column;padding-bottom:12px;}
+  .nav-section-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.9px;color:var(--fg-faint);padding:16px 22px 6px;}
+  .nav-item{display:flex;align-items:center;gap:11px;margin:1px 10px;width:auto;border:none;background:transparent;padding:9px 12px;border-radius:8px;
+    font-size:13.5px;font-weight:400;color:var(--fg-dim);cursor:pointer;text-align:left;white-space:nowrap;font-family:var(--font-body);}
+  .nav-item svg{width:17px;height:17px;flex-shrink:0;opacity:.8;}
+  .nav-item:hover{background:var(--surface-2);color:var(--fg);}
+  .nav-item.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+  .nav-item.active svg{opacity:1;}
+  .nav-item.novo::after{content:none;display:none;}
+  .nav-item:focus-visible,.a-ic-btn:focus-visible,.portal-volta:focus-visible,.btn:focus-visible{outline:2px solid var(--accent);outline-offset:1px;}
+  .a-opbtn{margin:4px 10px 0;font:inherit;font-size:12px;background:var(--surface-2);border:1px solid var(--border);color:var(--fg-dim);border-radius:8px;padding:8px 10px;cursor:pointer;}
+  .a-versao{margin-top:auto;padding:10px 18px;font-size:11px;color:var(--fg-faint);}
+  .a-versao b{color:var(--fg-dim);font-weight:600;}
+  .a-user{border-top:1px solid var(--border);padding:12px 14px;display:flex;gap:10px;align-items:center;}
+  .a-user .av{width:32px;height:32px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex:none;}
+  .a-user .who{flex:1;min-width:0;}
+  .a-user .who b{display:block;font-size:13px;font-weight:500;color:var(--fg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .a-user .who small{display:block;font-size:11px;color:var(--fg-faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .a-ic-btn{border:1px solid var(--border);background:var(--surface);color:var(--fg-dim);border-radius:8px;width:34px;height:34px;display:inline-flex;
+    align-items:center;justify-content:center;cursor:pointer;flex:none;padding:0;}
+  .a-ic-btn svg{width:16px;height:16px;}
+  .a-ic-btn:hover{color:var(--fg);border-color:var(--accent-border);}
+
+  /* ---- moldura: faixa superior ---- */
+  .a-main{flex:1;min-width:0;display:flex;flex-direction:column;}
+  .a-top{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:12px 24px;min-height:58px;border-bottom:1px solid var(--border);background:var(--surface);}
+  .a-crumb{flex:1;min-width:0;font-size:13.5px;color:var(--fg-dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .a-crumb b{color:var(--fg);font-weight:600;}
+  .a-burger{display:none;}
+  .conn-status{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--fg-faint);min-width:0;max-width:260px;}
+  .conn-status #statusText{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .status-dot{width:7px;height:7px;}
+  .a-acts{display:flex;gap:8px;align-items:center;}
+  .a-acts [data-acts]{display:none;}
+  .a-acts [data-acts].vis{display:inline-flex;}
+  .main{flex:1;min-width:0;padding:22px 24px 40px;}
+  .main > div{max-width:1280px;}
+
+  /* ---- títulos, cartões, botões ---- */
+  .page-title{font-family:var(--font-body);font-size:20px;font-weight:600;letter-spacing:0;text-transform:none;margin:0 0 14px;color:var(--fg);}
+  .page-sub{font-size:13px;color:var(--fg-dim);margin:-6px 0 16px;line-height:1.55;max-width:90ch;}
+  .card{border-radius:14px;}
+  .card h3{font-family:var(--font-body);font-size:15px;font-weight:600;letter-spacing:0;text-transform:none;}
+  .sectiontitle{font-family:var(--font-body);font-size:11px;font-weight:650;letter-spacing:.7px;color:var(--fg-dim);}
+  .lista-col h4{font-family:var(--font-body);font-size:11px;font-weight:650;letter-spacing:.7px;}
+  #app .btn{gap:7px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--fg);font-weight:500;font-size:12.5px;padding:0 13px;height:32px;}
+  #app .btn svg{width:15px;height:15px;flex:none;}
+  #app .btn:hover:not(:disabled){border-color:var(--accent-border);}
+  #app .btn-accent{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);}
+  #app .btn-outline{background:var(--surface-2);}
+  #app .btn-block{width:auto;}
+  .btn-accent{background:var(--accent);}
+  .btn:active{transform:none;}
+  .statcard .sv{font-family:var(--font-body);font-weight:650;font-size:24px;}
+  .achado-card h3{font-family:var(--font-body);font-size:14px;text-transform:none;letter-spacing:0;}
+  .viewtoggle button.ativo{background:var(--accent-soft);color:var(--accent);}
+
+  /* filtros numa linha (rótulo pequeno em cima, campo de 32 px) */
+  .dv3-filterbar{padding:12px 14px;gap:10px;border-radius:14px;}
+  .dv3-filtergroup > label{font-size:9.5px;color:var(--fg-faint);letter-spacing:.5px;}
+  .dv3-filtergroup > select,.dv3-filtergroup > input,.dv3-msel-btn{height:32px;padding-top:0;padding-bottom:0;font-size:12px;border-radius:7px;}
+  .dv3-btnfiltrar{height:32px;padding:0 14px;font-weight:600;font-size:12.5px;border-radius:8px;}
+  .filtrobar input[type=text]{height:32px;font-size:12px;border-radius:7px;}
+  .dm-chip{font-weight:500;font-size:12px;border-radius:7px;padding:5px 11px;background:var(--surface-2);}
+  .dm-chip.on{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent);font-weight:600;}
+  .dm-aplicar{border-color:var(--border);color:var(--fg);}
+  .dm-datafield input{height:32px;background:var(--surface-2);border-radius:7px;}
+
+  /* tabelas no modelo do Sistema da Qualidade (cabeçalho fixo, ocupando a altura da tela) */
+  .widetablewrap{max-height:max(320px, calc(100dvh - 250px));border-radius:10px;background:var(--surface);}
+  .widetable{font-size:12.5px;}
+  .widetable thead th{background:var(--surface-2);color:var(--fg-faint);font-size:10px;letter-spacing:.5px;font-weight:600;}
+  .widetable th,.widetable td{border-right-color:var(--border);}
+  .widetable th.wt-fixo,.widetable td.wt-fixo{background:var(--surface);}
+  .widetable thead th.wt-fixo{background:var(--surface-2);}
+  .datatable th,.detailtable th,.cordetail-table th{background:var(--surface-2);color:var(--fg-faint);font-size:10px;letter-spacing:.5px;}
+  .datatable td,.detailtable td,.cordetail-table td{font-size:12.5px;}
+  .critpill,.flagpill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;font-size:10.5px;}
+  .critpill.sim::before,.critpill.nao::before,.critpill.aviso::before,.flagpill.ok::before,.flagpill.bad::before,.flagpill.warn::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex:none;}
+  .dv3-filtergroup.dv3-btnfiltrar{align-items:center;justify-content:center;}
+
+  /* dashboard por máquina, painel e telas cheias: só fonte */
+  .dm-mname,.dm-dhead h2,.dm-trendhead h3,.lmc-head h3,.lmc-fim h3,.modal-card h4,.fullscreen-topbar .fstitle{font-family:var(--font-body);text-transform:none;letter-spacing:0;font-weight:650;}
+  .dm-mname{font-size:16px;}
+  .dm-dhead h2{font-size:18px;}
+  .fullscreen-topbar{background:var(--surface);}
+  .fullscreen-topbar .fstitle{color:var(--fg);font-size:16px;}
+
+  /* ---- versão da operação (celular/tablet) ---- */
+  .op-home{justify-content:flex-start;padding-top:max(32px, env(safe-area-inset-top,0px));}
+  .op-brandrow{display:flex;align-items:center;gap:12px;margin:0 0 10px;}
+  .op-brandrow .a-logo{height:36px;}
+  .op-brandrow b{display:block;font-size:18px;font-weight:650;color:var(--fg);}
+  .op-brandrow small{font-size:12.5px;color:var(--fg-faint);}
+  .op-big{flex-direction:row;align-items:center;gap:14px;padding:20px 18px;border-radius:16px;border-color:var(--border) !important;}
+  .op-big .op-ic{width:50px;height:50px;border-radius:13px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);flex:none;}
+  .op-big .op-ic svg{width:25px;height:25px;}
+  .op-big .op-bt{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;color:var(--fg);font-size:inherit;}
+  .op-big .op-bt b{font-family:var(--font-body);font-size:18px;font-weight:650;text-transform:none;letter-spacing:0;line-height:1.25;}
+  .op-big .op-bt span{color:var(--fg-dim);font-size:12.5px;}
+  .op-big .op-chev{margin-left:auto;color:var(--fg-faint);font-size:24px;line-height:1;}
+  .op-foot{margin-top:auto;padding-top:16px;align-items:stretch;text-align:center;}
+  .op-foot .portal-volta{margin:0;text-align:left;}
+  .op-footbtns{justify-content:center;}
+  .op-ver{font-size:11px;color:var(--fg-faint);}
+  .op-top{background:var(--surface);}
+  .op-ttl{font-family:var(--font-body);font-size:17px;font-weight:650;text-transform:none;letter-spacing:0;}
+  .op-mname{font-family:var(--font-body);font-size:16px;font-weight:650;}
+  .op-sheethead h3{font-family:var(--font-body);font-size:18px;text-transform:none;font-weight:650;}
+  .op-back,.op-refresh{border-radius:10px;width:40px;height:40px;}
+  .op-cta{border-radius:12px;font-weight:650;font-size:15px;padding:15px;}
+  .op-dot.none{background:var(--fg-faint);}
+
+  /* ---- celular / tela estreita (versão completa) ---- */
+  @media (max-width:900px){
+    #app{display:flex;}
+    .sidebar{position:fixed;left:0;top:0;bottom:0;height:100%;z-index:120;transform:translateX(-105%);transition:transform .2s ease;box-shadow:none;}
+    .sidebar.aberta{transform:none;box-shadow:8px 0 24px var(--shadow-drawer);}
+    .sidebar-overlay{z-index:110;}
+    .a-burger{display:inline-flex;}
+    .a-top{padding:10px 12px;}
+    .a-acts .btn .bt{display:none;}
+    .a-acts .btn{padding:0 9px !important;}
+    .conn-status #statusText{display:none;}
+    .main{padding:16px 12px 40px;}
+  }
+  @media (prefers-reduced-motion: reduce){ .sidebar{transition:none;} }
 </style>
 </head>
 <body>
@@ -576,11 +758,10 @@
   <!-- ===== VERSÃO DA OPERAÇÃO (celular/tablet) ===== -->
   <div id="opApp" hidden>
     <section id="opHome" class="op-home">
-      <div class="op-brand">CONTROLE DE PROCESSO</div>
-      <p class="op-hello">Registro do check list e últimos registros</p>
-      <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><b>Injetora</b><span>Registro do check list e últimos registros das injetoras</span></button>
-      <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><b>Sopro</b><span>Registro do check list e últimos registros das sopradoras</span></button>
-      <div class="op-foot"><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div></div>
+      <div class="op-brandrow"><img class="a-logo" src="sq-icone-192.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><svg class="a-logo a-logo-svg" viewBox="0 0 40 30" aria-hidden="true"><rect width="40" height="30" rx="7" fill="#c8202f"/><text x="20" y="20.5" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="14" fill="#fff">BP</text></svg><div><b>Controle de Processo</b><small>Registro do check list e últimos registros</small></div></div>
+      <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h10"/><path d="M12 7h6l4 5-4 5h-6z"/><path d="M5 9v6"/></svg></span><span class="op-bt"><b>Injetora</b><span>Registro do check list e últimos registros das injetoras</span></span><span class="op-chev">›</span></button>
+      <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4v3h-4z"/><path d="M9 5h6l1 4v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9z"/><path d="M8 13h8"/></svg></span><span class="op-bt"><b>Sopro</b><span>Registro do check list e últimos registros das sopradoras</span></span><span class="op-chev">›</span></button>
+      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 17/11/2026 23:40</span></div>
     </section>
     <section id="opDash" hidden>
       <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Últimos 8 registros de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
@@ -597,34 +778,44 @@
   <!-- ===== APP (pós-login) ===== -->
   <div id="app" hidden>
 
-    <div class="mobile-topbar">
-      <button class="btn-menu" onclick="alternarMenuMobile()">☰</button>
-      <span class="mark">CONTROLE DE PROCESSO</span>
-    </div>
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="fecharMenuMobile()"></div>
 
-    <div class="sidebar" id="sidebar">
-      <div class="sidebar-brand"><span class="mark">CONTROLE DE PROCESSO</span><span class="status-dot" id="statusDot"></span></div>
-      <div class="nav-section-label">Injeção</div>
-      <button class="nav-item active" data-page="dashboard" onclick="mudarPagina('dashboard')"><span class="ic">▦</span> Dashboard</button>
-      <button class="nav-item" data-page="dadosCadastrados" onclick="mudarPagina('dadosCadastrados')"><span class="ic">▤</span> Dados Cadastrados</button>
-      <button class="nav-item" data-page="criterios" onclick="mudarPagina('criterios')"><span class="ic">☑</span> Critérios</button>
-      <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><span class="ic">⇧</span> Carregar Dados</button>
-      <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('injecao')"><span class="ic">✏</span> Registro do Check List</button>
-      <button class="nav-item" data-page="iqr" onclick="mudarPagina('iqr')"><span class="ic">∑</span> IQR / Intervalo Interquartil</button>
-      <div class="nav-section-label">Sopro</div>
-      <button class="nav-item" data-page="dashboardSopro" onclick="mudarPagina('dashboardSopro')"><span class="ic">▦</span> Dashboard</button>
-      <button class="nav-item" data-page="dadosCadastradosSopro" onclick="mudarPagina('dadosCadastradosSopro')"><span class="ic">▤</span> Dados Cadastrados</button>
-      <button class="nav-item" data-page="criteriosSopro" onclick="mudarPagina('criteriosSopro')"><span class="ic">☑</span> Critérios</button>
-      <button class="nav-item" data-page="carregarDadosSopro" onclick="mudarPagina('carregarDadosSopro')"><span class="ic">⇧</span> Carregar Dados</button>
-      <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('sopro')"><span class="ic">✏</span> Registro do Check List</button>
-      <button class="nav-item" data-page="configuracoes" onclick="mudarPagina('configuracoes')"><span class="ic">⚙</span> Configurações</button>
-      <div class="sidebar-footer">
-        <div class="sidebar-user"><span id="statusText">conectando…</span><br><span id="userEmail"></span></div>
-        <button onclick="logout()">Sair</button>
-        <button id="btnVersaoOperacao" onclick="usarVersaoOperacao()" hidden style="margin-top:6px">Voltar à versão da operação</button>
+    <aside class="sidebar" id="sidebar" aria-label="Menu">
+      <div class="a-brand"><img class="a-logo" src="sq-icone-192.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><svg class="a-logo a-logo-svg" viewBox="0 0 40 30" aria-hidden="true"><rect width="40" height="30" rx="7" fill="#c8202f"/><text x="20" y="20.5" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="14" fill="#fff">BP</text></svg><div><b>Controle de Processo</b><small>BlowPet · Qualidade</small></div></div>
+      <a class="portal-volta hidden" id="btnPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a>
+      <nav class="a-nav">
+        <div class="nav-section-label">Injeção</div>
+        <button class="nav-item active" data-page="dashboard" onclick="mudarPagina('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>Dashboard</span></button>
+        <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('injecao')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg><span>Registro do Check List</span></button>
+        <button class="nav-item" data-page="dadosCadastrados" onclick="mudarPagina('dadosCadastrados')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg><span>Dados Cadastrados</span></button>
+        <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Carregar Dados</span></button>
+        <button class="nav-item" data-page="criterios" onclick="mudarPagina('criterios')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3"/><path d="M14 2v4M8 10v4M16 18v4"/></svg><span>Critérios</span></button>
+        <button class="nav-item" data-page="iqr" onclick="mudarPagina('iqr')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>IQR / Intervalo Interquartil</span></button>
+        <div class="nav-section-label">Sopro</div>
+        <button class="nav-item" data-page="dashboardSopro" onclick="mudarPagina('dashboardSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>Dashboard</span></button>
+        <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('sopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg><span>Registro do Check List</span></button>
+        <button class="nav-item" data-page="dadosCadastradosSopro" onclick="mudarPagina('dadosCadastradosSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg><span>Dados Cadastrados</span></button>
+        <button class="nav-item" data-page="carregarDadosSopro" onclick="mudarPagina('carregarDadosSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Carregar Dados</span></button>
+        <button class="nav-item" data-page="criteriosSopro" onclick="mudarPagina('criteriosSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3"/><path d="M14 2v4M8 10v4M16 18v4"/></svg><span>Critérios</span></button>
+        <div class="nav-section-label">Sistema</div>
+        <button class="nav-item" data-page="configuracoes" onclick="mudarPagina('configuracoes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg><span>Configurações</span></button>
+      </nav>
+      <button type="button" class="a-opbtn" id="btnVersaoOperacao" onclick="usarVersaoOperacao()" hidden>Voltar à versão da operação</button>
+      <div class="a-versao"><span>Versão do sistema: <b>17/11/2026 23:40</b></span></div>
+      <div class="a-user"><span class="av" id="userAv">·</span><div class="who"><b id="userNome">—</b><small id="userEmail"></small></div><button type="button" class="a-ic-btn" title="Sair" aria-label="Sair" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button></div>
+    </aside>
+
+    <div class="a-main">
+    <header class="a-top">
+      <button type="button" class="a-ic-btn a-burger" onclick="alternarMenuMobile()" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="a-crumb" id="aCrumb">Injeção / <b>Dashboard</b></div>
+      <span class="conn-status"><span class="status-dot" id="statusDot"></span><span id="statusText">conectando…</span></span>
+      <div class="a-acts">
+        <button class="btn" id="btnCarregarDash" data-acts="dashboard" onclick="carregarRegistrosInjecao()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg><span class="bt">Carregar registros</span></button>
+        <button class="btn" id="btnCarregarTabela" data-acts="dadosCadastrados" onclick="carregarRegistrosInjecao()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg><span class="bt">Carregar registros</span></button>
       </div>
-    </div>
+      <button type="button" class="a-ic-btn" id="btnTemaTopo" onclick="alternarTema()" title="Tema claro / escuro" aria-label="Trocar tema"></button>
+    </header>
 
     <div class="main">
 
@@ -632,10 +823,7 @@
     <div id="pageDashboard">
     <h1 class="page-title">Dashboard</h1>
 
-    <div class="card" style="margin-bottom:16px;">
-      <button class="btn btn-accent btn-block" id="btnCarregarDash" onclick="carregarRegistrosInjecao()">Carregar registros</button>
-      <div id="dashLoading" class="loading-row" hidden><div class="spinner"></div> Carregando…</div>
-    </div>
+    <div id="dashLoading" class="loading-row" hidden><div class="spinner"></div> Carregando os registros…</div>
 
     <div id="dashConteudo" hidden>
       <div class="dm-bar">
@@ -674,10 +862,7 @@
     <div id="pageDadosCadastrados" hidden>
     <h1 class="page-title">Dados Cadastrados</h1>
 
-    <div class="card" style="margin-bottom:16px;">
-      <button class="btn btn-accent btn-block" id="btnCarregarTabela" onclick="carregarRegistrosInjecao()">Carregar registros</button>
-      <div id="tabelaLoading" class="loading-row" hidden><div class="spinner"></div> Carregando…</div>
-    </div>
+    <div id="tabelaLoading" class="loading-row" hidden><div class="spinner"></div> Carregando os registros…</div>
 
     <div id="tabelaConteudo" hidden>
       <div class="dv3-filterbar">
@@ -1142,7 +1327,7 @@
 
   <div class="card" style="max-width:560px;">
     <div class="sectiontitle">Aparência</div>
-    <p class="note" style="margin-top:0;">Escolha entre o tema escuro (padrão) ou o tema claro. A escolha fica salva neste navegador — continua a mesma depois de atualizar a página ou sair e entrar de novo.</p>
+    <p class="note" style="margin-top:0;">Escolha entre o tema claro (padrão) ou o tema escuro. A escolha fica salva neste navegador e vale também para a Inspeção e o Portal da Qualidade. O botão da lua/sol, no alto da tela, faz a mesma troca.</p>
     <div class="tema-opcoes">
       <button type="button" class="tema-opcao" data-tema="escuro" onclick="definirTema('escuro')">
         <span class="tema-check">✓</span>
@@ -1159,6 +1344,7 @@
   </div><!-- /#pageConfiguracoes -->
 
   </div><!-- /.main -->
+  </div><!-- /.a-main -->
 
   </div><!-- /#app -->
 
@@ -1979,7 +2165,7 @@ var PAGINAS_IDS = {
 function definirTema(tema){
   if (tema === 'claro') document.documentElement.setAttribute('data-theme', 'claro');
   else document.documentElement.removeAttribute('data-theme');
-  try { localStorage.setItem('processoTema', tema); } catch (e) {}
+  try { localStorage.setItem('inspecaoTema', tema); localStorage.setItem('processoTema', tema); } catch (e) {}
   atualizarBotoesTema();
   // o gráfico do Dashboard é desenhado em JS (SVG) e não se redesenha sozinho quando o
   // CSS muda, então força um redesenho com a cor nova se já tinha dados carregados
@@ -1987,13 +2173,45 @@ function definirTema(tema){
   if (typeof renderDashMaquinas === 'function' && registrosCarregados !== null) renderDashMaquinas();
 }
 function temaSalvo(){
-  try { return localStorage.getItem('processoTema') === 'claro' ? 'claro' : 'escuro'; } catch (e) { return 'escuro'; }
+  try { return (localStorage.getItem('inspecaoTema') || localStorage.getItem('processoTema') || 'claro') === 'escuro' ? 'escuro' : 'claro'; } catch (e) { return 'claro'; }
 }
 function atualizarBotoesTema(){
   var atual = document.documentElement.getAttribute('data-theme') === 'claro' ? 'claro' : 'escuro';
   document.querySelectorAll('.tema-opcao').forEach(function(btn){
     btn.classList.toggle('ativo', btn.getAttribute('data-tema') === atual);
   });
+  var bt = document.getElementById('btnTemaTopo');
+  if (bt) bt.innerHTML = atual === 'escuro' ? ICONE_SOL : ICONE_LUA;
+}
+function alternarTema(){
+  definirTema(document.documentElement.getAttribute('data-theme') === 'claro' ? 'escuro' : 'claro');
+}
+var ICONE_LUA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>';
+var ICONE_SOL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>';
+
+// Faixa superior: "Grupo / Página" e as ações pequenas que fazem sentido em cada tela.
+var CRUMB_PAGINAS = {
+  dashboard:['Injeção','Dashboard'], dadosCadastrados:['Injeção','Dados Cadastrados'], criterios:['Injeção','Critérios'],
+  carregarDados:['Injeção','Carregar Dados'], iqr:['Injeção','IQR / Intervalo Interquartil'],
+  dashboardSopro:['Sopro','Dashboard'], dadosCadastradosSopro:['Sopro','Dados Cadastrados'], criteriosSopro:['Sopro','Critérios'],
+  carregarDadosSopro:['Sopro','Carregar Dados'], configuracoes:['Sistema','Configurações']
+};
+function atualizarFaixaSuperior(pagina){
+  var c = CRUMB_PAGINAS[pagina] || ['', ''];
+  var el = document.getElementById('aCrumb');
+  if (el) el.innerHTML = escHtml(c[0]) + ' / <b>' + escHtml(c[1]) + '</b>';
+  document.querySelectorAll('.a-acts [data-acts]').forEach(function(b){ b.classList.toggle('vis', b.getAttribute('data-acts') === pagina); });
+}
+function rotularBotao(btn, texto){
+  var sp = btn && btn.querySelector('.bt');
+  if (sp) sp.textContent = texto; else if (btn) btn.textContent = texto;
+}
+// Botão "‹ Portal da Qualidade": só aparece em navegador que já abriu o portal (o portal grava
+// portalQualidadeUsado). Quem usa o dia a dia não vê.
+function mostrarBotaoPortal(){
+  var usado = false;
+  try { usado = !!localStorage.getItem('portalQualidadeUsado'); } catch (e) {}
+  ['btnPortal', 'opPortal'].forEach(function(id){ var b = document.getElementById(id); if (b) b.classList.toggle('hidden', !usado); });
 }
 
 function mudarPagina(pagina){
@@ -2008,7 +2226,9 @@ function mudarPagina(pagina){
   if (pagina === 'criteriosSopro') renderCriteriosSopro();
   if (pagina === 'iqr') iqrAbrirPagina();
   if (pagina === 'configuracoes') atualizarBotoesTema();
+  atualizarFaixaSuperior(pagina);
   fecharMenuMobile();
+  window.scrollTo(0, 0);
 }
 
 function alternarMenuMobile(){
@@ -2637,12 +2857,12 @@ async function carregarRegistrosInjecao(){
 
     document.getElementById('dashConteudo').hidden = false;
     renderDashMaquinas();
-    btn.textContent = 'Atualizar registros';
+    rotularBotao(btn, 'Atualizar registros');
 
     document.getElementById('tabelaConteudo').hidden = false;
     popularFiltroTabela();
     aplicarFiltroTabela();
-    btnT.textContent = 'Atualizar registros';
+    rotularBotao(btnT, 'Atualizar registros');
   } catch (err) {
     mostrarToast('Falha de conexão ao carregar registros: ' + err.message, true);
   } finally {
@@ -3358,6 +3578,11 @@ function aposLogin(){
   document.getElementById('viewLogin').hidden = true;
   document.getElementById('app').hidden = false;
   document.getElementById('userEmail').textContent = contaAtual.username;
+  var nomeUsuario = (contaAtual.name || String(contaAtual.username || '').split('@')[0].replace(/[._-]+/g, ' ')).trim();
+  nomeUsuario = nomeUsuario.replace(/\b\w/g, function(l){ return l.toUpperCase(); });
+  document.getElementById('userNome').textContent = nomeUsuario || '—';
+  var partesNome = nomeUsuario.split(/\s+/).filter(Boolean);
+  document.getElementById('userAv').textContent = ((partesNome[0] || '?')[0] + (partesNome.length > 1 ? partesNome[partesNome.length - 1][0] : '')).toUpperCase();
   // Celular/tablet: versão da operação (sem o menu lateral). Não carrega a tabela inteira de
   // registros — só as últimas linhas, quando a pessoa escolhe Injetora ou Sopro.
   if (modoOperacao()){
@@ -5681,6 +5906,8 @@ function iniciarUI(){
   });
   show('viewUpload'); setSteps('active','','');
   atualizarBotoesTema();
+  atualizarFaixaSuperior('dashboard');
+  mostrarBotaoPortal();
 }
 
 iniciarUI();
