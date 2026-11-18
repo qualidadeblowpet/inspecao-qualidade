@@ -259,6 +259,12 @@ a{color:var(--accent);}
 .tl-item.auto::before{border-color:var(--fg-faint);}
 .tl-cab{font-size:11.5px; color:var(--fg-faint);}
 .tl-cab b{color:var(--fg-dim); font-weight:600;}
+.tl-cab{display:flex; align-items:center; gap:6px;}
+.tl-cab .tl-ed{margin-left:auto; opacity:.55;}
+.tl-item:hover .tl-cab .tl-ed{opacity:1;}
+.tl-cab .tl-ed .icon-btn{width:24px; height:24px;}
+.it-row .it-acoes{display:flex; gap:4px;}
+.fotos-rec.com-ed{grid-template-columns:repeat(auto-fill, minmax(84px, 1fr));}
 .tl-txt{font-size:13px; margin-top:3px; white-space:pre-wrap; overflow-wrap:anywhere;}
 .tl-item.auto .tl-txt{color:var(--fg-dim); font-style:italic;}
 .tl-item .galeria{margin-top:8px; grid-template-columns:repeat(auto-fill, minmax(64px, 1fr));}
@@ -1335,6 +1341,31 @@ table.occ tbody tr.clicavel{cursor:pointer;}
   </div>
 
   <!-- ===================== JANELA — CONCLUIR RECLAMAÇÃO ===================== -->
+  <div class="modal-overlay hidden" id="modalComent" style="z-index:220;">
+    <div class="modal-card" style="max-width:600px;">
+      <button class="modal-close" onclick="fecharModalComent()" aria-label="Fechar">✕</button>
+      <div class="modal-head"><h2>Editar comentário</h2><p class="tela-sub" style="margin-top:6px;" id="comEdSub"></p></div>
+      <div class="form-wrap" style="padding-top:12px; max-width:none;">
+        <div class="field"><label>Comentário</label><textarea id="comEdTexto" rows="5"></textarea></div>
+        <div class="section-title">Fotos e arquivos</div>
+        <div class="laudo-btns">
+          <button type="button" class="file-btn laudo-cam" onclick="document.getElementById('comEdCam').click()"><span class="ic"><svg><use href="#i-camera"/></svg></span><span>Tirar foto</span></button>
+          <button type="button" class="file-btn" onclick="document.getElementById('comEdArq').click()"><span class="ic"><svg><use href="#i-paperclip"/></svg></span><span>Anexar fotos</span></button>
+        </div>
+        <div class="fotos-rec com-ed" id="comEdFotos"></div>
+        <input type="file" id="comEdCam" accept="image/*" capture="environment" hidden onchange="comEdAnexar(this)">
+        <input type="file" id="comEdArq" accept="image/*,.pdf" multiple hidden onchange="comEdAnexar(this)">
+        <p class="med-note">A alteração fica registrada no andamento (quem alterou e quando). Fotos removidas saem do comentário, mas o arquivo continua guardado no OneDrive.</p>
+        <div class="form-actions">
+          <button type="button" class="btn btn-danger" style="margin-right:auto;" onclick="excluirComentario()"><svg><use href="#i-trash"/></svg> Excluir comentário</button>
+          <span class="save-msg" id="saveMsgComEd"></span>
+          <button class="btn btn-ghost" onclick="fecharModalComent()">Cancelar</button>
+          <button class="btn btn-accent" id="btnSalvarComEd" onclick="salvarComentarioEditado()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-overlay hidden" id="modalConcluirRec" style="z-index:220;">
     <div class="modal-card" style="max-width:600px;">
       <button class="modal-close" onclick="fecharModalConcluirRec()" aria-label="Fechar">✕</button>
@@ -1671,7 +1702,7 @@ const TABLE_COLS_PADRAO = JSON.parse(JSON.stringify(TABLE_COLS));
 // Colunas gravadas como NÚMERO (o resto vai como texto, pra o Excel não converter datas/NF/lotes).
 const COLS_NUM_QTD = ['Quantidade'];
 const COLS_NUM_MED = ['Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)'];
-const VERSAO_SISTEMA = '17/11/2026 09:11';   // data/hora desta versão — atualizada a cada entrega
+const VERSAO_SISTEMA = '17/11/2026 21:05';   // data/hora desta versão — atualizada a cada entrega
 document.getElementById('versaoSistema').textContent = VERSAO_SISTEMA;
 const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
@@ -2089,6 +2120,7 @@ async function excluirVariasLinhas(chaveTabela, indices){
 
 /* ====================== GRAPH API — UPLOAD DE FOTO ====================== */
 async function uploadArquivo(file, nomeArquivo, subpasta){
+  if (!driveId) throw new Error('não foi possível localizar a pasta de fotos do sistema (OneDrive da conta inspetor.qualidade) — clique em Atualizar e tente de novo');
   var token = await getToken();
   var ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
   var nomeFinal = nomeArquivo + '.' + ext;
@@ -2097,7 +2129,8 @@ async function uploadArquivo(file, nomeArquivo, subpasta){
     method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ item: { '@microsoft.graph.conflictBehavior': 'rename' } })
   });
-  var session = await sessionResp.json();
+  var session = await sessionResp.json().catch(function(){ return {}; });
+  if (sessionResp.status === 403 || sessionResp.status === 401 || (session.error && /accessdenied/i.test(session.error.code || ''))) throw new Error('sem permissão para gravar na pasta de fotos do sistema (' + PASTA_FOTOS + ', no OneDrive da conta inspetor.qualidade). Peça para compartilhar essa pasta com edição para este usuário.');
   if (!session.uploadUrl) throw new Error((session.error && session.error.message) || 'não foi possível iniciar o upload');
   var uploadResp = await fetch(session.uploadUrl, {
     method: 'PUT', headers: { 'Content-Range': 'bytes 0-' + (file.size - 1) + '/' + file.size }, body: file
@@ -3092,7 +3125,7 @@ async function registrarComentario(rac, texto, anexos, automatico){
 }
 function abrirFichaReclamacao(rac){
   var r = reclamacaoPorRac(rac); if (!r) return;
-  fichaRacAtual = rac; anexosPendentes = [];
+  fichaRacAtual = rac; anexosPendentes = []; itemEditando = null;
   detalheAtual = null;
   document.getElementById('dwIc').innerHTML = '<svg><use href="#i-megaphone"/></svg>';
   document.getElementById('dwTitulo').textContent = r['RAC'];
@@ -3125,7 +3158,8 @@ function renderFichaReclamacao(){
           '<span><b>Produção</b>' + escHtml(i['Data de Produção'] || '—') + '</span><span><b>Lote</b>' + escHtml(i['Lote'] || '—') + '</span>' +
           (preforma ? '<span><b>Caixa</b>' + escHtml(i['Caixa'] || '—') + '</span>' : '') + '</div>' +
           (l2 ? '<div class="it-l2">' + escHtml(l2) + '</div>' : '') + '</div>' +
-          '<button type="button" class="icon-btn icon-only danger" title="Remover" onclick="excluirItemReclamacao(' + i.__index + ')"><svg><use href="#i-trash"/></svg></button></div>';
+          '<span class="it-acoes"><button type="button" class="icon-btn icon-only" title="Editar" onclick="editarItemReclamacao(' + i.__index + ')"><svg><use href="#i-pencil"/></svg></button>' +
+          '<button type="button" class="icon-btn icon-only danger" title="Remover" onclick="excluirItemReclamacao(' + i.__index + ')"><svg><use href="#i-trash"/></svg></button></span></div>';
       }).join('') + '</div>'
       : '<p class="ficha-vazio"><span class="rec-pend">sem rastreabilidade</span> — nenhuma data / lote lançado ainda.</p>';
     html += '<div class="it-add" id="itAddBox"><button type="button" class="btn" onclick="document.getElementById(\'itAddBox\').hidden = true; document.getElementById(\'itForm\').hidden = false; document.getElementById(\'itDataProd\').focus();"><svg><use href="#i-plus"/></svg> Adicionar ' + (preforma ? 'data / lote / caixa' : 'data / lote') + '</button></div>' +
@@ -3135,7 +3169,7 @@ function renderFichaReclamacao(){
       (preforma ? '<div class="field"><label>Nº da caixa</label><input id="itCaixa" placeholder="Ex: 1548"></div>' : '') +
       '<div class="field"><label>Quantidade afetada</label><input id="itQtd" placeholder="Ex: 120 peças"></div>' +
       '<div class="field' + (preforma ? ' full' : '') + '"><label>Observação</label><input id="itObs" placeholder="Opcional"></div>' +
-      '<div class="full" style="display:flex; justify-content:flex-end; gap:8px;"><button type="button" class="btn" onclick="document.getElementById(\'itForm\').hidden = true; document.getElementById(\'itAddBox\').hidden = false;">Cancelar</button>' +
+      '<div class="full" style="display:flex; justify-content:flex-end; gap:8px;"><button type="button" class="btn" onclick="cancelarItemReclamacao()">Cancelar</button>' +
       '<button type="button" class="btn btn-accent" id="btnAddItem" onclick="adicionarItemReclamacao()">Adicionar</button></div></div>';
   }
 
@@ -3158,7 +3192,8 @@ function renderFichaReclamacao(){
       '<input type="file" id="comFotoArq" accept="image/*,.pdf" multiple hidden onchange="anexarNoComentario(this)"></div>';
     html += coms.length ? '<div class="timeline">' + coms.map(function(c){
       var auto = /^\[sistema\]/.test(c['Autor'] || ''), anx = anexosDe(c);
-      return '<div class="tl-item' + (auto ? ' auto' : '') + '"><div class="tl-cab">' + escHtml(c['Data/Hora'] || '') + ' · <b>' + escHtml(String(c['Autor'] || '').replace(/^\[sistema\]\s*/, '')) + '</b></div>' +
+      return '<div class="tl-item' + (auto ? ' auto' : '') + '"><div class="tl-cab"><span>' + escHtml(c['Data/Hora'] || '') + ' · <b>' + escHtml(String(c['Autor'] || '').replace(/^\[sistema\]\s*/, '')) + '</b></span>' +
+        (auto ? '' : '<span class="tl-ed"><button type="button" class="icon-btn icon-only" title="Editar ou excluir este comentário (texto e fotos)" onclick="abrirModalComent(' + c.__index + ')"><svg><use href="#i-pencil"/></svg></button></span>') + '</div>' +
         '<div class="tl-txt">' + escHtml(c['Comentário'] || '') + '</div>' + (anx.length ? galeriaHtml(anx) : '') + '</div>';
     }).join('') + '</div>' : '<p class="ficha-vazio">Nenhum comentário ainda.</p>';
   }
@@ -3167,6 +3202,28 @@ function renderFichaReclamacao(){
   body.innerHTML = html;
   carregarMiniaturas(body);
   desenharAnexosPendentes();
+}
+var itemEditando = null;   // __index do item de rastreabilidade em edição (null = novo)
+function editarItemReclamacao(idx){
+  var it = DATA.recItens.find(function(i){ return i.__index === idx; }); if (!it) return;
+  itemEditando = idx;
+  document.getElementById('itAddBox').hidden = true; document.getElementById('itForm').hidden = false;
+  document.getElementById('itDataProd').value = dataBRparaISO(it['Data de Produção'] || '');
+  document.getElementById('itLote').value = it['Lote'] || '';
+  var cx = document.getElementById('itCaixa'); if (cx) cx.value = it['Caixa'] || '';
+  document.getElementById('itQtd').value = it['Quantidade'] || '';
+  document.getElementById('itObs').value = it['Observação'] || '';
+  document.getElementById('btnAddItem').textContent = 'Salvar alteração';
+  document.querySelectorAll('.it-row').forEach(function(el){ el.style.background = el.getAttribute('data-idx') === String(idx) ? 'var(--accent-soft, rgba(21,127,153,.08))' : ''; });
+  document.getElementById('itForm').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  document.getElementById('itDataProd').focus();
+}
+function cancelarItemReclamacao(){
+  itemEditando = null;
+  document.getElementById('itForm').hidden = true; document.getElementById('itAddBox').hidden = false;
+  ['itDataProd', 'itLote', 'itCaixa', 'itQtd', 'itObs'].forEach(function(id){ var el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('btnAddItem').textContent = 'Adicionar';
+  document.querySelectorAll('.it-row').forEach(function(el){ el.style.background = ''; });
 }
 async function adicionarItemReclamacao(){
   var r = reclamacaoPorRac(fichaRacAtual); if (!r) return;
@@ -3177,6 +3234,15 @@ async function adicionarItemReclamacao(){
   btn.disabled = true; btn.innerHTML = 'Salvando…';
   document.querySelectorAll('#itForm input').forEach(function(i){ i.disabled = true; });
   try {
+    if (itemEditando !== null) {
+      await atualizarLinha('recItens', itemEditando, item);
+      DATA.recItens = linhasParaObjetos('recItens', await lerLinhasBrutas(TABELAS.recItens));
+      itemEditando = null;
+      if (fichaAberta() && fichaRacAtual === rac) renderFichaReclamacao();
+      renderReclamacoes();
+      mostrarToast('Item de rastreabilidade alterado.');
+      return;
+    }
     await incluirRegistro('recItens', item);
     if (fichaAberta() && fichaRacAtual === rac) renderFichaReclamacao();
     renderReclamacoes();
@@ -3218,6 +3284,80 @@ async function excluirItemReclamacao(idx){
     renderReclamacoes();
     mostrarToast('Item removido.');
   } catch (e) { mostrarToast('Erro ao remover: ' + e.message, true); if (linha) { linha.style.opacity = ''; linha.style.pointerEvents = ''; } }
+}
+/* ---- editar / excluir comentário do andamento (texto e fotos) ---- */
+var comEd = null;   // { idx, anexos: [links que ficam], novos: [{file, url}] }
+function abrirModalComent(idx){
+  var c = DATA.recComent.find(function(x){ return x.__index === idx; }); if (!c) return;
+  comEd = { idx: idx, anexos: anexosDe(c), novos: [] };
+  document.getElementById('comEdSub').textContent = (c['Data/Hora'] || '') + ' · ' + (c['Autor'] || '');
+  document.getElementById('comEdTexto').value = c['Comentário'] === '(fotos anexadas)' ? '' : (c['Comentário'] || '');
+  document.getElementById('saveMsgComEd').textContent = '';
+  desenharComEdFotos();
+  document.getElementById('modalComent').classList.remove('hidden');
+}
+function fecharModalComent(){
+  if (comEd) comEd.novos.forEach(function(n){ if (n.url) URL.revokeObjectURL(n.url); });
+  comEd = null; document.getElementById('modalComent').classList.add('hidden');
+}
+function desenharComEdFotos(){
+  var el = document.getElementById('comEdFotos'); if (!el || !comEd) return;
+  el.innerHTML = comEd.anexos.map(function(l, i){
+    return '<div class="fr">' + (ehPdf(l) ? '<a href="' + escHtml(l) + '" target="_blank" class="pdf" style="display:flex;align-items:center;justify-content:center;height:100%;font-size:11px;color:var(--fg-dim);">PDF</a>' : '<img data-foto="' + escHtml(l) + '" alt="" onclick="window.open(\'' + escHtml(l).replace(/'/g, '%27') + '\', \'_blank\')">') +
+      '<button type="button" title="Remover do comentário" onclick="comEd.anexos.splice(' + i + ',1); desenharComEdFotos();"><svg><use href="#i-x"/></svg></button></div>';
+  }).join('') + comEd.novos.map(function(n, i){
+    return '<div class="fr">' + (n.url ? '<img src="' + n.url + '" alt="">' : '<span style="display:flex;align-items:center;justify-content:center;height:100%;font-size:11px;">' + escHtml(n.file.name) + '</span>') + '<span class="nova">nova</span>' +
+      '<button type="button" title="Remover" onclick="comEd.novos.splice(' + i + ',1); desenharComEdFotos();"><svg><use href="#i-x"/></svg></button></div>';
+  }).join('');
+  if (!comEd.anexos.length && !comEd.novos.length) el.innerHTML = '';
+  carregarMiniaturas(el);
+}
+async function comEdAnexar(input){
+  var arqs = Array.prototype.slice.call(input.files || []); input.value = '';
+  for (var i = 0; i < arqs.length; i++) { var pronto = await reduzirImagem(arqs[i], 1600, 0.82); comEd.novos.push({ file: pronto, url: (pronto.type || '').indexOf('image/') === 0 ? URL.createObjectURL(pronto) : '' }); }
+  desenharComEdFotos();
+}
+function resumoComentario(c){ var t = String(c['Comentário'] || '').replace(/\s+/g, ' ').trim(); return (c['Autor'] || '—') + ' (' + (c['Data/Hora'] || '') + ')' + (t && t !== '(fotos anexadas)' ? ': “' + (t.length > 90 ? t.slice(0, 90) + '…' : t) + '”' : ''); }
+async function salvarComentarioEditado(){
+  var c = comEd && DATA.recComent.find(function(x){ return x.__index === comEd.idx; }); if (!c) return;
+  var msg = document.getElementById('saveMsgComEd'), btn = document.getElementById('btnSalvarComEd');
+  var txt = document.getElementById('comEdTexto').value.trim();
+  if (!txt && !comEd.anexos.length && !comEd.novos.length) { msg.className = 'save-msg err'; msg.textContent = 'Comentário vazio — para apagar, use "Excluir comentário".'; return; }
+  btn.disabled = true; msg.className = 'save-msg';
+  try {
+    var links = comEd.anexos.slice(), rac = c['RAC'], carimbo = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 14);
+    for (var i = 0; i < comEd.novos.length; i++) {
+      msg.textContent = 'Enviando foto ' + (i + 1) + ' de ' + comEd.novos.length + '…';
+      links.push(await uploadArquivo(comEd.novos[i].file, rac + '_' + carimbo + '_' + (i + 1), 'Reclamacoes/' + rac));
+    }
+    msg.textContent = 'Salvando…';
+    var antes = anexosDe(c), removidas = antes.filter(function(l){ return links.indexOf(l) === -1; }).length, novas = comEd.novos.length;
+    var textoMudou = (txt || '(fotos anexadas)') !== (c['Comentário'] || '');
+    await atualizarLinha('recComent', c.__index, Object.assign({}, c, { 'Comentário': txt || '(fotos anexadas)', 'Anexos': links.join('\n') }));
+    var mud = [textoMudou ? 'texto alterado' : '', novas ? novas + ' foto(s) incluída(s)' : '', removidas ? removidas + ' foto(s) removida(s)' : ''].filter(Boolean).join(', ');
+    if (mud) await registrarComentario(rac, 'Comentário de ' + (c['Autor'] || '—') + ' (' + (c['Data/Hora'] || '') + ') editado: ' + mud + '.', [], true);
+    DATA.recComent = linhasParaObjetos('recComent', await lerLinhasBrutas(TABELAS.recComent));
+    fecharModalComent();
+    if (fichaAberta()) renderFichaReclamacao();
+    renderReclamacoes();
+    mostrarToast(mud ? 'Comentário alterado.' : 'Nada foi alterado.');
+  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
+  finally { btn.disabled = false; }
+}
+async function excluirComentario(){
+  var c = comEd && DATA.recComent.find(function(x){ return x.__index === comEd.idx; }); if (!c) return;
+  var nAnx = anexosDe(c).length;
+  if (!(await confirmar('Excluir este comentário?', resumoComentario(c) + (nAnx ? ' — com ' + nAnx + ' foto(s)/arquivo(s)' : '') + '. A exclusão fica registrada no andamento; os arquivos continuam guardados no OneDrive.', 'Excluir', true))) return;
+  var msg = document.getElementById('saveMsgComEd'); msg.className = 'save-msg'; msg.textContent = 'Excluindo…';
+  try {
+    await excluirLinhaPorIndice('recComent', c.__index);
+    await registrarComentario(c['RAC'], 'Comentário excluído — ' + resumoComentario(c) + (nAnx ? ' (' + nAnx + ' anexo(s))' : '') + '.', [], true);
+    DATA.recComent = linhasParaObjetos('recComent', await lerLinhasBrutas(TABELAS.recComent));
+    fecharModalComent();
+    if (fichaAberta()) renderFichaReclamacao();
+    renderReclamacoes();
+    mostrarToast('Comentário excluído.');
+  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message; }
 }
 async function anexarNoComentario(input){
   var arqs = Array.prototype.slice.call(input.files || []); input.value = '';
@@ -5620,10 +5760,10 @@ async function pdfDaFicha(m){
   if (m.fotos.length) {
     var rot = m.tipo === 'rotulo';
     titulo(rot ? 'Rótulo homologado' : 'Fotos enviadas pelo cliente'); y += 1;
-    var colW = rot ? Math.min(larg, 120) : (larg - 9) / 4, x = Mg, linhaH = 0;
+    var colW = rot ? Math.min(larg, 120) : (larg - 9) / 4, x = Mg, linhaH = 0, fotosFalharam = 0;
     for (var i = 0; i < m.fotos.length; i++) {
       var arq = null; try { arq = await baixarArquivoLink(m.fotos[i].link); } catch (e) {}
-      var red = arq ? await imagemReduzida(arq.blob, rot ? 1200 : 700, 0.8) : null; if (!red) continue;
+      var red = arq ? await imagemReduzida(arq.blob, rot ? 1200 : 700, 0.8) : null; if (!red) { fotosFalharam++; continue; }
       var hImg = colW * red.h / red.w; if (!rot) hImg = Math.min(hImg, colW * 1.1);
       if (x + colW > W - Mg + 0.1) { x = Mg; y += linhaH + 3; linhaH = 0; }
       if (y + hImg > BASE) { novaPagina(); x = Mg; linhaH = 0; }
@@ -5631,6 +5771,7 @@ async function pdfDaFicha(m){
       linhaH = Math.max(linhaH, hImg); x += colW + 3;
     }
     y += linhaH + 3;
+    if (fotosFalharam) mostrarToast(fotosFalharam + ' foto(s) não puderam ser baixadas para o PDF — este usuário não tem acesso ao arquivo no OneDrive (provavelmente foi gravado na pasta de outro usuário).', true);
   }
   var nP = doc.getNumberOfPages();
   for (var p = 1; p <= nP; p++) { doc.setPage(p); doc.setFont('helvetica', 'normal'); doc.setFontSize(7); cor([130, 130, 130]); doc.text('Sistema da Qualidade BlowPet · ' + m.idTexto, Mg, H - Mg + 2); doc.text('Página ' + p + ' de ' + nP, W - Mg, H - Mg + 2, { align: 'right' }); }
@@ -6171,6 +6312,17 @@ async function gbatch(reqs, sequencial){
 function msgDe(res){ return (res.body && res.body.error && res.body.error.message) || ('erro ' + res.status); }
 
 /* ---- conexão ---- */
+// Fotos e laudos vão SEMPRE para o OneDrive da conta inspetor.qualidade (dona das listas), seja quem for
+// o usuário logado. O drive é achado pelo site das listas ou, se não der, pelo link da planilha base.
+async function driveDoSistema(){
+  try { var d = await gget(sitePath() + '/drive?$select=id'); if (d && d.id) return d.id; } catch (e) {}
+  try {
+    var enc = 'u!' + btoa(LINK_PLANILHA_PADRAO).replace(/=+$/, '').replace(/\//g, '_').replace(/\+/g, '-');
+    var it = await gget('/shares/' + enc + '/driveItem?$select=parentReference');
+    if (it && it.parentReference && it.parentReference.driveId) return it.parentReference.driveId;
+  } catch (e) {}
+  return null;   // sem o drive do sistema não grava foto (melhor avisar do que gravar na pasta de outra pessoa)
+}
 async function mapearListas(){
   var listas = await gtodos(sitePath() + '/lists?$select=id,displayName');
   LISTA_ID = {};
@@ -6182,7 +6334,7 @@ async function conectarPlanilha(){
   mostrarCarregando(true, 'Conectando às listas…');
   try {
     LISTS_SITE_ID = (await gget('/sites/' + LISTS_SITE + '?$select=id')).id;
-    try { driveId = (await gget('/me/drive?$select=id')).id; } catch (e) { driveId = null; }
+    driveId = await driveDoSistema();
     await mapearListas();
     var faltam = Object.keys(TABELAS).filter(function(k){ return !LISTA_ID[TABELAS[k]]; });
     if (faltam.length) {
