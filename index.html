@@ -1247,6 +1247,31 @@ body.ed-aberto .ed-drawer { display: flex; animation: ivEntra .18s ease-out; }
 .ed-drawer.modo-excluir .so-editar { display: none !important; }
 .ed-drawer:not(.modo-excluir) .so-excluir { display: none !important; }
 @media (max-width: 560px) { .ed-grid, .ed-grid.c4 { grid-template-columns: 1fr 1fr; } }
+
+.ed-senha-fundo { position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 140; display: none; align-items: center; justify-content: center; padding: 16px; }
+.ed-senha-fundo.aberto { display: flex; }
+.ed-senha { width: min(380px, 100%); background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 20px 50px rgba(0,0,0,.35); padding: 22px 22px 18px; display: flex; flex-direction: column; gap: 12px; animation: ivEntra .16s ease-out; }
+.ed-senha .cad { display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 12px; margin: 0 auto 2px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); }
+.ed-senha h3 { margin: 0; font-size: 17px; font-weight: 650; text-align: center; }
+.ed-senha .quem { text-align: center; font-size: 12.5px; color: var(--text-dim); margin-top: -6px; }
+.ed-senha .txt { font-size: 12.5px; color: var(--text-dim); line-height: 1.5; text-align: center; }
+.ed-senha label { font-size: 11px; color: var(--text-dim); font-weight: 600; display: block; margin-bottom: 4px; }
+.ed-senha input { font: inherit; font-size: 15px; letter-spacing: 1px; padding: 9px 11px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); width: 100%; box-sizing: border-box; }
+.ed-senha input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+.ed-senha .erro { min-height: 17px; font-size: 12.5px; color: var(--danger); text-align: center; }
+.ed-senha .bts { display: flex; gap: 8px; }
+.ed-senha .bts .btn { flex: 1; justify-content: center; }
+.ed-senha .lk { background: none; border: 0; color: var(--text-dim); font: inherit; font-size: 12px; text-decoration: underline; cursor: pointer; align-self: center; padding: 0; }
+.ed-senha .ajuda { font-size: 12px; color: var(--text-dim); background: var(--surface-2); border-radius: 8px; padding: 9px 11px; line-height: 1.5; display: none; }
+.ed-senha .ajuda.ver { display: block; }
+.ed-senhas { margin-top: 14px; font-size: 12.5px; }
+.ed-senhas .lin { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-top: 1px solid var(--border); }
+.ed-senhas .lin span:first-child { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.ed-senhas .st { font-size: 11.5px; color: var(--text-dim); }
+.ed-senhas .st.ok { color: var(--ok); }
+.ed-senhas button { font: inherit; font-size: 12px; padding: 4px 10px; border-radius: 7px; border: 1px solid var(--border); background: transparent; color: var(--text); cursor: pointer; }
+.so-dono { display: none; }
+body.e-dono .so-dono { display: block; }
 </style>
 
 <style>
@@ -1389,6 +1414,7 @@ table.occ-table tr:hover td { background: var(--surface-2); }
 <aside class="iv-drawer" id="ivDrawer" aria-label="Cadastro de inspeção" aria-hidden="true"></aside>
 <div class="ed-scrim" onclick="edFechar()"></div>
 <aside class="ed-drawer" id="edDrawer" aria-label="Editar cadastro"></aside>
+<div class="ed-senha-fundo" id="edSenhaFundo"><div class="ed-senha" role="dialog" aria-modal="true" id="edSenhaCaixa"></div></div>
 <div class="iv-tip" id="ivTip"></div>
 
 <!-- Resumo do turno (janela por cima de tudo: serve para computador e celular/tablet) -->
@@ -1994,7 +2020,7 @@ table.occ-table tr:hover td { background: var(--surface-2); }
         <h3>Quem pode editar cadastros</h3>
         <p class="config-note" style="margin-bottom:10px;">
           Quem estiver aqui vê o lápis <b>✎</b> nas telas de Ocorrência e pode corrigir ou excluir um cadastro depois de
-          confirmar o próprio usuário e senha da Microsoft. As outras contas não veem o lápis nem este quadro.
+          digitar a <b>senha de edição</b> (cada pessoa cria a sua no primeiro uso). As outras contas não veem o lápis nem este quadro.
           Cada alteração fica registrada no cadastro (quem, quando, o que mudou e o motivo); cada exclusão guarda uma cópia completa na lista <b>INSP Exclusões</b>.
         </p>
         <div class="ed-dono"><span id="edDonoEmail"></span><small>responsável · sempre liberado</small></div>
@@ -2002,7 +2028,11 @@ table.occ-table tr:hover td { background: var(--surface-2); }
           <label>Outros e-mails liberados para editar (um por linha)</label>
           <textarea id="listaEditores" rows="3" placeholder="nome@blowpet.com.br"></textarea>
         </div>
-        <button class="btn btn-accent" id="btnSalvarEditores" onclick="salvarEditores()">Salvar quem pode editar</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-accent" id="btnSalvarEditores" onclick="salvarEditores()">Salvar quem pode editar</button>
+          <button class="btn btn-outline" onclick="edTrocarMinhaSenha()">Trocar minha senha de edição</button>
+        </div>
+        <div class="ed-senhas so-dono" id="edSenhasStatus"></div>
       </div>
 
       <div class="card">
@@ -2168,7 +2198,7 @@ const LOGO_BLOWPET_BRANCO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAA
 const LOGO_BP_SIMBOLO = 'data:image/png;base64,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';
 const LOGO_PDF_PROP = 300 / 238; // largura/altura do logo
 function aplicarLogos() { const m = { preto: LOGO_BLOWPET_PRETO, branco: LOGO_BLOWPET_BRANCO, simbolo: LOGO_BP_SIMBOLO }; document.querySelectorAll('img[data-logo]').forEach(function(i) { if (!i.getAttribute('src')) i.src = m[i.dataset.logo]; }); }
-const ULTIMA_ATUALIZACAO_SISTEMA = '19/11/2026 17:31';
+const ULTIMA_ATUALIZACAO_SISTEMA = '19/11/2026 18:03';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas','face_injetora','vibrador_preforma','foto_vibrador_url','editado_em','editado_por','historico_edicao'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador','editado_em','editado_por','historico_edicao'];
@@ -2282,7 +2312,8 @@ let listas = {
   fornecedoresPreforma: [],
   gramaturasPreforma: [],
   operadoresSopro: [],
-  editoresCadastro: []
+  editoresCadastro: [],
+  senhasEdicao: []
 };
 const criticidades = ['LEVE', 'MÉDIO', 'GRAVE'];
 const statusCorrecao = ['CORRIGIDO', 'FICOU PENDENTE'];
@@ -2771,7 +2802,7 @@ function lstRenderStatus() {
 /* ---------------- Edição de cadastro (lápis) ----------------
    Só quem está autorizado vê o lápis (o responsável DONO_EDICAO sempre; os demais pela lista
    "editoresCadastro", guardada junto das listas de apoio). Antes de abrir a edição, a pessoa confirma
-   usuário e senha da Microsoft numa janelinha (vale por ED_VALIDADE_MIN minutos). Data, hora e fotos
+   a SENHA DE EDIÇÃO do sistema (cada pessoa tem a sua; vale por ED_VALIDADE_MIN minutos). Data, hora e fotos
    não mudam. Cada linha alterada guarda editado_em / editado_por / historico_edicao (antes → depois + motivo). */
 const DONO_EDICAO = 'cleber.rodrigues@blowpet.com.br';
 const ED_VALIDADE_MIN = 15;
@@ -2858,6 +2889,7 @@ function edAtualizarPermissao() {
   document.body.classList.toggle('pode-editar', pode);
   const ta = document.getElementById('listaEditores'); if (ta && document.activeElement !== ta) ta.value = (listas.editoresCadastro || []).join('\n');
   const dn = document.getElementById('edDonoEmail'); if (dn) dn.textContent = DONO_EDICAO;
+  edAtualizarStatusSenhas();
   if (!pode && document.body.classList.contains('ed-aberto')) edFechar();
   if (pode !== antes && dadosHistoricoCarregados) { try { renderTabelaInjecao(); renderTabelaSopro(); } catch (e) {} }
 }
@@ -2872,20 +2904,152 @@ function edAgora() {
 }
 function edHora(ms) { const d = new Date(ms); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
 
-// Confirmação de usuário e senha (janelinha da Microsoft, sempre pedindo a senha de novo).
+// Senha de edição do sistema (não é a senha da Microsoft). Cada pessoa autorizada cria a sua no 1º uso;
+// fica guardada só como "impressão digital" (PBKDF2-SHA256 com sal) na lista INSP Listas, tipo senhasEdicao,
+// valor "email|pbkdf2$iteracoes$sal$hash" — ninguém consegue ler a senha a partir dela.
+const ED_PBKDF2_ITER = 150000;
+const ED_CADEADO = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+let edSenhaErros = 0, edSenhaBloqueioAte = 0, edSenhaCtx = null;
+function edB64(buf) { return btoa(String.fromCharCode.apply(null, new Uint8Array(buf))); }
+function edDeB64(s) { return Uint8Array.from(atob(s), function(c) { return c.charCodeAt(0); }); }
+async function edHash(senha, sal, iter) {
+  const chave = await crypto.subtle.importKey('raw', new TextEncoder().encode(senha), 'PBKDF2', false, ['deriveBits']);
+  return edB64(await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: sal, iterations: iter }, chave, 256));
+}
+async function edGerarRegistro(email, senha) {
+  const sal = crypto.getRandomValues(new Uint8Array(16));
+  return email + '|pbkdf2$' + ED_PBKDF2_ITER + '$' + edB64(sal) + '$' + (await edHash(senha, sal, ED_PBKDF2_ITER));
+}
+async function edConferir(registro, senha) {
+  const p = String(registro).split('|').slice(1).join('|').split('$');
+  if (p[0] !== 'pbkdf2' || p.length !== 4) return false;
+  return (await edHash(senha, edDeB64(p[2]), parseInt(p[1], 10))) === p[3];
+}
+function edRegistroDe(email) {
+  email = String(email || '').toLowerCase();
+  return (listas.senhasEdicao || []).find(function(r) { return String(r).split('|')[0].toLowerCase() === email; }) || null;
+}
+// Relê as senhas direto da lista (outra máquina pode ter criado/trocado a senha)
+async function edLerSenhas() {
+  try {
+    if (typeof lstItens !== 'function' || !LST.listas.TabelaListas) return;
+    lstInvalidar('TabelaListas');
+    const itens = await lstItens('TabelaListas');
+    listas.senhasEdicao = itens.filter(function(it) { return it.valores[0] === 'senhasEdicao' && it.valores[1]; }).map(function(it) { return it.valores[1]; });
+  } catch (e) { console.warn('senhas de edição:', e); }
+}
+// Grava/troca/apaga a senha de UMA pessoa sem regravar as outras listas de apoio
+async function edGravarRegistro(email, registro) {
+  email = String(email).toLowerCase();
+  lstInvalidar('TabelaListas');
+  const itens = await lstItens('TabelaListas');
+  const velhos = itens.filter(function(it) { return it.valores[0] === 'senhasEdicao' && String(it.valores[1]).split('|')[0].toLowerCase() === email; }).map(function(it) { return it.id; });
+  if (registro) await lstAdicionar('TabelaListas', [['senhasEdicao', registro]]);
+  if (velhos.length) await lstExcluirIds('TabelaListas', velhos);
+  listas.senhasEdicao = (listas.senhasEdicao || []).filter(function(r) { return String(r).split('|')[0].toLowerCase() !== email; });
+  if (registro) listas.senhasEdicao.push(registro);
+  lstInvalidar('TabelaListas');
+}
+// modo: 'entrar' | 'criar' | 'trocar'
+function edSenhaAbrir(modo, email) {
+  return new Promise(function(resolve, reject) {
+    edSenhaCtx = { modo: modo, email: email, resolve: resolve, reject: reject };
+    const cx = document.getElementById('edSenhaCaixa');
+    const campo = function(id, rot, auto) { return '<div><label for="' + id + '">' + rot + '</label><input type="password" id="' + id + '" autocomplete="' + auto + '"></div>'; };
+    const titulo = modo === 'criar' ? 'Crie sua senha de edição' : modo === 'trocar' ? 'Trocar senha de edição' : 'Senha de edição';
+    const txt = modo === 'criar' ? 'É o primeiro uso nesta conta. Crie uma senha só para liberar a edição de cadastros (mínimo 4 caracteres). Não precisa ser a senha da Microsoft.'
+      : modo === 'trocar' ? 'Digite a senha atual e a nova senha.' : 'Digite sua senha para liberar a edição.';
+    cx.innerHTML = '<div class="cad">' + ED_CADEADO + '</div><h3>' + titulo + '</h3><div class="quem">' + edEsc(email) + '</div><div class="txt">' + txt + '</div>' +
+      (modo === 'entrar' ? campo('edS1', 'Senha', 'current-password') : '') +
+      (modo === 'trocar' ? campo('edS0', 'Senha atual', 'current-password') : '') +
+      (modo !== 'entrar' ? campo('edS1', 'Nova senha', 'new-password') + campo('edS2', 'Repita a nova senha', 'new-password') : '') +
+      '<div class="erro" id="edSErro"></div>' +
+      '<div class="bts"><button class="btn btn-outline" type="button" onclick="edSenhaCancelar()">Cancelar</button><button class="btn btn-accent" type="button" id="edSOk" onclick="edSenhaConfirmar()">' + (modo === 'entrar' ? 'Liberar edição' : 'Salvar senha') + '</button></div>' +
+      (modo === 'entrar' ? '<button class="lk" type="button" onclick="document.getElementById(\'edSAjuda\').classList.toggle(\'ver\')">Esqueci a senha</button>' +
+        '<div class="ajuda" id="edSAjuda">' + (email === DONO_EDICAO
+          ? 'Para criar uma nova: no Microsoft Lists, abra a lista <b>' + edEsc(LISTS_CFG.prefixo) + 'Listas</b>, apague a linha <b>senhasEdicao</b> com o seu e-mail e clique no lápis de novo — o app pede para criar outra senha.'
+          : 'Peça ao responsável (' + edEsc(DONO_EDICAO) + ') para zerar a sua senha em Configurações › Quem pode editar cadastros. Depois, clique no lápis e crie uma nova.') + '</div>' : '');
+    cx.onkeydown = function(e) { if (e.key === 'Enter') { e.preventDefault(); edSenhaConfirmar(); } };
+    document.getElementById('edSenhaFundo').classList.add('aberto');
+    setTimeout(function() { const f = document.getElementById(modo === 'trocar' ? 'edS0' : 'edS1'); if (f) f.focus(); }, 30);
+  });
+}
+function edSenhaFechar() { document.getElementById('edSenhaFundo').classList.remove('aberto'); document.getElementById('edSenhaCaixa').innerHTML = ''; }
+function edSenhaCancelar() {
+  const c = edSenhaCtx; edSenhaCtx = null; edSenhaFechar();
+  if (c) { const e = new Error('cancelado'); e.errorCode = 'user_cancelled'; c.reject(e); }
+}
+async function edSenhaConfirmar() {
+  const c = edSenhaCtx; if (!c) return;
+  const erro = document.getElementById('edSErro'), ok = document.getElementById('edSOk');
+  const v = function(id) { const el = document.getElementById(id); return el ? el.value : ''; };
+  const falhar = function(msg, limpar) { erro.textContent = msg; if (limpar) { const el = document.getElementById(limpar); el.value = ''; el.focus(); } };
+  if (edSenhaBloqueioAte > Date.now()) { falhar('Muitas tentativas. Aguarde ' + Math.ceil((edSenhaBloqueioAte - Date.now()) / 1000) + ' s.'); return; }
+  ok.disabled = true;
+  try {
+    if (c.modo === 'entrar' || c.modo === 'trocar') {
+      const atual = v(c.modo === 'trocar' ? 'edS0' : 'edS1');
+      if (!atual) { falhar('Digite a senha.'); return; }
+      const reg = edRegistroDe(c.email);
+      if (!reg || !(await edConferir(reg, atual))) {
+        edSenhaErros++;
+        if (edSenhaErros >= 5) { edSenhaErros = 0; edSenhaBloqueioAte = Date.now() + 60000; falhar('Senha incorreta 5 vezes. Aguarde 1 minuto.', c.modo === 'trocar' ? 'edS0' : 'edS1'); }
+        else falhar('Senha incorreta.', c.modo === 'trocar' ? 'edS0' : 'edS1');
+        return;
+      }
+      edSenhaErros = 0;
+      if (c.modo === 'entrar') { edSenhaCtx = null; edSenhaFechar(); c.resolve(); return; }
+    }
+    const n1 = v('edS1'), n2 = v('edS2');
+    if (n1.length < 4) { falhar('A senha precisa ter pelo menos 4 caracteres.', 'edS1'); return; }
+    if (n1 !== n2) { falhar('As duas senhas não são iguais.', 'edS2'); return; }
+    ok.textContent = 'Salvando…';
+    await edGravarRegistro(c.email, await edGerarRegistro(c.email, n1));
+    edSenhaCtx = null; edSenhaFechar(); edAtualizarStatusSenhas();
+    mostrarToast(c.modo === 'trocar' ? 'Senha de edição trocada.' : 'Senha de edição criada.');
+    c.resolve();
+  } catch (e) {
+    falhar('Não foi possível salvar: ' + (e.message || e));
+  } finally { if (ok && document.body.contains(ok)) { ok.disabled = false; if (ok.textContent === 'Salvando…') ok.textContent = 'Salvar senha'; } }
+}
 async function edConfirmarIdentidade() {
   if (edAut && edAut.ate > Date.now()) return edAut;
-  const res = await msalInstance.acquireTokenPopup({ scopes: ['User.Read'], prompt: 'login', loginHint: (contaAtual && contaAtual.username) || undefined });
-  const email = String((res && res.account && res.account.username) || '').trim().toLowerCase();
+  const email = String((contaAtual && contaAtual.username) || '').trim().toLowerCase();
   if (!edEmailAutorizado(email)) { const e = new Error('A conta ' + (email || '(desconhecida)') + ' não tem permissão para editar cadastros.'); e.semPermissao = true; throw e; }
+  await edLerSenhas();
+  await edSenhaAbrir(edRegistroDe(email) ? 'entrar' : 'criar', email);
   edAut = { email: email, ate: Date.now() + ED_VALIDADE_MIN * 60000 };
   return edAut;
 }
 function edErroIdentidade(e) {
   const cod = (e && (e.errorCode || e.code)) || '';
-  if (cod === 'user_cancelled') { mostrarToast('Confirmação cancelada — nada foi alterado.', true); return; }
-  if (cod === 'popup_window_error' || cod === 'empty_window_error') { mostrarToast('O navegador bloqueou a janela de login da Microsoft. Permita pop-ups para este site e tente de novo.', true); return; }
-  mostrarToast(e && e.semPermissao ? e.message : 'Não foi possível confirmar a identidade: ' + ((e && e.message) || e), true);
+  if (cod === 'user_cancelled') return;
+  mostrarToast(e && e.semPermissao ? e.message : 'Não foi possível confirmar a senha: ' + ((e && e.message) || e), true);
+}
+async function edTrocarMinhaSenha() {
+  const email = String((contaAtual && contaAtual.username) || '').trim().toLowerCase();
+  if (!edEmailAutorizado(email)) return;
+  await edLerSenhas();
+  try { await edSenhaAbrir(edRegistroDe(email) ? 'trocar' : 'criar', email); edAut = { email: email, ate: Date.now() + ED_VALIDADE_MIN * 60000 }; } catch (e) { edErroIdentidade(e); }
+}
+// Responsável: vê quem já criou senha e pode zerar a de outra pessoa (que cria outra no próximo uso)
+function edAtualizarStatusSenhas() {
+  const el = document.getElementById('edSenhasStatus'); if (!el) return;
+  const dono = !!(contaAtual && String(contaAtual.username).toLowerCase() === DONO_EDICAO);
+  document.body.classList.toggle('e-dono', dono);
+  if (!dono) { el.innerHTML = ''; return; }
+  const outros = (listas.editoresCadastro || []);
+  el.innerHTML = '<div style="font-weight:600; margin-bottom:4px;">Senhas de edição</div>' + edEmailsAutorizados().map(function(em) {
+    const tem = !!edRegistroDe(em);
+    return '<div class="lin"><span>' + edEsc(em) + '</span><span class="st' + (tem ? ' ok' : '') + '">' + (tem ? '✓ senha criada' : 'cria no 1º uso') + '</span>' +
+      (tem && em !== DONO_EDICAO ? '<button type="button" onclick="edZerarSenha(\'' + edEsc(em) + '\')">Zerar</button>' : '') + '</div>';
+  }).join('') + (outros.length ? '' : '<div class="st" style="padding-top:6px;">Só você está liberado por enquanto.</div>');
+}
+async function edZerarSenha(email) {
+  try { await edConfirmarIdentidade(); } catch (e) { edErroIdentidade(e); return; }
+  if (!confirm('Zerar a senha de edição de ' + email + '? No próximo uso, a pessoa cria uma nova.')) return;
+  try { await edGravarRegistro(email, null); edAtualizarStatusSenhas(); mostrarToast('Senha de ' + email + ' zerada.'); }
+  catch (e) { mostrarToast('Não foi possível zerar: ' + e.message, true); }
 }
 
 function abrirEdicao(proc, idx) {
@@ -2920,7 +3084,7 @@ function edAbrirGaveta(proc, linha) {
       '<button class="ed-x" onclick="edFechar()" title="Fechar sem salvar">✕</button></div>' +
     '<div class="ed-b">' +
       '<div class="ed-chips"><span class="ed-chip">Desvio <b>' + pos + '</b> de <b>' + sessao.length + '</b> desta inspeção</span>' +
-        '<span class="ed-chip ok" id="edChipAut">✓ Senha confirmada · ' + edEsc(edAut ? edAut.email : '') + ' · até ' + (edAut ? edHora(edAut.ate) : '—') + '</span></div>' +
+        '<span class="ed-chip ok" id="edChipAut">✓ Edição liberada · ' + edEsc(edAut ? edAut.email : '') + ' · até ' + (edAut ? edHora(edAut.ate) : '—') + '</span></div>' +
       '<div class="ed-g"><h4>Dados da inspeção</h4><div class="nota">Vale para ' + (sessao.length > 1 ? 'os ' + sessao.length + ' desvios' : 'o desvio') + ' desta inspeção.</div>' +
         '<div class="ed-grid">' + cfg.sessao.map(function(f) { return edCampoHtml(f, linha[f[0]]); }).join('') + '</div></div>' +
       '<div class="ed-g"><h4>' + (proc === 'sopro' ? 'Peso e altura' : 'Temperaturas') + '</h4><div class="nota">Também vale para toda a inspeção.</div>' +
@@ -3115,7 +3279,7 @@ async function salvarEditores() {
   edAtualizarPermissao();
   mostrarToast('Lista de quem pode editar salva (' + (listas.editoresCadastro.length + 1) + ' pessoa' + (listas.editoresCadastro.length ? 's' : '') + ').');
 }
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.body.classList.contains('ed-aberto')) edFechar(); });
+document.addEventListener('keydown', function(e) { if (e.key !== 'Escape') return; if (edSenhaCtx) { e.preventDefault(); edSenhaCancelar(); return; } if (document.body.classList.contains('ed-aberto')) edFechar(); });
 
 /* ---------------- Login (MSAL) ---------------- */
 async function getToken() {
@@ -3133,12 +3297,6 @@ async function getToken() {
 function logout() { msalInstance.logoutRedirect(); }
 
 async function iniciarLogin() {
-  // Esta página aberta DENTRO da janelinha de confirmação de senha (edição de cadastro): a Microsoft
-  // devolve o resultado para cá e a janela principal lê e fecha esta janela — aqui não se inicia nada.
-  if (window.opener && window.opener !== window && /^msal\./.test(window.name || '')) {
-    const ls = document.getElementById('loginScreen'); if (ls) ls.innerHTML = '<p style="font-size:14px;padding:24px;">Confirmando identidade…</p>';
-    return;
-  }
   if (typeof msal === 'undefined') {
     document.getElementById('loginMsg').className = 'err';
     document.getElementById('loginMsg').textContent = 'A biblioteca de login não carregou (possível bloqueio de rede). Tente por outra rede ou avise o TI para liberar cdn.jsdelivr.net.';
@@ -3309,7 +3467,7 @@ async function liberarAcesso() {
 }
 
 /* ---------------- Listas suspensas (guardadas na planilha, aba Listas_App) ---------------- */
-const CHAVES_LISTAS = ['responsaveis','equipInjecao','equipSopro','defeitosInjecao','defeitosSopro','operadores','coresInjecao','gramaturas','resinas','coresSopro','mlSopro','tipoFrasco','fornecedoresPreforma','gramaturasPreforma','operadoresSopro','editoresCadastro'];
+const CHAVES_LISTAS = ['responsaveis','equipInjecao','equipSopro','defeitosInjecao','defeitosSopro','operadores','coresInjecao','gramaturas','resinas','coresSopro','mlSopro','tipoFrasco','fornecedoresPreforma','gramaturasPreforma','operadoresSopro','editoresCadastro','senhasEdicao'];
 
 /* ---------------- Evita que o Excel converta data/hora automaticamente ---------------- */
 function letraColuna(indiceZeroBased) {
