@@ -1187,6 +1187,66 @@
   .rtp-bar { height: 8px; border-radius: 4px; background: #eceef0; overflow: hidden; } .rtp-bar i { display: block; height: 100%; background: #f2a93b; }
   .rtp-obs { border: 1px solid #dfe2e6; background: #fafafa; border-radius: 8px; padding: 11px 13px; font-size: 12px; line-height: 1.55; }
   .rtp-ass { margin-top: 6px; color: #7a7f87; font-size: 10px; }
+
+/* ---------- Edição de cadastro (lápis) — só para contas autorizadas ---------- */
+.occ-table .col-ed { display: none; }
+body.pode-editar .occ-table .col-ed { display: table-cell; position: sticky; left: 0; z-index: 1; background: var(--surface); width: 40px; padding: 4px 4px 4px 8px; }
+body.pode-editar .occ-table thead th.col-ed { z-index: 3; background: var(--surface-2); }
+body.pode-editar .occ-table tr:hover td.col-ed { background: var(--surface-2); }
+.bt-lapis { position: relative; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; border-radius: 7px; border: 1px solid var(--border); background: transparent; color: var(--text-dim); cursor: pointer; padding: 0; }
+.bt-lapis:hover { color: var(--accent); border-color: var(--accent); }
+.bt-lapis.editado::after { content: ''; position: absolute; top: -3px; right: -3px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); }
+.so-editor { display: none !important; }
+body.pode-editar .so-editor { display: block !important; }
+.ed-dono { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; font-size: 13px; font-weight: 600; padding: 8px 11px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--border); margin-bottom: 10px; }
+.ed-dono small { font-weight: 500; color: var(--text-dim); font-size: 11.5px; }
+.ed-scrim { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 130; display: none; }
+.ed-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(580px, 100%); background: var(--surface); border-left: 1px solid var(--border); z-index: 131; display: none; flex-direction: column; box-shadow: -12px 0 36px rgba(0,0,0,.3); }
+body.ed-aberto .ed-scrim { display: block; }
+body.ed-aberto .ed-drawer { display: flex; animation: ivEntra .18s ease-out; }
+.ed-h { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); display: flex; gap: 12px; align-items: flex-start; }
+.ed-h .ic { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); flex-shrink: 0; }
+.ed-h h2 { margin: 0; font-size: 17px; font-weight: 650; }
+.ed-h .s { font-size: 12.5px; color: var(--text-dim); margin-top: 3px; }
+.ed-x { margin-left: auto; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 15px; cursor: pointer; flex-shrink: 0; }
+.ed-b { flex: 1; overflow-y: auto; padding: 14px 18px 18px; display: flex; flex-direction: column; gap: 16px; }
+.ed-b > * { flex-shrink: 0; }
+.ed-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.ed-chip { font-size: 11.5px; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); }
+.ed-chip b { color: var(--text); font-weight: 600; }
+.ed-chip.ok { border-color: color-mix(in srgb, var(--ok) 50%, transparent); color: var(--ok); }
+.ed-g h4 { margin: 0; font-size: 11.5px; text-transform: uppercase; letter-spacing: .6px; color: var(--text-dim); font-weight: 700; }
+.ed-g .nota { font-size: 11.5px; color: var(--text-dim); margin: 2px 0 9px; }
+.ed-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 12px; }
+.ed-grid.c4 { grid-template-columns: repeat(4, 1fr); }
+.ed-f { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.ed-f.largo { grid-column: 1 / -1; }
+.ed-f label { font-size: 11px; color: var(--text-dim); font-weight: 600; }
+.ed-f select, .ed-f input, .ed-f textarea, .ed-ft textarea { font: inherit; font-size: 13px; padding: 7px 9px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); width: 100%; box-sizing: border-box; min-width: 0; }
+.ed-f textarea, .ed-ft textarea { resize: vertical; }
+.ed-f.mudou select, .ed-f.mudou input, .ed-f.mudou textarea { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent); }
+.ed-f .antes { display: none; font-size: 10.5px; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ed-f.mudou .antes { display: block; }
+.ed-fixos { font-size: 12px; color: var(--text-dim); background: var(--surface-2); border-radius: 8px; padding: 8px 11px; line-height: 1.5; }
+.ed-hist { font-size: 11.5px; color: var(--text-dim); background: var(--surface-2); border-radius: 8px; padding: 8px 11px; white-space: pre-wrap; line-height: 1.5; max-height: 120px; overflow-y: auto; }
+.ed-ft { border-top: 1px solid var(--border); padding: 12px 18px calc(12px + env(safe-area-inset-bottom,0px)); display: flex; flex-direction: column; gap: 8px; }
+.ed-ft label { font-size: 11px; color: var(--text-dim); font-weight: 600; }
+.ed-acoes { display: flex; gap: 8px; align-items: center; }
+.ed-cont { margin-right: auto; font-size: 12px; color: var(--text-dim); }
+.ed-cont b { color: var(--accent); }
+.ed-bt-excluir { background: transparent; border: 1px solid color-mix(in srgb, var(--danger) 55%, transparent); color: var(--danger); }
+.ed-bt-excluir:hover { background: color-mix(in srgb, var(--danger) 10%, transparent); }
+.ed-bt-excluir-def { background: var(--danger); border: 1px solid var(--danger); color: #fff; }
+.ed-bt-excluir-def:disabled { opacity: .5; }
+.ed-exc { display: none; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid color-mix(in srgb, var(--danger) 45%, transparent); background: color-mix(in srgb, var(--danger) 7%, transparent); }
+.ed-exc .t { font-size: 13px; font-weight: 650; color: var(--danger); }
+.ed-exc .n { font-size: 12px; color: var(--text-dim); line-height: 1.45; }
+.ed-exc label.op { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; font-weight: 500; color: var(--text); cursor: pointer; }
+.ed-exc label.op input { margin-top: 3px; accent-color: var(--danger); }
+.ed-drawer.modo-excluir .ed-exc { display: flex; }
+.ed-drawer.modo-excluir .so-editar { display: none !important; }
+.ed-drawer:not(.modo-excluir) .so-excluir { display: none !important; }
+@media (max-width: 560px) { .ed-grid, .ed-grid.c4 { grid-template-columns: 1fr 1fr; } }
 </style>
 
 <style>
@@ -1327,6 +1387,8 @@ table.occ-table tr:hover td { background: var(--surface-2); }
 <!-- Dashboard: gaveta do cadastro e balão do "Intervalo entre inspeções" (fora do #opApp, que fica oculto no computador) -->
 <div class="iv-scrim" id="ivScrim" onclick="ivFecharCadastro()"></div>
 <aside class="iv-drawer" id="ivDrawer" aria-label="Cadastro de inspeção" aria-hidden="true"></aside>
+<div class="ed-scrim" onclick="edFechar()"></div>
+<aside class="ed-drawer" id="edDrawer" aria-label="Editar cadastro"></aside>
 <div class="iv-tip" id="ivTip"></div>
 
 <!-- Resumo do turno (janela por cima de tudo: serve para computador e celular/tablet) -->
@@ -1623,7 +1685,7 @@ table.occ-table tr:hover td { background: var(--surface-2); }
           <table class="occ-table">
             <thead>
               <tr>
-                <th>Data</th><th>Hora</th><th>Equipamento</th><th>Face</th><th>Responsável</th><th>Operador</th><th>Cor</th>
+                <th class="col-ed"></th><th>Data</th><th>Hora</th><th>Equipamento</th><th>Face</th><th>Responsável</th><th>Operador</th><th>Cor</th>
                 <th>Gramatura</th><th>OP</th><th>N° Caixa</th><th>Resina</th>
                 <th>Defeito Detectado</th><th>Criticidade</th><th>Foto</th><th>Cavidade</th>
                 <th>°C Mín - Gate</th><th>°C Máx - Gate</th><th>°C Mín - Corpo</th><th>°C Max - Corpo</th>
@@ -1703,7 +1765,7 @@ table.occ-table tr:hover td { background: var(--surface-2); }
           <table class="occ-table">
             <thead>
               <tr>
-                <th>Data</th><th>Hora</th><th>Equipamento</th><th>Responsável</th><th>Operador</th><th>Frasco</th><th>Volume (mL)</th>
+                <th class="col-ed"></th><th>Data</th><th>Hora</th><th>Equipamento</th><th>Responsável</th><th>Operador</th><th>Frasco</th><th>Volume (mL)</th>
                 <th>Preforma</th><th>Fornecedor</th><th>Lote Caixa</th><th>Nº Caixa</th><th>Caixa Vermelha</th><th>Motivo Cx Vermelha</th>
                 <th>Rotulado</th><th>Condição Rotulagem</th><th>Defeito Encontrado</th><th>Criticidade</th>
                 <th>Teste Produção</th><th>Peso / Altura</th><th>Fechamento Saco</th><th>Alinhamento Palete</th><th>Organização Linha</th>
@@ -1928,6 +1990,21 @@ table.occ-table tr:hover td { background: var(--surface-2); }
         <div id="lstStatus"></div>
       </div>
 
+      <div class="card so-editor" id="cardEditores">
+        <h3>Quem pode editar cadastros</h3>
+        <p class="config-note" style="margin-bottom:10px;">
+          Quem estiver aqui vê o lápis <b>✎</b> nas telas de Ocorrência e pode corrigir ou excluir um cadastro depois de
+          confirmar o próprio usuário e senha da Microsoft. As outras contas não veem o lápis nem este quadro.
+          Cada alteração fica registrada no cadastro (quem, quando, o que mudou e o motivo); cada exclusão guarda uma cópia completa na lista <b>INSP Exclusões</b>.
+        </p>
+        <div class="ed-dono"><span id="edDonoEmail"></span><small>responsável · sempre liberado</small></div>
+        <div class="field">
+          <label>Outros e-mails liberados para editar (um por linha)</label>
+          <textarea id="listaEditores" rows="3" placeholder="nome@blowpet.com.br"></textarea>
+        </div>
+        <button class="btn btn-accent" id="btnSalvarEditores" onclick="salvarEditores()">Salvar quem pode editar</button>
+      </div>
+
       <div class="card">
         <h3>Liberar acesso a outras contas</h3>
         <div class="field">
@@ -2091,10 +2168,10 @@ const LOGO_BLOWPET_BRANCO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAA
 const LOGO_BP_SIMBOLO = 'data:image/png;base64,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';
 const LOGO_PDF_PROP = 300 / 238; // largura/altura do logo
 function aplicarLogos() { const m = { preto: LOGO_BLOWPET_PRETO, branco: LOGO_BLOWPET_BRANCO, simbolo: LOGO_BP_SIMBOLO }; document.querySelectorAll('img[data-logo]').forEach(function(i) { if (!i.getAttribute('src')) i.src = m[i.dataset.logo]; }); }
-const ULTIMA_ATUALIZACAO_SISTEMA = '19/11/2026 13:24';
+const ULTIMA_ATUALIZACAO_SISTEMA = '19/11/2026 17:31';
 
-const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas','face_injetora','vibrador_preforma','foto_vibrador_url'];
-const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
+const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas','face_injetora','vibrador_preforma','foto_vibrador_url','editado_em','editado_por','historico_edicao'];
+const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador','editado_em','editado_por','historico_edicao'];
 
 /* ---------------- Cadastro de cavidades por gramatura (aba própria, histórico append-only) ---------------- */
 const NOME_ABA_CAVIDADES = 'Cavidades_App';
@@ -2204,7 +2281,8 @@ let listas = {
   tipoFrasco: [],
   fornecedoresPreforma: [],
   gramaturasPreforma: [],
-  operadoresSopro: []
+  operadoresSopro: [],
+  editoresCadastro: []
 };
 const criticidades = ['LEVE', 'MÉDIO', 'GRAVE'];
 const statusCorrecao = ['CORRIGIDO', 'FICOU PENDENTE'];
@@ -2290,7 +2368,7 @@ const LISTS_TABELAS = [
   { tabela: 'TabelaResumoTurno',  aba: 'ResumoTurno_App',  nome: 'Resumo do Turno' }
 ];
 // Colunas que podem passar de 255 caracteres viram "Várias linhas de texto" (nunca cortam nada).
-const LISTS_LONGAS = ['observacao', 'foto_url', 'cavidade', 'motivo_caixa_vermelha', 'foto_vibrador_url', 'texto', 'cavidades_isoladas', 'chave'];
+const LISTS_LONGAS = ['observacao', 'foto_url', 'cavidade', 'motivo_caixa_vermelha', 'foto_vibrador_url', 'texto', 'cavidades_isoladas', 'chave', 'historico_edicao', 'motivo', 'dados'];
 const LST = { siteId: null, iniciado: null, listas: {}, colunas: {}, itens: {}, pendHeader: {}, pendSubst: {}, avisado: false, leituras: {} };
 const _fetchOriginal = window.fetch.bind(window);
 function lstRede(url, opt) { return (window._fetchRede || _fetchOriginal)(url, opt); }
@@ -2689,6 +2767,356 @@ function lstRenderStatus() {
   el.innerHTML = linhas.join('');
 }
 
+
+/* ---------------- Edição de cadastro (lápis) ----------------
+   Só quem está autorizado vê o lápis (o responsável DONO_EDICAO sempre; os demais pela lista
+   "editoresCadastro", guardada junto das listas de apoio). Antes de abrir a edição, a pessoa confirma
+   usuário e senha da Microsoft numa janelinha (vale por ED_VALIDADE_MIN minutos). Data, hora e fotos
+   não mudam. Cada linha alterada guarda editado_em / editado_por / historico_edicao (antes → depois + motivo). */
+const DONO_EDICAO = 'cleber.rodrigues@blowpet.com.br';
+const ED_VALIDADE_MIN = 15;
+const ED_COLS_HIST = ['editado_em', 'editado_por', 'historico_edicao'];
+const ED_LAPIS = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+const ED_AR = ['APROVADO', 'REPROVADO'], ED_SN = ['SIM', 'NÃO'];
+const ED_STATUS = ['CORRIGIDO', 'FICOU PENDENTE', 'SEM DESVIO'];
+// [campo, rótulo, tipo (sel | txt | num | area), opções, largo?]
+const ED_CAMPOS = {
+  injecao: {
+    sessao: [
+      ['equipamento', 'Equipamento', 'sel', function() { return listas.equipInjecao; }],
+      ['face_injetora', 'Face da injetora', 'sel', function() { return ['1', '2', '3', '4']; }],
+      ['responsavel', 'Responsável (inspetor)', 'sel', function() { return listas.responsaveis; }],
+      ['operador_principal', 'Operador', 'sel', function() { return listas.operadores; }],
+      ['cor', 'Cor', 'sel', function() { return listas.coresInjecao; }],
+      ['gramatura', 'Gramatura', 'sel', function() { return listas.gramaturas; }],
+      ['resina', 'Resina', 'sel', function() { return listas.resinas; }],
+      ['op', 'OP', 'txt'],
+      ['numero_caixa', 'Nº caixa', 'txt'],
+      ['vibrador_preforma', 'Vibrador de preforma', 'sel', function() { return ['APROVADO', 'REPROVADO', 'NÃO ANALISADO']; }],
+      ['organizacao_linha_produtiva', 'Organização da linha', 'sel', function() { return ED_AR; }],
+      ['tonalidade_preforma', 'Tonalidade', 'sel', function() { return ED_AR; }],
+      ['alinhamento_etiqueta_caixa', 'Alinhamento da etiqueta', 'sel', function() { return ED_AR; }]
+    ],
+    temp: [
+      ['temperatura_gate_min', '°C mín · gate', 'num'], ['temperatura_gate_max', '°C máx · gate', 'num'],
+      ['temperatura_corpo_min', '°C mín · corpo', 'num'], ['temperatura_corpo_max', '°C máx · corpo', 'num']
+    ],
+    desvio: [
+      ['defeito', 'Defeito', 'sel', function() { return listas.defeitosInjecao; }, 1],
+      ['cavidade', 'Cavidade(s) — separe por ;', 'txt', null, 1],
+      ['criticidade', 'Criticidade', 'sel', function() { return criticidades; }],
+      ['operador_ciente', 'Operador ciente', 'sel', function() { return ED_SN; }],
+      ['status_correcao', 'Status', 'sel', function() { return ED_STATUS; }],
+      ['observacao', 'Observação', 'area', null, 1]
+    ]
+  },
+  sopro: {
+    sessao: [
+      ['equipamento', 'Equipamento', 'sel', function() { return listas.equipSopro; }],
+      ['responsavel', 'Responsável (inspetor)', 'sel', function() { return listas.responsaveis; }],
+      ['operador', 'Operador', 'sel', function() { return listas.operadoresSopro; }],
+      ['cor', 'Cor', 'sel', function() { return listas.coresSopro; }],
+      ['tipo_frasco', 'Frasco', 'sel', function() { return listas.tipoFrasco; }],
+      ['ml', 'Volume (mL)', 'sel', function() { return listas.mlSopro; }],
+      ['gramatura_preforma', 'Gramatura da preforma', 'sel', function() { return listas.gramaturasPreforma; }],
+      ['fornecedor_preforma', 'Fornecedor da preforma', 'sel', function() { return listas.fornecedoresPreforma; }],
+      ['lote_caixa', 'Lote da caixa', 'txt'],
+      ['numero_caixa', 'Nº caixa', 'txt'],
+      ['caixa_vermelha', 'Caixa vermelha', 'sel', function() { return ED_SN; }],
+      ['motivo_caixa_vermelha', 'Motivo da caixa vermelha', 'txt'],
+      ['produto_rotulado', 'Produto rotulado', 'sel', function() { return ED_SN; }],
+      ['condicao_rotulo', 'Condição da rotulagem', 'sel', function() { return ED_AR; }],
+      ['teste_producao', 'Teste de produção', 'sel', function() { return ED_SN; }],
+      ['num_postos_molde', 'Nº de postos do molde', 'txt'],
+      ['condicao_fechamento_saco', 'Fechamento do saco', 'sel', function() { return ED_AR; }],
+      ['alinhamento_paletes', 'Alinhamento do palete', 'sel', function() { return ED_AR; }],
+      ['organizacao_linha_produtiva', 'Organização da linha', 'sel', function() { return ED_AR; }]
+    ],
+    temp: [
+      ['peso_1', 'Peso 1', 'num'], ['peso_2', 'Peso 2', 'num'], ['peso_3', 'Peso 3', 'num'], ['peso_4', 'Peso 4', 'num'],
+      ['altura_1', 'Altura 1', 'num'], ['altura_2', 'Altura 2', 'num'], ['altura_3', 'Altura 3', 'num'], ['altura_4', 'Altura 4', 'num']
+    ],
+    desvio: [
+      ['defeito', 'Defeito', 'sel', function() { return listas.defeitosSopro; }, 1],
+      ['criticidade', 'Criticidade', 'sel', function() { return criticidades; }],
+      ['status_correcao', 'Status', 'sel', function() { return ED_STATUS; }],
+      ['observacao', 'Observação', 'area', null, 1]
+    ]
+  }
+};
+let edAut = null;      // { email, ate } — identidade confirmada com senha
+let edEstado = null;   // { proc, linha, sessao: [linhas da mesma inspeção] }
+
+function edEsc(t) { return String(t == null ? '' : t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function edEmailsAutorizados() {
+  return [DONO_EDICAO].concat((listas.editoresCadastro || []).map(function(e) { return String(e).trim().toLowerCase(); })).filter(Boolean);
+}
+function edEmailAutorizado(email) { return !!email && edEmailsAutorizados().indexOf(String(email).trim().toLowerCase()) > -1; }
+function edPodeEditar() { return !!(contaAtual && edEmailAutorizado(contaAtual.username)); }
+function edAtualizarPermissao() {
+  const pode = edPodeEditar(), antes = document.body.classList.contains('pode-editar');
+  document.body.classList.toggle('pode-editar', pode);
+  const ta = document.getElementById('listaEditores'); if (ta && document.activeElement !== ta) ta.value = (listas.editoresCadastro || []).join('\n');
+  const dn = document.getElementById('edDonoEmail'); if (dn) dn.textContent = DONO_EDICAO;
+  if (!pode && document.body.classList.contains('ed-aberto')) edFechar();
+  if (pode !== antes && dadosHistoricoCarregados) { try { renderTabelaInjecao(); renderTabelaSopro(); } catch (e) {} }
+}
+function edCelula(proc, l) {
+  if (!edPodeEditar()) return '<td class="col-ed"></td>';
+  const tit = l.editado_em ? 'Editado em ' + l.editado_em + ' por ' + (l.editado_por || '—') + ' — clique para editar' : 'Editar este cadastro';
+  return '<td class="col-ed"><button type="button" class="bt-lapis' + (l.editado_em ? ' editado' : '') + '" title="' + edEsc(tit) + '" onclick="abrirEdicao(\'' + proc + '\',' + Number(l._idx) + ')">' + ED_LAPIS + '</button></td>';
+}
+function edAgora() {
+  const d = new Date(), p = function(n) { return String(n).padStart(2, '0'); };
+  return p(d.getDate()) + '/' + p(d.getMonth() + 1) + '/' + d.getFullYear() + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+}
+function edHora(ms) { const d = new Date(ms); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); }
+
+// Confirmação de usuário e senha (janelinha da Microsoft, sempre pedindo a senha de novo).
+async function edConfirmarIdentidade() {
+  if (edAut && edAut.ate > Date.now()) return edAut;
+  const res = await msalInstance.acquireTokenPopup({ scopes: ['User.Read'], prompt: 'login', loginHint: (contaAtual && contaAtual.username) || undefined });
+  const email = String((res && res.account && res.account.username) || '').trim().toLowerCase();
+  if (!edEmailAutorizado(email)) { const e = new Error('A conta ' + (email || '(desconhecida)') + ' não tem permissão para editar cadastros.'); e.semPermissao = true; throw e; }
+  edAut = { email: email, ate: Date.now() + ED_VALIDADE_MIN * 60000 };
+  return edAut;
+}
+function edErroIdentidade(e) {
+  const cod = (e && (e.errorCode || e.code)) || '';
+  if (cod === 'user_cancelled') { mostrarToast('Confirmação cancelada — nada foi alterado.', true); return; }
+  if (cod === 'popup_window_error' || cod === 'empty_window_error') { mostrarToast('O navegador bloqueou a janela de login da Microsoft. Permita pop-ups para este site e tente de novo.', true); return; }
+  mostrarToast(e && e.semPermissao ? e.message : 'Não foi possível confirmar a identidade: ' + ((e && e.message) || e), true);
+}
+
+function abrirEdicao(proc, idx) {
+  if (!edPodeEditar()) return;
+  const linha = ((dadosCache && dadosCache[proc]) || []).find(function(o) { return o._idx === idx; });
+  if (!linha) { mostrarToast('Cadastro não encontrado — clique em Atualizar e tente de novo.', true); return; }
+  if (edAut && edAut.ate > Date.now()) { edAbrirGaveta(proc, linha); return; }
+  edConfirmarIdentidade().then(function() { edAbrirGaveta(proc, linha); }).catch(edErroIdentidade);
+}
+function edCampoHtml(def, valor) {
+  const k = def[0], rot = def[1], tipo = def[2], v = valor == null ? '' : String(valor), id = 'ed_' + k;
+  let ctl;
+  if (tipo === 'sel') {
+    const ops = ((def[3] && def[3]()) || []).slice();
+    if (v && ops.indexOf(v) < 0) ops.unshift(v);
+    ctl = '<select id="' + id + '"><option value="">—</option>' + ops.map(function(o) { return '<option value="' + edEsc(o) + '"' + (o === v ? ' selected' : '') + '>' + edEsc(o) + '</option>'; }).join('') + '</select>';
+  } else if (tipo === 'area') ctl = '<textarea id="' + id + '" rows="2">' + edEsc(v) + '</textarea>';
+  else ctl = '<input id="' + id + '" type="text"' + (tipo === 'num' ? ' inputmode="decimal"' : '') + ' value="' + edEsc(v) + '">';
+  return '<div class="ed-f' + (def[4] ? ' largo' : '') + '" data-k="' + k + '" data-orig="' + edEsc(v) + '"><label for="' + id + '">' + edEsc(rot) + '</label>' + ctl + '<span class="antes">antes: ' + (v ? edEsc(v) : 'vazio') + '</span></div>';
+}
+function edAbrirGaveta(proc, linha) {
+  const cfg = ED_CAMPOS[proc];
+  const sessao = linha.id_sessao ? dadosCache[proc].filter(function(o) { return o.id_sessao === linha.id_sessao; }).sort(function(a, b) { return a._idx - b._idx; }) : [linha];
+  edEstado = { proc: proc, linha: linha, sessao: sessao };
+  const pos = sessao.indexOf(linha) + 1;
+  const quando = formatarDataBR(linha.data) + ' às ' + (linha.hora_fim || '—');
+  const fotos = sessao.filter(function(o) { return o.foto_url; }).length + (linha.foto_vibrador_url ? 1 : 0);
+  const d = document.getElementById('edDrawer');
+  d.innerHTML =
+    '<div class="ed-h"><div class="ic">' + ED_LAPIS + '</div><div><h2>Editar cadastro · ' + (proc === 'sopro' ? 'Sopro' : 'Injeção') + '</h2>' +
+      '<div class="s">' + edEsc(linha.equipamento || '—') + ' · ' + edEsc(quando) + ' · inspetor ' + edEsc(linha.responsavel || '—') + '</div></div>' +
+      '<button class="ed-x" onclick="edFechar()" title="Fechar sem salvar">✕</button></div>' +
+    '<div class="ed-b">' +
+      '<div class="ed-chips"><span class="ed-chip">Desvio <b>' + pos + '</b> de <b>' + sessao.length + '</b> desta inspeção</span>' +
+        '<span class="ed-chip ok" id="edChipAut">✓ Senha confirmada · ' + edEsc(edAut ? edAut.email : '') + ' · até ' + (edAut ? edHora(edAut.ate) : '—') + '</span></div>' +
+      '<div class="ed-g"><h4>Dados da inspeção</h4><div class="nota">Vale para ' + (sessao.length > 1 ? 'os ' + sessao.length + ' desvios' : 'o desvio') + ' desta inspeção.</div>' +
+        '<div class="ed-grid">' + cfg.sessao.map(function(f) { return edCampoHtml(f, linha[f[0]]); }).join('') + '</div></div>' +
+      '<div class="ed-g"><h4>' + (proc === 'sopro' ? 'Peso e altura' : 'Temperaturas') + '</h4><div class="nota">Também vale para toda a inspeção.</div>' +
+        '<div class="ed-grid c4">' + cfg.temp.map(function(f) { return edCampoHtml(f, linha[f[0]]); }).join('') + '</div></div>' +
+      '<div class="ed-g"><h4>Este desvio</h4><div class="nota">Só a linha em que você clicou.</div>' +
+        '<div class="ed-grid">' + cfg.desvio.map(function(f) { return edCampoHtml(f, linha[f[0]]); }).join('') + '</div></div>' +
+      '<div class="ed-fixos">Não mudam na edição: data e hora do cadastro (' + edEsc(quando) + ') e as fotos (' + fotos + ' anexada' + (fotos === 1 ? '' : 's') + ').</div>' +
+      (linha.historico_edicao ? '<div class="ed-g"><h4>Edições anteriores</h4><div class="ed-hist" style="margin-top:6px;">' + edEsc(linha.historico_edicao) + '</div></div>' : '') +
+    '</div>' +
+    '<div class="ed-ft">' +
+      '<div class="ed-exc"><div class="t">Excluir cadastro</div>' +
+        (sessao.length > 1
+          ? '<label class="op"><input type="radio" name="edExcQual" value="desvio" checked><span>Só este desvio <span style="color:var(--text-dim)">(' + edEsc(linha.defeito || 'sem defeito') + ')</span></span></label>' +
+            '<label class="op"><input type="radio" name="edExcQual" value="inspecao"><span>A inspeção inteira — ' + sessao.length + ' desvios</span></label>'
+          : '<div class="n" style="color:var(--text)">Esta inspeção tem um único lançamento — ele será removido.</div>') +
+        '<div class="n">Some das telas, do dashboard e dos relatórios. Uma cópia completa do que foi excluído, com o motivo, fica guardada na lista <b>' + edEsc(LISTS_CFG.prefixo + 'Exclusões') + '</b>. As fotos continuam na pasta.</div></div>' +
+      '<label for="ed_motivo"><span class="so-editar">Motivo da alteração (obrigatório)</span><span class="so-excluir">Motivo da exclusão (obrigatório)</span></label>' +
+      '<textarea id="ed_motivo" rows="2" placeholder="Ex.: operador lançado errado; cor corrigida conforme a OP"></textarea>' +
+      '<div class="ed-acoes so-editar"><button class="btn ed-bt-excluir" onclick="edModoExcluir(true)" title="Excluir este cadastro">Excluir…</button><span class="ed-cont" id="edCont">Nenhuma alteração ainda</span>' +
+        '<button class="btn btn-outline" onclick="edFechar()">Cancelar</button>' +
+        '<button class="btn btn-accent" id="edSalvar" onclick="edSalvar()" disabled>Salvar alterações</button></div>' +
+      '<div class="ed-acoes so-excluir"><span class="ed-cont"></span><button class="btn btn-outline" onclick="edModoExcluir(false)">Voltar</button>' +
+        '<button class="btn ed-bt-excluir-def" id="edExcluir" onclick="edExcluir()" disabled>Excluir definitivamente</button></div></div>';
+  d.oninput = d.onchange = edMarcar;
+  d.classList.remove('modo-excluir');
+  document.body.classList.add('ed-aberto');
+  edMarcar();
+}
+function edFechar() { document.body.classList.remove('ed-aberto'); edEstado = null; }
+function edNormalizar(k, v) {
+  v = String(v == null ? '' : v).trim();
+  if (k === 'cavidade') v = v.split(/[\s,;]+/).filter(Boolean).join(';');
+  return v;
+}
+function edMudancas() {
+  const m = [];
+  document.querySelectorAll('#edDrawer .ed-f').forEach(function(f) {
+    const k = f.getAttribute('data-k'), el = f.querySelector('select,input,textarea');
+    const novo = edNormalizar(k, el.value), antes = f.getAttribute('data-orig');
+    const mudou = novo !== edNormalizar(k, antes);
+    f.classList.toggle('mudou', mudou);
+    if (mudou) m.push({ k: k, rot: f.querySelector('label').textContent.replace(/ — separe por ;$/, ''), antes: antes, novo: novo });
+  });
+  return m;
+}
+function edMarcar() {
+  const m = edMudancas(), motivo = (document.getElementById('ed_motivo') || {}).value || '';
+  const c = document.getElementById('edCont');
+  if (c) c.innerHTML = m.length ? '<b>' + m.length + '</b> alteraç' + (m.length === 1 ? 'ão' : 'ões') + (motivo.trim() ? '' : ' · falta o motivo') : 'Nenhuma alteração ainda';
+  const b = document.getElementById('edSalvar'); if (b) b.disabled = !m.length || !motivo.trim();
+  const bx = document.getElementById('edExcluir'); if (bx) bx.disabled = !motivo.trim();
+}
+function edModoExcluir(ativo) {
+  const d = document.getElementById('edDrawer'); d.classList.toggle('modo-excluir', !!ativo);
+  const t = document.getElementById('ed_motivo');
+  t.placeholder = ativo ? 'Ex.: cadastro em duplicidade; lançado na máquina errada' : 'Ex.: operador lançado errado; cor corrigida conforme a OP';
+  if (ativo) t.focus();
+  edMarcar();
+}
+// Cria as 3 colunas de histórico no fim da lista (uma de cada vez), só se as colunas atuais
+// estiverem exatamente na ordem que o app lê — senão para, pra nunca desalinhar a leitura.
+async function edGarantirColunasHistorico(tabela, cab) {
+  const c = await lstColunas(tabela, true);
+  const faltam = ED_COLS_HIST.filter(function(n) { return !c.interno[n]; });
+  if (!faltam.length) return c;
+  const base = cab.filter(function(n) { return ED_COLS_HIST.indexOf(n) < 0; });
+  const esperado = base.concat(ED_COLS_HIST.filter(function(n) { return c.interno[n]; }));
+  if (c.ordem.join('|') !== esperado.join('|')) throw new Error('as colunas da lista estão fora da ordem esperada — nada foi alterado');
+  for (const n of faltam) await lstAdicionarColuna(tabela, n);
+  return await lstColunas(tabela, true);
+}
+async function edSalvar() {
+  const st = edEstado; if (!st) return;
+  const mud = edMudancas(), motivo = document.getElementById('ed_motivo').value.trim();
+  if (!mud.length) { mostrarToast('Nenhuma alteração para salvar.', true); return; }
+  if (!motivo) { mostrarToast('Escreva o motivo da alteração.', true); return; }
+  const btn = document.getElementById('edSalvar');
+  try { await edConfirmarIdentidade(); } catch (e) { edErroIdentidade(e); return; }
+  btn.disabled = true; btn.textContent = 'Salvando…';
+  const cfg = ED_CAMPOS[st.proc], camposDesvio = cfg.desvio.map(function(f) { return f[0]; });
+  const mSessao = mud.filter(function(x) { return camposDesvio.indexOf(x.k) < 0; });
+  const mDesvio = mud.filter(function(x) { return camposDesvio.indexOf(x.k) > -1; });
+  // Cavidade digitada à mão deixa de ser "Todas as ativas"
+  if (mDesvio.some(function(x) { return x.k === 'cavidade'; }) && st.linha.cavidade_todas) mDesvio.push({ k: 'cavidade_todas', rot: 'Todas as ativas', antes: st.linha.cavidade_todas, novo: '', oculto: 1 });
+  const tabela = st.proc === 'sopro' ? 'TabelaSopro' : 'TabelaInjecao', cab = st.proc === 'sopro' ? CABECALHO_SOPRO : CABECALHO_INJECAO;
+  let gravadas = 0;
+  try {
+    if (typeof lstG !== 'function' || !LST.listas[tabela]) throw new Error('banco de dados (Lists) não disponível');
+    const c = await edGarantirColunasHistorico(tabela, cab);
+    const loc = await edLocalizar(tabela, c, st.sessao), alvo = loc.alvo, val = loc.val;
+    const quando = edAgora(), quem = edAut.email;
+    for (let i = 0; i < st.sessao.length; i++) {
+      const o = st.sessao[i], aqui = mSessao.concat(o === st.linha ? mDesvio : []);
+      if (!aqui.length) continue;
+      const f = {};
+      aqui.forEach(function(x) { f[c.interno[x.k]] = x.novo; });
+      const resumo = aqui.filter(function(x) { return !x.oculto; }).map(function(x) { return x.rot + ': ' + (x.antes || 'vazio') + ' → ' + (x.novo || 'vazio'); }).join('; ');
+      const hist = quando + ' · ' + quem + ' · ' + resumo + ' · Motivo: ' + motivo;
+      const ant = val(alvo[i], 'historico_edicao');
+      f[c.interno.editado_em] = quando; f[c.interno.editado_por] = quem; f[c.interno.historico_edicao] = ant ? ant + '\n' + hist : hist;
+      await lstG('PATCH', lstSite() + '/lists/' + LST.listas[tabela] + '/items/' + alvo[i].id + '/fields', f);
+      gravadas++;
+      aqui.forEach(function(x) { o[x.k] = x.novo; });
+      o.editado_em = quando; o.editado_por = quem; o.historico_edicao = ant ? ant + '\n' + hist : hist;
+    }
+    lstInvalidar(tabela);
+    edFechar();
+    try { popularFiltrosEquipResp(); atualizarDashboard(); } catch (e) {}
+    if (st.proc === 'sopro') renderTabelaSopro(); else renderTabelaInjecao();
+    mostrarToast('Cadastro atualizado (' + gravadas + ' linha' + (gravadas === 1 ? '' : 's') + ').');
+  } catch (e) {
+    console.error('Edição de cadastro:', e);
+    lstInvalidar(tabela);
+    mostrarToast('Não foi possível salvar a edição: ' + e.message + (gravadas ? ' (' + gravadas + ' linha(s) já gravadas — clique em Atualizar)' : ''), true);
+    btn.disabled = false; btn.textContent = 'Salvar alterações';
+  }
+}
+// Acha na lista cada linha da inspeção (pela posição lida; se a lista mudou, pelo conteúdo).
+async function edLocalizar(tabela, c, objs) {
+  lstInvalidar(tabela);
+  const itens = await lstItens(tabela), p = function(n) { return c.ordem.indexOf(n); };
+  const val = function(it, n) { return p(n) < 0 ? '' : (it.valores[p(n)] || ''); };
+  const igual = function(it, o) { return val(it, 'id_sessao') === (o.id_sessao || '') && val(it, 'defeito') === (o.defeito || '') && val(it, 'observacao') === (o.observacao || '') && edNormalizar('cavidade', val(it, 'cavidade')) === edNormalizar('cavidade', o.cavidade); };
+  const alvo = objs.map(function(o) {
+    const it = itens[o._idx];
+    if (it && igual(it, o)) return it;
+    const cands = itens.filter(function(x) { return igual(x, o); });
+    if (cands.length === 1) return cands[0];
+    throw new Error('o cadastro foi alterado por outra pessoa enquanto você editava — clique em Atualizar e tente de novo');
+  });
+  return { alvo: alvo, val: val };
+}
+// Lista "INSP Exclusões": cópia completa de cada linha excluída (criada na 1ª exclusão).
+const ED_COLS_EXC = ['excluido_em', 'excluido_por', 'processo', 'equipamento', 'data_cadastro', 'id_sessao', 'quantidade', 'motivo', 'dados'];
+async function edListaExclusoes() {
+  const nome = LISTS_CFG.prefixo + 'Exclusões';
+  const ls = await lstTodos(lstSite() + '/lists?$select=id,displayName');
+  let l = ls.find(function(x) { return x.displayName === nome; }), id = l && l.id;
+  if (!id) { const usados = { title: 1, id: 1 }; id = (await lstG('POST', lstSite() + '/lists', { displayName: nome, columns: ED_COLS_EXC.map(function(h, n) { return lstDefColuna(h, n + 1, usados); }), list: { template: 'genericList' } })).id; }
+  const cols = await lstTodos(lstSite() + '/lists/' + id + '/columns'), mapa = {};
+  cols.forEach(function(c) { if (/^in:\d+/.test(c.description || '')) mapa[c.displayName] = c.name; });
+  return { id: id, mapa: mapa };
+}
+async function edExcluir() {
+  const st = edEstado; if (!st) return;
+  const motivo = document.getElementById('ed_motivo').value.trim();
+  if (!motivo) { mostrarToast('Escreva o motivo da exclusão.', true); return; }
+  const r = document.querySelector('input[name="edExcQual"]:checked');
+  const tudo = !r || r.value === 'inspecao' || st.sessao.length === 1;
+  const objs = tudo ? st.sessao : [st.linha];
+  const btn = document.getElementById('edExcluir');
+  try { await edConfirmarIdentidade(); } catch (e) { edErroIdentidade(e); return; }
+  btn.disabled = true; btn.textContent = 'Excluindo…';
+  const tabela = st.proc === 'sopro' ? 'TabelaSopro' : 'TabelaInjecao';
+  try {
+    if (typeof lstG !== 'function' || !LST.listas[tabela]) throw new Error('banco de dados (Lists) não disponível');
+    const c = await lstColunas(tabela, true);
+    const loc = await edLocalizar(tabela, c, objs);
+    // 1º guarda a cópia (se não conseguir guardar, não exclui nada)
+    const log = await edListaExclusoes(), f = { Title: (st.proc === 'sopro' ? 'Sopro' : 'Injeção') + ' · ' + (st.linha.equipamento || '') + ' · ' + edAgora() };
+    const dados = loc.alvo.map(function(it) { const o = {}; c.ordem.forEach(function(h, i) { if (it.valores[i]) o[h] = it.valores[i]; }); return o; });
+    const v = { excluido_em: edAgora(), excluido_por: edAut.email, processo: st.proc === 'sopro' ? 'Sopro' : 'Injeção', equipamento: st.linha.equipamento || '',
+      data_cadastro: formatarDataBR(st.linha.data) + ' ' + (st.linha.hora_fim || ''), id_sessao: st.linha.id_sessao || '',
+      quantidade: String(objs.length) + (tudo ? ' (inspeção inteira)' : ' (um desvio)'), motivo: motivo, dados: JSON.stringify(dados) };
+    Object.keys(v).forEach(function(k) { if (log.mapa[k]) f[log.mapa[k]] = v[k]; });
+    await lstG('POST', lstSite() + '/lists/' + log.id + '/items', { fields: f });
+    await lstExcluirIds(tabela, loc.alvo.map(function(it) { return it.id; }));
+    lstInvalidar(tabela);
+    edFechar();
+    mostrarToast((tudo && st.sessao.length > 1 ? 'Inspeção excluída (' + objs.length + ' desvios).' : 'Lançamento excluído.') + ' Cópia guardada em ' + LISTS_CFG.prefixo + 'Exclusões.');
+    carregarDados();
+  } catch (e) {
+    console.error('Exclusão de cadastro:', e);
+    lstInvalidar(tabela);
+    mostrarToast('Não foi possível excluir: ' + e.message, true);
+    btn.disabled = false; btn.textContent = 'Excluir definitivamente';
+  }
+}
+async function salvarEditores() {
+  if (!edPodeEditar()) return;
+  const txt = document.getElementById('listaEditores').value;
+  const emails = txt.split(/[\s,;]+/).map(function(s) { return s.trim().toLowerCase(); }).filter(Boolean);
+  const invalidos = emails.filter(function(e) { return !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e); });
+  if (invalidos.length) { mostrarToast('E-mail inválido: ' + invalidos.join(', '), true); return; }
+  try { await edConfirmarIdentidade(); } catch (e) { edErroIdentidade(e); return; }
+  const btn = document.getElementById('btnSalvarEditores'); btn.disabled = true;
+  const antes = listas.editoresCadastro;
+  listas.editoresCadastro = emails.filter(function(e, i) { return e !== DONO_EDICAO && emails.indexOf(e) === i; });
+  const ok = await salvarListasNaPlanilha();
+  btn.disabled = false;
+  if (!ok) { listas.editoresCadastro = antes; mostrarToast('Não foi possível salvar. Tente de novo.', true); return; }
+  edAtualizarPermissao();
+  mostrarToast('Lista de quem pode editar salva (' + (listas.editoresCadastro.length + 1) + ' pessoa' + (listas.editoresCadastro.length ? 's' : '') + ').');
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape' && document.body.classList.contains('ed-aberto')) edFechar(); });
+
 /* ---------------- Login (MSAL) ---------------- */
 async function getToken() {
   await msalPronto;
@@ -2705,6 +3133,12 @@ async function getToken() {
 function logout() { msalInstance.logoutRedirect(); }
 
 async function iniciarLogin() {
+  // Esta página aberta DENTRO da janelinha de confirmação de senha (edição de cadastro): a Microsoft
+  // devolve o resultado para cá e a janela principal lê e fecha esta janela — aqui não se inicia nada.
+  if (window.opener && window.opener !== window && /^msal\./.test(window.name || '')) {
+    const ls = document.getElementById('loginScreen'); if (ls) ls.innerHTML = '<p style="font-size:14px;padding:24px;">Confirmando identidade…</p>';
+    return;
+  }
   if (typeof msal === 'undefined') {
     document.getElementById('loginMsg').className = 'err';
     document.getElementById('loginMsg').textContent = 'A biblioteca de login não carregou (possível bloqueio de rede). Tente por outra rede ou avise o TI para liberar cdn.jsdelivr.net.';
@@ -2747,6 +3181,7 @@ function aposLogin() {
   { const nm = String(contaAtual.name || String(contaAtual.username || '').split('@')[0] || '—').trim(); const sn = document.getElementById('sbNome'), sa = document.getElementById('sbAvatar');
     if (sn) sn.textContent = nm; if (sa) sa.textContent = nm.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map(function(x) { return x.charAt(0).toUpperCase(); }).join('') || '—'; }
   if (modoOperacao()) opIniciar();
+  edAtualizarPermissao();
   conectarPlanilha();
 }
 
@@ -2874,7 +3309,7 @@ async function liberarAcesso() {
 }
 
 /* ---------------- Listas suspensas (guardadas na planilha, aba Listas_App) ---------------- */
-const CHAVES_LISTAS = ['responsaveis','equipInjecao','equipSopro','defeitosInjecao','defeitosSopro','operadores','coresInjecao','gramaturas','resinas','coresSopro','mlSopro','tipoFrasco','fornecedoresPreforma','gramaturasPreforma','operadoresSopro'];
+const CHAVES_LISTAS = ['responsaveis','equipInjecao','equipSopro','defeitosInjecao','defeitosSopro','operadores','coresInjecao','gramaturas','resinas','coresSopro','mlSopro','tipoFrasco','fornecedoresPreforma','gramaturasPreforma','operadoresSopro','editoresCadastro'];
 
 /* ---------------- Evita que o Excel converta data/hora automaticamente ---------------- */
 function letraColuna(indiceZeroBased) {
@@ -3938,6 +4373,7 @@ function renderListasNaTela() {
   document.getElementById('listaFornecedoresPreforma').value = listas.fornecedoresPreforma.join('\n');
   document.getElementById('listaGramaturasPreforma').value = listas.gramaturasPreforma.join('\n');
   document.getElementById('listaOperadoresSopro').value = listas.operadoresSopro.join('\n');
+  edAtualizarPermissao();
 }
 
 async function salvarListas() {
@@ -5032,7 +5468,7 @@ function montarLinhasSeguro(linhas, montarLinha) {
 function linhasArrayParaObjeto(linhasArray, cabecalho, processo) {
   return linhasArray.map(function(row) {
     const valores = row.values[0];
-    const obj = { processo: processo };
+    const obj = { processo: processo, _idx: row.index };
     // Tudo que vem do Excel vira TEXTO: ele devolve "123" digitado como número 123, e o app (que só
     // trabalha com texto nesses campos) quebrava ao montar a tabela — ver textoDaCelulaExcel().
     cabecalho.forEach(function(campo, i) { obj[campo] = textoDaCelulaExcel(normalizarValorDataHora(campo, valores[i])); });
@@ -5938,7 +6374,7 @@ function renderTabelaSopro() {
       const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
       const statusUpper = (l.status_correcao||'').toUpperCase();
       const statusClasse = statusUpper.indexOf('PENDENTE') > -1 ? 'pendente' : statusUpper.indexOf('SEM DESVIO') > -1 ? 'semdesvio' : 'corrigido';
-      return '<tr>' +
+      return '<tr>' + edCelula('sopro', l) +
         '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_fim||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
         '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador||'—')+'</td>' + '<td>'+(l.tipo_frasco||'—')+'</td>' + '<td>'+(l.ml||'—')+'</td>' +
         '<td>'+(l.gramatura_preforma||'—')+'</td>' + '<td>'+(l.fornecedor_preforma||'—')+'</td>' + '<td>'+(l.lote_caixa||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+porExtenso(l.caixa_vermelha)+'</td>' + '<td>'+(l.motivo_caixa_vermelha||'—')+'</td>' +
@@ -5973,7 +6409,7 @@ function renderTabelaInjecao() {
     const critClasse = (l.criticidade||'').toUpperCase() === 'GRAVE' ? 'grave' : (l.criticidade||'').toUpperCase() === 'MÉDIO' ? 'medio' : 'leve';
     const statusUpper = (l.status_correcao||'').toUpperCase();
       const statusClasse = statusUpper.indexOf('PENDENTE') > -1 ? 'pendente' : statusUpper.indexOf('SEM DESVIO') > -1 ? 'semdesvio' : 'corrigido';
-    return '<tr>' +
+    return '<tr>' + edCelula('injecao', l) +
       '<td>'+formatarDataBR(l.data)+'</td>' + '<td>'+(l.hora_fim||'—')+'</td>' + '<td>'+(l.equipamento||'—')+'</td>' +
       '<td>'+(l.face_injetora||'—')+'</td>' + '<td>'+(l.responsavel||'—')+'</td>' + '<td>'+(l.operador_principal||'—')+'</td>' + '<td>'+(l.cor||'—')+'</td>' +
       '<td>'+(l.gramatura||'—')+'</td>' + '<td>'+(l.op||'—')+'</td>' + '<td>'+(l.numero_caixa||'—')+'</td>' + '<td>'+(l.resina||'—')+'</td>' +
