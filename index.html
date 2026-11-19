@@ -88,6 +88,8 @@
   .field.campo-erro > label { color: var(--danger); }
   .vib-foto-label { font-size: 11px; color: var(--text-dim); margin-top: 5px; display: flex; align-items: center; gap: 6px; }
   .vib-foto-label.ok { color: var(--ok); } .vib-foto-label.aviso { color: var(--warn); }
+  .badge.nao-analisado { background: var(--surface-2); color: var(--text-dim); }
+  .vib-bloco .toggle-group .toggle-btn { white-space: nowrap; }
   .vib-mini { width: 34px; height: 34px; object-fit: cover; border-radius: 5px; border: 1px solid var(--border); }
   #loginMsg { margin-top: 16px; font-size: 13px; color: var(--text-dim); max-width: 340px; }
   #loginMsg.err { color: var(--danger); }
@@ -2089,7 +2091,7 @@ const LOGO_BLOWPET_BRANCO = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASwAA
 const LOGO_BP_SIMBOLO = 'data:image/png;base64,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';
 const LOGO_PDF_PROP = 300 / 238; // largura/altura do logo
 function aplicarLogos() { const m = { preto: LOGO_BLOWPET_PRETO, branco: LOGO_BLOWPET_BRANCO, simbolo: LOGO_BP_SIMBOLO }; document.querySelectorAll('img[data-logo]').forEach(function(i) { if (!i.getAttribute('src')) i.src = m[i.dataset.logo]; }); }
-const ULTIMA_ATUALIZACAO_SISTEMA = '17/11/2026 22:53';
+const ULTIMA_ATUALIZACAO_SISTEMA = '19/11/2026 11:03';
 
 const CABECALHO_INJECAO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','operador_principal','cor','gramatura','resina','defeito','cavidade','criticidade','operador_ciente','status_correcao','observacao','foto_url','criado_em','organizacao_linha_produtiva','tonalidade_preforma','alinhamento_etiqueta_caixa','temperatura_gate_min','temperatura_gate_max','temperatura_corpo_min','temperatura_corpo_max','op','numero_caixa','cavidade_todas','face_injetora','vibrador_preforma','foto_vibrador_url'];
 const CABECALHO_SOPRO = ['id_sessao','data','hora_inicio','hora_fim','equipamento','responsavel','cor','ml','tipo_frasco','defeito','criticidade','status_correcao','observacao','foto_url','criado_em','condicao_fechamento_saco','alinhamento_paletes','organizacao_linha_produtiva','produto_rotulado','condicao_rotulo','teste_producao','num_postos_molde','peso_1','peso_2','peso_3','peso_4','altura_1','altura_2','altura_3','altura_4','gramatura_preforma','fornecedor_preforma','lote_caixa','numero_caixa','caixa_vermelha','motivo_caixa_vermelha','operador'];
@@ -3968,18 +3970,39 @@ async function salvarListas() {
 /* ---------------- Formulário genérico (Injeção / Sopro) ---------------- */
 function gerarIdSessao() { return 'S' + Date.now(); }
 
-// Foto do "Vibrador de Preforma - Altura da Preforma na Caixa" (Cadastro Injeção) — obrigatória.
-let fotoVibradorInjecao = null;
+// Foto do "Vibrador de Preforma - Altura da Preforma na Caixa" (Cadastro Injeção) — obrigatória quando o
+// vibrador for avaliado (Aprovado/Reprovado); com "Não analisado" não precisa de foto.
+// A foto é compactada assim que é escolhida (fica leve para enviar e para a miniatura na tela).
+let fotoVibradorInjecao = null, fotoVibradorPronta = Promise.resolve(), fotoVibradorMiniUrl = null, fotoVibradorSeq = 0;
 function armazenarFotoVibrador(files) {
-  fotoVibradorInjecao = files && files[0] ? files[0] : null;
+  const original = files && files[0] ? files[0] : null, seq = ++fotoVibradorSeq;
   const lb = document.getElementById('inj_vibradorFotoLabel');
-  if (!lb) return;
-  if (!fotoVibradorInjecao) { lb.className = 'vib-foto-label'; lb.textContent = 'Nenhuma foto selecionada'; return; }
-  lb.className = 'vib-foto-label ok';
-  lb.innerHTML = '<img alt="" class="vib-mini"> 📷 ' + escaparHtmlFoto(fotoVibradorInjecao.name);
-  try { lb.querySelector('img').src = URL.createObjectURL(fotoVibradorInjecao); } catch (e) {}
-  const box = lb.closest('.field'); if (box) box.classList.remove('campo-erro');
+  if (fotoVibradorMiniUrl) { try { URL.revokeObjectURL(fotoVibradorMiniUrl); } catch (e) {} fotoVibradorMiniUrl = null; }
+  fotoVibradorInjecao = original;
+  if (!original) { fotoVibradorPronta = Promise.resolve(); if (lb) { lb.className = 'vib-foto-label'; lb.textContent = 'Nenhuma foto selecionada'; } return; }
+  if (lb) { lb.className = 'vib-foto-label'; lb.textContent = 'Preparando a foto…'; }
+  fotoVibradorPronta = (async function() {
+    let f = original;
+    try { f = await compactarFoto(original, 1600, 0.82); } catch (e) { f = original; }
+    if (seq !== fotoVibradorSeq) return;      // escolheram outra foto enquanto esta era preparada
+    fotoVibradorInjecao = f;
+    const lb2 = document.getElementById('inj_vibradorFotoLabel');
+    if (!lb2) return;
+    if (!f.size) { lb2.className = 'vib-foto-label aviso'; lb2.textContent = '⚠ A foto veio vazia do celular — tire ou escolha a foto de novo.'; fotoVibradorInjecao = null; return; }
+    lb2.className = 'vib-foto-label ok';
+    lb2.innerHTML = '<img alt="" class="vib-mini"> 📷 Foto anexada (' + Math.max(1, Math.round(f.size / 1024)) + ' KB)';
+    try { fotoVibradorMiniUrl = URL.createObjectURL(f); lb2.querySelector('img').src = fotoVibradorMiniUrl; } catch (e) {}
+    const box = lb2.closest('.field'); if (box) box.classList.remove('campo-erro');
+  })();
   if (typeof salvarRascunho === 'function') salvarRascunho('injecao');
+}
+// Com "Não analisado" a foto deixa de ser exigida: o rótulo do campo avisa isso na hora.
+function atualizarObrigFotoVib() {
+  const v = getToggleValue('inj_vibrador'), el = document.getElementById('inj_vibFotoRotulo');
+  if (!el) return;
+  el.textContent = v === 'NÃO ANALISADO' ? 'Foto da caixa (não precisa — não analisado)' : (v ? 'Foto da caixa (obrigatória)' : 'Foto da caixa (obrigatória se Aprovado ou Reprovado)');
+  const g = document.getElementById('inj_vibrador'), box = g && g.closest('.vib-bloco');
+  if (box && v) box.querySelectorAll('.field').forEach(function(f, i) { if (i === 0 || v === 'NÃO ANALISADO') f.classList.remove('campo-erro'); });
 }
 function renderFormInjecao() {
   cavidadesAtivasAtual = null; isoladasAtuaisAtual = []; gramaturaCavResolvida = null;
@@ -4011,10 +4034,11 @@ function renderFormInjecao() {
         toggleGroupHtml('inj_tonalidadePreforma', 'Tonalidade da preforma', ['APROVADO','REPROVADO'], 'APROVADO') +
         toggleGroupHtml('inj_alinhamentoEtiqueta', 'Alinhamento etiqueta caixa', ['APROVADO','REPROVADO'], 'APROVADO') +
       '</div>' +
-      // Vibrador de preforma: começa SEM opção marcada (precisa olhar a caixa e escolher) e a foto é sempre obrigatória
+      // Vibrador de preforma: começa SEM opção marcada. Aprovado/Reprovado exigem a foto da caixa;
+      // "Não analisado" (a análise é feita uma vez por turno) não exige foto.
       '<div class="grid-2 vib-bloco">' +
-        toggleGroupHtml('inj_vibrador', 'Vibrador de Preforma - Altura da Preforma na Caixa', ['APROVADO','REPROVADO'], '') +
-        '<div class="field"><label>Foto da caixa (obrigatória)</label><input type="file" accept="image/*" id="inj_vibradorFoto" onchange="armazenarFotoVibrador(this.files)"><div id="inj_vibradorFotoLabel" class="vib-foto-label">Nenhuma foto selecionada</div></div>' +
+        toggleGroupHtml('inj_vibrador', 'Vibrador de Preforma - Altura da Preforma na Caixa', ['APROVADO','REPROVADO','NÃO ANALISADO'], '') +
+        '<div class="field"><label id="inj_vibFotoRotulo">Foto da caixa (obrigatória se Aprovado ou Reprovado)</label><input type="file" accept="image/*" id="inj_vibradorFoto" onchange="armazenarFotoVibrador(this.files)"><div id="inj_vibradorFotoLabel" class="vib-foto-label">Nenhuma foto selecionada</div></div>' +
       '</div>' +
       '<div class="grid-2">' +
         '<div class="field"><label>Temperatura Gate — °C Mínima</label><input type="number" step="0.1" id="inj_tempGateMin" placeholder="Ex: 240.0"></div>' +
@@ -4038,7 +4062,8 @@ function renderFormInjecao() {
   preencherSelect('inj_cor', listas.coresInjecao);
   preencherSelect('inj_gramatura', listas.gramaturas);
   preencherSelect('inj_resina', listas.resinas);
-  fotoVibradorInjecao = null;
+  fotoVibradorInjecao = null; fotoVibradorPronta = Promise.resolve(); fotoVibradorSeq++;
+  if (fotoVibradorMiniUrl) { try { URL.revokeObjectURL(fotoVibradorMiniUrl); } catch (e) {} fotoVibradorMiniUrl = null; }
   renderDesvios('injecao');
   alternarSecaoDesvios('injecao', '');
 }
@@ -4120,6 +4145,7 @@ function toggleGroupHtml(id, label, opcoes, valorPadrao) {
 function selecionarToggle(groupId, valor) {
   const group = document.getElementById(groupId);
   if (!group) return;
+  if (groupId === 'inj_vibrador') setTimeout(atualizarObrigFotoVib, 0);
   group.dataset.value = valor;
   Array.prototype.forEach.call(group.querySelectorAll('.toggle-btn'), function(btn) {
     btn.classList.toggle('active', btn.textContent === valor);
@@ -4318,25 +4344,83 @@ function renderDesvios(processo) {
 
 const PASTA_FOTOS = "Documents/Apps/Microsoft Forms/Inspeção da Qualidade - Linhas de Injeção/Pergunta";
 
+// Envio de foto ao OneDrive. Antes ia o arquivo inteiro numa única requisição e qualquer oscilação da
+// rede (Wi-Fi da fábrica / 4G) com uma foto grande de celular derrubava o envio. Agora: a foto vai em
+// partes de ~3 MB, cada parte com até 4 novas tentativas, e as respostas são lidas sem quebrar quando
+// o servidor não devolve JSON. Foto vazia (0 bytes — acontece quando o celular não conseguiu entregar o
+// arquivo, ex.: foto só na nuvem do Google Fotos) é avisada com clareza.
+async function fotoFetchJson(url, opcoes, tentativas) {
+  tentativas = tentativas || 4;
+  let erro = null;
+  for (let t = 0; t < tentativas; t++) {
+    let r = null;
+    try { r = await fetch(url, opcoes); } catch (e) { erro = new Error('sem conexão com a internet no momento'); }
+    if (r) {
+      let txt = ''; try { txt = await r.text(); } catch (e) {}
+      let j = {}; try { j = txt ? JSON.parse(txt) : {}; } catch (e) { j = {}; }
+      if (r.ok) return { r: r, j: j };
+      erro = new Error((j.error && j.error.message) || ('erro ' + r.status));
+      if (r.status !== 429 && r.status < 500) throw erro;          // erro definitivo: não adianta repetir
+    }
+    if (t < tentativas - 1) await new Promise(function(res) { setTimeout(res, 1200 * (t + 1)); });
+  }
+  throw erro || new Error('falha no envio');
+}
 async function uploadFoto(token, file, idSessao, indice) {
-  const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+  if (!file || !file.size) throw new Error('a foto veio vazia do celular — tire ou escolha a foto de novo');
+  try { return await uploadFotoUmaVez(token, file, idSessao, indice); }
+  catch (e) { await new Promise(function(res) { setTimeout(res, 1500); }); return await uploadFotoUmaVez(token, file, idSessao, indice); }
+}
+async function uploadFotoUmaVez(token, file, idSessao, indice) {
+  const ext = (file.name && file.name.indexOf('.') > -1 ? file.name.split('.').pop() : 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
   const nomeArquivo = 'Inspecao_' + idSessao + '_' + indice + '.' + ext;
   const caminho = PASTA_FOTOS.split('/').map(encodeURIComponent).join('/') + '/' + encodeURIComponent(nomeArquivo);
-  const sessionResp = await fetch('https://graph.microsoft.com/v1.0/drives/' + driveId + '/root:/' + caminho + ':/createUploadSession', {
+  const ses = await fotoFetchJson('https://graph.microsoft.com/v1.0/drives/' + driveId + '/root:/' + caminho + ':/createUploadSession', {
     method: 'POST',
     headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
     body: JSON.stringify({ item: { '@microsoft.graph.conflictBehavior': 'rename' } })
   });
-  const session = await sessionResp.json();
-  if (!session.uploadUrl) throw new Error(session.error ? session.error.message : 'não foi possível iniciar o upload');
-  const uploadResp = await fetch(session.uploadUrl, {
-    method: 'PUT',
-    headers: { 'Content-Range': 'bytes 0-' + (file.size - 1) + '/' + file.size },
-    body: file
-  });
-  const uploadJson = await uploadResp.json();
-  if (!uploadResp.ok) throw new Error(uploadJson.error ? uploadJson.error.message : 'falha no upload');
-  return uploadJson.webUrl || '';
+  const uploadUrl = ses.j.uploadUrl;
+  if (!uploadUrl) throw new Error('não foi possível iniciar o envio da foto');
+  const PARTE = 10 * 327680;   // 3,2 MB (a Microsoft exige múltiplos de 320 KB)
+  let fim = null;
+  for (let ini = 0; ini < file.size; ini += PARTE) {
+    const ate = Math.min(ini + PARTE, file.size);
+    fim = await fotoFetchJson(uploadUrl, { method: 'PUT', headers: { 'Content-Range': 'bytes ' + ini + '-' + (ate - 1) + '/' + file.size }, body: file.slice(ini, ate) });
+  }
+  return (fim && fim.j && fim.j.webUrl) || '';
+}
+
+// Compacta a foto antes de enviar: lado maior com até 1600 px, JPEG 82% (fica entre ~200 e 500 KB, nítida
+// o bastante para avaliar a caixa). Se o aparelho não conseguir abrir a imagem, usa a original.
+async function compactarFoto(file, ladoMax, qualidade) {
+  ladoMax = ladoMax || 1600; qualidade = qualidade || 0.82;
+  if (!file || !file.size || !/^image\//.test(file.type || 'image/')) return file;
+  let fonte = null, w = 0, h = 0, liberar = function() {};
+  try {
+    if (window.createImageBitmap) {
+      try { fonte = await createImageBitmap(file, { imageOrientation: 'from-image' }); } catch (e) { fonte = await createImageBitmap(file); }
+      w = fonte.width; h = fonte.height; liberar = function() { try { fonte.close(); } catch (e) {} };
+    }
+  } catch (e) { fonte = null; }
+  if (!fonte) {
+    try {
+      const url = URL.createObjectURL(file);
+      fonte = await new Promise(function(ok, falha) { const im = new Image(); im.onload = function() { ok(im); }; im.onerror = falha; im.src = url; });
+      w = fonte.naturalWidth; h = fonte.naturalHeight; liberar = function() { URL.revokeObjectURL(url); };
+    } catch (e) { return file; }
+  }
+  try {
+    const esc = Math.min(1, ladoMax / Math.max(w, h)), cw = Math.max(1, Math.round(w * esc)), ch = Math.max(1, Math.round(h * esc));
+    const c = document.createElement('canvas'); c.width = cw; c.height = ch;
+    const ctx = c.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cw, ch); ctx.drawImage(fonte, 0, 0, cw, ch);
+    liberar();
+    const blob = await new Promise(function(ok) { c.toBlob(ok, 'image/jpeg', qualidade); });
+    c.width = c.height = 0;
+    if (!blob || !blob.size || blob.size >= file.size) return file;
+    const nome = String(file.name || 'foto').replace(/\.[^.]*$/, '') + '.jpg';
+    try { return new File([blob], nome, { type: 'image/jpeg' }); } catch (e) { blob.name = nome; return blob; }
+  } catch (e) { liberar(); return file; }
 }
 
 /* ---------------- Rascunho automático do Cadastro (Sopro e Injeção) ---------------- */
@@ -4488,13 +4572,14 @@ function abrirRevisao(processo) {
       mostrarToast('ATENÇÃO: É necessário preencher os dados nos campos: ' + faltando.join(', ') + '.', true);
       return;
     }
-    // Vibrador de Preforma: escolher Aprovado/Reprovado E anexar a foto (sempre obrigatória)
-    const vibFaltando = [];
-    if (!getToggleValue('inj_vibrador')) vibFaltando.push('Vibrador de Preforma (Aprovado ou Reprovado)');
-    if (!fotoVibradorInjecao) vibFaltando.push('foto da caixa do Vibrador de Preforma');
+    // Vibrador de Preforma: escolher Aprovado, Reprovado ou Não analisado. A foto da caixa só é exigida
+    // quando foi avaliado (Aprovado/Reprovado).
+    const vibEscolha = getToggleValue('inj_vibrador'), vibFaltando = [];
+    if (!vibEscolha) vibFaltando.push('Vibrador de Preforma (Aprovado, Reprovado ou Não analisado)');
+    else if (vibEscolha !== 'NÃO ANALISADO' && !fotoVibradorInjecao) vibFaltando.push('foto da caixa do Vibrador de Preforma');
     if (vibFaltando.length) {
       const g = document.getElementById('inj_vibrador'), box = g && g.closest('.vib-bloco');
-      if (box) { box.querySelectorAll('.field').forEach(function(f) { f.classList.add('campo-erro'); }); box.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+      if (box) { box.querySelectorAll('.field').forEach(function(f, i) { if (!vibEscolha ? i === 0 : i === 1) f.classList.add('campo-erro'); }); box.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
       mostrarToast('ATENÇÃO: falta preencher: ' + vibFaltando.join(' e ') + '.', true);
       return;
     }
@@ -4698,7 +4783,7 @@ function renderRevisaoHtml(processo, temDefeito, desvios) {
       '</div></div>';
 
     corpo += '<div class="revisao-secao"><div class="revisao-secao-titulo">Verificações de qualidade</div><div class="revisao-grid">' +
-      itemRevisao('Organização linha', porExtenso(organizacaoLinha)) + itemRevisao('Tonalidade preforma', porExtenso(tonalidadePreforma)) + itemRevisao('Alinhamento etiqueta', porExtenso(alinhamentoEtiqueta)) + itemRevisao('Vibrador de preforma', porExtenso(vibrador)) + itemRevisao('Foto da caixa', fotoVibradorInjecao ? '📷 ' + fotoVibradorInjecao.name : 'Não', !fotoVibradorInjecao) +
+      itemRevisao('Organização linha', porExtenso(organizacaoLinha)) + itemRevisao('Tonalidade preforma', porExtenso(tonalidadePreforma)) + itemRevisao('Alinhamento etiqueta', porExtenso(alinhamentoEtiqueta)) + itemRevisao('Vibrador de preforma', porExtenso(vibrador)) + itemRevisao('Foto da caixa', fotoVibradorInjecao ? '📷 anexada' : (vibrador === 'NÃO ANALISADO' ? 'Não precisa' : 'Não'), !fotoVibradorInjecao) +
       '</div></div>';
   }
 
@@ -4774,12 +4859,18 @@ async function confirmarSalvarSessao(processo) {
     // resolvida; isso só importa de verdade se alguém salvar nos primeiros instantes após logar.
     if (colunasInjecaoProntasPromise) { try { await colunasInjecaoProntasPromise; } catch (e) { /* segue mesmo assim — colunas podem já existir */ } }
 
-    // Foto do Vibrador de Preforma (Injeção) vai primeiro: é obrigatória, então se não subir nada é salvo
+    // Foto do Vibrador de Preforma (Injeção) vai primeiro: quando o vibrador foi avaliado ela é obrigatória,
+    // então, se não subir, nada é salvo (o formulário continua preenchido para tentar de novo).
     let fotoVibradorUrl = '';
+    if (processo === 'injecao') { try { await fotoVibradorPronta; } catch (e) {} }
     if (processo === 'injecao' && fotoVibradorInjecao) {
       btn.textContent = 'Enviando foto da caixa…';
       try { fotoVibradorUrl = await uploadFoto(token, fotoVibradorInjecao, idSessao, 'vibrador'); }
-      catch (e) { mostrarToast('Não consegui enviar a foto do Vibrador de Preforma (' + e.message + '). Nada foi salvo — tente de novo.', true); return; }
+      catch (e) {
+        const vibObrig = getToggleValue('inj_vibrador') !== 'NÃO ANALISADO';
+        if (vibObrig) { mostrarToast('Não consegui enviar a foto da caixa (' + e.message + '). Nada foi salvo — confira a internet e toque em salvar de novo.', true); return; }
+        fotoVibradorUrl = '';
+      }
     }
 
     // Envia as fotos primeiro (quando houver) e guarda a URL de cada uma
@@ -5733,6 +5824,7 @@ function porExtenso(v) {
   if (u === 'NÃO' || u === 'NAO') return 'Não';
   if (u === 'APROVADO') return 'Aprovado';
   if (u === 'REPROVADO') return 'Reprovado';
+  if (u === 'NÃO ANALISADO' || u === 'NAO ANALISADO') return 'Não analisado';
   return v || '—';
 }
 
@@ -5740,6 +5832,7 @@ function badgeAprovadoReprovado(v) {
   const u = (v||'').toString().toUpperCase();
   if (u === 'APROVADO') return '<span class="badge corrigido">Aprovado</span>';
   if (u === 'REPROVADO') return '<span class="badge pendente">Reprovado</span>';
+  if (u === 'NÃO ANALISADO' || u === 'NAO ANALISADO') return '<span class="badge nao-analisado">Não analisado</span>';
   return v || '—';
 }
 
@@ -5976,7 +6069,7 @@ function montarTextoWhatsApp(processo, linhas, quando) {
         texto += '* CAV: ' + formatarCavidadesWpp(item.cavidade, item.cavidade_todas) + '\n';
       });
       else texto += 'Sem desvio\n';
-      if (s.vibrador_preforma) texto += SEP + '\n' + ' Vibrador Preforma (Altura Caixa): *' + porExtenso(s.vibrador_preforma) + '*\n';
+      if (s.vibrador_preforma && porExtenso(s.vibrador_preforma) !== 'Não analisado') texto += SEP + '\n' + ' Vibrador Preforma (Altura Caixa): *' + porExtenso(s.vibrador_preforma) + '*\n';
       texto += FIM + '\n';
       if (idx < grupos.length - 1) texto += '\n';
     });
