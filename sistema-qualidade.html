@@ -820,6 +820,33 @@ table.occ.tab-ctrl-exc td.st .badge{font-size:10px; letter-spacing:.15px; paddin
 .mc-tab.exc.pe th:nth-child(1), .mc-tab.exc.pe th:nth-child(2){width:30%;} .mc-tab.exc.pe th:nth-child(3){width:40%;}
 .mc-tab.exc.pe tr.fora td{background:var(--danger-soft);} .mc-tab.exc.pe tr.fora td input[data-c="a"]{color:var(--danger); border-color:var(--danger);}
 .mc-tab.exc.pe tr.ok td input[data-c="a"]{color:var(--ok);}
+/* ---- tela provisória: correção da importação ---- */
+.tag-prov{display:inline-block; vertical-align:middle; font-size:10.5px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; padding:2px 8px; border-radius:6px; background:var(--warn-soft); color:var(--warn); margin-left:6px;}
+.corr-cards{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px; margin:0 0 14px;}
+.corr-card{border:1px solid var(--border); border-radius:12px; padding:11px 13px; background:var(--surface); cursor:pointer;}
+.corr-card.on{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset;}
+.corr-card .t{font-size:10.5px; letter-spacing:.5px; text-transform:uppercase; color:var(--fg-faint);}
+.corr-card .n{font-size:20px; font-weight:700; margin-top:2px;} .corr-card .n small{font-size:12px; font-weight:500; color:var(--fg-dim);}
+.corr-card .n b{color:var(--warn);}
+.corr-top{gap:12px; flex-wrap:wrap;}
+.corr-abas{display:flex; gap:4px; flex-wrap:wrap;}
+.corr-abas button{border:1px solid var(--border); background:var(--surface-2); color:var(--fg-dim); border-radius:8px; padding:6px 12px; font:600 12.5px inherit; cursor:pointer;}
+.corr-abas button.on{background:var(--accent); color:#fff; border-color:var(--accent);}
+.corr-so{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--fg-dim); cursor:pointer;}
+.corr-scroll{max-height:calc(100vh - 330px); overflow:auto;}
+table.occ.corr-tab{min-width:0; font-size:12.5px;}
+table.occ.corr-tab th{padding:8px 5px; position:sticky; top:0; z-index:1;}
+table.occ.corr-tab td{padding:4px 5px; white-space:nowrap;}
+.corr-tab input, .corr-tab select{width:100%; min-width:64px; font:inherit; font-size:12.5px; padding:5px 6px; border:1px solid var(--border); border-radius:6px; background:var(--surface); color:var(--fg);}
+.corr-tab td.vz input, .corr-tab td.vz select{background:var(--warn-soft); border-color:color-mix(in srgb, var(--warn) 55%, transparent);}
+.corr-tab td.fc input, .corr-tab td.fc select{background:var(--accent-soft); border-color:color-mix(in srgb, var(--accent) 55%, transparent); color:var(--accent); font-weight:600;}
+.corr-tab tr.alt td{background:color-mix(in srgb, var(--ok-soft) 70%, transparent);}
+.corr-tab tr.alt td:first-child{box-shadow:inset 3px 0 0 var(--ok);}
+.corr-tab td.ro{color:var(--fg-dim);}
+.corr-tab .w-s{min-width:56px; max-width:70px;} .corr-tab .w-m{min-width:86px;} .corr-tab .w-l{min-width:150px;}
+.corr-lote{display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center; padding:10px 12px; margin:0 0 10px; border:1px dashed var(--border); border-radius:10px; font-size:12.5px;}
+.corr-lote b{font-weight:600;} .corr-lote .it{display:flex; align-items:center; gap:6px;}
+.corr-lote select{font:inherit; font-size:12.5px; padding:4px 6px; border-radius:6px; border:1px solid var(--border); background:var(--surface); color:var(--fg);}
 </style>
 </head>
 <body>
@@ -912,6 +939,7 @@ table.occ.tab-ctrl-exc td.st .badge{font-size:10px; letter-spacing:.15px; paddin
       <button class="a-item" data-nav="ctrl:ctrlPeso" onclick="abrirCtrlTela('ctrlPeso')"><svg><use href="#i-scale"/></svg><span>Peso das preformas</span><span class="ct" id="ctCtrlPeso">0</span></button>
       <button class="a-item" data-nav="ctrl:ctrlExcent" onclick="abrirCtrlTela('ctrlExcent')"><svg><use href="#i-target"/></svg><span>Excentricidade das preformas</span><span class="ct" id="ctCtrlExcent">0</span></button>
       <button class="a-item" data-nav="ctrl:ctrlPonto" onclick="abrirCtrlTela('ctrlPonto')"><svg><use href="#i-dot"/></svg><span>Ponto preto — resina PCR</span><span class="ct" id="ctCtrlPonto">0</span></button>
+      <button class="a-item" data-nav="corr" onclick="abrirCorr()"><svg><use href="#i-pencil"/></svg><span>Correção da importação</span><span class="ct" id="ctCorr" title="registros com pendência">0</span></button>
       <button class="a-item a-grp-btn" id="btnGrpCad" type="button" aria-expanded="false" onclick="alternarCadastrosMenu()"><svg><use href="#i-folder"/></svg><span>Cadastros</span><svg class="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div class="a-sub" id="grpCad">
       <button class="a-item cad-btn" data-nav="cadastros:clientes" data-cad="clientes"><svg><use href="#i-users"/></svg><span>Clientes</span><span class="ct" id="ctClientes">0</span></button>
@@ -1060,6 +1088,27 @@ table.occ.tab-ctrl-exc td.st .badge{font-size:10px; letter-spacing:.15px; paddin
               <tbody id="tbodyCtrl"></tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TELA PROVISÓRIA — CORREÇÃO DO HISTÓRICO IMPORTADO (remover quando terminar) ===================== -->
+  <section class="tela" id="tela-corr">
+    <div class="tela-head"><h2>Correção da importação <span class="tag-prov">provisório</span></h2></div>
+    <p class="tela-sub">Complete aqui o que veio faltando das planilhas: é só preencher na própria tabela e clicar em <b>Salvar alterações</b>. Amarelo = vazio · azul = fora do cadastro (escolha o item certo na lista). Depois de terminar, peça a remoção desta tela.</p>
+    <div class="corr-cards" id="corrCards"></div>
+    <div class="screen">
+      <div class="app-shell">
+        <div class="app-main">
+          <div class="app-topbar corr-top">
+            <div class="corr-abas" id="corrAbas"></div>
+            <label class="corr-so"><input type="checkbox" id="corrSo" checked onchange="renderCorr()"> só com pendência</label>
+            <span class="save-msg" id="corrMsg" style="margin-left:auto;"></span>
+            <button class="btn btn-accent" id="corrSalvar" onclick="salvarCorr()" disabled>Salvar alterações</button>
+          </div>
+          <div id="corrLote"></div>
+          <div class="table-scroll corr-scroll"><table class="occ corr-tab"><thead><tr id="corrHead"></tr></thead><tbody id="corrBody"></tbody></table></div>
         </div>
       </div>
     </div>
@@ -1975,7 +2024,7 @@ const COLS_NUM_QTD = ['Quantidade'];
 const COLS_NUM_MED = ['Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)'];
 // Botão de volta ao Portal da Qualidade: só aparece neste navegador se ele já abriu o portal
 try { if (localStorage.getItem('portalQualidadeUsado')) document.getElementById('btnPortal').classList.remove('hidden'); } catch (e) {}
-const VERSAO_SISTEMA = '23/11/2026 22:04';   // data/hora desta versão — atualizada a cada entrega
+const VERSAO_SISTEMA = '23/11/2026 22:39';   // data/hora desta versão — atualizada a cada entrega
 document.getElementById('versaoSistema').textContent = VERSAO_SISTEMA;
 const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
@@ -2681,6 +2730,7 @@ function marcarMenu(){
   if (gb) gb.classList.toggle('tem-ativo', emCad && !document.getElementById('grpCad').classList.contains('aberto'));
   var crumb = { visao:'<b>Visão geral</b>', reclamacao:'Qualidade / <b>Reclamações de cliente</b>' }[telaAtual];
   if (telaAtual === 'ctrl') crumb = 'Qualidade / <b>' + escHtml(CTRL[ctrlAtual].titulo) + '</b>';
+  if (telaAtual === 'corr') crumb = 'Qualidade / <b>Correção da importação</b>';
   if (telaAtual === 'lista') crumb = 'Recebimento / <b>' + escHtml(MAT_LABEL_PLANO[matAtual] || '') + '</b>';
   if (telaAtual === 'cadastros') crumb = 'Cadastros / <b>' + escHtml((typeof CAD_INFO !== 'undefined' && CAD_INFO[cadAtual]) ? CAD_INFO[cadAtual].titulo : '') + '</b>';
   var el = document.getElementById('aCrumb'); if (el && crumb) el.innerHTML = crumb;
@@ -2799,6 +2849,7 @@ function renderTudo(){
   atualizarContagensCadastros();
   atualizarContagensCtrl(); renderPreformas();
   if (telaAtual === 'ctrl') { popularFiltrosCtrl(); renderCtrl(); }
+  atualizarContagemCorr(); renderCorr();
 }
 function atualizarContagensCadastros(){
   document.getElementById('ctEspecificacoes').textContent = DATA.especificacoes.length;
@@ -6672,6 +6723,7 @@ function renderCtrl(){
 function atualizarContagensCtrl(){
   Object.keys(CTRL).forEach(function(k){ var el = document.getElementById('ct' + k.charAt(0).toUpperCase() + k.slice(1)); if (el) el.textContent = (DATA[k] || []).length; });
   var cp = document.getElementById('ctPreformas'); if (cp) cp.textContent = (DATA.preformas || []).length;
+  if (typeof atualizarContagemCorr === 'function') atualizarContagemCorr();
 }
 
 /* ---- blocos do resultado (mesmos no painel, no PDF e no e-mail) ---- */
@@ -7396,6 +7448,146 @@ async function excluirCp(idx, ci){
   if (!(await confirmar('Excluir a ' + (ci + 1) + 'ª contraprova?', 'Contraprova de ' + (cps[ci] && cps[ci].d || '') + '. O resultado volta a considerar as medições anteriores.', 'Excluir', true))) return;
   cps.splice(ci, 1);
   try { await gravarCps(idx, cps, 'Contraprova excluída.'); } catch (e) { mostrarToast('Erro ao excluir: ' + e.message, true); }
+}
+
+/* ====================== TELA PROVISÓRIA — CORREÇÃO DO HISTÓRICO IMPORTADO ======================
+   Completa, direto na tabela, o que veio faltando das planilhas. Bloco independente: para remover,
+   tirar esta parte, a tela "tela-corr", o item do menu e o CSS ".corr-". */
+var corrAba = 'ctrlExcent', corrAlt = {};
+var CORR = {
+  preformas: { titulo: 'Preformas (EPA)', campos: [
+    ['Gramatura', 'ro'], ['EPA', 'txt', 'w-m'], ['Descrição', 'txt', 'w-l'], ['Peso Nominal', 'num', 'w-s'], ['Tolerância Peso', 'num', 'w-s'], ['Esp Nominal', 'num', 'w-s'], ['Tolerância Excentricidade', 'num', 'w-s'], ['Cavidades', 'num', 'w-s']] },
+  ctrlPeso: { titulo: 'Peso', campos: [['Data Análise', 'ro'], ['Gramatura', 'ro'], ['Data Produção', 'data'], ['OP', 'txt', 'w-s'], ['Cor', 'Cores'], ['Resina', 'resina'], ['Máquina', 'Maquinas'], ['Responsável', 'resp'], ['Resultado', 'res']] },
+  ctrlExcent: { titulo: 'Excentricidade', campos: [['Data Análise', 'ro'], ['Gramatura', 'ro'], ['OP', 'txt', 'w-s'], ['Cor', 'Cores'], ['Resina', 'resina'], ['Máquina', 'Maquinas'], ['Responsável', 'resp'], ['Turno', 'Turnos'], ['Instrumento', 'Instrumentos'], ['Resultado', 'res']] },
+  ctrlPonto: { titulo: 'Ponto preto', campos: [['Data Análise', 'ro'], ['Gramatura', 'ro'], ['OP', 'txt', 'w-s'], ['Cor', 'Cores'], ['Resina', 'resina'], ['Responsável', 'resp'], ['Turno', 'Turnos'], ['Resultado', 'res']] }
+};
+var ROT_CORR = { 'Gramatura': 'Preforma', 'Peso Nominal': 'Peso nominal', 'Tolerância Peso': 'Tol. peso', 'Esp Nominal': 'Esp. nominal', 'Tolerância Excentricidade': 'Tol. excentr.', 'Data Análise': 'Data', 'Data Produção': 'Data produção' };
+function corrLista(tipo){
+  if (tipo === 'resina') return resinasCadastradas();
+  if (tipo === 'resp') return responsaveisLista();
+  return listaOrdenada(tipo, tipo === 'Turnos');
+}
+// situação de um campo: '' ok · 'vz' vazio · 'fc' fora do cadastro / conferir
+function corrSit(k, r, campo, tipo){
+  var v = String(r[campo] == null ? '' : r[campo]).trim();
+  if (tipo === 'ro' || tipo === 'res') return '';
+  if (k === 'preformas') {
+    if (campo === 'Descrição') return '';
+    if (campo === 'Peso Nominal' && /conferir com a EPA/i.test(r['Observações'] || '')) return v ? 'fc' : 'vz';
+    return v ? '' : 'vz';
+  }
+  if (campo === 'Data Produção' && k !== 'ctrlPeso') return '';
+  if (!v) return 'vz';
+  if (['Cores', 'Maquinas', 'Turnos', 'Instrumentos', 'resina', 'resp'].indexOf(tipo) > -1 && corrLista(tipo).indexOf(v) === -1) return 'fc';
+  return '';
+}
+function corrPend(k, r){ return CORR[k].campos.some(function(c){ return corrSit(k, r, c[0], c[1]); }); }
+function corrContar(k){ var n = 0, porCampo = {}; (DATA[k] || []).forEach(function(r){ var p = false; CORR[k].campos.forEach(function(c){ var s = corrSit(k, r, c[0], c[1]); if (s) { p = true; porCampo[c[0]] = (porCampo[c[0]] || 0) + 1; } }); if (p) n++; }); return { n: n, porCampo: porCampo }; }
+function abrirCorr(){ corrAlt = {}; irPara('corr'); renderCorr(); toggleMenu(false); }
+function corrTrocarAba(k){ if (k !== corrAba && Object.keys(corrAlt).length) { mostrarToast('Há alterações não salvas nesta aba — clique em Salvar alterações antes de trocar.', true); return; } corrAba = k; renderCorr(); }
+function atualizarContagemCorr(){
+  var el = document.getElementById('ctCorr'); if (!el) return;
+  el.textContent = ['preformas', 'ctrlPeso', 'ctrlExcent', 'ctrlPonto'].reduce(function(s, k){ return s + (TEM_TABELA[k] ? corrContar(k).n : 0); }, 0);
+}
+function renderCorr(){
+  if (telaAtual !== 'corr') return;
+  var ks = ['preformas', 'ctrlPeso', 'ctrlExcent', 'ctrlPonto'];
+  document.getElementById('corrCards').innerHTML = ks.map(function(k){ var c = TEM_TABELA[k] ? corrContar(k) : { n: 0 };
+    return '<div class="corr-card' + (k === corrAba ? ' on' : '') + '" onclick="corrTrocarAba(\'' + k + '\')"><div class="t">' + CORR[k].titulo + '</div><div class="n">' + (c.n ? '<b>' + c.n + '</b>' : '0') + ' <small>com pendência de ' + (DATA[k] || []).length + '</small></div></div>'; }).join('');
+  document.getElementById('corrAbas').innerHTML = ks.map(function(k){ return '<button type="button" class="' + (k === corrAba ? 'on' : '') + '" onclick="corrTrocarAba(\'' + k + '\')">' + CORR[k].titulo + '</button>'; }).join('');
+  var k = corrAba, cfg = CORR[k], so = document.getElementById('corrSo').checked;
+  document.getElementById('corrHead').innerHTML = cfg.campos.map(function(c){ return '<th>' + escHtml(ROT_CORR[c[0]] || c[0]) + '</th>'; }).join('') + '<th></th>';
+  var linhas = (DATA[k] || []).slice();
+  if (k === 'preformas') linhas.sort(function(a, b){ return gramOrd(a['Gramatura'], b['Gramatura']); });
+  else linhas.sort(function(a, b){ return dataParaOrdenar(dataCtrl(b)) - dataParaOrdenar(dataCtrl(a)) || b.__index - a.__index; });
+  if (so) linhas = linhas.filter(function(r){ return corrPend(k, r) || corrAlt[r.__index]; });
+  document.getElementById('corrBody').innerHTML = !TEM_TABELA[k] ? '<tr><td colspan="12" class="empty-note">A lista ainda não existe — use Configurações › Verificar listas.</td></tr>'
+    : linhas.length ? linhas.map(function(r){ return corrLinhaHtml(k, r); }).join('') : '<tr><td colspan="12" class="empty-note">Nada pendente aqui.</td></tr>';
+  renderCorrLote();
+  corrAtualizarBotao();
+}
+function corrLinhaHtml(k, r){
+  var a = corrAlt[r.__index] || {};
+  function val(c){ return a[c] !== undefined ? a[c] : (r[c] == null ? '' : String(r[c])); }
+  var tds = CORR[k].campos.map(function(c){
+    var campo = c[0], tipo = c[1], v = val(campo), sit = corrSit(k, Object.assign({}, r, a), campo, tipo), at = ' data-idx="' + r.__index + '" data-campo="' + escHtml(campo) + '"';
+    if (tipo === 'ro') return '<td class="ro">' + (campo === 'Gramatura' ? '<b>' + escHtml(v) + ' g</b>' : escHtml(v)) + '</td>';
+    if (tipo === 'res') { var cc = calcCtrl(k, Object.assign({}, r, a)); return '<td>' + badgeResCtrl(cc.resultado) + '</td>'; }
+    if (tipo === 'data') return '<td class="' + sit + '"><input type="date"' + at + ' value="' + escHtml(dataBRparaISO(v)) + '"></td>';
+    if (tipo === 'txt' || tipo === 'num') return '<td class="' + sit + '"><input class="' + (c[2] || '') + '"' + at + ' value="' + escHtml(v) + '"' + (tipo === 'num' ? ' inputmode="decimal"' : '') + '></td>';
+    var lista = corrLista(tipo), fora = v && lista.indexOf(v) === -1;
+    return '<td class="' + sit + '"><select' + at + '><option value="">—</option>' + lista.map(function(x){ return '<option' + (x === v ? ' selected' : '') + ' value="' + escHtml(x) + '">' + escHtml(x) + '</option>'; }).join('') +
+      (fora ? '<option selected value="' + escHtml(v) + '">' + escHtml(v) + ' (fora do cadastro)</option>' : '') + '</select></td>';
+  }).join('');
+  return '<tr class="' + (corrAlt[r.__index] ? 'alt' : '') + '" id="corrLin' + r.__index + '">' + tds + '<td>' + (k !== 'preformas' ? '<button type="button" class="icon-btn icon-only" title="Abrir análise" onclick="abrirCtrl(\'' + k + '\',' + r.__index + ')"><svg><use href="#i-expand"/></svg></button>' : '') + '</td></tr>';
+}
+function corrMudou(el){
+  var idx = +el.dataset.idx, campo = el.dataset.campo, v = el.type === 'date' ? (el.value ? formatarDataBR(el.value) : '') : el.value.trim();
+  var r = (DATA[corrAba] || []).find(function(x){ return x.__index === idx; }); if (!r) return;
+  corrAlt[idx] = corrAlt[idx] || {};
+  if (String(r[campo] || '') === v) delete corrAlt[idx][campo]; else corrAlt[idx][campo] = v;
+  if (!Object.keys(corrAlt[idx]).length) delete corrAlt[idx];
+  var tr = document.getElementById('corrLin' + idx); if (tr) { var tmp = document.createElement('tbody'); tmp.innerHTML = corrLinhaHtml(corrAba, r); tr.replaceWith(tmp.firstChild); }
+  corrAtualizarBotao();
+}
+document.addEventListener('change', function(e){ if (e.target && e.target.closest && e.target.closest('#corrBody') && e.target.dataset.campo) corrMudou(e.target); });
+function corrAtualizarBotao(){ var n = Object.keys(corrAlt).length, b = document.getElementById('corrSalvar'); if (!b) return; b.disabled = !n; b.textContent = n ? 'Salvar alterações (' + n + ')' : 'Salvar alterações'; }
+// troca em lote: valores fora do cadastro de um campo → item do cadastro, em todos os registros da aba
+function renderCorrLote(){
+  var k = corrAba, el = document.getElementById('corrLote'); if (k === 'preformas' || !TEM_TABELA[k]) { el.innerHTML = ''; return; }
+  var itens = [];
+  CORR[k].campos.forEach(function(c){
+    if (['Cores', 'Maquinas', 'Turnos', 'Instrumentos', 'resina', 'resp'].indexOf(c[1]) === -1) return;
+    var lista = corrLista(c[1]), cont = {};
+    (DATA[k] || []).forEach(function(r){ var v = String(r[c[0]] || '').trim(); if (v && lista.indexOf(v) === -1) cont[v] = (cont[v] || 0) + 1; });
+    Object.keys(cont).forEach(function(v){ itens.push('<span class="it"><b>' + escHtml(c[0]) + ' "' + escHtml(v) + '"</b> (' + cont[v] + ') → <select data-lote-campo="' + escHtml(c[0]) + '" data-lote-de="' + escHtml(v) + '"><option value="">escolher…</option>' +
+      lista.map(function(x){ return '<option value="' + escHtml(x) + '">' + escHtml(x) + '</option>'; }).join('') + '<option value="__vazio">(deixar vazio)</option></select></span>'); });
+  });
+  el.innerHTML = itens.length ? '<div class="corr-lote"><span class="cell-dim">Trocar em todos os registros desta aba:</span>' + itens.join('') + '<button type="button" class="btn" onclick="corrAplicarLote()">Aplicar na tabela</button></div>' : '';
+}
+function corrAplicarLote(){
+  var n = 0;
+  document.querySelectorAll('#corrLote select').forEach(function(s){ if (!s.value) return; var campo = s.dataset.loteCampo, de = s.dataset.loteDe, para = s.value === '__vazio' ? '' : s.value;
+    (DATA[corrAba] || []).forEach(function(r){ var a = corrAlt[r.__index] || {}; var atual = a[campo] !== undefined ? a[campo] : String(r[campo] || '').trim();
+      if (atual === de) { corrAlt[r.__index] = Object.assign(a, (function(o){ o[campo] = para; return o; })({})); n++; } }); });
+  if (!n) { mostrarToast('Escolha para qual item trocar.', true); return; }
+  document.getElementById('corrSo').checked = false; renderCorr(); mostrarToast(n + ' campo(s) trocados na tabela — confira e clique em Salvar alterações.');
+}
+async function salvarCorr(){
+  var k = corrAba, ids = Object.keys(corrAlt).map(Number), msg = document.getElementById('corrMsg'), btn = document.getElementById('corrSalvar'); if (!ids.length) return;
+  // preformas: levar peso nominal/tolerâncias para as análises importadas da mesma preforma
+  var levar = [];
+  if (k === 'preformas') ids.forEach(function(idx){ var a = corrAlt[idx], p = DATA.preformas.find(function(x){ return x.__index === idx; });
+    if (p && ['Peso Nominal', 'Tolerância Peso', 'Esp Nominal', 'Tolerância Excentricidade'].some(function(c){ return a[c] !== undefined; })) levar.push(Object.assign({}, p, a)); });
+  var nAn = 0; levar.forEach(function(p){ nAn += corrImportadas(p['Gramatura']).length; });
+  var aplicar = levar.length && nAn ? await confirmar('Atualizar também as análises importadas?', 'A especificação de ' + levar.map(function(p){ return p['Gramatura'] + ' g'; }).join(', ') + ' mudou. Quer aplicar o novo peso nominal / tolerâncias nas ' + nAn + ' análise(s) importadas das planilhas dessa(s) preforma(s)? O resultado delas é recalculado. Análises lançadas no sistema não mudam.', 'Sim, aplicar', false) : false;
+  btn.disabled = true; msg.className = 'save-msg';
+  try {
+    for (var i = 0; i < ids.length; i++) {
+      msg.textContent = 'Salvando ' + (i + 1) + ' de ' + ids.length + '…';
+      var r = DATA[k].find(function(x){ return x.__index === ids[i]; }), novo = Object.assign({}, r, corrAlt[ids[i]]);
+      if (k === 'preformas') novo['Observações'] = String(novo['Observações'] || '').replace(/\s*Criado a partir das planilhas de controle — conferir com a EPA\.?/i, '').trim();
+      else Object.assign(novo, camposCalculados(k, novo));
+      await atualizarLinha(k, ids[i], novo);
+    }
+    if (aplicar) for (var j = 0; j < levar.length; j++) {
+      var p = levar[j], lista = corrImportadas(p['Gramatura']);
+      for (var q = 0; q < lista.length; q++) { var it = lista[q], an = Object.assign({}, it.r);
+        msg.textContent = 'Atualizando análises de ' + p['Gramatura'] + ' g (' + (q + 1) + ' de ' + lista.length + ')…';
+        if (it.k === 'ctrlPeso') { an['Peso Nominal'] = p['Peso Nominal'] || an['Peso Nominal']; an['Tolerância'] = p['Tolerância Peso'] || an['Tolerância']; }
+        else { an['Esp Nominal'] = p['Esp Nominal'] || an['Esp Nominal']; an['Tolerância'] = p['Tolerância Excentricidade'] || an['Tolerância']; }
+        Object.assign(an, camposCalculados(it.k, an)); await atualizarLinha(it.k, it.r.__index, an); }
+    }
+    for (var kk of (aplicar ? ['preformas', 'ctrlPeso', 'ctrlExcent'] : [k])) DATA[kk] = linhasParaObjetos(kk, await lerLinhasBrutas(TABELAS[kk]));
+    corrAlt = {}; msg.textContent = ''; renderCorr(); atualizarContagemCorr(); atualizarContagensCtrl(); if (typeof renderPreformas === 'function') renderPreformas();
+    mostrarToast(ids.length + ' registro(s) salvos' + (aplicar ? ' e análises importadas atualizadas' : '') + '.');
+  } catch (e) { msg.className = 'save-msg err'; msg.textContent = 'Erro: ' + e.message + ' — o que já foi salvo ficou gravado; clique em Salvar de novo.'; }
+  finally { corrAtualizarBotao(); }
+}
+function corrImportadas(g){
+  var out = [];
+  ['ctrlPeso', 'ctrlExcent'].forEach(function(k){ (DATA[k] || []).forEach(function(r){ if (r['Gramatura'] === g && /^Importado da planilha/i.test(r['Observações'] || '')) out.push({ k: k, r: r }); }); });
+  return out;
 }
 
 </script>
