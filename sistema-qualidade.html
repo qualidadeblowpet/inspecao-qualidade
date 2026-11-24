@@ -2024,7 +2024,7 @@ const COLS_NUM_QTD = ['Quantidade'];
 const COLS_NUM_MED = ['Viscosidade IV Blowpet (dl/g)','Viscosidade IV Laudo (dl/g)','Cor L (CIELAB)','Cor b (CIELAB)','Teor Acetaldeído AA (ppm)','Cristalinidade (% peso)','Densidade (g/cm³)','Ponto de Fusão (°C)'];
 // Botão de volta ao Portal da Qualidade: só aparece neste navegador se ele já abriu o portal
 try { if (localStorage.getItem('portalQualidadeUsado')) document.getElementById('btnPortal').classList.remove('hidden'); } catch (e) {}
-const VERSAO_SISTEMA = '23/11/2026 22:39';   // data/hora desta versão — atualizada a cada entrega
+const VERSAO_SISTEMA = '24/11/2026 16:58';   // data/hora desta versão — atualizada a cada entrega
 document.getElementById('versaoSistema').textContent = VERSAO_SISTEMA;
 const MAT_LABEL = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
 const MAT_LABEL_PLANO = {resina:'Resina PET', rotulo:'Rótulo', pigmento:'Pigmento', cinta:'Caixa de Preforma (Cinta)', tampa:'Caixa de Preforma (Tampa)'};
@@ -5880,6 +5880,9 @@ function modeloReclamacao(r){
     tabelaExtra: its.length ? { titulo: 'Rastreabilidade', colunas: ['Produção', 'Lote'].concat(preforma ? ['Caixa'] : [], ['Qtd.', 'Obs.']), linhas: its.map(function(i){ return [i['Data de Produção'], i['Lote']].concat(preforma ? [i['Caixa']] : [], [i['Quantidade'], i['Observação']]).map(function(x){ return x || ''; }); }) } : null,
     conclusao: conc ? { resultado: r['Classificação'] || '', data: r['Data de Conclusão'] || '', por: r['Concluído por'] || '', texto: r['Conclusão'] || '' } : null,
     observacoes: r['Observações'] || '', fotos: fotos, anexos: anexos,
+    // histórico da tratativa: comentários escritos pelas pessoas (sem os registros automáticos do sistema), do mais antigo ao mais recente
+    historico: comentariosDaReclamacao(r['RAC']).slice().reverse().filter(function(c){ return !/^\[sistema\]/.test(String(c['Autor'] || '')); }).map(function(c){
+      var an = anexosDe(c); return { dh: c['Data/Hora'] || '', autor: c['Autor'] || '', texto: String(c['Comentário'] || '').trim(), fotos: an.filter(function(l){ return !ehPdf(l); }).length, pdfs: an.filter(ehPdf).length }; }),
     assunto: '[Reclamação de Cliente] ' + r['RAC'] + ' · ' + (r['Cliente'] || '') + (r['Motivo'] ? ' · ' + r['Motivo'] : '') + (r['Criticidade'] === 'Crítica' ? ' · CRÍTICA' : '') + (conc ? ' · CONCLUÍDA (' + String(r['Classificação'] || '').toUpperCase() + ')' : ''),
     whats: ['*Reclamação de Cliente — ' + r['RAC'] + '*' + (r['Criticidade'] ? ' (' + r['Criticidade'].toLowerCase() + ')' : ''),
       (r['Cliente'] || '') + (cli && textoCliente(cli) ? ' · ' + textoCliente(cli) : ''), r['Produto'] || '', r['Motivo'] ? 'Motivo: ' + r['Motivo'] : '',
@@ -5959,6 +5962,10 @@ function emailHtml(m, srcFoto, srcLogo){
   } else if (m.tipo !== 'reclamacao' && !m.ctrl) h += tit(m.tituloResultados) + '<p style="margin:0;color:#5b6372">Produto sem EMP vinculada — resultado definido manualmente.</p>';
   if (m.tabelaExtra) h += tit(m.tabelaExtra.titulo) + '<table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;border:1px solid #e6e9ee"><tr>' + m.tabelaExtra.colunas.map(function(c){ return '<th style="' + th + '">' + E(c) + '</th>'; }).join('') + '</tr>' +
     m.tabelaExtra.linhas.map(function(l, li){ return '<tr>' + l.map(function(c, ci){ var k = m.tabelaExtra.cor ? m.tabelaExtra.cor(li, ci) : null; return '<td style="' + td + (m.ctrl ? 'padding:3px 8px;font-size:12px;' : '') + (k ? 'color:#c00000;font-weight:bold;' : '') + '">' + E(c) + '</td>'; }).join('') + '</tr>'; }).join('') + '</table>';
+  if (m.historico && m.historico.length) h += tit('Histórico da tratativa', m.historico.length + ' comentário' + (m.historico.length > 1 ? 's' : '')) + '<table cellspacing="0" cellpadding="0" style="width:100%;border-collapse:collapse;border:1px solid #e6e9ee">' +
+    m.historico.map(function(c, i){ var anx = [c.fotos ? c.fotos + ' foto' + (c.fotos > 1 ? 's' : '') : '', c.pdfs ? c.pdfs + ' arquivo' + (c.pdfs > 1 ? 's' : '') + ' PDF' : ''].filter(Boolean).join(' e ');
+      return '<tr style="background:' + (i % 2 ? '#ffffff' : '#f7f8fa') + '"><td style="' + td + 'width:26%;white-space:nowrap"><div style="font:bold 12px Arial,sans-serif;color:#15181d">' + E(c.autor) + '</div><div style="font:11px Arial,sans-serif;color:#88909c">' + E(c.dh) + '</div></td>' +
+        '<td style="' + td + 'white-space:pre-wrap;color:#33373d">' + E(c.texto || '—') + (anx ? '<div style="margin-top:4px;font:11px Arial,sans-serif;color:#157f99">Anexo: ' + anx + (c.fotos ? ' (nas fotos abaixo)' : '') + '</div>' : '') + '</td></tr>'; }).join('') + '</table>';
   if (m.conclusao) h += tit('Conclusão — ' + m.conclusao.resultado, [m.conclusao.data, m.conclusao.por ? 'por ' + m.conclusao.por : ''].filter(Boolean).join(' ')) + '<p style="margin:0;padding:10px 12px;border:1px solid #e6e9ee;white-space:pre-wrap">' + E(m.conclusao.texto) + '</p>';
   if (m.observacoes) h += tit('Observações') + '<p style="margin:0;white-space:pre-wrap;color:#33373d">' + E(m.observacoes) + '</p>';
   if (m.fotos.length) {
@@ -6111,6 +6118,22 @@ async function pdfDaFicha(m){
       function(li, i){ return (i === 2 || i === 4) ? (cs[m.resultados.linhas[li].aval] || null) : null; });
   }
   if (m.tabelaExtra) { titulo(m.tabelaExtra.titulo); var n = m.tabelaExtra.colunas.length, pesos = m.tabelaExtra.pesos || (n === 5 ? [0.17, 0.17, 0.12, 0.16, 0.38] : [0.2, 0.2, 0.18, 0.42]); tabela(m.tabelaExtra.colunas, pesos.map(function(p){ return larg * p; }), m.tabelaExtra.linhas, m.tabelaExtra.cor); }
+  if (m.historico && m.historico.length) {
+    titulo('Histórico da tratativa', m.historico.length + ' comentário' + (m.historico.length > 1 ? 's' : ''));
+    m.historico.forEach(function(c, i){
+      var linhas = doc.splitTextToSize(c.texto || '—', larg - 50), anx = [c.fotos ? c.fotos + ' foto' + (c.fotos > 1 ? 's' : '') : '', c.pdfs ? c.pdfs + ' PDF' : ''].filter(Boolean).join(' e ');
+      var h = Math.max(9, linhas.length * 4.1 + (anx ? 4.2 : 0) + 3.2);
+      garante(Math.min(h, 40));
+      if (i % 2 === 0) { doc.setFillColor(247, 248, 250); doc.rect(Mg, y, larg, h, 'F'); }
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.6); cor([25, 25, 25]); doc.text(doc.splitTextToSize(c.autor, 44)[0], Mg + 2, y + 4.4);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.8); cor([130, 135, 145]); doc.text(c.dh, Mg + 2, y + 8.2);
+      doc.setFontSize(8.8); cor([45, 48, 55]); var yy = y + 4.4;
+      linhas.forEach(function(l){ if (yy > BASE) { novaPagina(); yy = y + 4.4; } doc.text(l, Mg + 48, yy); yy += 4.1; });
+      if (anx) { doc.setFontSize(7.8); doc.setTextColor(21, 127, 153); doc.text('Anexo: ' + anx + (c.fotos ? ' (nas fotos abaixo)' : ''), Mg + 48, yy); yy += 4.2; }
+      y = Math.max(y + h, yy - 1); doc.setDrawColor(230, 232, 236); doc.setLineWidth(0.15); doc.line(Mg, y, W - Mg, y);
+    });
+    y += 2;
+  }
   if (m.conclusao) { titulo('Conclusão — ' + m.conclusao.resultado, [m.conclusao.data, m.conclusao.por ? 'por ' + m.conclusao.por : ''].filter(Boolean).join(' ')); doc.setFont('helvetica', 'normal'); doc.setFontSize(9); cor([30, 30, 30]); doc.splitTextToSize(m.conclusao.texto || '—', larg).forEach(function(l){ garante(5); doc.text(l, Mg, y + 3.5); y += 4.3; }); y += 2; }
   if (m.observacoes) { titulo('Observações'); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); cor([60, 60, 60]); doc.splitTextToSize(m.observacoes, larg).forEach(function(l){ garante(5); doc.text(l, Mg, y + 3.5); y += 4; }); y += 2; }
   if (m.fotos.length) {
