@@ -743,6 +743,150 @@
     max-height:260px;overflow:auto;white-space:pre-wrap;margin:12px 0 0;color:var(--fg);}
   .lst-acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
   .lst-acoes a.btn{text-decoration:none;}
+
+  /* ===================== MAPA DO MOLDE (24/11/2026) ===================== */
+  :root{ --mm-plate:#161b23; --mm-plate-2:#1c222c; --mm-ring:#4d596a; --mm-shade:#0e1217; --mm-sombra:rgba(0,0,0,.45); --mm-ov:rgba(0,0,0,.6); }
+  :root[data-theme="claro"]{ --mm-plate:#e7ebf0; --mm-plate-2:#dbe1e8; --mm-ring:#97a3b1; --mm-shade:#d6dde5; --mm-sombra:rgba(21,24,29,.14); --mm-ov:rgba(21,24,29,.38); }
+  #pageMapaMolde{max-width:1320px;}
+  .mm-cab{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-bottom:14px}
+  .mm-cab .mm-tt{flex:1;min-width:240px}
+  .mm-cab .page-title{margin-bottom:4px}
+  .mm-cab .page-sub{margin:0}
+  .mm-acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  #app .btn.mm-red{background:var(--danger);border-color:var(--danger);color:#fff}
+  #app .btn.mm-grn{background:var(--ok);border-color:var(--ok);color:#fff}
+  .mm-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;white-space:nowrap}
+  .mm-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+  .mm-badge.ok{background:var(--ok-bg);color:var(--ok)} .mm-badge.bad{background:var(--danger-bg);color:var(--danger)}
+  .mm-badge.dim{background:var(--surface-3);color:var(--fg-dim)} .mm-badge.alt{background:var(--accent-soft);color:var(--accent)}
+  .mm-badge.warn{background:var(--warn-bg);color:var(--warn)}
+  .mm-filtro{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .mm-filtro input{height:34px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--fg);padding:0 11px;min-width:0;flex:1;max-width:340px;font:inherit;font-size:13px}
+  .mm-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+  .mm-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;cursor:pointer;text-align:left;font:inherit;color:var(--fg)}
+  .mm-card:hover{border-color:var(--accent-border)}
+  .mm-card:focus-visible,.mm-cav:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .mm-card .t{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+  .mm-card b{font-size:15px;font-weight:650}
+  .mm-card small{color:var(--fg-dim);font-size:12px}
+  .mm-bar{height:7px;border-radius:4px;background:var(--danger-bg);overflow:hidden}
+  .mm-bar i{display:block;height:100%;background:var(--ok)}
+  .mm-card .n{display:flex;justify-content:space-between;font-size:12px;color:var(--fg-dim)}
+  .mm-card .n b{font-size:12px;font-weight:650;color:var(--fg)}
+  .mm-vazio-msg{color:var(--fg-dim);font-size:13px;padding:18px;border:1px dashed var(--border);border-radius:14px;background:var(--surface)}
+  .mm-imp{background:var(--surface);border:1px solid var(--accent-border);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;flex-direction:column;gap:10px}
+  .mm-imp h3{margin:0;font-size:15px;font-weight:650}
+  .mm-imp p{margin:0;font-size:13px;color:var(--fg-dim);line-height:1.5}
+  .mm-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+  .mm-kpi{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 14px}
+  .mm-kpi small{display:block;font-size:10.5px;letter-spacing:.5px;text-transform:uppercase;color:var(--fg-faint)}
+  .mm-kpi b{font-size:22px;font-weight:650}
+  .mm-wrap{display:grid;grid-template-columns:minmax(0,58fr) minmax(300px,42fr);gap:14px;align-items:stretch}
+  .mm-mapa{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px;overflow-x:auto;max-width:100%;container-type:inline-size}
+  .mm-leg{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--fg-dim);margin-bottom:12px}
+  .mm-leg .mini{display:inline-block;width:16px;height:16px;border-radius:50%;border:2px solid var(--mm-ring);background:var(--surface);margin-right:6px;vertical-align:-3px;position:relative}
+  .mm-leg .mini.x{border-color:var(--danger);background:repeating-linear-gradient(45deg,var(--danger-bg) 0 3px,var(--surface) 3px 6px)}
+  .mm-leg .mini.x::after{content:'✕';position:absolute;top:-6px;right:-7px;width:11px;height:11px;border-radius:50%;background:var(--danger);color:#fff;font-size:6.5px;font-weight:800;display:grid;place-items:center;border:1.5px solid var(--surface)}
+  .mm-molde{background:linear-gradient(180deg,var(--mm-plate),var(--mm-plate-2));border:1px solid var(--border);border-radius:16px;padding:8px;display:flex;flex-direction:column;gap:8px;
+    --d:clamp(34px, calc((100cqw - 16px - var(--nb) * 18px - (var(--nb) - 1) * 26px) / var(--n) - 26px), 62px)}
+  .mm-faixa{display:flex;align-items:stretch;justify-content:center}
+  .mm-bloco{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:0 1px 2px var(--mm-sombra);padding:28px 8px 8px;display:grid;gap:8px 6px;position:relative;justify-items:center;align-items:end}
+  .mm-rots{position:absolute;top:6px;left:9px;right:9px;display:flex;gap:4px;flex-wrap:wrap}
+  .mm-rot{font-size:10px;font-weight:700;letter-spacing:.3px;color:var(--fg-dim);background:var(--surface-2);border-radius:6px;padding:2px 7px;white-space:nowrap}
+  .mm-canal{width:26px;flex:none;display:flex;align-items:center;justify-content:center;position:relative}
+  .mm-canal::before{content:'';position:absolute;top:8px;bottom:8px;left:50%;border-left:2px dashed var(--mm-ring)}
+  .mm-canal span{position:relative;writing-mode:vertical-rl;transform:rotate(180deg);font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--fg-dim);background:var(--mm-plate);padding:6px 1px;border-radius:6px;max-height:100%;overflow:hidden}
+  .mm-entre{display:flex;justify-content:center;margin:-2px 0}
+  .mm-entre span{font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--fg-dim);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:2px 9px}
+  .mm-cav{display:flex;flex-direction:row;align-items:flex-end;gap:3px;border:0;background:none;padding:0;cursor:pointer;font:inherit;color:var(--fg)}
+  .mm-cav[disabled]{cursor:default}
+  .mm-cav .c{width:var(--d);height:var(--d);border-radius:50%;border:2px solid var(--mm-ring);display:grid;place-items:center;font-size:calc(var(--d) * .32);font-weight:650;color:var(--fg);
+    background:radial-gradient(circle at 50% 42%,var(--surface) 0 56%,var(--mm-shade) 100%);position:relative;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;letter-spacing:-.3px}
+  .mm-cav .c span{position:relative;z-index:1;white-space:nowrap}
+  .mm-cav .c.longo{font-size:calc(var(--d) * .22);letter-spacing:-.4px}
+  .mm-cav .p{font-size:calc(var(--d) * .24);color:var(--fg-dim);min-width:calc(var(--d) * .36);text-align:left;line-height:1}
+  .mm-cav:not([disabled]):hover .c{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 6px 14px var(--mm-sombra)}
+  .mm-cav.iso .c{border-color:var(--danger);color:var(--danger);background:repeating-linear-gradient(45deg,var(--danger-bg) 0 5px,var(--surface) 5px 10px)}
+  .mm-cav.iso .c::after{content:'✕';position:absolute;top:-4px;right:-4px;width:calc(var(--d) * .36);height:calc(var(--d) * .36);border-radius:50%;background:var(--danger);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;border:2px solid var(--surface);z-index:2}
+  .mm-cav.sel .c{box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--accent)}
+  .mm-buraco{width:calc(var(--d) + var(--d) * .36 + 3px);height:var(--d)}
+  .mm-lateral{position:relative;min-width:0}
+  .mm-lateral-in{position:absolute;inset:0;display:flex;flex-direction:column;gap:14px}
+  .mm-painel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+  .mm-painel h3{margin:0;font-size:16px;font-weight:650}
+  .mm-painel .vazio{color:var(--fg-dim);font-size:13px;margin:0}
+  .mm-lateral .mm-sel{flex:none}
+  .mm-lateral .mm-hcard{flex:1 1 auto;min-height:0;overflow:hidden}
+  .mm-sel-ult{font-size:12.5px;color:var(--fg-dim);background:var(--surface-2);border-radius:9px;padding:8px 10px;line-height:1.45}
+  .mm-hleg{font-size:12px;color:var(--fg-dim);margin:-4px 0 0}.mm-hleg b{color:var(--fg)}
+  .mm-hlist{overflow:auto;min-height:0;display:flex;flex-direction:column;margin:0 -4px;padding:0 4px}
+  .mm-hitem{border-top:1px solid var(--border);padding:10px 0;display:flex;flex-direction:column;gap:6px;cursor:pointer;border-radius:8px}
+  .mm-hitem:first-child{border-top:0}
+  .mm-hitem:hover .mm-hpos{color:var(--accent)}
+  .mm-hitem.marcado{background:var(--accent-soft);margin:0 -8px;padding:10px 8px}
+  .mm-hitem .hl{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .mm-hpos{font-weight:650;color:var(--fg);font-size:13px}
+  .mm-hcorpo{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start}
+  .mm-htxt{display:flex;flex-direction:column;gap:5px;min-width:0;font-size:13px;overflow-wrap:anywhere}
+  .mm-hquando{font-size:12px;color:var(--fg-dim)}
+  .mm-himp{font-size:11px;color:var(--fg-faint)}
+  .mm-hfoto{width:116px;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:zoom-in;display:block;background:var(--surface-2)}
+  .mm-hfoto-link{font-size:12px;color:var(--accent)}
+  .mm-ov{position:fixed;inset:0;background:var(--mm-ov);display:grid;place-items:center;z-index:300;padding:16px}
+  .mm-modal{background:var(--surface);color:var(--fg);border:1px solid var(--border);border-radius:16px;width:min(540px,100%);max-height:92vh;overflow:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 50px var(--mm-sombra)}
+  .mm-modal.larga{width:min(980px,100%)}
+  .mm-modal h3{margin:0;font-size:17px;font-weight:650}
+  .mm-modal .sub{margin:-6px 0 0;font-size:12.5px;color:var(--fg-dim);line-height:1.5}
+  .mm-fld{display:flex;flex-direction:column;gap:5px}
+  .mm-fld > label{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--fg-faint)}
+  .mm-fld input[type=text],.mm-fld input[type=number],.mm-fld textarea,.mm-fld select{border:1px solid var(--border);background:var(--surface-2);color:var(--fg);border-radius:9px;padding:8px 11px;width:100%;font:inherit;font-size:13.5px}
+  .mm-fld textarea{min-height:80px;resize:vertical}
+  .mm-fld input:focus,.mm-fld textarea:focus,.mm-fld select:focus,.mm-rotf input:focus,.mm-ed-it input:focus,.mm-filtro input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .mm-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mm-grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .mm-opc{font-size:11px;color:var(--fg-faint);text-transform:none;letter-spacing:0}
+  .mm-drop{border:1.5px dashed var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--fg-dim);font-size:12.5px;text-align:center}
+  .mm-drop .mm-acoes{justify-content:center}
+  .mm-prev img{max-width:180px;max-height:140px;border-radius:8px;border:1px solid var(--border);display:block}
+  .mm-quando{font-size:12px;color:var(--fg-dim);background:var(--surface-2);border-radius:8px;padding:8px 10px}
+  .mm-erro{color:var(--danger);font-size:12.5px;font-weight:600}
+  .mm-aviso{color:var(--warn);font-size:12.5px;font-weight:600}
+  .mm-rodape{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+  .mm-lb{position:fixed;inset:0;background:rgba(0,0,0,.82);display:grid;place-items:center;z-index:320;padding:16px;cursor:zoom-out}
+  .mm-lb img{max-width:100%;max-height:90vh;border-radius:10px;background:#fff}
+  .mm-lb span{color:#fff;font-size:13px}
+  .mm-ed{display:flex;flex-direction:column;gap:10px;max-height:50vh;overflow:auto;padding:2px}
+  .mm-ed-faixa{display:flex;gap:12px;justify-content:center}
+  .mm-ed-bloco{display:grid;gap:6px;border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--mm-plate);align-content:start}
+  .mm-ed-it{border:1px solid var(--border);border-radius:9px;padding:6px;display:grid;grid-template-columns:1fr 1fr;gap:5px;background:var(--surface);min-width:112px;position:relative}
+  .mm-ed-it.mud{border-color:var(--accent);background:var(--accent-soft)}
+  .mm-ed-it.vazio{opacity:.45;background:transparent;border-style:dashed}
+  .mm-ed-it label{font-size:9.5px;letter-spacing:.4px;text-transform:uppercase;color:var(--fg-faint);display:flex;flex-direction:column;gap:2px}
+  .mm-ed-it input{width:100%;height:28px;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--fg);padding:0 4px;font-weight:600;text-align:center;font-size:13.5px;font-family:inherit}
+  .mm-ed-it .mm-tira{position:absolute;top:-7px;right:-7px;width:18px;height:18px;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--fg-dim);font-size:11px;line-height:1;cursor:pointer;padding:0;display:grid;place-items:center}
+  .mm-passos{display:flex;gap:6px;flex-wrap:wrap}
+  .mm-passos span{font-size:11.5px;padding:4px 10px;border-radius:999px;background:var(--surface-2);color:var(--fg-dim)}
+  .mm-passos span.on{background:var(--accent-soft);color:var(--accent);font-weight:650}
+  .mm-escolha{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mm-escolha label{border:1px solid var(--border);border-radius:12px;padding:10px 12px;display:flex;gap:9px;align-items:flex-start;cursor:pointer;font-size:13px;background:var(--surface-2)}
+  .mm-escolha label b{display:block;font-weight:650}
+  .mm-escolha label small{color:var(--fg-dim);font-size:12px}
+  .mm-escolha label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+  .mm-pre{container-type:inline-size;border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--surface)}
+  .mm-rotf{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--fg-dim);padding:6px 0;border-top:1px solid var(--border)}
+  .mm-rotf:first-child{border-top:0}
+  .mm-rotf b{min-width:58px;color:var(--fg)}
+  .mm-rotf input{height:30px;border:1px solid var(--border);border-radius:7px;background:var(--surface-2);color:var(--fg);padding:0 8px;font:inherit;font-size:12.5px;width:130px}
+  .mm-rotf input.canal{width:100px;border-style:dashed}
+  .mm-imp-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;max-height:48vh;overflow:auto}
+  .mm-imp-it{border:1px solid var(--border);border-radius:10px;padding:8px 10px;display:flex;gap:8px;align-items:flex-start;font-size:12.5px;background:var(--surface-2)}
+  .mm-imp-it b{display:block;font-size:13px}
+  .mm-imp-it small{color:var(--fg-dim)}
+  .mm-imp-it button{margin-left:auto}
+  .mm-load{display:flex;gap:10px;align-items:center;color:var(--fg-dim);font-size:13px;padding:14px 0}
+  @media (max-width:1100px){ .mm-wrap{grid-template-columns:1fr} .mm-lateral-in{position:static} .mm-hlist{max-height:560px} }
+  @media (max-width:760px){ .mm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))} .mm-grid2,.mm-grid3,.mm-escolha{grid-template-columns:1fr} .mm-hfoto{width:92px} }
+  @media (prefers-reduced-motion: reduce){ .mm-cav .c{transition:none} }
 </style>
 </head>
 <body>
@@ -765,7 +909,7 @@
       <div class="op-brandrow"><img class="a-logo" src="sq-icone-192.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><svg class="a-logo a-logo-svg" viewBox="0 0 40 30" aria-hidden="true"><rect width="40" height="30" rx="7" fill="#c8202f"/><text x="20" y="20.5" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="14" fill="#fff">BP</text></svg><div><b>Controle de Processo</b><small>Registro do check list e últimos registros</small></div></div>
       <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h10"/><path d="M12 7h6l4 5-4 5h-6z"/><path d="M5 9v6"/></svg></span><span class="op-bt"><b>Injetora</b><span>Registro do check list e últimos registros das injetoras</span></span><span class="op-chev">›</span></button>
       <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4v3h-4z"/><path d="M9 5h6l1 4v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9z"/><path d="M8 13h8"/></svg></span><span class="op-bt"><b>Sopro</b><span>Registro do check list e últimos registros das sopradoras</span></span><span class="op-chev">›</span></button>
-      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 23/11/2026 16:02</span></div>
+      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 24/11/2026 17:43</span></div>
     </section>
     <section id="opDash" hidden>
       <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Últimos 8 registros de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
@@ -792,6 +936,7 @@
         <button class="nav-item active" data-page="dashboard" onclick="mudarPagina('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>Dashboard</span></button>
         <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('injecao')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg><span>Registro do Check List</span></button>
         <button class="nav-item" data-page="dadosCadastrados" onclick="mudarPagina('dadosCadastrados')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg><span>Dados Cadastrados</span></button>
+        <button class="nav-item" data-page="mapaMolde" onclick="mudarPagina('mapaMolde')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="2"/><circle cx="15.5" cy="8.5" r="2"/><circle cx="8.5" cy="15.5" r="2"/><path d="m13.8 13.8 3.4 3.4M17.2 13.8l-3.4 3.4"/></svg><span>Mapa do Molde</span></button>
         <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Carregar Dados</span></button>
         <button class="nav-item" data-page="criterios" onclick="mudarPagina('criterios')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3"/><path d="M14 2v4M8 10v4M16 18v4"/></svg><span>Critérios</span></button>
         <button class="nav-item" data-page="iqr" onclick="mudarPagina('iqr')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>IQR / Intervalo Interquartil</span></button>
@@ -806,7 +951,7 @@
         <button class="nav-item" data-page="listasTeste" onclick="mudarPagina('listasTeste')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>Banco de dados</span></button>
       </nav>
       <button type="button" class="a-opbtn" id="btnVersaoOperacao" onclick="usarVersaoOperacao()" hidden>Voltar à versão da operação</button>
-      <div class="a-versao"><span>Versão do sistema: <b>23/11/2026 16:02</b></span></div>
+      <div class="a-versao"><span>Versão do sistema: <b>24/11/2026 17:43</b></span></div>
       <div class="a-user"><span class="av" id="userAv">·</span><div class="who"><b id="userNome">—</b><small id="userEmail"></small></div><button type="button" class="a-ic-btn" title="Sair" aria-label="Sair" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button></div>
     </aside>
 
@@ -1369,6 +1514,9 @@
     </div>
     <div id="lstRelatorio"></div>
   </div>
+
+  <!-- ===== PÁGINA: MAPA DO MOLDE ===== -->
+  <div id="pageMapaMolde" hidden><div id="mmConteudo"></div></div>
   </div><!-- /.main -->
   </div><!-- /.a-main -->
 
@@ -2850,7 +2998,7 @@ var registrosCarregados = null; // array de objetos {id_sessao,data,hora,maquina
 var PAGINAS_IDS = {
   dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', criterios:'pageCriterios', carregarDados:'pageCarregarDados', iqr:'pageIqr',
   dashboardSopro:'pageDashboardSopro', dadosCadastradosSopro:'pageDadosCadastradosSopro', criteriosSopro:'pageCriteriosSopro', carregarDadosSopro:'pageCarregarDadosSopro',
-  configuracoes:'pageConfiguracoes', listasTeste:'pageListasTeste'
+  configuracoes:'pageConfiguracoes', listasTeste:'pageListasTeste', mapaMolde:'pageMapaMolde'
 };
 
 // =============================================================================
@@ -2890,7 +3038,7 @@ var CRUMB_PAGINAS = {
   dashboard:['Injeção','Dashboard'], dadosCadastrados:['Injeção','Dados Cadastrados'], criterios:['Injeção','Critérios'],
   carregarDados:['Injeção','Carregar Dados'], iqr:['Injeção','IQR / Intervalo Interquartil'],
   dashboardSopro:['Sopro','Dashboard'], dadosCadastradosSopro:['Sopro','Dados Cadastrados'], criteriosSopro:['Sopro','Critérios'],
-  carregarDadosSopro:['Sopro','Carregar Dados'], configuracoes:['Sistema','Configurações'], listasTeste:['Sistema','Banco de dados']
+  carregarDadosSopro:['Sopro','Carregar Dados'], configuracoes:['Sistema','Configurações'], listasTeste:['Sistema','Banco de dados'], mapaMolde:['Injeção','Mapa do Molde']
 };
 function atualizarFaixaSuperior(pagina){
   var c = CRUMB_PAGINAS[pagina] || ['', ''];
@@ -2923,6 +3071,7 @@ function mudarPagina(pagina){
   if (pagina === 'iqr') iqrAbrirPagina();
   if (pagina === 'configuracoes') atualizarBotoesTema();
   if (pagina === 'listasTeste') lstRenderStatus();
+  if (pagina === 'mapaMolde') mmAbrirPagina();
   atualizarFaixaSuperior(pagina);
   fecharMenuMobile();
   window.scrollTo(0, 0);
@@ -6618,5 +6767,935 @@ if (window.__SKIP_LOGIN__){
 }
 </script>
 
+<script type="application/json" id="dadosImportMoldes">[{"chave":"MOLDE 19,0G","maquina":"Husky LX1","gramatura":"19,0","camara":"","rev":"14/09/2026","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZM: B22"],"cols":2,"lug":[{"id":1,"cav":"04","cast":"4"},{"id":2,"cav":"03","cast":"3"},{"id":3,"cav":"08","cast":"8"},{"id":4,"cav":"07","cast":"7"},{"id":5,"cav":"12","cast":"12"},{"id":6,"cav":"11","cast":"11"},{"id":7,"cav":"16","cast":"16"},{"id":8,"cav":"15","cast":"15"},{"id":9,"cav":"20","cast":"20"},{"id":10,"cav":"19","cast":"19"},{"id":11,"cav":"24","cast":"24"},{"id":12,"cav":"23","cast":"23"},{"id":13,"cav":"28","cast":"28"},{"id":14,"cav":"27","cast":"27"}]},{"rot":["ZM: B21"],"cols":2,"lug":[{"id":15,"cav":"02","cast":"2"},{"id":16,"cav":"01","cast":"1"},{"id":17,"cav":"06","cast":"6"},{"id":18,"cav":"05","cast":"5"},{"id":19,"cav":"10","cast":"10"},{"id":20,"cav":"09","cast":"9"},{"id":21,"cav":"14","cast":"14"},{"id":22,"cav":"13","cast":"13"},{"id":23,"cav":"18","cast":"18"},{"id":24,"cav":"17","cast":"17"},{"id":25,"cav":"22","cast":"22"},{"id":26,"cav":"21","cast":"21"},{"id":27,"cav":"26","cast":"26"},{"id":28,"cav":"25","cast":"25"}]}],"canais":["ZA: PB1"],"abaixo":"ZA: S/B"},{"blocos":[{"rot":["ZM: M25"],"cols":2,"lug":[{"id":29,"cav":"32","cast":"32"},{"id":30,"cav":"31","cast":"31"},{"id":31,"cav":"36","cast":"36"},{"id":32,"cav":"35","cast":"35"},{"id":33,"cav":"40","cast":"40"},{"id":34,"cav":"39","cast":"39"},{"id":35,"cav":"44","cast":"44"},{"id":36,"cav":"43","cast":"43"},{"id":37,"cav":"48","cast":"48"},{"id":38,"cav":"47","cast":"47"},{"id":39,"cav":"52","cast":"52"},{"id":40,"cav":"51","cast":"51"},{"id":41,"cav":"56","cast":"56"},{"id":42,"cav":"55","cast":"55"}]},{"rot":["ZM: M24"],"cols":2,"lug":[{"id":43,"cav":"30","cast":"30"},{"id":44,"cav":"29","cast":"29"},{"id":45,"cav":"34","cast":"34"},{"id":46,"cav":"33","cast":"33"},{"id":47,"cav":"38","cast":"38"},{"id":48,"cav":"37","cast":"37"},{"id":49,"cav":"42","cast":"42"},{"id":50,"cav":"41","cast":"41"},{"id":51,"cav":"46","cast":"46"},{"id":52,"cav":"45","cast":"45"},{"id":53,"cav":"50","cast":"50"},{"id":54,"cav":"49","cast":"49"},{"id":55,"cav":"54","cast":"54"},{"id":56,"cav":"53","cast":"53"}]}],"canais":["ZA: PB2"],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":21,"data":"15/09/2026","resp":"Ramon","desc":"CAVIDADE ISOLADA 14 DEVIDO AO GATE ALTO 15/09/2026 RAMON"},{"tipo":"isolada","lugar":13,"data":"14/09/2026","resp":"Matheus","desc":"CAVIDADES ISOLADAS 28,32,35,36,39 DEVIDO A AGULHA TRAVADA NÃO SAIU NA PARTIDA - 14/09/2026 MATHEUS"},{"tipo":"isolada","lugar":29,"data":"14/09/2026","resp":"Matheus","desc":"CAVIDADES ISOLADAS 28,32,35,36,39 DEVIDO A AGULHA TRAVADA NÃO SAIU NA PARTIDA - 14/09/2026 MATHEUS"},{"tipo":"isolada","lugar":32,"data":"14/09/2026","resp":"Matheus","desc":"CAVIDADES ISOLADAS 28,32,35,36,39 DEVIDO A AGULHA TRAVADA NÃO SAIU NA PARTIDA - 14/09/2026 MATHEUS"},{"tipo":"isolada","lugar":31,"data":"14/09/2026","resp":"Matheus","desc":"CAVIDADES ISOLADAS 28,32,35,36,39 DEVIDO A AGULHA TRAVADA NÃO SAIU NA PARTIDA - 14/09/2026 MATHEUS"},{"tipo":"isolada","lugar":34,"data":"14/09/2026","resp":"Matheus","desc":"CAVIDADES ISOLADAS 28,32,35,36,39 DEVIDO A AGULHA TRAVADA NÃO SAIU NA PARTIDA - 14/09/2026 MATHEUS"}]},{"chave":"MOLDE 9,5G HUSLY","maquina":"Husky 1","gramatura":"9,5","camara":"","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZM: B22"],"cols":2,"lug":[{"id":1,"cav":"04","cast":"4"},{"id":2,"cav":"03","cast":"3"},{"id":3,"cav":"08","cast":"8"},{"id":4,"cav":"07","cast":"7"},{"id":5,"cav":"12","cast":"12"},{"id":6,"cav":"50","cast":"11"},{"id":7,"cav":"16","cast":"16"},{"id":8,"cav":"15","cast":"15"},{"id":9,"cav":"20","cast":"20"},{"id":10,"cav":"19","cast":"19"},{"id":11,"cav":"24","cast":"24"},{"id":12,"cav":"23","cast":"23"}]},{"rot":["ZM: B21"],"cols":2,"lug":[{"id":13,"cav":"02","cast":"2"},{"id":14,"cav":"01","cast":"1"},{"id":15,"cav":"06","cast":"6"},{"id":16,"cav":"05","cast":"5"},{"id":17,"cav":"10","cast":"10"},{"id":18,"cav":"09","cast":"9"},{"id":19,"cav":"14","cast":"14"},{"id":20,"cav":"13","cast":"13"},{"id":21,"cav":"18","cast":"18"},{"id":22,"cav":"17","cast":"17"},{"id":23,"cav":"22","cast":"22"},{"id":24,"cav":"21","cast":"21"}]}],"canais":["ZA: PB1"],"abaixo":"ZA: S/B"},{"blocos":[{"rot":["ZM: B25"],"cols":2,"lug":[{"id":25,"cav":"28","cast":"28"},{"id":26,"cav":"27","cast":"27"},{"id":27,"cav":"32","cast":"32"},{"id":28,"cav":"31","cast":"31"},{"id":29,"cav":"36","cast":"36"},{"id":30,"cav":"35","cast":"35"},{"id":31,"cav":"40","cast":"40"},{"id":32,"cav":"39","cast":"39"},{"id":33,"cav":"44","cast":"44"},{"id":34,"cav":"43","cast":"43"},{"id":35,"cav":"48","cast":"48"},{"id":36,"cav":"47","cast":"47"}]},{"rot":["ZM: B24"],"cols":2,"lug":[{"id":37,"cav":"26","cast":"26"},{"id":38,"cav":"25","cast":"25"},{"id":39,"cav":"30","cast":"30"},{"id":40,"cav":"29","cast":"29"},{"id":41,"cav":"34","cast":"34"},{"id":42,"cav":"33","cast":"33"},{"id":43,"cav":"38","cast":"38"},{"id":44,"cav":"37","cast":"37"},{"id":45,"cav":"42","cast":"42"},{"id":46,"cav":"41","cast":"41"},{"id":47,"cav":"46","cast":"46"},{"id":48,"cav":"45","cast":"45"}]}],"canais":["ZA: PB2"],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":35,"data":"07/01/2026","resp":"Arthur","desc":"CAV.48(48) NÃO SAIU NA PARTIDA 07/01/26- ARTHUR"},{"tipo":"isolada","lugar":40,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":17,"data":"07/01/2026","resp":"Arthur","desc":"CAV.10(10) NÃO SAIU NA PARTIDA 07/01/26- ARTHUR"},{"tipo":"isolada","lugar":21,"data":"07/01/2026","resp":"Arthur","desc":"CAV.18(18) NÃO SAIU NA PARTIDA 07/01/26- ARTHUR"},{"tipo":"isolada","lugar":11,"data":"08/01/2026","resp":"Thiago","desc":"CAV.24(24) NÃO SAIU NA PARTIDA 08/01/26- THIAGO"},{"tipo":"isolada","lugar":19,"data":"08/01/2026","resp":"Thiago","desc":"CAV.14(14) NÃO SAIU NA PARTIDA 08/01/26- THIAGO"},{"tipo":"isolada","lugar":47,"data":"09/01/2026","resp":"Matheus","desc":"CAV.46(46) NÃO SAIU NA PARTIDA 09/01/26- MATHEUS"},{"tipo":"obs","lugar":"","data":"07/01/2026","resp":"Arthur","desc":"CAV.26(26) NÃO SAIU NA PARTIDA 07/01/26- ARTHUR"}]},{"chave":"Desenho 13,7g KM","maquina":"KM3","gramatura":"13,7","camara":"BP021","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZM: 504","ZA: 516"],"cols":2,"lug":[{"id":1,"cav":"48","cast":"48"},{"id":2,"cav":"63","cast":"47"},{"id":3,"cav":"67","cast":"44"},{"id":4,"cav":"43","cast":"43"},{"id":5,"cav":"66","cast":"40"},{"id":6,"cav":"39","cast":"39"},{"id":7,"cav":"54","cast":"36"},{"id":8,"cav":"35","cast":"35"},{"id":9,"cav":"71","cast":"32"},{"id":10,"cav":"31","cast":"31"},{"id":11,"cav":"28","cast":"28"},{"id":12,"cav":"27","cast":"27"}]},{"rot":["ZA: 515","ZM: 503"],"cols":2,"lug":[{"id":13,"cav":"56","cast":"46"},{"id":14,"cav":"71","cast":"45"},{"id":15,"cav":"81","cast":"42"},{"id":16,"cav":"41","cast":"41"},{"id":17,"cav":"38","cast":"38"},{"id":18,"cav":"55","cast":"37"},{"id":19,"cav":"69","cast":"34"},{"id":20,"cav":"74","cast":"33"},{"id":21,"cav":"65","cast":"30"},{"id":22,"cav":"29","cast":"29"},{"id":23,"cav":"26","cast":"26"},{"id":24,"cav":"64","cast":"25"}]}],"canais":[""],"abaixo":"ZM: 506 · ZM: 505"},{"blocos":[{"rot":["ZM: 502","ZA: 514"],"cols":2,"lug":[{"id":25,"cav":"59","cast":"24"},{"id":26,"cav":"68","cast":"23"},{"id":27,"cav":"73","cast":"20"},{"id":28,"cav":"72","cast":"19"},{"id":29,"cav":"16","cast":"16"},{"id":30,"cav":"15","cast":"15"},{"id":31,"cav":"08","cast":"12"},{"id":32,"cav":"11","cast":"11"},{"id":33,"cav":"70","cast":"8"},{"id":34,"cav":"70","cast":"7"},{"id":35,"cav":"52","cast":"4"},{"id":36,"cav":"66","cast":"3"}]},{"rot":["ZM: 501","ZA: 513"],"cols":2,"lug":[{"id":37,"cav":"19","cast":"22"},{"id":38,"cav":"65","cast":"21"},{"id":39,"cav":"18","cast":"18"},{"id":40,"cav":"62","cast":"17"},{"id":41,"cav":"02","cast":"14"},{"id":42,"cav":"73","cast":"13"},{"id":43,"cav":"80","cast":"10"},{"id":44,"cav":"79","cast":"9"},{"id":45,"cav":"61","cast":"6"},{"id":46,"cav":"78","cast":"5"},{"id":47,"cav":"75","cast":"2"},{"id":48,"cav":"60","cast":"1"}]}],"canais":[""],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":1,"data":"20/11/2025","resp":"Pablo","desc":"CAV.48(48) REBARBA ALTA - 20/11/25 - PABLO"}]},{"chave":"MOLDE 15,6","maquina":"Husky GL","gramatura":"15,6","camara":"","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZM: B22"],"cols":2,"lug":[{"id":1,"cav":"04","cast":"4"},{"id":2,"cav":"03","cast":"3"},{"id":3,"cav":"08","cast":"8"},{"id":4,"cav":"07","cast":"7"},{"id":5,"cav":"12","cast":"12"},{"id":6,"cav":"11","cast":"11"},{"id":7,"cav":"16","cast":"16"},{"id":8,"cav":"15","cast":"15"},{"id":9,"cav":"20","cast":"20"},{"id":10,"cav":"19","cast":"19"},{"id":11,"cav":"24","cast":"24"},{"id":12,"cav":"23","cast":"23"},{"id":13,"cav":"28","cast":"28"},{"id":14,"cav":"27","cast":"27"}]},{"rot":["ZM: B21"],"cols":2,"lug":[{"id":15,"cav":"02","cast":"2"},{"id":16,"cav":"01","cast":"1"},{"id":17,"cav":"06","cast":"6"},{"id":18,"cav":"05","cast":"5"},{"id":19,"cav":"10","cast":"10"},{"id":20,"cav":"09","cast":"9"},{"id":21,"cav":"14","cast":"14"},{"id":22,"cav":"13","cast":"13"},{"id":23,"cav":"18","cast":"18"},{"id":24,"cav":"17","cast":"17"},{"id":25,"cav":"22","cast":"22"},{"id":26,"cav":"21","cast":"21"},{"id":27,"cav":"26","cast":"26"},{"id":28,"cav":"25","cast":"25"}]}],"canais":["ZA: PB1"],"abaixo":"ZA: S/B"},{"blocos":[{"rot":["ZM: M25"],"cols":2,"lug":[{"id":29,"cav":"32","cast":"32"},{"id":30,"cav":"31","cast":"31"},{"id":31,"cav":"36","cast":"36"},{"id":32,"cav":"35","cast":"35"},{"id":33,"cav":"40","cast":"40"},{"id":34,"cav":"39","cast":"39"},{"id":35,"cav":"44","cast":"44"},{"id":36,"cav":"43","cast":"43"},{"id":37,"cav":"48","cast":"48"},{"id":38,"cav":"47","cast":"47"},{"id":39,"cav":"52","cast":"52"},{"id":40,"cav":"57","cast":"51"},{"id":41,"cav":"56","cast":"56"},{"id":42,"cav":"55","cast":"55"}]},{"rot":["ZM: M24"],"cols":2,"lug":[{"id":43,"cav":"30","cast":"30"},{"id":44,"cav":"29","cast":"29"},{"id":45,"cav":"34","cast":"34"},{"id":46,"cav":"33","cast":"33"},{"id":47,"cav":"59","cast":"38"},{"id":48,"cav":"37","cast":"37"},{"id":49,"cav":"42","cast":"42"},{"id":50,"cav":"41","cast":"41"},{"id":51,"cav":"46","cast":"46"},{"id":52,"cav":"45","cast":"45"},{"id":53,"cav":"50","cast":"50"},{"id":54,"cav":"49","cast":"49"},{"id":55,"cav":"54","cast":"54"},{"id":56,"cav":"53","cast":"53"}]}],"canais":["ZA: PB2"],"abaixo":""}]},"eventos":[]},{"chave":"Desenho16,5g e 17,5g KM","maquina":"KM1","gramatura":"16,5 ou 17,5","camara":"BP024","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZM: 504","ZA: 516"],"cols":2,"lug":[{"id":1,"cav":"48","cast":"48"},{"id":2,"cav":"27","cast":"47"},{"id":3,"cav":"44","cast":"44"},{"id":4,"cav":"43","cast":"43"},{"id":5,"cav":"50","cast":"40"},{"id":6,"cav":"39","cast":"39"},{"id":7,"cav":"49","cast":"36"},{"id":8,"cav":"35","cast":"35"},{"id":9,"cav":"32","cast":"32"},{"id":10,"cav":"31","cast":"31"},{"id":11,"cav":"28","cast":"28"},{"id":12,"cav":"47","cast":"27"}]},{"rot":["ZA: 515","ZM: 503"],"cols":2,"lug":[{"id":13,"cav":"45","cast":"46"},{"id":14,"cav":"46","cast":"45"},{"id":15,"cav":"42","cast":"42"},{"id":16,"cav":"41","cast":"41"},{"id":17,"cav":"53","cast":"38"},{"id":18,"cav":"37","cast":"37"},{"id":19,"cav":"34","cast":"34"},{"id":20,"cav":"33","cast":"33"},{"id":21,"cav":"30","cast":"30"},{"id":22,"cav":"29","cast":"29"},{"id":23,"cav":"26","cast":"26"},{"id":24,"cav":"25","cast":"25"}]}],"canais":[""],"abaixo":"ZM: 506 · ZM: 505"},{"blocos":[{"rot":["ZM: 502","ZA: 514"],"cols":2,"lug":[{"id":25,"cav":"24","cast":"24"},{"id":26,"cav":"11","cast":"23"},{"id":27,"cav":"20","cast":"20"},{"id":28,"cav":"07","cast":"19"},{"id":29,"cav":"16","cast":"16"},{"id":30,"cav":"15","cast":"15"},{"id":31,"cav":"12","cast":"12"},{"id":32,"cav":"23","cast":"11"},{"id":33,"cav":"08","cast":"8"},{"id":34,"cav":"19","cast":"7"},{"id":35,"cav":"51","cast":"4"},{"id":36,"cav":"03","cast":"3"}]},{"rot":["ZM: 501","ZA: 513"],"cols":2,"lug":[{"id":37,"cav":"38","cast":"22"},{"id":38,"cav":"50","cast":"21"},{"id":39,"cav":"14","cast":"18"},{"id":40,"cav":"49","cast":"17"},{"id":41,"cav":"02","cast":"14"},{"id":42,"cav":"13","cast":"13"},{"id":43,"cav":"22","cast":"10"},{"id":44,"cav":"09","cast":"9"},{"id":45,"cav":"18","cast":"6"},{"id":46,"cav":"52","cast":"5"},{"id":47,"cav":"06","cast":"2"},{"id":48,"cav":"54","cast":"1"}]}],"canais":[""],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":47,"data":"13/05/2025","resp":"Felipe","desc":"CAV.02(06) GATE ALTO - 13/05/25 - FELIPE"}]},{"chave":"MOLDE 17,7G","maquina":"KM3","gramatura":"17,7","camara":"BP023","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZA: 516","ZM: 504"],"cols":2,"lug":[{"id":1,"cav":"48","cast":"48"},{"id":2,"cav":"47","cast":"47"},{"id":3,"cav":"44","cast":"44"},{"id":4,"cav":"43","cast":"43"},{"id":5,"cav":"40","cast":"40"},{"id":6,"cav":"39","cast":"39"},{"id":7,"cav":"36","cast":"36"},{"id":8,"cav":"35","cast":"35"},{"id":9,"cav":"32","cast":"32"},{"id":10,"cav":"31","cast":"31"},{"id":11,"cav":"28","cast":"28"},{"id":12,"cav":"27","cast":"27"}]},{"rot":["ZM: 503","ZA: 515"],"cols":2,"lug":[{"id":13,"cav":"46","cast":"46"},{"id":14,"cav":"45","cast":"45"},{"id":15,"cav":"42","cast":"42"},{"id":16,"cav":"41","cast":"41"},{"id":17,"cav":"38","cast":"38"},{"id":18,"cav":"37","cast":"37"},{"id":19,"cav":"34","cast":"34"},{"id":20,"cav":"33","cast":"33"},{"id":21,"cav":"30","cast":"30"},{"id":22,"cav":"29","cast":"29"},{"id":23,"cav":"26","cast":"26"},{"id":24,"cav":"25","cast":"25"}]}],"canais":[""],"abaixo":"ZM: 505 · ZM: 506"},{"blocos":[{"rot":["ZA: 514","ZM: 502"],"cols":2,"lug":[{"id":25,"cav":"24","cast":"24"},{"id":26,"cav":"23","cast":"23"},{"id":27,"cav":"20","cast":"20"},{"id":28,"cav":"19","cast":"19"},{"id":29,"cav":"16","cast":"16"},{"id":30,"cav":"15","cast":"15"},{"id":31,"cav":"12","cast":"12"},{"id":32,"cav":"11","cast":"11"},{"id":33,"cav":"08","cast":"8"},{"id":34,"cav":"07","cast":"7"},{"id":35,"cav":"04","cast":"4"},{"id":36,"cav":"03","cast":"3"}]},{"rot":["ZM: 501","ZA: 513"],"cols":2,"lug":[{"id":37,"cav":"22","cast":"22"},{"id":38,"cav":"21","cast":"21"},{"id":39,"cav":"18","cast":"18"},{"id":40,"cav":"17","cast":"17"},{"id":41,"cav":"14","cast":"14"},{"id":42,"cav":"13","cast":"13"},{"id":43,"cav":"10","cast":"10"},{"id":44,"cav":"09","cast":"9"},{"id":45,"cav":"06","cast":"6"},{"id":46,"cav":"05","cast":"5"},{"id":47,"cav":"02","cast":"2"},{"id":48,"cav":"01","cast":"1"}]}],"canais":[""],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":29,"data":"25/03/2025","resp":"Arthur","desc":"CAV.16(16) GATE ALTO - 25/03/25 - ARTHUR"},{"tipo":"isolada","lugar":48,"data":"25/03/2025","resp":"Arthur","desc":"CAV.01(01) NÃO SAIU NA PARTIDA (QUEIMOU A RESISTÊNCIA) - 25/03/25 - ARTHUR"},{"tipo":"isolada","lugar":8,"data":"30/03/2025","resp":"Marcos","desc":"CAV.35(35) GATE ALTO - 30/03/25 - MARCOS"},{"tipo":"isolada","lugar":31,"data":"01/04/2025","resp":"Anderson","desc":"CAV.12(12) GATE ALTO - 01/04/25 - ANDERSON"},{"tipo":"isolada","lugar":10,"data":"06/04/2025","resp":"Marcos","desc":"CAV.31(31) TRAVOU AGULHA ABERTA - 06/04/25 - MARCOS"},{"tipo":"isolada","lugar":32,"data":"07/04/2025","resp":"Marcos","desc":"CAV.11(11) TRAVOU AGULHA ABERTA - 07/04/25 - MARCOS"}]},{"chave":"Desenho 21g HUSKY","maquina":"Husky","gramatura":"21,0","camara":"BP026","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":[],"cols":2,"lug":[{"id":1,"cav":"63","cast":"4"},{"id":2,"cav":"95","cast":"3"},{"id":3,"cav":"25","cast":"8"},{"id":4,"cav":"59","cast":"7"},{"id":5,"cav":"72","cast":"12"},{"id":6,"cav":"50","cast":"11"},{"id":7,"cav":"86","cast":"16"},{"id":8,"cav":"58","cast":"15"},{"id":9,"cav":"77","cast":"20"},{"id":10,"cav":"07","cast":"19"},{"id":11,"cav":"84","cast":"24"},{"id":12,"cav":"81","cast":"23"}]},{"rot":[],"cols":2,"lug":[{"id":13,"cav":"83","cast":"2"},{"id":14,"cav":"87","cast":"1"},{"id":15,"cav":"92","cast":"6"},{"id":16,"cav":"93","cast":"5"},{"id":17,"cav":"91","cast":"10"},{"id":18,"cav":"11","cast":"9"},{"id":19,"cav":"90","cast":"14"},{"id":20,"cav":"79","cast":"13"},{"id":21,"cav":"57","cast":"18"},{"id":22,"cav":"94","cast":"17"},{"id":23,"cav":"54","cast":"22"},{"id":24,"cav":"09","cast":"21"}]}],"canais":[""],"abaixo":""},{"blocos":[{"rot":[],"cols":2,"lug":[{"id":25,"cav":"88","cast":"28"},{"id":26,"cav":"70","cast":"27"},{"id":27,"cav":"36","cast":"32"},{"id":28,"cav":"35","cast":"31"},{"id":29,"cav":"33","cast":"36"},{"id":30,"cav":"51","cast":"35"},{"id":31,"cav":"74","cast":"40"},{"id":32,"cav":"39","cast":"39"},{"id":33,"cav":"01","cast":"44"},{"id":34,"cav":"49","cast":"43"},{"id":35,"cav":"69","cast":"48"},{"id":36,"cav":"76","cast":"47"}]},{"rot":[],"cols":2,"lug":[{"id":37,"cav":"73","cast":"26"},{"id":38,"cav":"80","cast":"25"},{"id":39,"cav":"68","cast":"30"},{"id":40,"cav":"52","cast":"29"},{"id":41,"cav":"03","cast":"34"},{"id":42,"cav":"89","cast":"33"},{"id":43,"cav":"38","cast":"38"},{"id":44,"cav":"64","cast":"37"},{"id":45,"cav":"56","cast":"42"},{"id":46,"cav":"71","cast":"41"},{"id":47,"cav":"78","cast":"46"},{"id":48,"cav":"85","cast":"45"}]}],"canais":[""],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":37,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":17,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":21,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":3,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":5,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":9,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":22,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":29,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":46,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":1,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":45,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":31,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":44,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":48,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":40,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":38,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":19,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":15,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":16,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":13,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":24,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":20,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":32,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":41,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":39,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":47,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":25,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":27,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":36,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":34,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":2,"data":"29/07/2026","resp":"Junior","desc":"CAV.3(95) FURO NO GATE - 29/07/26- JUNIOR"},{"tipo":"isolada","lugar":35,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":33,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."}]},{"chave":"MOLDE 29,0","maquina":"Husky 2","gramatura":"29,0","camara":"","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["3-4M2 INF M2 SUP"],"cols":2,"lug":[{"id":1,"cav":"04","cast":"4"},{"id":2,"cav":"03","cast":"3"},{"id":3,"cav":"08","cast":"8"},{"id":4,"cav":"07","cast":"7"},{"id":5,"cav":"12","cast":"12"},{"id":6,"cav":"11","cast":"11"},{"id":7,"cav":"16","cast":"16"},{"id":8,"cav":"15","cast":"15"},{"id":9,"cav":"20","cast":"20"},{"id":10,"cav":"19","cast":"19"},{"id":11,"cav":"24","cast":"24"},{"id":12,"cav":"23","cast":"23"}]},{"rot":["1-2M1 INF M1 SUP"],"cols":2,"lug":[{"id":13,"cav":"02","cast":"2"},{"id":14,"cav":"01","cast":"1"},{"id":15,"cav":"06","cast":"6"},{"id":16,"cav":"05","cast":"5"},{"id":17,"cav":"10","cast":"10"},{"id":18,"cav":"09","cast":"9"},{"id":19,"cav":"14","cast":"14"},{"id":20,"cav":"13","cast":"13"},{"id":21,"cav":"18","cast":"18"},{"id":22,"cav":"17","cast":"17"},{"id":23,"cav":"22","cast":"22"},{"id":24,"cav":"21","cast":"21"}]}],"canais":[""],"abaixo":"BUCHA: 11"},{"blocos":[{"rot":["7-8M4 INF M4 SUP"],"cols":2,"lug":[{"id":25,"cav":"28","cast":"28"},{"id":26,"cav":"27","cast":"27"},{"id":27,"cav":"32","cast":"32"},{"id":28,"cav":"31","cast":"31"},{"id":29,"cav":"36","cast":"36"},{"id":30,"cav":"35","cast":"35"},{"id":31,"cav":"40","cast":"40"},{"id":32,"cav":"39","cast":"39"},{"id":33,"cav":"44","cast":"44"},{"id":34,"cav":"43","cast":"43"},{"id":35,"cav":"48","cast":"48"},{"id":36,"cav":"47","cast":"47"}]},{"rot":["5-6M3 INF M3 SUP"],"cols":2,"lug":[{"id":37,"cav":"26","cast":"26"},{"id":38,"cav":"25","cast":"25"},{"id":39,"cav":"30","cast":"30"},{"id":40,"cav":"29","cast":"29"},{"id":41,"cav":"34","cast":"34"},{"id":42,"cav":"33","cast":"33"},{"id":43,"cav":"38","cast":"38"},{"id":44,"cav":"37","cast":"37"},{"id":45,"cav":"42","cast":"42"},{"id":46,"cav":"41","cast":"41"},{"id":47,"cav":"46","cast":"46"},{"id":48,"cav":"45","cast":"45"}]}],"canais":[""],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":35,"data":"18/08/2026","resp":"Osvaldo","desc":"CAV.48(48)-INTERFERENCIA DE PEÇA 18/08/26-OSVALDO"},{"tipo":"isolada","lugar":1,"data":"20/08/2026","resp":"Lucas","desc":"CAV.04(04)-INTERFERENCIA DE PEÇA 20/08/26-LUCAS"}]},{"chave":"Desenho 34g e 37g HUSKY 2","maquina":"Husky 2","gramatura":"34,0","camara":"","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["3-4M2 INF M2 SUP"],"cols":2,"lug":[{"id":1,"cav":"04","cast":"4"},{"id":2,"cav":"03","cast":"3"},{"id":3,"cav":"08","cast":"8"},{"id":4,"cav":"07","cast":"7"},{"id":5,"cav":"12","cast":"12"},{"id":6,"cav":"11","cast":"11"},{"id":7,"cav":"16","cast":"16"},{"id":8,"cav":"15","cast":"15"},{"id":9,"cav":"20","cast":"20"},{"id":10,"cav":"19","cast":"19"},{"id":11,"cav":"24","cast":"24"},{"id":12,"cav":"23","cast":"23"}]},{"rot":["1-2M1 INF M1 SUP"],"cols":2,"lug":[{"id":13,"cav":"02","cast":"2"},{"id":14,"cav":"01","cast":"1"},{"id":15,"cav":"06","cast":"6"},{"id":16,"cav":"05","cast":"5"},{"id":17,"cav":"10","cast":"10"},{"id":18,"cav":"09","cast":"9"},{"id":19,"cav":"14","cast":"14"},{"id":20,"cav":"13","cast":"13"},{"id":21,"cav":"18","cast":"18"},{"id":22,"cav":"17","cast":"17"},{"id":23,"cav":"22","cast":"22"},{"id":24,"cav":"21","cast":"21"}]}],"canais":[""],"abaixo":"BUCHA: 11"},{"blocos":[{"rot":["7-8M4 INF M4 SUP"],"cols":2,"lug":[{"id":25,"cav":"28","cast":"28"},{"id":26,"cav":"27","cast":"27"},{"id":27,"cav":"32","cast":"32"},{"id":28,"cav":"31","cast":"31"},{"id":29,"cav":"36","cast":"36"},{"id":30,"cav":"35","cast":"35"},{"id":31,"cav":"40","cast":"40"},{"id":32,"cav":"39","cast":"39"},{"id":33,"cav":"44","cast":"44"},{"id":34,"cav":"43","cast":"43"},{"id":35,"cav":"48","cast":"48"},{"id":36,"cav":"47","cast":"47"}]},{"rot":["5-6M3 INF M3 SUP"],"cols":2,"lug":[{"id":37,"cav":"26","cast":"26"},{"id":38,"cav":"25","cast":"25"},{"id":39,"cav":"30","cast":"30"},{"id":40,"cav":"29","cast":"29"},{"id":41,"cav":"34","cast":"34"},{"id":42,"cav":"33","cast":"33"},{"id":43,"cav":"38","cast":"38"},{"id":44,"cav":"37","cast":"37"},{"id":45,"cav":"42","cast":"42"},{"id":46,"cav":"41","cast":"41"},{"id":47,"cav":"46","cast":"46"},{"id":48,"cav":"45","cast":"45"}]}],"canais":["9-10DIS. INFDIS.SUP"],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":33,"data":"30/06/2026","resp":"Pablo","desc":"CAV.10.(10),27(27)E 44(44)ISOLADA POR POROSIDADE(MARCA LINHA JUNÇÃO DO GATE) - PABLO - 2026-06-30 00:00:00"},{"tipo":"isolada","lugar":26,"data":"30/06/2026","resp":"Pablo","desc":"CAV.10.(10),27(27)E 44(44)ISOLADA POR POROSIDADE(MARCA LINHA JUNÇÃO DO GATE) - PABLO - 2026-06-30 00:00:00"},{"tipo":"isolada","lugar":17,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":1,"data":"19/07/2026","resp":"Caren","desc":"CAV..04(04) MÁ REFRIGERAÇÃO( CAUSANDO RECHUPE NO CORPO) -CAREN- 19/07/26"}]},{"chave":"MOLDE 42G HUSKY 2","maquina":"Husky 2","gramatura":"42,0","camara":"BP439","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZM: B22"],"cols":2,"lug":[{"id":1,"cav":"04","cast":"4"},{"id":2,"cav":"03","cast":"3"},{"id":3,"cav":"08","cast":"8"},{"id":4,"cav":"07","cast":"7"},{"id":5,"cav":"12","cast":"12"},{"id":6,"cav":"50","cast":"11"},{"id":7,"cav":"16","cast":"16"},{"id":8,"cav":"15","cast":"15"},{"id":9,"cav":"20","cast":"20"},{"id":10,"cav":"19","cast":"19"},{"id":11,"cav":"24","cast":"24"},{"id":12,"cav":"23","cast":"23"}]},{"rot":["ZM: B21"],"cols":2,"lug":[{"id":13,"cav":"02","cast":"2"},{"id":14,"cav":"01","cast":"1"},{"id":15,"cav":"06","cast":"6"},{"id":16,"cav":"05","cast":"5"},{"id":17,"cav":"10","cast":"10"},{"id":18,"cav":"09","cast":"9"},{"id":19,"cav":"14","cast":"14"},{"id":20,"cav":"13","cast":"13"},{"id":21,"cav":"18","cast":"18"},{"id":22,"cav":"17","cast":"17"},{"id":23,"cav":"22","cast":"22"},{"id":24,"cav":"21","cast":"21"}]}],"canais":["ZA: PB1"],"abaixo":"ZA: S/B"},{"blocos":[{"rot":["ZM: M25"],"cols":2,"lug":[{"id":25,"cav":"28","cast":"28"},{"id":26,"cav":"27","cast":"27"},{"id":27,"cav":"32","cast":"32"},{"id":28,"cav":"31","cast":"31"},{"id":29,"cav":"36","cast":"36"},{"id":30,"cav":"35","cast":"35"},{"id":31,"cav":"40","cast":"40"},{"id":32,"cav":"39","cast":"39"},{"id":33,"cav":"44","cast":"44"},{"id":34,"cav":"43","cast":"43"},{"id":35,"cav":"48","cast":"48"},{"id":36,"cav":"47","cast":"47"}]},{"rot":["ZM: M24"],"cols":2,"lug":[{"id":37,"cav":"26","cast":"26"},{"id":38,"cav":"73","cast":"25"},{"id":39,"cav":"30","cast":"30"},{"id":40,"cav":"29","cast":"29"},{"id":41,"cav":"34","cast":"34"},{"id":42,"cav":"33","cast":"33"},{"id":43,"cav":"38","cast":"38"},{"id":44,"cav":"37","cast":"37"},{"id":45,"cav":"42","cast":"42"},{"id":46,"cav":"41","cast":"41"},{"id":47,"cav":"46","cast":"46"},{"id":48,"cav":"45","cast":"45"}]}],"canais":["ZA: PB2"],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":35,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":40,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":6,"data":"12/06/2025","resp":"Arthur","desc":"Cav. 11(50)-Gate alto-Arthur - 12/06/2025"},{"tipo":"isolada","lugar":38,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"obs","lugar":"","data":"16/05/2025","resp":"Arthur","desc":"Cav.48(69)Rebarba alta -Arthur-16/05/2025"},{"tipo":"obs","lugar":"","data":"17/05/2025","resp":"Arthur","desc":"Cav.29(52)- Interferência de peça -Arthur  17/05/2025"},{"tipo":"obs","lugar":"","data":"06/06/2025","resp":"Lucas","desc":"Cav.09(11)- Rebarba alta- Lucas 06/06/2025"},{"tipo":"obs","lugar":"","data":"12/06/2025","resp":"Arthur","desc":"Cav. 11(50)-Gate alto-Arthur - 12/06/2025"},{"tipo":"obs","lugar":"","data":"","resp":"","desc":"TROCA DA CAV. 11(69) POR (50)"},{"tipo":"obs","lugar":"","data":"","resp":"","desc":"TROCA DA CAV. 25(52) POR (73)"}]},{"chave":"MOLDE 41,5G","maquina":"Hypet","gramatura":"41,5","camara":"","rev":"","desenho":{"v":1,"faixas":[{"blocos":[{"rot":[],"cols":6,"lug":[{"id":1,"cav":"01","cast":"1"},{"id":2,"cav":"13","cast":"13"},{"id":3,"cav":"25","cast":"25"},{"id":4,"cav":"37","cast":"37"},{"id":5,"cav":"49","cast":"49"},{"id":6,"cav":"61","cast":"61"},{"id":7,"cav":"02","cast":"2"},{"id":8,"cav":"14","cast":"14"},{"id":9,"cav":"26","cast":"26"},{"id":10,"cav":"38","cast":"38"},{"id":11,"cav":"50","cast":"50"},{"id":12,"cav":"62","cast":"62"},{"id":13,"cav":"03","cast":"3"},{"id":14,"cav":"15","cast":"15"},{"id":15,"cav":"27","cast":"27"},{"id":16,"cav":"39","cast":"39"},{"id":17,"cav":"51","cast":"51"},{"id":18,"cav":"63","cast":"63"}]}],"canais":[],"abaixo":""},{"blocos":[{"rot":[],"cols":6,"lug":[{"id":19,"cav":"04","cast":"4"},{"id":20,"cav":"16","cast":"16"},{"id":21,"cav":"28","cast":"28"},{"id":22,"cav":"40","cast":"40"},{"id":23,"cav":"52","cast":"52"},{"id":24,"cav":"64","cast":"64"},{"id":25,"cav":"05","cast":"5"},{"id":26,"cav":"17","cast":"17"},{"id":27,"cav":"29","cast":"29"},{"id":28,"cav":"41","cast":"41"},{"id":29,"cav":"53","cast":"53"},{"id":30,"cav":"65","cast":"65"},{"id":31,"cav":"06","cast":"6"},{"id":32,"cav":"18","cast":"18"},{"id":33,"cav":"30","cast":"30"},{"id":34,"cav":"42","cast":"42"},{"id":35,"cav":"54","cast":"54"},{"id":36,"cav":"66","cast":"66"},{"id":37,"cav":"07","cast":"7"},{"id":38,"cav":"19","cast":"19"},{"id":39,"cav":"31","cast":"31"},{"id":40,"cav":"43","cast":"43"},{"id":41,"cav":"55","cast":"55"},{"id":42,"cav":"67","cast":"67"},{"id":43,"cav":"08","cast":"8"},{"id":44,"cav":"20","cast":"20"},{"id":45,"cav":"32","cast":"32"},{"id":46,"cav":"44","cast":"44"},{"id":47,"cav":"56","cast":"56"},{"id":48,"cav":"68","cast":"68"},{"id":49,"cav":"09","cast":"9"},{"id":50,"cav":"21","cast":"21"},{"id":51,"cav":"33","cast":"33"},{"id":52,"cav":"45","cast":"45"},{"id":53,"cav":"57","cast":"57"},{"id":54,"cav":"69","cast":"69"}]}],"canais":[],"abaixo":""},{"blocos":[{"rot":[],"cols":6,"lug":[{"id":55,"cav":"10","cast":"10"},{"id":56,"cav":"22","cast":"22"},{"id":57,"cav":"34","cast":"34"},{"id":58,"cav":"46","cast":"46"},{"id":59,"cav":"58","cast":"58"},{"id":60,"cav":"70","cast":"70"},{"id":61,"cav":"11","cast":"11"},{"id":62,"cav":"23","cast":"23"},{"id":63,"cav":"35","cast":"35"},{"id":64,"cav":"47","cast":"47"},{"id":65,"cav":"59","cast":"59"},{"id":66,"cav":"71","cast":"71"},{"id":67,"cav":"12","cast":"12"},{"id":68,"cav":"24","cast":"24"},{"id":69,"cav":"36","cast":"36"},{"id":70,"cav":"48","cast":"48"},{"id":71,"cav":"60","cast":"60"},{"id":72,"cav":"72","cast":"72"}]}],"canais":[],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":67,"data":"27/07/2026","resp":"Osvaldo","desc":"CAV.12(12) NÃO FORMANDO CORPO TOTALMENTE (FALHA NA INJEÇÃO) -27/07/26- OSVALDO"}]},{"chave":"MOLDE 42G HUSKY1","maquina":"Husky 1","gramatura":"42,0","camara":"BP439","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZM: B22"],"cols":2,"lug":[{"id":1,"cav":"04","cast":"4"},{"id":2,"cav":"03","cast":"3"},{"id":3,"cav":"08","cast":"8"},{"id":4,"cav":"07","cast":"7"},{"id":5,"cav":"12","cast":"12"},{"id":6,"cav":"11","cast":"11"},{"id":7,"cav":"16","cast":"16"},{"id":8,"cav":"15","cast":"15"},{"id":9,"cav":"20","cast":"20"},{"id":10,"cav":"19","cast":"19"},{"id":11,"cav":"24","cast":"24"},{"id":12,"cav":"23","cast":"23"}]},{"rot":["ZM: B21"],"cols":2,"lug":[{"id":13,"cav":"02","cast":"2"},{"id":14,"cav":"01","cast":"1"},{"id":15,"cav":"06","cast":"6"},{"id":16,"cav":"05","cast":"5"},{"id":17,"cav":"10","cast":"10"},{"id":18,"cav":"09","cast":"9"},{"id":19,"cav":"14","cast":"14"},{"id":20,"cav":"13","cast":"13"},{"id":21,"cav":"18","cast":"18"},{"id":22,"cav":"17","cast":"17"},{"id":23,"cav":"22","cast":"22"},{"id":24,"cav":"21","cast":"21"}]}],"canais":["ZA: PB1"],"abaixo":"ZA: S/B"},{"blocos":[{"rot":["ZM: M25"],"cols":2,"lug":[{"id":25,"cav":"28","cast":"28"},{"id":26,"cav":"27","cast":"27"},{"id":27,"cav":"32","cast":"32"},{"id":28,"cav":"31","cast":"31"},{"id":29,"cav":"36","cast":"36"},{"id":30,"cav":"35","cast":"35"},{"id":31,"cav":"40","cast":"40"},{"id":32,"cav":"39","cast":"39"},{"id":33,"cav":"44","cast":"44"},{"id":34,"cav":"43","cast":"43"},{"id":35,"cav":"48","cast":"48"},{"id":36,"cav":"47","cast":"47"}]},{"rot":["ZM: M24"],"cols":2,"lug":[{"id":37,"cav":"26","cast":"26"},{"id":38,"cav":"25","cast":"25"},{"id":39,"cav":"51","cast":"30"},{"id":40,"cav":"29","cast":"29"},{"id":41,"cav":"34","cast":"34"},{"id":42,"cav":"33","cast":"33"},{"id":43,"cav":"38","cast":"38"},{"id":44,"cav":"37","cast":"37"},{"id":45,"cav":"42","cast":"42"},{"id":46,"cav":"41","cast":"41"},{"id":47,"cav":"46","cast":"46"},{"id":48,"cav":"45","cast":"45"}]}],"canais":["ZA: PB2"],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":33,"data":"02/02/2026","resp":"Ramon","desc":"CAV. 44(44) -GATE ALTO 02/02/26 - RAMON"},{"tipo":"isolada","lugar":16,"data":"14/02/2026","resp":"Osvaldo","desc":"CAV.05(05)- GATEALTO 14/02/2026- OSVALDO"}]},{"chave":"MOLDE 42G -(72 CAV)","maquina":"KM2","gramatura":"42,0","camara":"BP025","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZM: 508","ZA: 518"],"cols":2,"lug":[{"id":1,"cav":"67","cast":"72"},{"id":2,"cav":"68","cast":"71"},{"id":3,"cav":"66","cast":"66"},{"id":4,"cav":"65","cast":"65"},{"id":5,"cav":"60","cast":"60"},{"id":6,"cav":"59","cast":"59"},{"id":7,"cav":"54","cast":"54"},{"id":8,"cav":"53","cast":"53"},{"id":9,"cav":"48","cast":"48"},{"id":10,"cav":"47","cast":"47"},{"id":11,"cav":"42","cast":"42"},{"id":12,"cav":"41","cast":"41"}]},{"rot":["ZM: 507","ZA: 517"],"cols":2,"lug":[{"id":13,"cav":"69","cast":"70"},{"id":14,"cav":"70","cast":"69"},{"id":15,"cav":"64","cast":"64"},{"id":16,"cav":"63","cast":"63"},{"id":17,"cav":"58","cast":"58"},{"id":18,"cav":"57","cast":"57"},{"id":19,"cav":"52","cast":"52"},{"id":20,"cav":"51","cast":"51"},{"id":21,"cav":"46","cast":"46"},{"id":22,"cav":"45","cast":"45"},{"id":23,"cav":"40","cast":"40"},{"id":24,"cav":"39","cast":"39"}]},{"rot":["ZM: 504","ZA: 516"],"cols":2,"lug":[{"id":25,"cav":"71","cast":"68"},{"id":26,"cav":"72","cast":"67"},{"id":27,"cav":"62","cast":"62"},{"id":28,"cav":"61","cast":"61"},{"id":29,"cav":"56","cast":"56"},{"id":30,"cav":"55","cast":"55"},{"id":31,"cav":"50","cast":"50"},{"id":32,"cav":"49","cast":"49"},{"id":33,"cav":"44","cast":"44"},{"id":34,"cav":"43","cast":"43"},{"id":35,"cav":"38","cast":"38"},{"id":36,"cav":"37","cast":"37"}]}],"canais":["",""],"abaixo":"ZM: 505 · ZM: 506"},{"blocos":[{"rot":["ZM: 503","ZA: 515"],"cols":2,"lug":[{"id":37,"cav":"36","cast":"36"},{"id":38,"cav":"35","cast":"35"},{"id":39,"cav":"30","cast":"30"},{"id":40,"cav":"29","cast":"29"},{"id":41,"cav":"24","cast":"24"},{"id":42,"cav":"23","cast":"23"},{"id":43,"cav":"18","cast":"18"},{"id":44,"cav":"17","cast":"17"},{"id":45,"cav":"12","cast":"12"},{"id":46,"cav":"11","cast":"11"},{"id":47,"cav":"06","cast":"6"},{"id":48,"cav":"05","cast":"5"}]},{"rot":["ZM: 502","ZA: 514"],"cols":2,"lug":[{"id":49,"cav":"34","cast":"34"},{"id":50,"cav":"33","cast":"33"},{"id":51,"cav":"28","cast":"28"},{"id":52,"cav":"27","cast":"27"},{"id":53,"cav":"22","cast":"22"},{"id":54,"cav":"21","cast":"21"},{"id":55,"cav":"16","cast":"16"},{"id":56,"cav":"15","cast":"15"},{"id":57,"cav":"10","cast":"10"},{"id":58,"cav":"09","cast":"9"},{"id":59,"cav":"74","cast":"4"},{"id":60,"cav":"03","cast":"3"}]},{"rot":["ZM: 501","ZA: 513"],"cols":2,"lug":[{"id":61,"cav":"32","cast":"32"},{"id":62,"cav":"31","cast":"31"},{"id":63,"cav":"26","cast":"26"},{"id":64,"cav":"25","cast":"25"},{"id":65,"cav":"20","cast":"20"},{"id":66,"cav":"19","cast":"19"},{"id":67,"cav":"14","cast":"14"},{"id":68,"cav":"75","cast":"13"},{"id":69,"cav":"08","cast":"8"},{"id":70,"cav":"07","cast":"7"},{"id":71,"cav":"02","cast":"2"},{"id":72,"cav":"01","cast":"1"}]}],"canais":["",""],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":65,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":58,"data":"03/09/2025","resp":"Tiago","desc":"CAV. 09(09) - REBARBA ALTA - 03/09/25 - TIAGO"},{"tipo":"isolada","lugar":12,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":60,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":64,"data":"03/10/2025","resp":"Mateus","desc":"CAV. 25(25) - REBARBA ALTA - 03/10/25 - MATEUS"},{"tipo":"isolada","lugar":3,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":1,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":29,"data":"01/11/2025","resp":"Arthur","desc":"CAV. 56(56) - NÃO SAIU NA PARTIDA - 01/11/25 - ARTHUR"},{"tipo":"isolada","lugar":33,"data":"02/11/2025","resp":"Pablo","desc":"CAV. 44(44) - GATE ALTO - 02/11/25 - PABLO"},{"tipo":"isolada","lugar":36,"data":"12/11/2025","resp":"Pablo","desc":"CAV. 37(37) - MARCA NO GATE DA PREFORMA (SUJIDADE NA CAVIDADE) - 12/11/25 - PABLO"},{"tipo":"isolada","lugar":28,"data":"24/11/2025","resp":"Ramon","desc":"CAV. 61(61) - GATE ALTO - 24/11/25 - RAMON"},{"tipo":"isolada","lugar":49,"data":"26/12/2025","resp":"Kennedy","desc":"CAV. 34(34) - NÃO SAIU NA PARTIDA 26/12/25- KENNEDY"}]},{"chave":"Desenho 43,7g KM","maquina":"KM3","gramatura":"43,7","camara":"BP024","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZA: 516","ZM: 504"],"cols":2,"lug":[{"id":1,"cav":"44","cast":"48"},{"id":2,"cav":"66","cast":"47"},{"id":3,"cav":"48","cast":"44"},{"id":4,"cav":"43","cast":"43"},{"id":5,"cav":"40","cast":"40"},{"id":6,"cav":"39","cast":"39"},{"id":7,"cav":"36","cast":"36"},{"id":8,"cav":"35","cast":"35"},{"id":9,"cav":"32","cast":"32"},{"id":10,"cav":"31","cast":"31"},{"id":11,"cav":"28","cast":"28"},{"id":12,"cav":"27","cast":"27"}]},{"rot":["ZM: 503","ZA: 515"],"cols":2,"lug":[{"id":13,"cav":"46","cast":"46"},{"id":14,"cav":"45","cast":"45"},{"id":15,"cav":"42","cast":"42"},{"id":16,"cav":"41","cast":"41"},{"id":17,"cav":"38","cast":"38"},{"id":18,"cav":"37","cast":"37"},{"id":19,"cav":"34","cast":"34"},{"id":20,"cav":"33","cast":"33"},{"id":21,"cav":"30","cast":"30"},{"id":22,"cav":"29","cast":"29"},{"id":23,"cav":"58","cast":"26"},{"id":24,"cav":"25","cast":"25"}]}],"canais":[""],"abaixo":"ZM: 505 · ZM: 506"},{"blocos":[{"rot":["ZA: 514","ZM: 502"],"cols":2,"lug":[{"id":25,"cav":"18","cast":"24"},{"id":26,"cav":"23","cast":"23"},{"id":27,"cav":"20","cast":"20"},{"id":28,"cav":"19","cast":"19"},{"id":29,"cav":"16","cast":"16"},{"id":30,"cav":"15","cast":"15"},{"id":31,"cav":"12","cast":"12"},{"id":32,"cav":"47","cast":"11"},{"id":33,"cav":"08","cast":"8"},{"id":34,"cav":"56","cast":"7"},{"id":35,"cav":"04","cast":"4"},{"id":36,"cav":"64","cast":"3"}]},{"rot":["ZM: 501","ZA: 513"],"cols":2,"lug":[{"id":37,"cav":"22","cast":"22"},{"id":38,"cav":"59","cast":"21"},{"id":39,"cav":"26","cast":"18"},{"id":40,"cav":"63","cast":"17"},{"id":41,"cav":"13","cast":"14"},{"id":42,"cav":"57","cast":"13"},{"id":43,"cav":"10","cast":"10"},{"id":44,"cav":"09","cast":"9"},{"id":45,"cav":"06","cast":"6"},{"id":46,"cav":"61","cast":"5"},{"id":47,"cav":"02","cast":"2"},{"id":48,"cav":"60","cast":"1"}]}],"canais":[""],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":48,"data":"29/12/2025","resp":"Matheus","desc":"CAV. 01(60) NÃO SAIU NA PARTIDA - 29/12/25- MATHEUS"}]},{"chave":"MOLDE 46,4G- HUSKY GL","maquina":"Husky GL","gramatura":"46,4","camara":"","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZM: B22"],"cols":2,"lug":[{"id":1,"cav":"18-04","cast":"4"},{"id":2,"cav":"18-03","cast":"3"},{"id":3,"cav":"18-08","cast":"8"},{"id":4,"cav":"18-07","cast":"7"},{"id":5,"cav":"18-12","cast":"12"},{"id":6,"cav":"18-11","cast":"11"},{"id":7,"cav":"18-16","cast":"16"},{"id":8,"cav":"18-15","cast":"15"},{"id":9,"cav":"18-20","cast":"20"},{"id":10,"cav":"18-19","cast":"19"},{"id":11,"cav":"18-24","cast":"24"},{"id":12,"cav":"18-23","cast":"23"},{"id":13,"cav":"18-28","cast":"28"},{"id":14,"cav":"18-27","cast":"27"}]},{"rot":["ZM: B21"],"cols":2,"lug":[{"id":15,"cav":"18-02","cast":"2"},{"id":16,"cav":"18-01","cast":"1"},{"id":17,"cav":"18-06","cast":"6"},{"id":18,"cav":"18-05","cast":"5"},{"id":19,"cav":"18-10","cast":"10"},{"id":20,"cav":"18-09","cast":"9"},{"id":21,"cav":"18-14","cast":"14"},{"id":22,"cav":"18-13","cast":"13"},{"id":23,"cav":"18-18","cast":"18"},{"id":24,"cav":"18-17","cast":"17"},{"id":25,"cav":"18-22","cast":"22"},{"id":26,"cav":"18-21","cast":"21"},{"id":27,"cav":"18-26","cast":"26"},{"id":28,"cav":"18-25","cast":"25"}]}],"canais":["ZA: PB1"],"abaixo":"ZA: S/B"},{"blocos":[{"rot":["ZM: M25"],"cols":2,"lug":[{"id":29,"cav":"18-32","cast":"32"},{"id":30,"cav":"18-31","cast":"31"},{"id":31,"cav":"18-36","cast":"36"},{"id":32,"cav":"18-35","cast":"35"},{"id":33,"cav":"18-40","cast":"40"},{"id":34,"cav":"18-39","cast":"39"},{"id":35,"cav":"18-44","cast":"44"},{"id":36,"cav":"18-43","cast":"43"},{"id":37,"cav":"18-48","cast":"48"},{"id":38,"cav":"18-47","cast":"47"},{"id":39,"cav":"18-52","cast":"52"},{"id":40,"cav":"18-51","cast":"51"},{"id":41,"cav":"18-56","cast":"56"},{"id":42,"cav":"18-55","cast":"55"}]},{"rot":["ZM: M24"],"cols":2,"lug":[{"id":43,"cav":"18-30","cast":"30"},{"id":44,"cav":"18-29","cast":"29"},{"id":45,"cav":"18-34","cast":"34"},{"id":46,"cav":"18-33","cast":"33"},{"id":47,"cav":"18-38","cast":"38"},{"id":48,"cav":"18-37","cast":"37"},{"id":49,"cav":"18-42","cast":"42"},{"id":50,"cav":"18-41","cast":"41"},{"id":51,"cav":"18-46","cast":"46"},{"id":52,"cav":"18-45","cast":"45"},{"id":53,"cav":"18-50","cast":"50"},{"id":54,"cav":"18-49","cast":"49"},{"id":55,"cav":"18-54","cast":"54"},{"id":56,"cav":"18-53","cast":"53"}]}],"canais":["ZA: PB2"],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":40,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":39,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":38,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":16,"data":"","resp":"","desc":"Marcada como isolada na planilha, sem descrição."},{"tipo":"isolada","lugar":1,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":33,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":52,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":3,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":17,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":12,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":13,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":29,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":31,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":37,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":41,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":36,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":34,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":30,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":44,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":54,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":56,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":42,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":21,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":45,"data":"23/11/2025","resp":"Ramon","desc":"CAV.34 (18-34) GATE ALTO 23/11/25-RAMON"},{"tipo":"isolada","lugar":32,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":35,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":26,"data":"15/01/2026","resp":"Arthur","desc":"CAV.21(18-21) REBARBA ALTA - 15/01/26- ARTHUR"},{"tipo":"isolada","lugar":8,"data":"18/11/2025","resp":"Arthur","desc":"CAV.04,06,08,14,15,23,28,29,31,32,35,36,39,40,43,44,45,47,48,49,51,52,53,55 e 56 MARCA NO CORPO 18/11/25-ARTHUR"},{"tipo":"isolada","lugar":18,"data":"08/04/2026","resp":"Arthur","desc":"CAV.05,07,26,50-NÃO SAIRAM NA PARTIDA -08/04/26- ARTHUR"},{"tipo":"isolada","lugar":4,"data":"08/04/2026","resp":"Arthur","desc":"CAV.05,07,26,50-NÃO SAIRAM NA PARTIDA -08/04/26- ARTHUR"},{"tipo":"isolada","lugar":27,"data":"08/04/2026","resp":"Arthur","desc":"CAV.05,07,26,50-NÃO SAIRAM NA PARTIDA -08/04/26- ARTHUR"},{"tipo":"isolada","lugar":53,"data":"08/04/2026","resp":"Arthur","desc":"CAV.05,07,26,50-NÃO SAIRAM NA PARTIDA -08/04/26- ARTHUR"}]},{"chave":"MOLDE 46,5 OU 48,0 GR - KM","maquina":"KM2","gramatura":"46,5 ou 48","camara":"","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZA: 516","ZM: 504"],"cols":2,"lug":[{"id":1,"cav":"44","cast":"48"},{"id":2,"cav":"54","cast":"47"},{"id":3,"cav":"48","cast":"44"},{"id":4,"cav":"43","cast":"43"},{"id":5,"cav":"40","cast":"40"},{"id":6,"cav":"39","cast":"39"},{"id":7,"cav":"36","cast":"36"},{"id":8,"cav":"35","cast":"35"},{"id":9,"cav":"32","cast":"32"},{"id":10,"cav":"31","cast":"31"},{"id":11,"cav":"28","cast":"28"},{"id":12,"cav":"50","cast":"27"}]},{"rot":["ZM: 503","ZA: 515"],"cols":2,"lug":[{"id":13,"cav":"46","cast":"46"},{"id":14,"cav":"45","cast":"45"},{"id":15,"cav":"42","cast":"42"},{"id":16,"cav":"41","cast":"41"},{"id":17,"cav":"38","cast":"38"},{"id":18,"cav":"37","cast":"37"},{"id":19,"cav":"34","cast":"34"},{"id":20,"cav":"33","cast":"33"},{"id":21,"cav":"30","cast":"30"},{"id":22,"cav":"29","cast":"29"},{"id":23,"cav":"26","cast":"26"},{"id":24,"cav":"25","cast":"25"}]}],"canais":[""],"abaixo":"ZM: 505 · ZM: 506"},{"blocos":[{"rot":["ZA: 514","ZM: 502"],"cols":2,"lug":[{"id":25,"cav":"24","cast":"24"},{"id":26,"cav":"23","cast":"23"},{"id":27,"cav":"20","cast":"20"},{"id":28,"cav":"19","cast":"19"},{"id":29,"cav":"16","cast":"16"},{"id":30,"cav":"15","cast":"15"},{"id":31,"cav":"12","cast":"12"},{"id":32,"cav":"11","cast":"11"},{"id":33,"cav":"08","cast":"8"},{"id":34,"cav":"52","cast":"7"},{"id":35,"cav":"04","cast":"4"},{"id":36,"cav":"03","cast":"3"}]},{"rot":["ZM: 501","ZA: 513"],"cols":2,"lug":[{"id":37,"cav":"22","cast":"22"},{"id":38,"cav":"49","cast":"21"},{"id":39,"cav":"18","cast":"18"},{"id":40,"cav":"51","cast":"17"},{"id":41,"cav":"14","cast":"14"},{"id":42,"cav":"13","cast":"13"},{"id":43,"cav":"10","cast":"10"},{"id":44,"cav":"09","cast":"9"},{"id":45,"cav":"06","cast":"6"},{"id":46,"cav":"05","cast":"5"},{"id":47,"cav":"02","cast":"2"},{"id":48,"cav":"53","cast":"1"}]}],"canais":[""],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":30,"data":"22/08/2025","resp":"Arthur","desc":"CAV. 15(15) NÃO SAIU NA PARTIDA -ARTHUR -22/08/2025"},{"tipo":"isolada","lugar":10,"data":"22/08/2025","resp":"Arthur","desc":"CAV. 31(31) NÃO SAIU NA PARTIDA-ARTHUR -22/08/2025"},{"tipo":"isolada","lugar":17,"data":"22/08/2025","resp":"Arthur","desc":"CAV. 38(38) NÃO SAIU NA PARTIDA-ARTHUR -22/08/2025"},{"tipo":"isolada","lugar":11,"data":"26/08/2025","resp":"Tiago","desc":"CAV. 28(28) GATE ALTO-TIAGO-26/08/25"},{"tipo":"isolada","lugar":7,"data":"29/08/2025","resp":"Arthur","desc":"CAV. 36(36) MARCA NA PREFORMA -ARTHUR 29/08/25"},{"tipo":"isolada","lugar":31,"data":"27/08/2025","resp":"Tiago","desc":"CAV. 12(12) GATE ALTO-TIAGO-27/08/25"},{"tipo":"isolada","lugar":48,"data":"29/08/2025","resp":"Mateus","desc":"CAV. 01(53) AGULHA ABERTA - MATEUS - 29/08/25"},{"tipo":"isolada","lugar":47,"data":"31/08/2025","resp":"Pablo","desc":"CAV. 02(02) AGULHA ABERTA -PABLO - 31/08/25"},{"tipo":"obs","lugar":"","data":"22/08/2025","resp":"","desc":"TROCA DE CAST. 1(01)-17(17)-21(21)-27(27)-47(47)- 22/08/2025"}]},{"chave":"Desenho 58g KM","maquina":"KM3","gramatura":"58,0","camara":"","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZA: 516","ZM: 504"],"cols":2,"lug":[{"id":1,"cav":"09","cast":"48"},{"id":2,"cav":"s4","cast":"47"},{"id":3,"cav":"11","cast":"44"},{"id":4,"cav":"16","cast":"43"},{"id":5,"cav":"05","cast":"40"},{"id":6,"cav":"39","cast":"39"},{"id":7,"cav":"s2","cast":"36"},{"id":8,"cav":"35","cast":"35"},{"id":9,"cav":"s6","cast":"32"},{"id":10,"cav":"51","cast":"31"},{"id":11,"cav":"s9","cast":"28"},{"id":12,"cav":"27","cast":"27"}]},{"rot":["ZM: 503","ZA: 515"],"cols":2,"lug":[{"id":13,"cav":"s7","cast":"46"},{"id":14,"cav":"45","cast":"45"},{"id":15,"cav":"32","cast":"42"},{"id":16,"cav":"55","cast":"41"},{"id":17,"cav":"s10","cast":"38"},{"id":18,"cav":"26","cast":"37"},{"id":19,"cav":"29","cast":"34"},{"id":20,"cav":"s5","cast":"33"},{"id":21,"cav":"s8","cast":"30"},{"id":22,"cav":"28","cast":"29"},{"id":23,"cav":"53","cast":"26"},{"id":24,"cav":"25","cast":"25"}]}],"canais":[""],"abaixo":"ZM: 505 · ZM: 506"},{"blocos":[{"rot":["ZA: 514","ZM: 502"],"cols":2,"lug":[{"id":25,"cav":"09","cast":"24"},{"id":26,"cav":"s1","cast":"23"},{"id":27,"cav":"20","cast":"20"},{"id":28,"cav":"23","cast":"19"},{"id":29,"cav":"50","cast":"16"},{"id":30,"cav":"s3","cast":"15"},{"id":31,"cav":"59","cast":"12"},{"id":32,"cav":"61","cast":"11"},{"id":33,"cav":"58","cast":"8"},{"id":34,"cav":"57","cast":"7"},{"id":35,"cav":"04","cast":"4"},{"id":36,"cav":"59","cast":"3"}]},{"rot":["ZM: 501","ZA: 513"],"cols":2,"lug":[{"id":37,"cav":"34","cast":"22"},{"id":38,"cav":"57","cast":"21"},{"id":39,"cav":"54","cast":"18"},{"id":40,"cav":"60","cast":"17"},{"id":41,"cav":"60","cast":"14"},{"id":42,"cav":"13","cast":"13"},{"id":43,"cav":"10","cast":"10"},{"id":44,"cav":"19","cast":"9"},{"id":45,"cav":"56","cast":"6"},{"id":46,"cav":"05","cast":"5"},{"id":47,"cav":"52","cast":"2"},{"id":48,"cav":"01","cast":"1"}]}],"canais":[""],"abaixo":""}]},"eventos":[{"tipo":"isolada","lugar":25,"data":"25/09/2020","resp":"Rafael","desc":"CAV.24(09): REBARBA ALTA - 25/09/2020 - RAFAEL"},{"tipo":"isolada","lugar":46,"data":"25/09/2020","resp":"Rafael","desc":"CAV.05(05): AGULHA TORTA, BICO QUEBRADO E CASTANHA TRINCADA - 25/09/2020 - RAFAEL"},{"tipo":"isolada","lugar":37,"data":"03/11/2020","resp":"Cassio","desc":"CAV.22(34): REBARBA ALTA - 03/11/2020 - CASSIO"},{"tipo":"isolada","lugar":32,"data":"","resp":"Rafael","desc":"CAV.11(61): CASTANHA TRINCADA - RAFAEL"},{"tipo":"isolada","lugar":41,"data":"04/11/2020","resp":"Arthur","desc":"CAV.14(60): TRAVANDO NA FACE 2 DO ROBÔ - 04/11/2020 - ARTHUR"},{"tipo":"isolada","lugar":1,"data":"26/09/2020","resp":"Rafael","desc":"CAV.48(09): REBARBA NO ANEL - 26/09/2020 - RAFAEL"},{"tipo":"isolada","lugar":13,"data":"25/09/2020","resp":"Rafael","desc":"CAV.46(s7): CASTANHA TRINCADA - 25/09/2020 - RAFAEL"}]},{"chave":"MOLDE 44G","maquina":"Husky 1","gramatura":"44,0","camara":"","rev":"22/07/2021","desenho":{"v":1,"faixas":[{"blocos":[{"rot":["ZM: B22"],"cols":2,"lug":[{"id":1,"cav":"04","cast":"4"},{"id":2,"cav":"03","cast":"3"},{"id":3,"cav":"08","cast":"8"},{"id":4,"cav":"07","cast":"7"},{"id":5,"cav":"12","cast":"12"},{"id":6,"cav":"11","cast":"11"},{"id":7,"cav":"16","cast":"16"},{"id":8,"cav":"15","cast":"15"},{"id":9,"cav":"20","cast":"20"},{"id":10,"cav":"19","cast":"19"},{"id":11,"cav":"24","cast":"24"},{"id":12,"cav":"23","cast":"23"}]},{"rot":["ZM: B21"],"cols":2,"lug":[{"id":13,"cav":"02","cast":"2"},{"id":14,"cav":"01","cast":"1"},{"id":15,"cav":"06","cast":"6"},{"id":16,"cav":"05","cast":"5"},{"id":17,"cav":"10","cast":"10"},{"id":18,"cav":"09","cast":"9"},{"id":19,"cav":"14","cast":"14"},{"id":20,"cav":"13","cast":"13"},{"id":21,"cav":"18","cast":"18"},{"id":22,"cav":"17","cast":"17"},{"id":23,"cav":"22","cast":"22"},{"id":24,"cav":"21","cast":"21"}]}],"canais":["ZA: PB1"],"abaixo":"ZA: S/B"},{"blocos":[{"rot":["ZM: B25"],"cols":2,"lug":[{"id":25,"cav":"28","cast":"28"},{"id":26,"cav":"27","cast":"27"},{"id":27,"cav":"32","cast":"32"},{"id":28,"cav":"31","cast":"31"},{"id":29,"cav":"36","cast":"36"},{"id":30,"cav":"35","cast":"35"},{"id":31,"cav":"40","cast":"40"},{"id":32,"cav":"39","cast":"39"},{"id":33,"cav":"44","cast":"44"},{"id":34,"cav":"43","cast":"43"},{"id":35,"cav":"48","cast":"48"},{"id":36,"cav":"47","cast":"47"}]},{"rot":["ZM: B24"],"cols":2,"lug":[{"id":37,"cav":"26","cast":"26"},{"id":38,"cav":"25","cast":"25"},{"id":39,"cav":"51","cast":"30"},{"id":40,"cav":"29","cast":"29"},{"id":41,"cav":"34","cast":"34"},{"id":42,"cav":"33","cast":"33"},{"id":43,"cav":"38","cast":"38"},{"id":44,"cav":"37","cast":"37"},{"id":45,"cav":"42","cast":"42"},{"id":46,"cav":"41","cast":"41"},{"id":47,"cav":"46","cast":"46"},{"id":48,"cav":"45","cast":"45"}]}],"canais":["ZA: PB2"],"abaixo":""}]},"eventos":[]}]</script>
+<script>
+const MM_IMPORT = JSON.parse(document.getElementById('dadosImportMoldes').textContent);
+/* =============================================================================
+   MAPA DO MOLDE (Injeção) — 24/11/2026
+   Controle das cavidades isoladas de cada molde, com histórico (nome, data/hora automática,
+   descrição e 1 foto por registro), edição dos números de cavidade/castanha e cadastro de molde novo.
+   Dados no Microsoft Lists (mesmo site das listas "CP …"):
+     • "CP Moldes": 1 item por molde, com o DESENHO em JSON (faixas → blocos → lugares).
+     • "CP Mapa do Molde - Histórico": 1 item por isolar / liberar / números alterados / cadastro.
+       A situação de cada lugar é o último "isolada"/"liberada" dele.
+   Fotos: pasta "Mapa do Molde - Fotos/<molde>" ao lado da planilha (OneDrive inspetor.qualidade).
+   Termos (Cleber): número DENTRO do círculo = Cavidade; número ao lado = Castanha; 29(29) = cavidade(castanha).
+   ============================================================================= */
+const MM_LISTAS = {
+  moldes: { nome: 'Moldes', cols: [
+    ['mmMaquina', 'Máquina'], ['mmGramatura', 'Gramatura'], ['mmCamara', 'Câmara quente'], ['mmCavidades', 'Cavidades'],
+    ['mmRev', 'Rev'], ['mmDesenho', 'Desenho', 1], ['mmAtivo', 'Ativo'], ['mmOrigem', 'Origem'] ] },
+  hist: { nome: 'Mapa do Molde - Histórico', cols: [
+    ['mmMoldeId', 'Molde ID'], ['mmMolde', 'Molde'], ['mmLugar', 'Lugar'], ['mmCavidade', 'Cavidade'], ['mmCastanha', 'Castanha'],
+    ['mmTipo', 'Tipo'], ['mmResp', 'Responsável'], ['mmDesc', 'Descrição', 1], ['mmData', 'Data'], ['mmHora', 'Hora'],
+    ['mmDataIso', 'Data ISO'], ['mmMudanca', 'Mudança', 1], ['mmFotoDrive', 'Foto drive'], ['mmFotoItem', 'Foto item'],
+    ['mmFotoUrl', 'Foto link', 1], ['mmOrigem', 'Origem'] ] }
+};
+const MM_PASTA_FOTOS = 'Mapa do Molde - Fotos';
+const MM = { ids: {}, iniciado: null, carregado: false, carregando: null, moldes: [], hist: [], erro: '', atual: null, sel: null,
+  thumbs: {}, pastaPai: null, tela: 'lista' };
+
+function mmEsc(s) { return escHtml(s == null ? '' : s); }
+function mmP2(n) { return String(n).padStart(2, '0'); }
+function mmAgora() { const d = new Date(); return { data: mmP2(d.getDate()) + '/' + mmP2(d.getMonth() + 1) + '/' + d.getFullYear(), hora: mmP2(d.getHours()) + ':' + mmP2(d.getMinutes()), iso: d.getFullYear() + '-' + mmP2(d.getMonth() + 1) + '-' + mmP2(d.getDate()) }; }
+function mmIsoDe(data) { const m = String(data || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m ? m[3] + '-' + mmP2(m[2]) + '-' + mmP2(m[1]) : ''; }
+function mmCC(cav, cast) { return mmEsc(cav) + '(' + mmEsc(cast) + ')'; }     // cavidade(castanha)
+function mmNomeLista(k) { return LISTS_CFG.prefixo + MM_LISTAS[k].nome; }
+function mmNomeMolde(m) { return (m.maquina || 'Molde') + ' · ' + (m.gramatura ? m.gramatura + ' g' : ''); }
+
+/* ---- desenho ---- */
+// desenho = { v:1, faixas:[ { blocos:[ { rot:[..], cols:N, lug:[ {id,cav,cast} | null, ... ] } ], canais:[..], abaixo:'' } ] }
+function mmLugares(des) {
+  const out = [];
+  (des && des.faixas || []).forEach(function(fx) { fx.blocos.forEach(function(b) { b.lug.forEach(function(L) { if (L) out.push(L); }); }); });
+  return out;
+}
+function mmLugar(m, id) { return mmLugares(m.desenho).find(function(L) { return String(L.id) === String(id); }) || null; }
+function mmClonar(o) { return JSON.parse(JSON.stringify(o)); }
+// Gera a grade: linhas por faixa, colunas por bloco e a ordem da numeração
+function mmGerarDesenho(linhasFaixas, colsBlocos, ordem, inicio) {
+  const R = linhasFaixas.reduce(function(s, x) { return s + x; }, 0), C = colsBlocos.reduce(function(s, x) { return s + x; }, 0);
+  const ini = Number(inicio) || 1;
+  const num = function(r, c) {
+    if (ordem === 'linha-esq') return r * C + c;
+    if (ordem === 'coluna-esq') return c * R + r;
+    if (ordem === 'coluna-dir') return (C - 1 - c) * R + r;
+    return r * C + (C - 1 - c);                                   // linha-dir (padrão Husky)
+  };
+  const faixas = []; let r0 = 0;
+  linhasFaixas.forEach(function(nl) {
+    const blocos = []; let c0 = 0;
+    colsBlocos.forEach(function(nc) {
+      const lug = [];
+      for (let r = r0; r < r0 + nl; r++) for (let c = c0; c < c0 + nc; c++) { const n = num(r, c) + ini; lug.push({ id: n, cav: mmP2(n), cast: String(n) }); }
+      blocos.push({ rot: [], cols: nc, lug: lug }); c0 += nc;
+    });
+    faixas.push({ blocos: blocos, canais: blocos.slice(1).map(function() { return ''; }), abaixo: '' });
+    r0 += nl;
+  });
+  return { v: 1, faixas: faixas };
+}
+
+/* ---- Microsoft Graph / Lists ---- */
+async function mmIniciar() {
+  if (!MM.iniciado) {
+    MM.iniciado = (async function() {
+      await lstIniciar();
+      const ls = await lstTodos(lstSite() + '/lists?$select=id,displayName');
+      Object.keys(MM_LISTAS).forEach(function(k) { const l = ls.find(function(x) { return x.displayName === mmNomeLista(k); }); MM.ids[k] = l ? l.id : null; });
+    })().catch(function(e) { MM.iniciado = null; throw e; });
+  }
+  return MM.iniciado;
+}
+async function mmGarantirListas() {
+  await mmIniciar();
+  for (const k of Object.keys(MM_LISTAS)) {
+    if (MM.ids[k]) continue;
+    const corpo = { displayName: mmNomeLista(k), list: { template: 'genericList' }, columns: MM_LISTAS[k].cols.map(function(c) {
+      return { name: c[0], displayName: c[1], text: c[2] ? { allowMultipleLines: true, textType: 'plain', linesForEditing: 4 } : { allowMultipleLines: false, maxLength: 255 } };
+    }) };
+    try { MM.ids[k] = (await lstG('POST', lstSite() + '/lists', corpo)).id; }
+    catch (e) {   // outra pessoa criou ao mesmo tempo
+      const ls = await lstTodos(lstSite() + '/lists?$select=id,displayName');
+      const l = ls.find(function(x) { return x.displayName === mmNomeLista(k); });
+      if (!l) throw e; MM.ids[k] = l.id;
+    }
+  }
+}
+function mmItensUrl(k) { return lstSite() + '/lists/' + MM.ids[k] + '/items'; }
+async function mmLerLista(k) {
+  if (!MM.ids[k]) return [];
+  const sel = ['Title'].concat(MM_LISTAS[k].cols.map(function(c) { return c[0]; })).join(',');
+  const brutos = await lstTodos(mmItensUrl(k) + '?$expand=fields($select=' + sel + ')&$top=999');
+  return brutos.map(function(it) { const f = it.fields || {}; f._id = Number(it.id); return f; }).sort(function(a, b) { return a._id - b._id; });
+}
+function mmCampos(k, o) {   // objeto {mmX: valor} -> fields só com texto
+  const f = {};
+  MM_LISTAS[k].cols.forEach(function(c) { if (o[c[0]] !== undefined) { let v = o[c[0]] == null ? '' : String(o[c[0]]); if (!c[2]) v = v.slice(0, 255); f[c[0]] = v; } });
+  if (o.Title !== undefined) f.Title = String(o.Title || '-').slice(0, 255);
+  return f;
+}
+// Inclui vários itens (20 por pacote, repetindo os que voltarem "ocupado"); devolve os ids na ordem.
+async function mmIncluir(k, lista) {
+  const url = mmItensUrl(k), ids = [];
+  for (let i = 0; i < lista.length; i += 20) {
+    let lote = lista.slice(i, i + 20).map(function(f, j) { return { j: j, f: f }; }), tent = 0; const res = [];
+    while (lote.length) {
+      const rr = await lstBatch(lote.map(function(x) { return { method: 'POST', url: url, body: { fields: x.f } }; }), false), resto = [];
+      let erro = null;
+      rr.forEach(function(r, q) {
+        if (r.status === 201 || r.status === 200) res[lote[q].j] = Number(r.body.id);
+        else if (r.status === 429 || r.status === 503 || r.status === 0) resto.push(lote[q]);
+        else erro = erro || ((r.body && r.body.error && r.body.error.message) || ('erro ' + r.status));
+      });
+      if (erro) throw new Error(erro);
+      if (resto.length && tent++ >= 8) throw new Error('o Microsoft Lists está ocupado — tente de novo em instantes');
+      if (resto.length) await lstEsperar(800 * tent);
+      lote = resto;
+    }
+    res.forEach(function(id) { ids.push(id); });
+  }
+  return ids;
+}
+async function mmAtualizar(k, id, o) { return lstG('PATCH', mmItensUrl(k) + '/' + id + '/fields', mmCampos(k, o)); }
+
+function mmMoldeDeItem(f) {
+  let des = null; try { des = JSON.parse(f.mmDesenho || ''); } catch (e) { des = null; }
+  return { id: f._id, maquina: f.mmMaquina || '', gramatura: f.mmGramatura || '', camara: f.mmCamara || '', rev: f.mmRev || '',
+    ativo: f.mmAtivo !== 'FALSE', origem: f.mmOrigem || '', desenho: des && des.faixas ? des : { v: 1, faixas: [] } };
+}
+function mmEventoDeItem(f) {
+  return { id: f._id, moldeId: Number(f.mmMoldeId) || 0, lugar: f.mmLugar || '', cav: f.mmCavidade || '', cast: f.mmCastanha || '', tipo: f.mmTipo || f.Title || '',
+    resp: f.mmResp || '', desc: f.mmDesc || '', data: f.mmData || '', hora: f.mmHora || '', iso: f.mmDataIso || mmIsoDe(f.mmData),
+    mudanca: f.mmMudanca || '', fotoDrive: f.mmFotoDrive || '', fotoItem: f.mmFotoItem || '', fotoUrl: f.mmFotoUrl || '', origem: f.mmOrigem || '' };
+}
+function mmChaveEv(e) { return (e.iso || '0000-00-00') + ' ' + (e.hora || '00:00') + ' ' + String(e.id).padStart(9, '0'); }
+async function mmCarregar(forcar) {
+  if (MM.carregando) return MM.carregando;
+  if (MM.carregado && !forcar) return;
+  MM.carregando = (async function() {
+    try {
+      MM.iniciado = forcar ? null : MM.iniciado;
+      await mmIniciar();
+      const [ms, hs] = await Promise.all([mmLerLista('moldes'), mmLerLista('hist')]);
+      MM.moldes = ms.map(mmMoldeDeItem).filter(function(m) { return m.ativo; });
+      MM.hist = hs.map(mmEventoDeItem).sort(function(a, b) { return mmChaveEv(a) < mmChaveEv(b) ? -1 : 1; });
+      MM.carregado = true; MM.erro = '';
+    } catch (e) { MM.erro = (e && e.message) || String(e); throw e; }
+    finally { MM.carregando = null; }
+  })();
+  return MM.carregando;
+}
+// Situação de cada lugar (último isolar/liberar) e eventos do molde (mais recentes em cima)
+function mmEventosDo(m) { return MM.hist.filter(function(e) { return e.moldeId === m.id; }).slice().reverse(); }
+function mmSituacao(m) {
+  const st = {};
+  MM.hist.forEach(function(e) { if (e.moldeId === m.id && e.lugar !== '' && (e.tipo === 'isolada' || e.tipo === 'liberada')) st[e.lugar] = e; });
+  return st;   // lugar -> último evento isolar/liberar
+}
+function mmContagem(m) {
+  const st = mmSituacao(m), lug = mmLugares(m.desenho); let iso = 0;
+  lug.forEach(function(L) { const e = st[L.id]; if (e && e.tipo === 'isolada') iso++; });
+  return { total: lug.length, iso: iso, at: lug.length - iso, st: st };
+}
+
+/* ---- fotos (OneDrive, ao lado da planilha) ---- */
+function mmReduzirFoto(arquivo) {
+  return new Promise(function(ok, falha) {
+    const url = URL.createObjectURL(arquivo), img = new Image();
+    img.onload = function() {
+      const max = 1600, k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+      c.toBlob(function(b) { b ? ok({ blob: b, url: c.toDataURL('image/jpeg', .82) }) : falha(new Error('não foi possível ler a foto')); }, 'image/jpeg', .82);
+    };
+    img.onerror = function() { URL.revokeObjectURL(url); falha(new Error('o arquivo escolhido não é uma imagem')); };
+    img.src = url;
+  });
+}
+function mmNomePasta(s) { return String(s || 'molde').replace(/[\\/:*?"<>|#%]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80) || 'molde'; }
+async function mmEnviarFoto(blob, m, rotulo) {
+  if (!driveId || !itemId) throw new Error('a planilha não está conectada (Configurações) — não há onde guardar a foto');
+  if (!MM.pastaPai) {
+    const it = await lstG('GET', '/drives/' + driveId + '/items/' + itemId + '?$select=id,parentReference');
+    MM.pastaPai = (it.parentReference && it.parentReference.id) || 'root';
+  }
+  const a = mmAgora(), nome = (a.iso + '_' + a.hora.replace(':', 'h') + '_' + mmNomePasta(rotulo) + '.jpg').replace(/\s+/g, '_');
+  const cam = [MM_PASTA_FOTOS, mmNomePasta(mmNomeMolde(m)), nome].map(encodeURIComponent).join('/');
+  const base = MM.pastaPai === 'root' ? '/drives/' + driveId + '/root:/' : '/drives/' + driveId + '/items/' + MM.pastaPai + ':/';
+  const token = await getToken();
+  let r, j = {};
+  for (let t = 0; ; t++) {
+    r = await lstRede('https://graph.microsoft.com/v1.0' + base + cam + ':/content?@microsoft.graph.conflictBehavior=rename',
+      { method: 'PUT', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'image/jpeg' }, body: blob });
+    if ((r.status === 429 || r.status === 503) && t < 4) { await lstEsperar(1500 * (t + 1)); continue; }
+    break;
+  }
+  try { j = await r.json(); } catch (e) { j = {}; }
+  if (!r.ok) throw new Error('a foto não subiu: ' + ((j.error && j.error.message) || ('erro ' + r.status)));
+  return { drive: (j.parentReference && j.parentReference.driveId) || driveId, item: j.id || '', url: j.webUrl || '' };
+}
+// Miniatura/foto grande pelo Graph (link temporário já autorizado)
+async function mmMiniatura(e, grande) {
+  if (!e.fotoItem) return null;
+  const k = e.fotoDrive + '/' + e.fotoItem;
+  if (!MM.thumbs[k]) {
+    MM.thumbs[k] = lstG('GET', '/drives/' + e.fotoDrive + '/items/' + e.fotoItem + '/thumbnails?select=medium,large')
+      .then(function(j) { const t = (j.value || [])[0] || {}; return { m: t.medium && t.medium.url, g: (t.large && t.large.url) || (t.medium && t.medium.url) }; })
+      .catch(function() { delete MM.thumbs[k]; return null; });
+  }
+  const t = await MM.thumbs[k];
+  return t ? (grande ? t.g : t.m) : null;
+}
+
+/* ---------- MAPA DO MOLDE: telas ---------- */
+const MM_SVG = {
+  novo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
+  edit: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+  pdf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><path d="M14 2v6h6"/></svg>',
+  att: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>',
+  molde: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 3v18"/></svg>',
+  imp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>'
+};
+function mmEl(id) { return document.getElementById(id); }
+function mmCrumb(m) {
+  const el = mmEl('aCrumb'); if (!el) return;
+  if (!m) { el.innerHTML = 'Injeção / <b>Mapa do Molde</b>'; return; }
+  el.innerHTML = 'Injeção / <a href="#" id="mmCrumbVolta" style="color:inherit">Mapa do Molde</a> / <b>' + mmEsc(mmNomeMolde(m)) + '</b>';
+  mmEl('mmCrumbVolta').onclick = function(e) { e.preventDefault(); mmTelaLista(); };
+}
+async function mmAbrirPagina() {
+  MM.tela = 'lista'; MM.atual = null; MM.sel = null;
+  mmTelaLista(true);
+}
+function mmCarregando(txt) { mmEl('mmConteudo').innerHTML = '<div class="mm-load"><div class="spinner"></div> ' + mmEsc(txt) + '</div>'; }
+
+/* ===== lista de moldes ===== */
+function mmPendentesImport() {
+  const ja = {}; MM.moldes.forEach(function(m) { if (m.origem) ja[m.origem] = 1; });
+  return MM_IMPORT.filter(function(x) { return !ja['planilha: ' + x.chave]; });
+}
+async function mmTelaLista(recarregar) {
+  MM.tela = 'lista'; MM.atual = null; MM.sel = null; mmCrumb(null);
+  if (recarregar || !MM.carregado) {
+    mmCarregando('Carregando os moldes…');
+    try { await mmCarregar(true); }
+    catch (e) {
+      mmEl('mmConteudo').innerHTML = '<h1 class="page-title">Mapa do Molde</h1><div class="mm-vazio-msg"><b>Não foi possível ler os moldes.</b><br>' + mmEsc(e.message || e) +
+        '<div style="margin-top:10px"><button class="btn" onclick="mmTelaLista(true)">' + MM_SVG.att + 'Tentar de novo</button></div></div>';
+      return;
+    }
+    if (MM.tela !== 'lista') return;
+  }
+  const pend = mmPendentesImport();
+  const cards = MM.moldes.slice().sort(function(a, b) { return mmNomeMolde(a).localeCompare(mmNomeMolde(b), 'pt-BR', { numeric: true }); }).map(function(m) {
+    const c = mmContagem(m), pct = c.total ? Math.round(c.at / c.total * 100) : 0;
+    return '<button type="button" class="mm-card" data-m="' + m.id + '"><div class="t"><div><b>' + mmEsc(mmNomeMolde(m)) + '</b><br><small>' + mmEsc(c.total + ' cavidades' + (m.camara ? ' · ' + m.camara : '')) + '</small></div>' +
+      (c.iso ? '<span class="mm-badge bad">' + c.iso + ' isolada' + (c.iso > 1 ? 's' : '') + '</span>' : '<span class="mm-badge ok">todas ativas</span>') + '</div>' +
+      '<div class="mm-bar"><i style="width:' + pct + '%"></i></div><div class="n"><span><b>' + c.at + '</b> de ' + c.total + ' ativas</span><span>' + pct + '% da capacidade</span></div></button>';
+  }).join('');
+  const imp = pend.length ? '<div class="mm-imp"><h3>Importar os desenhos da planilha</h3><p>' + pend.length + ' molde' + (pend.length > 1 ? 's' : '') +
+    ' da planilha "CAVIDADES MOLDES INJEÇÃO" ainda não ' + (pend.length > 1 ? 'estão' : 'está') + ' no sistema. Confira cada desenho e as cavidades isoladas antes de gravar — dá para desmarcar o que não quiser trazer.</p>' +
+    '<div><button class="btn btn-accent" onclick="mmAbrirImport()">' + MM_SVG.imp + 'Conferir e importar</button></div></div>' : '';
+  mmEl('mmConteudo').innerHTML = '<div class="mm-cab"><div class="mm-tt"><h1 class="page-title">Mapa do Molde</h1><p class="page-sub">Um cartão por molde. Abra o molde para ver o desenho, isolar ou liberar cavidades e editar os números de cavidade e castanha. Cada mudança guarda o nome, a data e a hora e a descrição.</p></div>' +
+    '<div class="mm-acoes"><button class="btn" onclick="mmTelaLista(true)">' + MM_SVG.att + 'Atualizar</button><button class="btn btn-accent" onclick="mmNovoMolde()">' + MM_SVG.novo + 'Novo molde</button></div></div>' + imp +
+    (MM.moldes.length ? '<div class="mm-filtro"><input id="mmBusca" type="search" placeholder="Buscar máquina, gramatura ou câmara quente…" aria-label="Buscar molde"></div><div class="mm-cards" id="mmCards">' + cards + '</div>'
+      : '<div class="mm-vazio-msg">Nenhum molde cadastrado ainda. ' + (pend.length ? 'Importe os desenhos da planilha ou cadastre um molde novo.' : 'Use "Novo molde" para cadastrar.') + '</div>');
+  if (MM.moldes.length) {
+    mmEl('mmCards').addEventListener('click', function(e) { const b = e.target.closest('[data-m]'); if (b) mmTelaMolde(Number(b.getAttribute('data-m'))); });
+    mmEl('mmBusca').addEventListener('input', function(e) { const q = e.target.value.toLowerCase(); document.querySelectorAll('#mmCards .mm-card').forEach(function(c) { c.hidden = !!q && c.textContent.toLowerCase().indexOf(q) === -1; }); });
+  }
+}
+
+/* ===== mapa (desenho) ===== */
+// o = { st: situação, sel: lugar selecionado, leitura: true = só olhar }
+function mmHtmlMapa(m, o) {
+  o = o || {};
+  const des = m.desenho, fx0 = des.faixas.reduce(function(a, f) { const n = f.blocos.reduce(function(s, b) { return s + b.cols; }, 0); return !a || n > a.n ? { n: n, nb: f.blocos.length } : a; }, null) || { n: 4, nb: 2 };
+  const cav = function(L) {
+    if (!L) return '<span class="mm-buraco"></span>';
+    const e = o.st && o.st[L.id], iso = !!(e && e.tipo === 'isolada'), cls = (iso ? ' iso' : '') + (String(o.sel) === String(L.id) ? ' sel' : '');
+    const t = 'Cavidade ' + L.cav + ' · castanha ' + L.cast + (iso ? ' · isolada' : ' · ativa');
+    return '<button type="button" class="mm-cav' + cls + '" data-l="' + mmEsc(L.id) + '" title="' + mmEsc(t) + '" aria-label="' + mmEsc(t) + '"' + (o.leitura ? ' disabled' : '') + '><span class="c' + (String(L.cav).length > 3 ? ' longo' : '') + '"><span>' + mmEsc(L.cav) + '</span></span><span class="p">' + mmEsc(L.cast) + '</span></button>';
+  };
+  return '<div class="mm-molde" style="--n:' + fx0.n + ';--nb:' + fx0.nb + '">' + des.faixas.map(function(fx) {
+    return '<div class="mm-faixa">' + fx.blocos.map(function(b, bi) {
+      return (bi ? '<div class="mm-canal">' + (fx.canais[bi - 1] ? '<span>' + mmEsc(fx.canais[bi - 1]) + '</span>' : '') + '</div>' : '') +
+        '<div class="mm-bloco" style="grid-template-columns:repeat(' + b.cols + ',auto)">' + (b.rot && b.rot.length ? '<span class="mm-rots">' + b.rot.map(function(r) { return '<span class="mm-rot">' + mmEsc(r) + '</span>'; }).join('') + '</span>' : '') + b.lug.map(cav).join('') + '</div>';
+    }).join('') + '</div>' + (fx.abaixo ? '<div class="mm-entre"><span>' + mmEsc(fx.abaixo) + '</span></div>' : '');
+  }).join('') + '</div>';
+}
+const MM_LEG = '<div class="mm-leg"><span><i class="mini"></i>Ativa</span><span><i class="mini x"></i>Isolada</span><span>Número dentro do círculo = cavidade · ao lado = castanha</span></div>';
+
+/* ===== molde: mapa + lateral ===== */
+async function mmTelaMolde(id, manterSel) {
+  const m = MM.moldes.find(function(x) { return x.id === id; });
+  if (!m) { mmTelaLista(); return; }
+  MM.tela = 'molde'; MM.atual = m; if (!manterSel) MM.sel = null;
+  mmRenderMolde();
+  window.scrollTo(0, 0);
+}
+function mmRenderMolde() {
+  const m = MM.atual, c = mmContagem(m), evs = mmEventosDo(m);
+  mmCrumb(m);
+  const kp = '<div class="mm-kpis"><div class="mm-kpi"><small>Cavidades ativas</small><b style="color:var(--ok)">' + c.at + '</b> <small style="display:inline">de ' + c.total + '</small></div><div class="mm-kpi"><small>Isoladas agora</small><b style="color:var(--danger)">' + c.iso + '</b></div><div class="mm-kpi"><small>Capacidade</small><b>' + (c.total ? Math.round(c.at / c.total * 100) : 0) + '%</b></div><div class="mm-kpi"><small>Registros no histórico</small><b>' + evs.length + '</b></div></div>';
+  const info = [c.total + ' cavidades', m.camara ? 'câmara quente ' + m.camara : '', m.rev ? 'Rev. ' + m.rev : ''].filter(Boolean).join(' · ');
+  mmEl('mmConteudo').innerHTML = '<div class="mm-cab"><div class="mm-tt"><h1 class="page-title">' + mmEsc(mmNomeMolde(m)) + '</h1><p class="page-sub">' + mmEsc(info) + '</p></div>' +
+    '<div class="mm-acoes"><button type="button" class="btn" id="mmBtnNum">' + MM_SVG.edit + 'Editar números</button><button type="button" class="btn" id="mmBtnDados">' + MM_SVG.molde + 'Editar molde</button><button type="button" class="btn" id="mmBtnPdf">' + MM_SVG.pdf + 'PDF do mapa</button></div></div>' + kp +
+    '<div class="mm-wrap"><div class="mm-mapa">' + MM_LEG + mmHtmlMapa(m, { st: c.st, sel: MM.sel }) + '</div><aside class="mm-lateral"><div class="mm-lateral-in"><section class="mm-painel mm-sel" id="mmPainel" aria-label="Cavidade selecionada"></section>' +
+    '<section class="mm-painel mm-hcard" aria-label="Histórico do molde"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><h3>Histórico do molde</h3><small style="color:var(--fg-faint)">' + evs.length + ' registro' + (evs.length === 1 ? '' : 's') + ' · mais recentes em cima</small></div><div class="mm-hleg"><b>29(29)</b> = cavidade(castanha)</div><div class="mm-hlist" id="mmHlist">' + mmHtmlHistorico(evs, m) + '</div></section></div></aside></div>';
+  mmEl('mmBtnNum').onclick = function() { mmAbrirEdicao(null); };
+  mmEl('mmBtnDados').onclick = mmAbrirDadosMolde;
+  mmEl('mmBtnPdf').onclick = function() { mmGerarPdf(m); };
+  document.querySelector('#mmConteudo .mm-mapa').addEventListener('click', function(e) { const b = e.target.closest('.mm-cav'); if (b) { MM.sel = b.getAttribute('data-l'); mmRenderMolde(); if (window.innerWidth <= 1100) mmEl('mmPainel').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
+  mmEl('mmHlist').addEventListener('click', function(e) {
+    const f = e.target.closest('.mm-hfoto'); if (f) { mmVerFoto(Number(f.getAttribute('data-ev'))); return; }
+    if (e.target.closest('a')) return;
+    const it = e.target.closest('.mm-hitem'); if (it && it.getAttribute('data-l')) { MM.sel = it.getAttribute('data-l'); mmRenderMolde(); }
+  });
+  mmRenderPainel(c);
+  mmCarregarMiniaturas(mmEl('mmHlist'));
+}
+function mmNomeLugar(L) { return 'Cavidade ' + L.cav + '(' + L.cast + ')'; }
+function mmRenderPainel(c) {
+  const pn = mmEl('mmPainel'), m = MM.atual, L = MM.sel ? mmLugar(m, MM.sel) : null;
+  if (!L) { pn.innerHTML = '<h3>Cavidade selecionada</h3><p class="vazio">Toque num círculo do mapa (ou num registro do histórico) para ver a cavidade, isolar, liberar ou editar os números.</p>'; return; }
+  const ult = c.st[L.id] || null, iso = !!(ult && ult.tipo === 'isolada');
+  pn.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h3>' + mmEsc(mmNomeLugar(L)) + '</h3>' + (iso ? '<span class="mm-badge bad">isolada</span>' : '<span class="mm-badge ok">ativa</span>') + '</div>' +
+    (ult ? '<div class="mm-sel-ult">' + (ult.tipo === 'isolada' ? 'Isolada' : 'Liberada') + ' em ' + mmEsc((ult.data || 'data não informada') + (ult.hora ? ' ' + ult.hora : '')) + (ult.resp ? ' por ' + mmEsc(ult.resp) : '') + ' — ' + mmEsc(ult.desc) + '</div>' : '<div class="mm-sel-ult">Sem isolamentos registrados nesta cavidade.</div>') +
+    '<div class="mm-acoes">' + (iso ? '<button type="button" class="btn mm-grn" id="mmBtnAcao">Liberar cavidade</button>' : '<button type="button" class="btn mm-red" id="mmBtnAcao">Isolar cavidade</button>') +
+    '<button type="button" class="btn" id="mmBtnNumUm">' + MM_SVG.edit + 'Editar números</button></div>';
+  mmEl('mmBtnAcao').onclick = function() { mmAbrirForm(iso ? 'liberada' : 'isolada', L); };
+  mmEl('mmBtnNumUm').onclick = function() { mmAbrirEdicao(L.id); };
+}
+const MM_TIPOS = { isolada: ['bad', 'isolada'], liberada: ['ok', 'liberada'], numeros: ['alt', 'números alterados'], cadastro: ['alt', 'molde cadastrado'], desenho: ['alt', 'molde alterado'], obs: ['dim', 'observação'] };
+function mmHtmlHistorico(evs, m) {
+  if (!evs.length) return '<p class="vazio" style="color:var(--fg-dim);font-size:13px">Nenhum registro neste molde ainda.</p>';
+  return evs.map(function(e) {
+    const t = MM_TIPOS[e.tipo] || ['dim', e.tipo];
+    const pos = e.lugar !== '' ? mmCC(e.cav, e.cast) : (e.tipo === 'obs' ? 'Molde' : 'Molde todo');
+    const foto = e.fotoItem ? '<img class="mm-hfoto" data-ev="' + e.id + '" alt="Foto do registro">' : '';
+    return '<div class="mm-hitem' + (e.lugar !== '' && String(e.lugar) === String(MM.sel) ? ' marcado' : '') + '" data-l="' + mmEsc(e.lugar) + '"><div class="hl"><span class="mm-hpos">' + pos + '</span><span class="mm-badge ' + t[0] + '">' + mmEsc(t[1]) + '</span></div>' +
+      '<div class="mm-hcorpo"><div class="mm-htxt"><div class="mm-hquando">' + mmEsc((e.data || 'sem data') + (e.hora ? ' ' + e.hora : '')) + ' · ' + mmEsc(e.resp || '—') + '</div>' +
+      (e.mudanca ? '<div style="font-weight:600">' + mmEsc(e.mudanca) + '</div>' : '') + '<div>' + mmEsc(e.desc) + '</div>' +
+      (e.origem === 'planilha' ? '<div class="mm-himp">Importado da planilha (registros antigos não têm foto)</div>' : '') + '</div>' + foto + '</div></div>';
+  }).join('');
+}
+function mmCarregarMiniaturas(raiz) {
+  raiz.querySelectorAll('img.mm-hfoto[data-ev]').forEach(function(img) {
+    const e = MM.hist.find(function(x) { return x.id === Number(img.getAttribute('data-ev')); });
+    if (!e) return;
+    mmMiniatura(e, false).then(function(u) {
+      if (u) { img.src = u; return; }
+      const a = document.createElement('a'); a.className = 'mm-hfoto-link'; a.textContent = 'Abrir foto'; a.target = '_blank'; a.rel = 'noopener'; a.href = e.fotoUrl || '#';
+      img.replaceWith(a);
+    });
+  });
+}
+async function mmVerFoto(evId) {
+  const e = MM.hist.find(function(x) { return x.id === evId; }); if (!e) return;
+  const lb = document.createElement('div'); lb.className = 'mm-lb'; lb.innerHTML = '<span>Carregando a foto…</span>';
+  lb.onclick = function() { lb.remove(); }; (document.getElementById('app') || document.body).appendChild(lb);
+  const u = await mmMiniatura(e, true);
+  if (!lb.isConnected) return;
+  lb.innerHTML = u ? '<img src="' + mmEsc(u) + '" alt="Foto do registro">' : '<span>Não foi possível abrir a foto aqui. ' + (e.fotoUrl ? '<a style="color:#fff" target="_blank" rel="noopener" href="' + mmEsc(e.fotoUrl) + '">Abrir no OneDrive</a>' : '') + '</span>';
+}
+
+/* ===== janelas ===== */
+function mmModal(html, larga) {
+  const ov = document.createElement('div'); ov.className = 'mm-ov';
+  ov.innerHTML = '<form class="mm-modal' + (larga ? ' larga' : '') + '" novalidate>' + html + '</form>';
+  (document.getElementById('app') || document.body).appendChild(ov);
+  const f = ov.querySelector('form');
+  const fechar = function() { ov.remove(); document.removeEventListener('keydown', esc); };
+  const esc = function(e) { const ovs = document.querySelectorAll('.mm-ov'); if (e.key === 'Escape' && !f._salvando && ovs[ovs.length - 1] === ov) fechar(); };
+  document.addEventListener('keydown', esc);
+  ov.addEventListener('click', function(e) { if (e.target === ov && !f._salvando) fechar(); });
+  f.querySelectorAll('[data-fechar]').forEach(function(b) { b.onclick = function() { if (!f._salvando) fechar(); }; });
+  f._fechar = fechar;
+  const pri = f.querySelector('input[type=text],textarea'); if (pri) setTimeout(function() { pri.focus(); }, 30);
+  return f;
+}
+function mmCampoFoto(obrig) {
+  return '<div class="mm-fld"><label>Foto ' + (obrig ? '(obrigatória)' : '<span class="mm-opc">(opcional)</span>') + '</label><div class="mm-drop"><span>Tire a foto pelo celular ou escolha do computador · 1 foto por registro</span>' +
+    '<div class="mm-acoes"><label class="btn" for="mmFotoCam">Tirar foto</label><label class="btn" for="mmFotoArq" id="mmFotoBtn">Escolher arquivo</label></div>' +
+    '<input type="file" id="mmFotoCam" accept="image/*" capture="environment" hidden><input type="file" id="mmFotoArq" accept="image/*" hidden><div class="mm-prev" id="mmFotoPrev"></div></div></div>';
+}
+function mmLigarFoto(f) {
+  f._foto = null;
+  const ler = async function(inp) {
+    const a = inp.files && inp.files[0]; if (!a) return;
+    try { f._foto = await mmReduzirFoto(a); mmEl('mmFotoPrev').innerHTML = '<img src="' + f._foto.url + '" alt="Foto escolhida">'; mmEl('mmFotoBtn').textContent = 'Trocar arquivo'; }
+    catch (e) { mostrarToast(e.message, true); }
+    inp.value = '';
+  };
+  mmEl('mmFotoCam').onchange = function() { ler(this); };
+  mmEl('mmFotoArq').onchange = function() { ler(this); };
+}
+function mmRodapeForm(txt, cls) {
+  const a = mmAgora();
+  return '<div class="mm-quando">Data e hora são gravadas sozinhas ao salvar (agora: ' + a.data + ' ' + a.hora + ').</div><div class="mm-erro" id="mmFErro" hidden></div>' +
+    '<div class="mm-rodape"><button type="button" class="btn" data-fechar>Cancelar</button><button type="submit" class="btn ' + cls + '" id="mmFSalvar">' + txt + '</button></div>';
+}
+function mmErroForm(msgs) { const e = mmEl('mmFErro'); e.textContent = msgs; e.hidden = !msgs; }
+async function mmSalvando(f, fn) {
+  const b = mmEl('mmFSalvar'), txt = b.textContent;
+  f._salvando = true; b.disabled = true; b.textContent = 'Salvando…'; mmErroForm('');
+  try { await fn(); }
+  catch (e) { mmErroForm('Não salvou: ' + ((e && e.message) || e)); }
+  finally { f._salvando = false; if (b.isConnected) { b.disabled = false; b.textContent = txt; } }
+}
+function mmEventoBase(m, L, tipo, resp, desc) {
+  const a = mmAgora();
+  return { Title: tipo, mmMoldeId: m.id, mmMolde: mmNomeMolde(m), mmLugar: L ? L.id : '', mmCavidade: L ? L.cav : '', mmCastanha: L ? L.cast : '', mmTipo: tipo,
+    mmResp: resp, mmDesc: desc, mmData: a.data, mmHora: a.hora, mmDataIso: a.iso, mmOrigem: 'app' };
+}
+function mmComFoto(o, foto) { if (foto) { o.mmFotoDrive = foto.drive; o.mmFotoItem = foto.item; o.mmFotoUrl = foto.url; } return o; }
+
+// Isolar / liberar
+function mmAbrirForm(tipo, L) {
+  const m = MM.atual, iso = tipo === 'isolada';
+  const f = mmModal('<h3>' + (iso ? 'Isolar ' : 'Liberar ') + mmEsc(mmNomeLugar(L)) + '</h3><p class="sub">' + mmEsc(mmNomeMolde(m)) + '</p>' +
+    '<div class="mm-fld"><label for="mmFNome">Seu nome</label><input type="text" id="mmFNome" autocomplete="name" maxlength="80"></div>' +
+    '<div class="mm-fld"><label for="mmFDesc">' + (iso ? 'Motivo do isolamento' : 'O que foi feito para liberar') + '</label><textarea id="mmFDesc" maxlength="2000"></textarea></div>' +
+    mmCampoFoto(true) + mmRodapeForm(iso ? 'Isolar cavidade' : 'Liberar cavidade', iso ? 'mm-red' : 'mm-grn'));
+  mmLigarFoto(f);
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    const resp = mmEl('mmFNome').value.trim(), desc = mmEl('mmFDesc').value.trim(), falta = [];
+    if (!resp) falta.push('digite o seu nome');
+    if (!desc) falta.push(iso ? 'descreva o motivo' : 'descreva o que foi feito');
+    if (!f._foto) falta.push('anexe uma foto');
+    if (falta.length) { mmErroForm('Para salvar: ' + falta.join(', ') + '.'); return; }
+    mmSalvando(f, async function() {
+      await mmCarregar(true);                         // confere se ninguém mudou antes
+      const m2 = MM.moldes.find(function(x) { return x.id === m.id; }); if (!m2) throw new Error('o molde não existe mais');
+      const L2 = mmLugar(m2, L.id), atual = mmSituacao(m2)[L.id], jaIso = !!(atual && atual.tipo === 'isolada');
+      if (jaIso === iso) { f._fechar(); MM.atual = m2; mmRenderMolde(); mostrarToast('Esta cavidade já está ' + (iso ? 'isolada' : 'ativa') + ' (outra pessoa registrou antes).', true); return; }
+      const foto = await mmEnviarFoto(f._foto.blob, m2, (iso ? 'isolada_' : 'liberada_') + L2.cav + '(' + L2.cast + ')');
+      await mmIncluir('hist', [mmCampos('hist', mmComFoto(mmEventoBase(m2, L2, tipo, resp, desc), foto))]);
+      await mmCarregar(true);
+      f._fechar(); MM.atual = MM.moldes.find(function(x) { return x.id === m.id; }) || m2; mmRenderMolde();
+      mostrarToast(mmNomeLugar(L2) + (iso ? ' isolada.' : ' liberada.'));
+    });
+  };
+}
+
+/* ===== editar números ===== */
+function mmHtmlEditor(des, so, opts) {
+  opts = opts || {};
+  const it = function(L, fi, bi, k) {
+    if (!L && !opts.vazios) return '';
+    if (!L) return '<div class="mm-ed-it vazio" data-pos="' + fi + '.' + bi + '.' + k + '"><label>Cav.<input disabled></label><label>Cast.<input disabled></label><button type="button" class="mm-tira" title="Voltar a ter cavidade aqui" data-volta>+</button></div>';
+    if (so != null && String(L.id) !== String(so)) return '';
+    return '<div class="mm-ed-it" data-id="' + mmEsc(L.id) + '"><label>Cav.<input data-k="cav" value="' + mmEsc(L.cav) + '" data-o="' + mmEsc(L.cav) + '" maxlength="12" aria-label="Cavidade"></label><label>Cast.<input data-k="cast" value="' + mmEsc(L.cast) + '" data-o="' + mmEsc(L.cast) + '" maxlength="12" aria-label="Castanha"></label>' +
+      (opts.vazios ? '<button type="button" class="mm-tira" title="Sem cavidade neste lugar" data-tira>×</button>' : '') + '</div>';
+  };
+  if (so != null) { const L = mmLugares(des).find(function(x) { return String(x.id) === String(so); }); return '<div class="mm-ed"><div class="mm-ed-faixa"><div class="mm-ed-bloco" style="grid-template-columns:1fr">' + it(L) + '</div></div></div>'; }
+  return '<div class="mm-ed">' + des.faixas.map(function(fx, fi) {
+    return '<div class="mm-ed-faixa">' + fx.blocos.map(function(b, bi) { return '<div class="mm-ed-bloco" style="grid-template-columns:repeat(' + b.cols + ',minmax(112px,1fr))">' + b.lug.map(function(L, k) { return it(L, fi, bi, k); }).join('') + '</div>'; }).join('') + '</div>';
+  }).join('') + '</div>';
+}
+function mmLigarEditor(raiz, aoMudar) {
+  raiz.addEventListener('input', function(e) {
+    const c = e.target.closest('.mm-ed-it'); if (!c || !c.getAttribute('data-id')) return;
+    c.classList.toggle('mud', [].some.call(c.querySelectorAll('input[data-k]'), function(i) { return i.value.trim() !== i.getAttribute('data-o'); }));
+    if (aoMudar) aoMudar();
+  });
+}
+function mmLerEditor(raiz) {   // { id: {cav, cast} } dos campos alterados
+  const out = {};
+  raiz.querySelectorAll('.mm-ed-it[data-id]').forEach(function(c) {
+    const v = {}; c.querySelectorAll('input[data-k]').forEach(function(i) { v[i.getAttribute('data-k')] = i.value.trim(); v[i.getAttribute('data-k') + '0'] = i.getAttribute('data-o'); });
+    if (v.cav !== v.cav0 || v.cast !== v.cast0) out[c.getAttribute('data-id')] = v;
+  });
+  return out;
+}
+function mmRepetidos(lug) {
+  const cont = {}; lug.forEach(function(L) { const k = String(L.cav).replace(/^0+(?=\d)/, '').toLowerCase(); cont[k] = (cont[k] || 0) + 1; });
+  return Object.keys(cont).filter(function(k) { return cont[k] > 1; });
+}
+function mmAbrirEdicao(so) {
+  const m = MM.atual, L = so != null ? mmLugar(m, so) : null;
+  const f = mmModal('<h3>Editar números ' + (L ? 'da ' + mmEsc(mmNomeLugar(L)) : 'do molde') + '</h3><p class="sub">' + mmEsc(mmNomeMolde(m)) + ' · cada lugar alterado vira um registro no histórico "números alterados" (antes → depois).</p>' +
+    mmHtmlEditor(m.desenho, so) + '<div class="mm-aviso" id="mmFAviso" hidden></div>' +
+    '<div class="mm-grid2"><div class="mm-fld"><label for="mmFNome">Seu nome</label><input type="text" id="mmFNome" maxlength="80"></div><div class="mm-fld"><label for="mmFDesc">Motivo da alteração</label><input type="text" id="mmFDesc" maxlength="500"></div></div>' +
+    mmCampoFoto(false) + mmRodapeForm('Salvar números', 'btn-accent'), !L);
+  mmLigarFoto(f);
+  const avisar = function() {
+    const mud = mmLerEditor(f), lug = mmLugares(m.desenho).map(function(x) { const v = mud[x.id]; return v ? { cav: v.cav } : x; });
+    const rep = mmRepetidos(lug), a = mmEl('mmFAviso');
+    a.hidden = !rep.length; a.textContent = rep.length ? 'Atenção: número de cavidade repetido no molde (' + rep.slice(0, 8).join(', ') + '). Dá para salvar assim mesmo.' : '';
+  };
+  mmLigarEditor(f, avisar);
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    const mud = mmLerEditor(f), resp = mmEl('mmFNome').value.trim(), desc = mmEl('mmFDesc').value.trim(), falta = [];
+    if (!Object.keys(mud).length) falta.push('altere algum número');
+    if (Object.keys(mud).some(function(id) { return !mud[id].cav || !mud[id].cast; })) falta.push('cavidade e castanha não podem ficar vazias');
+    if (!resp) falta.push('digite o seu nome');
+    if (!desc) falta.push('descreva o motivo');
+    if (falta.length) { mmErroForm('Para salvar: ' + falta.join(', ') + '.'); return; }
+    mmSalvando(f, async function() {
+      const it = await lstG('GET', mmItensUrl('moldes') + '/' + m.id + '?$expand=fields($select=mmDesenho)');
+      let des; try { des = JSON.parse(it.fields.mmDesenho); } catch (e) { throw new Error('o desenho do molde não pôde ser lido'); }
+      const evs = [], a = mmAgora();
+      mmLugares(des).forEach(function(X) {
+        const v = mud[X.id]; if (!v) return;
+        const antes = X.cav + '(' + X.cast + ')'; X.cav = v.cav; X.cast = v.cast;
+        evs.push({ X: { id: X.id, cav: X.cav, cast: X.cast }, mud: 'De ' + antes + ' para ' + v.cav + '(' + v.cast + ')' });
+      });
+      if (!evs.length) throw new Error('os lugares alterados não existem mais no desenho');
+      const foto = f._foto ? await mmEnviarFoto(f._foto.blob, m, 'numeros') : null;
+      await mmAtualizar('moldes', m.id, { mmDesenho: JSON.stringify(des), mmRev: a.data + ' ' + a.hora, mmCavidades: mmLugares(des).length });
+      await mmIncluir('hist', evs.map(function(x) { const o = mmComFoto(mmEventoBase(m, x.X, 'numeros', resp, desc), foto); o.mmMudanca = x.mud; return mmCampos('hist', o); }));
+      await mmCarregar(true);
+      f._fechar(); MM.atual = MM.moldes.find(function(x) { return x.id === m.id; }) || m; mmRenderMolde();
+      mostrarToast(evs.length + ' lugar' + (evs.length > 1 ? 'es alterados.' : ' alterado.'));
+    });
+  };
+}
+
+/* ===== rótulos (ZA/ZM etc.) ===== */
+function mmHtmlRotulos(des) {
+  return '<div>' + des.faixas.map(function(fx, fi) {
+    let h = '<div class="mm-rotf"><b>Faixa ' + (fi + 1) + '</b>';
+    fx.blocos.forEach(function(b, bi) {
+      if (bi) h += '<input class="canal" data-r="c" data-f="' + fi + '" data-b="' + (bi - 1) + '" value="' + mmEsc(fx.canais[bi - 1] || '') + '" placeholder="canal (ZA)" aria-label="Rótulo do canal ' + bi + ' da faixa ' + (fi + 1) + '">';
+      h += '<input data-r="b" data-f="' + fi + '" data-b="' + bi + '" value="' + mmEsc((b.rot || []).join('; ')) + '" placeholder="bloco ' + (bi + 1) + ' (ZM)" aria-label="Rótulos do bloco ' + (bi + 1) + ' da faixa ' + (fi + 1) + '">';
+    });
+    if (fi < des.faixas.length - 1) h += '<span>abaixo:</span><input data-r="a" data-f="' + fi + '" value="' + mmEsc(fx.abaixo || '') + '" placeholder="entre faixas" aria-label="Rótulo entre a faixa ' + (fi + 1) + ' e a próxima">';
+    return h + '</div>';
+  }).join('') + '<div class="mm-opc" style="margin-top:4px">Vários rótulos no mesmo bloco: separe com ponto e vírgula (ex.: ZM: 504; ZA: 516).</div></div>';
+}
+function mmLerRotulos(raiz, des) {
+  raiz.querySelectorAll('[data-r]').forEach(function(i) {
+    const fx = des.faixas[+i.getAttribute('data-f')], v = i.value.trim(); if (!fx) return;
+    if (i.getAttribute('data-r') === 'b') { const b = fx.blocos[+i.getAttribute('data-b')]; if (b) b.rot = v ? v.split(';').map(function(x) { return x.trim(); }).filter(Boolean) : []; }
+    else if (i.getAttribute('data-r') === 'c') fx.canais[+i.getAttribute('data-b')] = v;
+    else fx.abaixo = v;
+  });
+  return des;
+}
+
+/* ===== editar dados do molde + rótulos ===== */
+function mmAbrirDadosMolde() {
+  const m = MM.atual, des = mmClonar(m.desenho);
+  const f = mmModal('<h3>Editar molde</h3><p class="sub">Dados do molde e rótulos do desenho (ZA, ZM, PB…). Para mudar números de cavidade/castanha use "Editar números".</p>' +
+    '<div class="mm-grid3"><div class="mm-fld"><label for="mmDMaq">Máquina</label><input type="text" id="mmDMaq" value="' + mmEsc(m.maquina) + '" maxlength="60"></div><div class="mm-fld"><label for="mmDGram">Gramatura (g)</label><input type="text" id="mmDGram" value="' + mmEsc(m.gramatura) + '" maxlength="40"></div><div class="mm-fld"><label for="mmDCam">Câmara quente <span class="mm-opc">(opcional)</span></label><input type="text" id="mmDCam" value="' + mmEsc(m.camara) + '" maxlength="40"></div></div>' +
+    '<div class="mm-fld"><label>Rótulos do desenho</label><div id="mmDRot">' + mmHtmlRotulos(des) + '</div></div><div class="mm-pre" id="mmDPre">' + mmHtmlMapa({ desenho: des }, { leitura: true }) + '</div>' +
+    '<div class="mm-grid2"><div class="mm-fld"><label for="mmFNome">Seu nome</label><input type="text" id="mmFNome" maxlength="80"></div><div class="mm-fld"><label for="mmFDesc">Motivo da alteração</label><input type="text" id="mmFDesc" maxlength="500"></div></div>' +
+    mmRodapeForm('Salvar molde', 'btn-accent'), true);
+  mmEl('mmDRot').addEventListener('input', function() { mmEl('mmDPre').innerHTML = mmHtmlMapa({ desenho: mmLerRotulos(mmEl('mmDRot'), mmClonar(m.desenho)) }, { leitura: true }); });
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    const maq = mmEl('mmDMaq').value.trim(), gram = mmEl('mmDGram').value.trim(), cam = mmEl('mmDCam').value.trim(), resp = mmEl('mmFNome').value.trim(), desc = mmEl('mmFDesc').value.trim(), falta = [];
+    if (!maq) falta.push('informe a máquina'); if (!gram) falta.push('informe a gramatura');
+    if (!resp) falta.push('digite o seu nome'); if (!desc) falta.push('descreva o motivo');
+    if (falta.length) { mmErroForm('Para salvar: ' + falta.join(', ') + '.'); return; }
+    mmSalvando(f, async function() {
+      const it = await lstG('GET', mmItensUrl('moldes') + '/' + m.id + '?$expand=fields($select=mmDesenho)');
+      let d2; try { d2 = JSON.parse(it.fields.mmDesenho); } catch (e) { throw new Error('o desenho do molde não pôde ser lido'); }
+      mmLerRotulos(mmEl('mmDRot'), d2);
+      const mud = [];
+      if (maq !== m.maquina) mud.push('máquina: ' + m.maquina + ' → ' + maq);
+      if (gram !== m.gramatura) mud.push('gramatura: ' + m.gramatura + ' → ' + gram);
+      if (cam !== m.camara) mud.push('câmara quente: ' + (m.camara || '—') + ' → ' + (cam || '—'));
+      if (JSON.stringify(d2.faixas.map(function(x) { return [x.canais, x.abaixo, x.blocos.map(function(b) { return b.rot; })]; })) !== JSON.stringify(m.desenho.faixas.map(function(x) { return [x.canais, x.abaixo, x.blocos.map(function(b) { return b.rot; })]; }))) mud.push('rótulos do desenho');
+      if (!mud.length) throw new Error('nada foi alterado');
+      const a = mmAgora();
+      await mmAtualizar('moldes', m.id, { Title: maq + ' ' + gram, mmMaquina: maq, mmGramatura: gram, mmCamara: cam, mmDesenho: JSON.stringify(d2), mmRev: a.data + ' ' + a.hora });
+      const m2 = Object.assign({}, m, { maquina: maq, gramatura: gram });
+      const o = mmEventoBase(m2, null, 'desenho', resp, desc); o.mmMudanca = 'Alterado: ' + mud.join('; ');
+      await mmIncluir('hist', [mmCampos('hist', o)]);
+      await mmCarregar(true);
+      f._fechar(); MM.atual = MM.moldes.find(function(x) { return x.id === m.id; }) || m; mmRenderMolde(); mostrarToast('Molde atualizado.');
+    });
+  };
+}
+
+/* ===== novo molde (3 passos) ===== */
+function mmNumeros(txt) { return String(txt || '').split(/[^\d]+/).filter(Boolean).map(Number).filter(function(n) { return n > 0 && n <= 40; }); }
+const MM_ORDENS = [
+  ['linha-dir', 'Por linha, da direita para a esquerda (ex.: Husky: 04 03 02 01)'],
+  ['linha-esq', 'Por linha, da esquerda para a direita (01 02 03 04)'],
+  ['coluna-esq', 'Por coluna, de cima para baixo, começando na esquerda (ex.: Hypet)'],
+  ['coluna-dir', 'Por coluna, de cima para baixo, começando na direita']
+];
+function mmNovoMolde() {
+  const W = { passo: 1, maq: '', gram: '', cam: '', base: 'zero', copia: '', linhas: '6, 6', cols: '2, 2', ordem: 'linha-dir', inicio: 1, des: null, origemTxt: '', removidos: {} };
+  const ov = document.createElement('div'); ov.className = 'mm-ov';
+  ov.innerHTML = '<form class="mm-modal larga" novalidate></form>'; (document.getElementById('app') || document.body).appendChild(ov);
+  const f = ov.querySelector('form');
+  const fechar = function() { if (!f._salvando) { ov.remove(); document.removeEventListener('keydown', esc); } };
+  const esc = function(e) { const ovs = document.querySelectorAll('.mm-ov'); if (e.key === 'Escape' && ovs[ovs.length - 1] === ov) fechar(); };
+  document.addEventListener('keydown', esc);
+  f._fechar = function() { f._salvando = false; fechar(); };
+  const gerar = function() {
+    if (W.base === 'copiar') {
+      const m = MM.moldes.find(function(x) { return String(x.id) === String(W.copia); });
+      W.des = m ? mmClonar(m.desenho) : null; W.origemTxt = m ? 'desenho copiado de ' + mmNomeMolde(m) : '';
+    } else {
+      const lf = mmNumeros(W.linhas), cb = mmNumeros(W.cols);
+      W.des = lf.length && cb.length ? mmGerarDesenho(lf, cb, W.ordem, W.inicio) : null;
+      W.origemTxt = 'desenho montado do zero: faixas de ' + lf.join('+') + ' linhas, blocos de ' + cb.join('+') + ' colunas, ' + (MM_ORDENS.find(function(o) { return o[0] === W.ordem; }) || [0, ''])[1].replace(/\s*\(.*\)$/, '').toLowerCase();
+    }
+    W.removidos = {};
+  };
+  const passos = function() { return '<div class="mm-passos">' + ['1. Dados', '2. Montar o desenho', '3. Conferir e salvar'].map(function(t, i) { return '<span class="' + (W.passo === i + 1 ? 'on' : '') + '">' + t + '</span>'; }).join('') + '</div>'; };
+  const rodape = function(prox) {
+    return '<div class="mm-erro" id="mmFErro" hidden></div><div class="mm-rodape">' + (W.passo > 1 ? '<button type="button" class="btn" id="mmWVolta">Voltar</button>' : '') + '<button type="button" class="btn" id="mmWCanc">Cancelar</button><button type="submit" class="btn btn-accent" id="mmFSalvar">' + prox + '</button></div>';
+  };
+  const lerP1 = function() { W.maq = mmEl('mmWMaq').value.trim(); W.gram = mmEl('mmWGram').value.trim(); W.cam = mmEl('mmWCam').value.trim(); W.base = f.querySelector('input[name=mmWBase]:checked').value; W.copia = mmEl('mmWCopia') ? mmEl('mmWCopia').value : ''; };
+  const lerP2 = function() {
+    if (W.base === 'zero') { W.linhas = mmEl('mmWLin').value; W.cols = mmEl('mmWCol').value; W.ordem = mmEl('mmWOrd').value; W.inicio = Math.max(1, Number(mmEl('mmWIni').value) || 1); }
+  };
+  const aplicarP3 = function() {
+    const mud = mmLerEditor(f);
+    mmLugares(W.des).forEach(function(L) { const v = mud[L.id]; if (v) { L.cav = v.cav; L.cast = v.cast; } });
+  };
+  const render = function() {
+    let h = '<h3>Novo molde</h3>' + passos();
+    if (W.passo === 1) {
+      const opts = MM.moldes.slice().sort(function(a, b) { return mmNomeMolde(a).localeCompare(mmNomeMolde(b), 'pt-BR', { numeric: true }); })
+        .map(function(m) { return '<option value="' + m.id + '"' + (String(W.copia) === String(m.id) ? ' selected' : '') + '>' + mmEsc(mmNomeMolde(m) + ' · ' + mmLugares(m.desenho).length + ' cav.') + '</option>'; }).join('');
+      h += '<div class="mm-grid3"><div class="mm-fld"><label for="mmWMaq">Máquina</label><input type="text" id="mmWMaq" value="' + mmEsc(W.maq) + '" placeholder="ex.: Husky 1" maxlength="60"></div>' +
+        '<div class="mm-fld"><label for="mmWGram">Gramatura (g)</label><input type="text" id="mmWGram" value="' + mmEsc(W.gram) + '" placeholder="ex.: 9,5" maxlength="40"></div>' +
+        '<div class="mm-fld"><label for="mmWCam">Câmara quente <span class="mm-opc">(opcional)</span></label><input type="text" id="mmWCam" value="' + mmEsc(W.cam) + '" placeholder="ex.: BP439" maxlength="40"></div></div>' +
+        '<div class="mm-fld"><label>Como montar o desenho</label><div class="mm-escolha">' +
+        '<label><input type="radio" name="mmWBase" value="zero"' + (W.base === 'zero' ? ' checked' : '') + '><span><b>Montar do zero</b><small>Informe linhas, colunas, blocos e a ordem da numeração — o app gera o mapa numerado.</small></span></label>' +
+        '<label><input type="radio" name="mmWBase" value="copiar"' + (W.base === 'copiar' ? ' checked' : '') + (MM.moldes.length ? '' : ' disabled') + '><span><b>Copiar de um molde parecido</b><small>Copia o desenho (números e rótulos) e você ajusta.</small></span></label></div></div>' +
+        '<div class="mm-fld" id="mmWCopiaF"' + (W.base === 'copiar' ? '' : ' hidden') + '><label for="mmWCopia">Molde de base</label><select id="mmWCopia">' + opts + '</select></div>' +
+        '<div class="mm-aviso" id="mmWDup" hidden></div>' + rodape('Próximo');
+    } else if (W.passo === 2) {
+      if (W.base === 'zero') {
+        h += '<div class="mm-grid2"><div class="mm-fld"><label for="mmWLin">Linhas em cada faixa (de cima para baixo)</label><input type="text" id="mmWLin" value="' + mmEsc(W.linhas) + '" placeholder="ex.: 6, 6  ou  3, 6, 3"></div>' +
+          '<div class="mm-fld"><label for="mmWCol">Colunas em cada bloco (da esquerda para a direita)</label><input type="text" id="mmWCol" value="' + mmEsc(W.cols) + '" placeholder="ex.: 2, 2  ou  6"></div></div>' +
+          '<div class="mm-grid2"><div class="mm-fld"><label for="mmWOrd">Ordem da numeração</label><select id="mmWOrd">' + MM_ORDENS.map(function(o) { return '<option value="' + o[0] + '"' + (W.ordem === o[0] ? ' selected' : '') + '>' + mmEsc(o[1]) + '</option>'; }).join('') + '</select></div>' +
+          '<div class="mm-fld"><label for="mmWIni">Numeração começa em</label><input type="number" id="mmWIni" min="1" value="' + W.inicio + '"></div></div>' +
+          '<p class="mm-opc" style="margin:0">Uma <b>faixa</b> é uma parte do molde separada na horizontal (ex.: metade de cima e de baixo). Um <b>bloco</b> é um grupo de colunas separado por canal (ex.: 2 + 2 = dois blocos com canal no meio; 6 = bloco único).</p>';
+      } else h += '<p class="sub" style="margin:0">' + mmEsc(W.origemTxt) + '. Ajuste os rótulos aqui e os números no próximo passo.</p>';
+      h += '<div class="mm-fld"><label>Rótulos <span class="mm-opc">(opcional)</span></label><div id="mmWRot">' + (W.des ? mmHtmlRotulos(W.des) : '') + '</div></div>' +
+        '<div class="mm-pre" id="mmWPre">' + (W.des ? mmHtmlMapa({ desenho: W.des }, { leitura: true }) : '<p class="vazio">Informe linhas e colunas.</p>') + '</div>' +
+        '<div class="mm-opc" id="mmWTot">' + (W.des ? mmLugares(W.des).length + ' cavidades' : '') + '</div>' + rodape('Próximo');
+    } else {
+      const lug = mmLugares(W.des);
+      h += '<p class="sub" style="margin:0">Confira os números de cavidade (dentro do círculo) e castanha (ao lado). Use × para deixar um lugar sem cavidade.</p>' + mmHtmlEditor(W.des, null, { vazios: true }) +
+        '<div class="mm-aviso" id="mmFAviso" hidden></div><div class="mm-opc" id="mmWTot">' + lug.length + ' cavidades · ' + mmEsc(W.maq + ' · ' + W.gram + ' g') + '</div>' +
+        '<div class="mm-fld" style="max-width:340px"><label for="mmFNome">Seu nome</label><input type="text" id="mmFNome" maxlength="80"></div>' +
+        '<div class="mm-quando">Data e hora do cadastro são gravadas sozinhas (viram a Rev. do molde).</div>' + rodape('Salvar molde');
+    }
+    f.innerHTML = '<div style="display:contents">' + h + '</div>';
+    const B = f.firstChild;
+    const canc = mmEl('mmWCanc'); canc.onclick = fechar;
+    const volta = mmEl('mmWVolta'); if (volta) volta.onclick = function() { if (W.passo === 3) aplicarP3(); if (W.passo === 2) { lerP2(); if (W.des) mmLerRotulos(mmEl('mmWRot'), W.des); } W.passo--; render(); };
+    if (W.passo === 1) {
+      const dup = function() {
+        lerP1(); const d = mmEl('mmWDup'), q = (W.maq + '|' + W.gram).toLowerCase().replace(/\s+/g, '');
+        const ex = MM.moldes.find(function(m) { return (m.maquina + '|' + m.gramatura).toLowerCase().replace(/\s+/g, '') === q; });
+        d.hidden = !ex; d.textContent = ex ? 'Já existe um molde ' + mmNomeMolde(ex) + '. Dá para cadastrar outro assim mesmo (ex.: molde reserva).' : '';
+        mmEl('mmWCopiaF').hidden = W.base !== 'copiar';
+      };
+      B.addEventListener('input', dup); B.addEventListener('change', dup);
+      setTimeout(function() { mmEl('mmWMaq').focus(); }, 30);
+    }
+    if (W.passo === 2) {
+      const atual = function() {
+        if (W.base === 'zero') { lerP2(); gerar(); mmEl('mmWRot').innerHTML = W.des ? mmHtmlRotulos(W.des) : ''; }
+        if (W.des) mmLerRotulos(mmEl('mmWRot'), W.des);
+        mmEl('mmWPre').innerHTML = W.des ? mmHtmlMapa({ desenho: W.des }, { leitura: true }) : '<p class="vazio">Informe linhas e colunas.</p>';
+        mmEl('mmWTot').textContent = W.des ? mmLugares(W.des).length + ' cavidades' : '';
+      };
+      ['mmWLin', 'mmWCol', 'mmWOrd', 'mmWIni'].forEach(function(id) { const e = mmEl(id); if (e) { e.addEventListener('input', atual); e.addEventListener('change', atual); } });
+      mmEl('mmWRot').addEventListener('input', function() { if (!W.des) return; mmLerRotulos(mmEl('mmWRot'), W.des); mmEl('mmWPre').innerHTML = mmHtmlMapa({ desenho: W.des }, { leitura: true }); });
+    }
+    if (W.passo === 3) {
+      const aviso = function() { aplicarP3(); const rep = mmRepetidos(mmLugares(W.des)), a = mmEl('mmFAviso'); a.hidden = !rep.length; a.textContent = rep.length ? 'Atenção: número de cavidade repetido (' + rep.slice(0, 8).join(', ') + '). Dá para salvar assim mesmo.' : ''; mmEl('mmWTot').textContent = mmLugares(W.des).length + ' cavidades · ' + W.maq + ' · ' + W.gram + ' g'; };
+      mmLigarEditor(B, aviso);
+      B.addEventListener('click', function(e) {
+        const t = e.target.closest('[data-tira],[data-volta]'); if (!t) return;
+        aplicarP3();
+        const c = t.closest('.mm-ed-it');
+        if (t.hasAttribute('data-tira')) {
+          const id = c.getAttribute('data-id');
+          W.des.faixas.forEach(function(fx, fi) { fx.blocos.forEach(function(b, bi) { b.lug.forEach(function(L, k) { if (L && String(L.id) === id) { W.removidos[fi + '.' + bi + '.' + k] = L; b.lug[k] = null; } }); }); });
+        } else {
+          const p = c.getAttribute('data-pos').split('.').map(Number), L = W.removidos[p.join('.')];
+          const maxId = mmLugares(W.des).reduce(function(s, x) { return Math.max(s, Number(x.id) || 0); }, 0);
+          W.des.faixas[p[0]].blocos[p[1]].lug[p[2]] = L || { id: maxId + 1, cav: mmP2(maxId + 1), cast: String(maxId + 1) };
+        }
+        render();
+      });
+    }
+    f.onsubmit = function(ev) {
+      ev.preventDefault();
+      const erro = function(t) { const e = mmEl('mmFErro'); e.textContent = t; e.hidden = false; };
+      if (W.passo === 1) {
+        lerP1();
+        if (!W.maq || !W.gram) { erro('Para continuar: informe a máquina e a gramatura.'); return; }
+        if (W.base === 'copiar' && !W.copia) { erro('Escolha o molde de base.'); return; }
+        gerar();
+        W.passo = 2; render(); return;
+      }
+      if (W.passo === 2) {
+        if (W.base === 'zero') { lerP2(); gerar(); }
+        if (!W.des || !mmLugares(W.des).length) { erro('O desenho está vazio: informe linhas e colunas.'); return; }
+        mmLerRotulos(mmEl('mmWRot'), W.des);
+        W.passo = 3; render(); return;
+      }
+      aplicarP3();
+      const resp = mmEl('mmFNome').value.trim(), lug = mmLugares(W.des);
+      if (!resp) { erro('Para salvar: digite o seu nome.'); return; }
+      if (!lug.length) { erro('O desenho ficou sem cavidades.'); return; }
+      if (lug.some(function(L) { return !String(L.cav).trim() || !String(L.cast).trim(); })) { erro('Cavidade e castanha não podem ficar vazias.'); return; }
+      mmSalvando(f, async function() {
+        await mmGarantirListas();
+        const a = mmAgora();
+        const ids = await mmIncluir('moldes', [mmCampos('moldes', { Title: W.maq + ' ' + W.gram, mmMaquina: W.maq, mmGramatura: W.gram, mmCamara: W.cam, mmCavidades: lug.length,
+          mmRev: a.data + ' ' + a.hora, mmDesenho: JSON.stringify(W.des), mmAtivo: 'TRUE', mmOrigem: 'app' })]);
+        const m = { id: ids[0], maquina: W.maq, gramatura: W.gram };
+        const o = mmEventoBase(m, null, 'cadastro', resp, 'Molde cadastrado no sistema (' + W.origemTxt + ').'); o.mmMudanca = lug.length + ' cavidades';
+        await mmIncluir('hist', [mmCampos('hist', o)]);
+        await mmCarregar(true);
+        f._fechar(); mostrarToast('Molde ' + W.maq + ' · ' + W.gram + ' g cadastrado.'); mmTelaMolde(ids[0]);
+      });
+    };
+  };
+  render();
+}
+
+/* ===== importação dos desenhos da planilha ===== */
+function mmImportSituacao(x) { const st = {}; x.eventos.forEach(function(e) { if (e.lugar !== '' && (e.tipo === 'isolada' || e.tipo === 'liberada')) st[e.lugar] = e; }); return st; }
+function mmImportLugar(x, id) { return mmLugares(x.desenho).find(function(L) { return String(L.id) === String(id); }); }
+function mmImportNome(x) { return x.maquina + ' · ' + x.gramatura + ' g'; }
+function mmVerImport(x) {
+  const st = mmImportSituacao(x), lug = mmLugares(x.desenho), iso = Object.keys(st).filter(function(k) { return st[k].tipo === 'isolada'; }).length;
+  const evs = x.eventos.map(function(e) { const L = e.lugar !== '' ? mmImportLugar(x, e.lugar) : null;
+    return '<div class="mm-hitem"><div class="hl"><span class="mm-hpos">' + (L ? mmCC(L.cav, L.cast) : 'Molde') + '</span><span class="mm-badge ' + (e.tipo === 'isolada' ? 'bad' : 'dim') + '">' + (e.tipo === 'isolada' ? 'isolada' : 'observação') + '</span></div><div class="mm-htxt"><div class="mm-hquando">' + mmEsc((e.data || 'sem data') + ' · ' + (e.resp || '—')) + '</div><div>' + mmEsc(e.desc) + '</div></div></div>'; }).join('');
+  const f = mmModal('<h3>' + mmEsc(mmImportNome(x)) + '</h3><p class="sub">Aba "' + mmEsc(x.chave) + '" · ' + lug.length + ' cavidades · ' + iso + ' isolada' + (iso === 1 ? '' : 's') + (x.camara ? ' · ' + mmEsc(x.camara) : '') + (x.rev ? ' · Rev. ' + mmEsc(x.rev) : '') + '</p>' +
+    '<div class="mm-pre">' + MM_LEG + mmHtmlMapa(x, { st: st, leitura: true }) + '</div>' +
+    '<div class="mm-fld"><label>O que entra no histórico</label><div class="mm-hlist" style="max-height:260px">' + (evs || '<p class="vazio">Nada.</p>') + '</div></div>' +
+    '<p class="mm-opc" style="margin:0">Depois de importar, dá para corrigir números ("Editar números"), rótulos ("Editar molde") e liberar ou isolar cavidades normalmente.</p>' +
+    '<div class="mm-rodape"><button type="button" class="btn" data-fechar>Fechar</button></div>', true);
+  f.onsubmit = function(e) { e.preventDefault(); };
+}
+function mmAbrirImport() {
+  const pend = mmPendentesImport();
+  if (!pend.length) { mostrarToast('Todos os moldes da planilha já estão no sistema.'); return; }
+  const f = mmModal('<h3>Importar desenhos da planilha</h3><p class="sub">Cada molde entra com o desenho (cavidade, castanha, blocos e rótulos ZA/ZM), as cavidades marcadas com X como <b>isoladas</b> (com a descrição da observação, quando houver) e as demais observações no histórico. Toque em "Ver" para conferir.</p>' +
+    '<div class="mm-imp-lista">' + pend.map(function(x, i) {
+      const st = mmImportSituacao(x), iso = Object.keys(st).length;
+      return '<label class="mm-imp-it"><input type="checkbox" data-i="' + i + '" checked><span><b>' + mmEsc(mmImportNome(x)) + '</b><small>' + mmLugares(x.desenho).length + ' cav. · ' + iso + ' isolada' + (iso === 1 ? '' : 's') + '</small></span><button type="button" class="btn" data-ver="' + i + '">Ver</button></label>';
+    }).join('') + '</div>' +
+    '<div class="mm-fld" style="max-width:340px"><label for="mmFNome">Seu nome</label><input type="text" id="mmFNome" maxlength="80"></div><div class="mm-quando" id="mmIProg">Os moldes são gravados nas listas "' + mmEsc(mmNomeLista('moldes')) + '" e "' + mmEsc(mmNomeLista('hist')) + '" (criadas na primeira vez).</div>' +
+    mmRodapeForm('Importar selecionados', 'btn-accent'), true);
+  f.addEventListener('click', function(e) { const b = e.target.closest('[data-ver]'); if (b) { e.preventDefault(); mmVerImport(pend[+b.getAttribute('data-ver')]); } });
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    const sel = [].map.call(f.querySelectorAll('input[data-i]:checked'), function(c) { return pend[+c.getAttribute('data-i')]; }), resp = mmEl('mmFNome').value.trim();
+    if (!sel.length) { mmErroForm('Marque ao menos um molde.'); return; }
+    if (!resp) { mmErroForm('Para importar: digite o seu nome.'); return; }
+    mmSalvando(f, async function() {
+      const prog = mmEl('mmIProg');
+      prog.textContent = 'Preparando as listas…';
+      await mmGarantirListas();
+      await mmCarregar(true);
+      const ja = {}; MM.moldes.forEach(function(m) { ja[m.origem] = 1; });
+      let n = 0;
+      for (const x of sel) {
+        if (ja['planilha: ' + x.chave]) continue;                 // outra pessoa importou no meio tempo
+        prog.textContent = 'Gravando ' + mmImportNome(x) + ' (' + (++n) + ' de ' + sel.length + ')…';
+        const lug = mmLugares(x.desenho);
+        const ids = await mmIncluir('moldes', [mmCampos('moldes', { Title: x.maquina + ' ' + x.gramatura, mmMaquina: x.maquina, mmGramatura: x.gramatura, mmCamara: x.camara, mmCavidades: lug.length,
+          mmRev: x.rev, mmDesenho: JSON.stringify(x.desenho), mmAtivo: 'TRUE', mmOrigem: 'planilha: ' + x.chave })]);
+        const m = { id: ids[0], maquina: x.maquina, gramatura: x.gramatura };
+        const evs = x.eventos.map(function(e) {
+          const L = e.lugar !== '' ? mmImportLugar(x, e.lugar) : null;
+          return mmCampos('hist', { Title: e.tipo, mmMoldeId: m.id, mmMolde: mmNomeMolde(m), mmLugar: L ? L.id : '', mmCavidade: L ? L.cav : '', mmCastanha: L ? L.cast : '', mmTipo: e.tipo,
+            mmResp: e.resp, mmDesc: e.desc, mmData: e.data, mmHora: '', mmDataIso: mmIsoDe(e.data), mmOrigem: 'planilha' });
+        });
+        const c = mmEventoBase(m, null, 'cadastro', resp, 'Desenho importado da planilha "CAVIDADES MOLDES INJEÇÃO" (aba "' + x.chave + '").'); c.mmMudanca = lug.length + ' cavidades';
+        evs.push(mmCampos('hist', c));
+        await mmIncluir('hist', evs);
+      }
+      await mmCarregar(true);
+      f._fechar(); mostrarToast(n + ' molde' + (n === 1 ? ' importado.' : 's importados.')); mmTelaLista();
+    });
+  };
+}
+
+/* ===== PDF do mapa (A4 paisagem): mapa na altura toda à esquerda; à direita máquina/gramatura, indicadores e cavidades isoladas ===== */
+async function mmGerarPdf(m) {
+  let JsPDF;
+  try { JsPDF = await carregarJsPDF(); } catch (e) { mostrarToast('Não foi possível gerar o PDF: ' + e.message, true); return; }
+  const doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  mmDesenharPdf(doc, m);
+  const nome = ('Mapa_do_Molde_' + m.maquina + '_' + m.gramatura + 'g').replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, '_') + '.pdf';
+  try {
+    const blob = doc.output('blob'), arq = new File([blob], nome, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [arq] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) { await navigator.share({ files: [arq], title: nome }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  doc.save(nome);
+}
+function mmDesenharPdf(doc, m) {
+  const W = 297, H = 210, MG = 8, GAP = 6, AV = W - 2 * MG, LW = AV * 0.61, RX = MG + LW + GAP, RW = AV - LW - GAP, TOP = MG, ALT = H - 2 * MG;
+  const COR = { tinta: [21, 24, 29], dim: [91, 99, 114], faint: [136, 144, 156], borda: [154, 163, 173], linha: [221, 225, 230], placa: [238, 241, 244], verm: [198, 47, 54], rosa: [249, 220, 221], verde: [31, 122, 85], acc: [21, 127, 153], escuro: [61, 67, 75], chip: [238, 240, 243] };
+  const cor = function(k, t) { const c = COR[k]; if (t === 'f') doc.setFillColor(c[0], c[1], c[2]); else if (t === 'd') doc.setDrawColor(c[0], c[1], c[2]); else doc.setTextColor(c[0], c[1], c[2]); };
+  const des = m.desenho, st = mmSituacao(m), lug = mmLugares(des);
+  const isoDe = function(L) { const e = st[L.id]; return !!(e && e.tipo === 'isolada'); };
+  // ---------- mapa ----------
+  cor('placa', 'f'); cor('borda', 'd'); doc.setLineWidth(0.3); doc.roundedRect(MG, TOP, LW, ALT, 3, 3, 'FD');
+  const PAD = 2.5, CANAL = 9, CHIP = 6.5, ENTRE = 6, nf = des.faixas.length;
+  const linhasF = des.faixas.map(function(fx) { return Math.max.apply(null, fx.blocos.map(function(b) { return Math.ceil(b.lug.length / b.cols); })); });
+  const extras = des.faixas.reduce(function(s, fx, i) { return s + (i < nf - 1 ? (fx.abaixo ? ENTRE : PAD) : 0); }, 0);
+  const totLin = linhasF.reduce(function(s, x) { return s + x; }, 0);
+  const hUtil = ALT - 2 * PAD - extras - nf * (CHIP + 1.5);
+  const passoL = hUtil / totLin;
+  const maxCols = Math.max.apply(null, des.faixas.map(function(fx) { return fx.blocos.reduce(function(s, b) { return s + b.cols; }, 0); }));
+  const maxBlocos = Math.max.apply(null, des.faixas.map(function(fx) { return fx.blocos.length; }));
+  const passoC = (LW - 2 * PAD - (maxBlocos - 1) * CANAL - maxBlocos * 4) / maxCols;
+  const D = Math.max(5, Math.min(12, passoL * 0.8, passoC * 0.62)), R = D / 2;
+  const fsCav = Math.min(12.5, D * 1.05), fsCast = Math.min(8.5, D * 0.72);
+  let y = TOP + PAD;
+  des.faixas.forEach(function(fx, fi) {
+    const hF = linhasF[fi] * passoL + CHIP + 1.5, nc = fx.blocos.reduce(function(s, b) { return s + b.cols; }, 0);
+    const wBlocosTot = LW - 2 * PAD - (fx.blocos.length - 1) * CANAL;
+    let x = MG + PAD;
+    fx.blocos.forEach(function(b, bi) {
+      const bw = wBlocosTot * b.cols / nc, nl = Math.ceil(b.lug.length / b.cols);
+      if (bi) {   // canal
+        const cx = x + CANAL / 2; cor('borda', 'd'); doc.setLineWidth(0.35); doc.setLineDashPattern([1.2, 1], 0); doc.line(cx, y + 2, cx, y + hF - 2); doc.setLineDashPattern([], 0);
+        const t = fx.canais[bi - 1];
+        if (t) { doc.setFont('helvetica', 'bold'); doc.setFontSize(7); const tw = doc.getTextWidth(t); cor('placa', 'f'); doc.rect(cx - 2, y + hF / 2 - tw / 2 - 1, 4, tw + 2, 'F'); cor('dim'); doc.text(t, cx + 1.2, y + hF / 2 + tw / 2, { angle: 90 }); }
+        x += CANAL;
+      }
+      doc.setFillColor(255, 255, 255); cor('borda', 'd'); doc.setLineWidth(0.3); doc.roundedRect(x, y, bw, hF, 2, 2, 'FD');
+      let cxh = x + 2; doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
+      (b.rot || []).forEach(function(t) { const tw = doc.getTextWidth(t) + 2.6; if (cxh + tw > x + bw - 1) return; cor('chip', 'f'); doc.roundedRect(cxh, y + 1.4, tw, 3.6, 0.8, 0.8, 'F'); cor('dim'); doc.text(t, cxh + 1.3, y + 4.1); cxh += tw + 1.2; });
+      const cw = (bw - 2) / b.cols;
+      b.lug.forEach(function(L, k) {
+        if (!L) return;
+        const r = Math.floor(k / b.cols), c = k % b.cols;
+        const ccx = x + 1 + cw * c + cw / 2 - R * 0.35, ccy = y + CHIP + 1.5 + passoL * r + passoL / 2;
+        const iso = isoDe(L);
+        if (iso) {
+          doc.setFillColor(255, 255, 255); doc.circle(ccx, ccy, R, 'F');
+          doc.saveGraphicsState(); doc.circle(ccx, ccy, R, null); doc.clip(); doc.discardPath();
+          cor('rosa', 'd'); doc.setLineWidth(R * 0.22);
+          for (let s = -2 * R; s <= 2 * R; s += R * 0.42) doc.line(ccx + s - R, ccy + R, ccx + s + R, ccy - R);
+          doc.restoreGraphicsState();
+          cor('verm', 'd'); doc.setLineWidth(0.45); doc.circle(ccx, ccy, R, 'S');
+        } else { doc.setFillColor(255, 255, 255); doc.setDrawColor(111, 123, 136); doc.setLineWidth(0.4); doc.circle(ccx, ccy, R, 'FD'); }
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(Math.max(5, fsCav * (String(L.cav).length > 3 ? 0.72 : String(L.cav).length > 2 ? 0.85 : 1)));
+        if (iso) cor('verm'); else cor('tinta');
+        doc.text(String(L.cav), ccx, ccy + fsCav * 0.13, { align: 'center' });
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(fsCast); cor('dim');
+        doc.text(String(L.cast), ccx + R + 0.6, ccy + R * 0.95);
+        if (iso) {   // selo vermelho com ✕ (igual ao app)
+          const bx = ccx + R * 0.74, by = ccy - R * 0.74, br = Math.max(1.4, R * 0.36);
+          doc.setFillColor(255, 255, 255); doc.circle(bx, by, br + 0.45, 'F'); cor('verm', 'f'); doc.circle(bx, by, br, 'F');
+          doc.setDrawColor(255, 255, 255); doc.setLineWidth(Math.max(0.3, br * 0.22)); const q = br * 0.42;
+          doc.line(bx - q, by - q, bx + q, by + q); doc.line(bx - q, by + q, bx + q, by - q);
+        }
+      });
+      x += bw;
+    });
+    y += hF;
+    if (fi < nf - 1) {
+      if (fx.abaixo) { doc.setFont('helvetica', 'bold'); doc.setFontSize(7); const tw = doc.getTextWidth(fx.abaixo) + 4, cx = MG + LW / 2; doc.setFillColor(255, 255, 255); cor('borda', 'd'); doc.setLineWidth(0.25); doc.roundedRect(cx - tw / 2, y + 1.2, tw, ENTRE - 2.4, 1, 1, 'FD'); cor('dim'); doc.text(fx.abaixo, cx, y + ENTRE / 2 + 1, { align: 'center' }); y += ENTRE; }
+      else y += PAD;
+    }
+  });
+  // ---------- lado direito ----------
+  let ry = TOP + 3;
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); cor('acc'); doc.text('MAPA DO MOLDE · SITUAÇÃO DAS CAVIDADES', RX, ry); ry += 6;
+  doc.setFontSize(7.5); cor('dim'); doc.text('MÁQUINA', RX, ry); doc.text('GRAMATURA', RX + RW / 2 + 2, ry); ry += 9;
+  doc.setFontSize(23); cor('tinta');
+  const ajusta = function(t, w, fs) { doc.setFontSize(fs); while (doc.getTextWidth(t) > w && fs > 10) { fs -= 1; doc.setFontSize(fs); } return fs; };
+  ajusta(m.maquina || '—', RW / 2 - 2, 23); doc.text(m.maquina || '—', RX, ry);
+  ajusta((m.gramatura || '—') + ' g', RW / 2 - 2, 23); doc.text((m.gramatura || '—') + ' g', RX + RW / 2 + 2, ry); ry += 5;
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); cor('dim');
+  doc.text('Injetora', RX, ry); doc.text('Preforma · molde ' + lug.length + ' cavidades' + (m.camara ? ' · ' + m.camara : ''), RX + RW / 2 + 2, ry, { maxWidth: RW / 2 - 2 }); ry += 6;
+  const a = mmAgora();
+  doc.setFontSize(7.8); let mx = RX;
+  [['Rev. ', m.rev || '—'], ['Emitido ', a.data + ' ' + a.hora], ['Seção ', 'Injeção']].forEach(function(p) { doc.setFont('helvetica', 'normal'); cor('dim'); doc.text(p[0], mx, ry); mx += doc.getTextWidth(p[0]); doc.setFont('helvetica', 'bold'); cor('tinta'); doc.text(p[1], mx, ry); mx += doc.getTextWidth(p[1]) + 5; });
+  ry += 3; cor('tinta', 'd'); doc.setLineWidth(0.5); doc.line(RX, ry, RX + RW, ry); ry += 4;
+  // indicadores
+  const nIso = lug.filter(isoDe).length, at = lug.length - nIso, kw = (RW - 5) / 3;
+  [['CAVIDADES ATIVAS', String(at), ' de ' + lug.length, 'verde'], ['ISOLADAS', String(nIso), '', 'verm'], ['CAPACIDADE', (lug.length ? Math.round(at / lug.length * 100) : 0) + '%', '', 'tinta']].forEach(function(k, i) {
+    const kx = RX + i * (kw + 2.5); doc.setDrawColor(201, 207, 214); doc.setLineWidth(0.3); doc.roundedRect(kx, ry, kw, 14, 2, 2, 'S');
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); cor('dim'); doc.text(k[0], kx + 3, ry + 4.5);
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(15); cor(k[3]); doc.text(k[1], kx + 3, ry + 11.3);
+    if (k[2]) { const w = doc.getTextWidth(k[1]); doc.setFont('helvetica', 'normal'); doc.setFontSize(9); cor('tinta'); doc.text(k[2], kx + 3 + w, ry + 11.3); }
+  });
+  ry += 19;
+  // legenda
+  doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+  doc.setDrawColor(111, 123, 136); doc.setLineWidth(0.3); doc.circle(RX + 1.6, ry - 1, 1.6, 'S'); cor('dim'); doc.text('Ativa', RX + 4.2, ry);
+  cor('rosa', 'f'); cor('verm', 'd'); doc.circle(RX + 17, ry - 1, 1.6, 'FD'); cor('verm', 'f'); doc.circle(RX + 18.3, ry - 2.3, 0.85, 'F'); cor('dim'); doc.text('Isolada', RX + 20.4, ry);
+  doc.setFont('helvetica', 'bold'); cor('tinta'); doc.text('29(29)', RX + 36, ry); const w29 = doc.getTextWidth('29(29)'); doc.setFont('helvetica', 'normal'); cor('dim'); doc.text(' = cavidade(castanha)', RX + 36 + w29, ry);
+  ry += 4;
+  // tabela de isoladas
+  const linhas = lug.filter(isoDe).map(function(L) { const e = st[L.id]; return { L: L, e: e, k: mmChaveEv(e) }; }).sort(function(p, q) { return p.k < q.k ? 1 : -1; })
+    .map(function(p) { return [p.L.cav + '(' + p.L.cast + ')', p.e.data ? p.e.data + (p.e.hora ? ' ' + p.e.hora : '') : '—', p.e.desc || '—', p.e.resp || '—']; });
+  cor('escuro', 'f'); doc.roundedRect(RX, ry, RW, 6, 1, 1, 'F'); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(255, 255, 255); doc.text('CAVIDADES ISOLADAS', RX + 2.5, ry + 4.2); ry += 7;
+  if (!linhas.length) { doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); cor('dim'); doc.text('Nenhuma cavidade isolada.', RX + 1.5, ry + 5); }
+  else doc.autoTable({
+    startY: ry, head: [['CAV.(CAST.)', 'ISOLADA EM', 'MOTIVO', 'RESPONSÁVEL']], body: linhas, margin: { left: RX, right: MG, top: MG, bottom: 26 }, tableWidth: RW, theme: 'plain',
+    styles: { font: 'helvetica', fontSize: 7.8, cellPadding: { top: 1.3, bottom: 1.3, left: 1.4, right: 1.4 }, textColor: COR.tinta, lineColor: COR.linha, lineWidth: { bottom: 0.25 }, valign: 'top', overflow: 'linebreak' },
+    headStyles: { fontStyle: 'bold', fontSize: 6.5, textColor: COR.dim, lineColor: COR.borda, lineWidth: { bottom: 0.3 } },
+    columnStyles: { 0: { fontStyle: 'bold', cellWidth: 18 }, 1: { cellWidth: 24 }, 3: { cellWidth: 20 } }
+  });
+  // rodapé de cada página
+  const np = doc.getNumberOfPages();
+  for (let p = 1; p <= np; p++) {
+    doc.setPage(p);
+    if (p === 1) { doc.setDrawColor(154, 163, 173); doc.setLineWidth(0.3); doc.line(RX, H - MG - 9, RX + RW / 2 - 3, H - MG - 9); doc.line(RX + RW / 2 + 3, H - MG - 9, RX + RW, H - MG - 9);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); cor('dim'); doc.text('Conferido por', RX, H - MG - 6); doc.text('Data', RX + RW / 2 + 3, H - MG - 6); }
+    doc.setFontSize(6.8); cor('faint'); doc.text('Mapa do Molde · Controle de Processo BlowPet', RX, H - MG - 0.5); doc.text('Página ' + p + ' de ' + np, RX + RW, H - MG - 0.5, { align: 'right' });
+  }
+}
+
+</script>
 </body>
 </html>
