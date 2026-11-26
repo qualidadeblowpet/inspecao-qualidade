@@ -745,8 +745,8 @@
   .lst-acoes a.btn{text-decoration:none;}
 
   /* ===================== MAPA DO MOLDE (24/11/2026) ===================== */
-  :root{ --mm-plate:#161b23; --mm-plate-2:#1c222c; --mm-ring:#4d596a; --mm-shade:#0e1217; --mm-sombra:rgba(0,0,0,.45); --mm-ov:rgba(0,0,0,.6); }
-  :root[data-theme="claro"]{ --mm-plate:#e7ebf0; --mm-plate-2:#dbe1e8; --mm-ring:#97a3b1; --mm-shade:#d6dde5; --mm-sombra:rgba(21,24,29,.14); --mm-ov:rgba(21,24,29,.38); }
+  :root{ --mm-prod:#5b9bf2; --mm-prod-soft:rgba(91,155,242,.14); --mm-prod-ink:#071220; --mm-prod-border:#2c4e7d; --mm-plate:#161b23; --mm-plate-2:#1c222c; --mm-ring:#4d596a; --mm-shade:#0e1217; --mm-sombra:rgba(0,0,0,.45); --mm-ov:rgba(0,0,0,.6); }
+  :root[data-theme="claro"]{ --mm-prod:#1f6fd1; --mm-prod-soft:#e4eefb; --mm-prod-ink:#ffffff; --mm-prod-border:#b7cff1; --mm-plate:#e7ebf0; --mm-plate-2:#dbe1e8; --mm-ring:#97a3b1; --mm-shade:#d6dde5; --mm-sombra:rgba(21,24,29,.14); --mm-ov:rgba(21,24,29,.38); }
   #pageMapaMolde{max-width:1320px;}
   .mm-cab{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;margin-bottom:14px}
   .mm-cab .mm-tt{flex:1;min-width:240px}
@@ -774,6 +774,29 @@
   .mm-col-vazia{font-size:12.5px;color:var(--fg-faint);text-align:center;padding:16px 8px;border:1px dashed var(--border);border-radius:10px}
   .mm-col .mm-card{padding:12px 14px;gap:8px}
   .mm-outros{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+  .mm-badge.prod{background:var(--mm-prod);color:var(--mm-prod-ink)}
+  .mm-badge.prod::before{animation:mmPulso 1.6s ease-in-out infinite}
+  @keyframes mmPulso{0%,100%{opacity:1}50%{opacity:.35}}
+  #app .btn.mm-prod{background:var(--mm-prod);border-color:var(--mm-prod);color:var(--mm-prod-ink)}
+  .mm-prodcard{border:2px solid var(--mm-prod) !important;background:linear-gradient(180deg,var(--mm-prod-soft),var(--surface) 70%);box-shadow:0 4px 14px var(--mm-sombra)}
+  .mm-prodcard .t b{font-size:18px}
+  .mm-desde{font-size:11.5px;color:var(--mm-prod);font-weight:600;margin-top:-4px}
+  .mm-rod{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .mm-rod .n{font-size:12px;color:var(--fg-dim)}.mm-rod .n b{color:var(--fg)}
+  .mm-acao{border:1px solid var(--border);background:var(--surface-2);color:var(--fg-dim);border-radius:7px;font:inherit;font-size:11.5px;font-weight:600;padding:4px 9px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+  .mm-acao:hover,.mm-acao:focus-visible{border-color:var(--mm-prod-border);color:var(--mm-prod);outline:none}
+  .mm-acao svg{width:11px;height:11px}
+  .mm-sep{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--fg-faint);padding:2px 4px 0}
+  .mm-lista{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+  .mm-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:8px 10px 8px 12px;border-top:1px solid var(--border);cursor:pointer}
+  .mm-row:first-child{border-top:0}
+  .mm-row:hover{background:var(--surface-2)}
+  .mm-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+  .mm-row-tx{display:flex;flex-direction:column;min-width:0}
+  .mm-row b{font-size:14px;font-weight:650}
+  .mm-row small{color:var(--fg-dim);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mm-desde{white-space:nowrap}
+  .mm-row-ac{display:flex;align-items:center;gap:2px}
   .mm-card-ed{border:0;background:none;color:var(--fg-faint);cursor:pointer;padding:2px 4px;margin-left:4px;border-radius:6px;vertical-align:-2px;display:inline-flex}
   .mm-card-ed svg{width:14px;height:14px}
   .mm-card-ed:hover,.mm-card-ed:focus-visible{color:var(--accent);background:var(--accent-soft);outline:none}
@@ -819,6 +842,16 @@
   .mm-cav:not([disabled]):hover .c{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 6px 14px var(--mm-sombra)}
   .mm-cav.iso .c{border-color:var(--danger);color:var(--danger);background:repeating-linear-gradient(45deg,var(--danger-bg) 0 5px,var(--surface) 5px 10px)}
   .mm-cav.iso .c::after{content:'✕';position:absolute;top:-4px;right:-4px;width:calc(var(--d) * .36);height:calc(var(--d) * .36);border-radius:50%;background:var(--danger);color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center;border:2px solid var(--surface);z-index:2}
+  .mm-cav.marc .c{box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--accent);border-color:var(--accent)}
+  .mm-cav.marc .c::before{content:'✓';position:absolute;bottom:-4px;left:-4px;width:calc(var(--d) * .36);height:calc(var(--d) * .36);border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:11px;font-weight:800;display:grid;place-items:center;border:2px solid var(--surface);z-index:3}
+  .mm-modo-sel .mm-cav .c{cursor:copy}
+  .mm-barra{position:sticky;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:40;margin-top:14px;background:var(--surface);border:1px solid var(--accent-border);border-radius:14px;box-shadow:0 10px 30px var(--mm-sombra);padding:10px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .mm-barra-tx{flex:1;min-width:200px;display:flex;flex-direction:column;gap:2px}
+  .mm-barra-tx b{font-size:14px}
+  .mm-barra-tx small{font-size:12px;color:var(--fg-dim);overflow-wrap:anywhere}
+  .mm-chips{display:flex;flex-wrap:wrap;gap:6px}
+  .mm-chip{font-size:12px;font-weight:650;padding:3px 9px;border-radius:999px;background:var(--surface-2)}
+  .mm-chip.bad{background:var(--danger-bg);color:var(--danger)}.mm-chip.ok{background:var(--ok-bg);color:var(--ok)}
   .mm-cav.sel .c{box-shadow:0 0 0 3px var(--surface),0 0 0 6px var(--accent)}
   .mm-buraco{width:calc(var(--d) + var(--d) * .36 + 3px);height:var(--d)}
   .mm-lateral{position:relative;min-width:0}
@@ -898,7 +931,7 @@
   @media (max-width:1100px){ .mm-maqs{grid-template-columns:repeat(2,minmax(0,1fr))} .mm-wrap{grid-template-columns:1fr} .mm-lateral-in{position:static} .mm-hlist{max-height:560px} }
   @media (max-width:640px){ .mm-maqs{grid-template-columns:1fr} }
   @media (max-width:760px){ .mm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))} .mm-grid2,.mm-grid3,.mm-escolha{grid-template-columns:1fr} .mm-hfoto{width:92px} }
-  @media (prefers-reduced-motion: reduce){ .mm-cav .c{transition:none} }
+  @media (prefers-reduced-motion: reduce){ .mm-cav .c{transition:none} .mm-badge.prod::before{animation:none} }
 </style>
 </head>
 <body>
@@ -921,7 +954,7 @@
       <div class="op-brandrow"><img class="a-logo" src="sq-icone-192.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><svg class="a-logo a-logo-svg" viewBox="0 0 40 30" aria-hidden="true"><rect width="40" height="30" rx="7" fill="#c8202f"/><text x="20" y="20.5" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="14" fill="#fff">BP</text></svg><div><b>Controle de Processo</b><small>Registro do check list e últimos registros</small></div></div>
       <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h10"/><path d="M12 7h6l4 5-4 5h-6z"/><path d="M5 9v6"/></svg></span><span class="op-bt"><b>Injetora</b><span>Registro do check list e últimos registros das injetoras</span></span><span class="op-chev">›</span></button>
       <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4v3h-4z"/><path d="M9 5h6l1 4v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9z"/><path d="M8 13h8"/></svg></span><span class="op-bt"><b>Sopro</b><span>Registro do check list e últimos registros das sopradoras</span></span><span class="op-chev">›</span></button>
-      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 16:43</span></div>
+      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 17:45</span></div>
     </section>
     <section id="opDash" hidden>
       <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Últimos 8 registros de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
@@ -963,7 +996,7 @@
         <button class="nav-item" data-page="listasTeste" onclick="mudarPagina('listasTeste')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>Banco de dados</span></button>
       </nav>
       <button type="button" class="a-opbtn" id="btnVersaoOperacao" onclick="usarVersaoOperacao()" hidden>Voltar à versão da operação</button>
-      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 16:43</b></span></div>
+      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 17:45</b></span></div>
       <div class="a-user"><span class="av" id="userAv">·</span><div class="who"><b id="userNome">—</b><small id="userEmail"></small></div><button type="button" class="a-ic-btn" title="Sair" aria-label="Sair" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button></div>
     </aside>
 
@@ -6796,16 +6829,17 @@ const MM_IMPORT = JSON.parse(document.getElementById('dadosImportMoldes').textCo
 const MM_LISTAS = {
   moldes: { nome: 'Moldes', cols: [
     ['mmMaquina', 'Máquina'], ['mmGramatura', 'Gramatura'], ['mmCamara', 'Câmara quente'], ['mmCavidades', 'Cavidades'],
-    ['mmRev', 'Rev'], ['mmDesenho', 'Desenho', 1], ['mmAtivo', 'Ativo'], ['mmOrigem', 'Origem'] ] },
+    ['mmRev', 'Rev'], ['mmDesenho', 'Desenho', 1], ['mmAtivo', 'Ativo'], ['mmOrigem', 'Origem'],
+    ['mmProducao', 'Em produção'], ['mmProdDesde', 'Em produção desde'] ] },
   hist: { nome: 'Mapa do Molde - Histórico', cols: [
     ['mmMoldeId', 'Molde ID'], ['mmMolde', 'Molde'], ['mmLugar', 'Lugar'], ['mmCavidade', 'Cavidade'], ['mmCastanha', 'Castanha'],
     ['mmTipo', 'Tipo'], ['mmResp', 'Responsável'], ['mmDesc', 'Descrição', 1], ['mmData', 'Data'], ['mmHora', 'Hora'],
     ['mmDataIso', 'Data ISO'], ['mmMudanca', 'Mudança', 1], ['mmFotoDrive', 'Foto drive'], ['mmFotoItem', 'Foto item'],
-    ['mmFotoUrl', 'Foto link', 1], ['mmOrigem', 'Origem'] ] }
+    ['mmFotoUrl', 'Foto link', 1], ['mmOrigem', 'Origem'], ['mmLote', 'Grupo'] ] }
 };
 const MM_PASTA_FOTOS = 'Mapa do Molde - Fotos';
 const MM = { ids: {}, iniciado: null, carregado: false, carregando: null, moldes: [], hist: [], erro: '', atual: null, sel: null,
-  thumbs: {}, fotosDrive: null, tela: 'lista' };
+  thumbs: {}, fotosDrive: null, tela: 'lista', colunas: {}, multi: false, selVarias: {} };
 
 function mmEsc(s) { return escHtml(s == null ? '' : s); }
 function mmP2(n) { return String(n).padStart(2, '0'); }
@@ -6886,9 +6920,24 @@ async function mmGarantirListas() {
   }
 }
 function mmItensUrl(k) { return lstSite() + '/lists/' + MM.ids[k] + '/items'; }
+// Listas criadas antes de uma coluna nova existir ganham a coluna (ex.: "Em produção", 27/11/2026).
+async function mmGarantirColunas() {
+  for (const k of Object.keys(MM_LISTAS)) {
+    if (!MM.ids[k] || (MM.colunas[k] && MM.colunas[k].ok)) continue;
+    const cols = await lstTodos(lstSite() + '/lists/' + MM.ids[k] + '/columns?$select=name');
+    const tem = {}; cols.forEach(function(c) { tem[c.name] = 1; });
+    for (const c of MM_LISTAS[k].cols) {
+      if (tem[c[0]]) continue;
+      try { await lstG('POST', lstSite() + '/lists/' + MM.ids[k] + '/columns', { name: c[0], displayName: c[1], text: c[2] ? { allowMultipleLines: true, textType: 'plain', linesForEditing: 4 } : { allowMultipleLines: false, maxLength: 255 } }); tem[c[0]] = 1; }
+      catch (e) { console.warn('[Mapa do Molde] coluna ' + c[0] + ' não criada: ' + e.message); }
+    }
+    MM.colunas[k] = { ok: true, tem: tem };
+  }
+}
 async function mmLerLista(k) {
   if (!MM.ids[k]) return [];
-  const sel = ['Title'].concat(MM_LISTAS[k].cols.map(function(c) { return c[0]; })).join(',');
+  const tem = MM.colunas[k] && MM.colunas[k].tem;
+  const sel = ['Title'].concat(MM_LISTAS[k].cols.map(function(c) { return c[0]; }).filter(function(n) { return !tem || tem[n]; })).join(',');
   const brutos = await lstTodos(mmItensUrl(k) + '?$expand=fields($select=' + sel + ')&$top=999');
   return brutos.map(function(it) { const f = it.fields || {}; f._id = Number(it.id); return f; }).sort(function(a, b) { return a._id - b._id; });
 }
@@ -6925,12 +6974,13 @@ async function mmAtualizar(k, id, o) { return lstG('PATCH', mmItensUrl(k) + '/' 
 function mmMoldeDeItem(f) {
   let des = null; try { des = JSON.parse(f.mmDesenho || ''); } catch (e) { des = null; }
   return { id: f._id, maquina: f.mmMaquina || '', gramatura: f.mmGramatura || '', camara: f.mmCamara || '', rev: f.mmRev || '',
-    ativo: f.mmAtivo !== 'FALSE', origem: f.mmOrigem || '', desenho: des && des.faixas ? des : { v: 1, faixas: [] } };
+    ativo: f.mmAtivo !== 'FALSE', origem: f.mmOrigem || '', desenho: des && des.faixas ? des : { v: 1, faixas: [] },
+    producao: f.mmProducao === 'TRUE', prodDesde: f.mmProdDesde || '' };
 }
 function mmEventoDeItem(f) {
   return { id: f._id, moldeId: Number(f.mmMoldeId) || 0, lugar: f.mmLugar || '', cav: f.mmCavidade || '', cast: f.mmCastanha || '', tipo: f.mmTipo || f.Title || '',
     resp: f.mmResp || '', desc: f.mmDesc || '', data: f.mmData || '', hora: f.mmHora || '', iso: f.mmDataIso || mmIsoDe(f.mmData),
-    mudanca: f.mmMudanca || '', fotoDrive: f.mmFotoDrive || '', fotoItem: f.mmFotoItem || '', fotoUrl: f.mmFotoUrl || '', origem: f.mmOrigem || '' };
+    mudanca: f.mmMudanca || '', lote: f.mmLote || '', fotoDrive: f.mmFotoDrive || '', fotoItem: f.mmFotoItem || '', fotoUrl: f.mmFotoUrl || '', origem: f.mmOrigem || '' };
 }
 function mmChaveEv(e) { return (e.iso || '0000-00-00') + ' ' + (e.hora || '00:00') + ' ' + String(e.id).padStart(9, '0'); }
 async function mmCarregar(forcar) {
@@ -6940,6 +6990,7 @@ async function mmCarregar(forcar) {
     try {
       MM.iniciado = forcar ? null : MM.iniciado;
       await mmIniciar();
+      await mmGarantirColunas();
       const [ms, hs] = await Promise.all([mmLerLista('moldes'), mmLerLista('hist')]);
       MM.moldes = ms.map(mmMoldeDeItem).filter(function(m) { return m.ativo; });
       MM.hist = hs.map(mmEventoDeItem).sort(function(a, b) { return mmChaveEv(a) < mmChaveEv(b) ? -1 : 1; });
@@ -7027,6 +7078,23 @@ async function mmMiniatura(e, grande) {
   return t ? (grande ? t.g : t.m) : null;
 }
 
+/* ---- molde em produção (1 por máquina; NÃO entra no histórico) ---- */
+async function mmDefinirProducao(m, ligar) {
+  await mmCarregar(true);
+  const m2 = MM.moldes.find(function(x) { return x.id === m.id; });
+  if (!m2) throw new Error('o molde não existe mais');
+  const q = mmMaquinaPadrao(m2.maquina);
+  if (ligar && !q) throw new Error('defina a máquina do molde antes (lápis do cartão)');
+  if (ligar) {
+    const outros = MM.moldes.filter(function(x) { return x.id !== m2.id && x.producao && mmMaquinaPadrao(x.maquina) === q; });
+    for (const x of outros) await mmAtualizar('moldes', x.id, { mmProducao: '', mmProdDesde: '' });
+    const a = mmAgora();
+    await mmAtualizar('moldes', m2.id, { mmProducao: 'TRUE', mmProdDesde: a.data + ' ' + a.hora });
+  } else await mmAtualizar('moldes', m2.id, { mmProducao: '', mmProdDesde: '' });
+  await mmCarregar(true);
+}
+function mmProducaoDa(q) { return MM.moldes.find(function(x) { return x.producao && mmMaquinaPadrao(x.maquina) === q; }) || null; }
+
 /* ---------- MAPA DO MOLDE: telas ---------- */
 const MM_SVG = {
   novo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
@@ -7034,6 +7102,9 @@ const MM_SVG = {
   pdf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><path d="M14 2v6h6"/></svg>',
   att: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>',
   molde: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 3v18"/></svg>',
+  varias: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="m14.5 17.5 2 2 4-4"/></svg>',
+  play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>',
+  parar: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>',
   imp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>'
 };
 function mmEl(id) { return document.getElementById(id); }
@@ -7044,7 +7115,7 @@ function mmCrumb(m) {
   mmEl('mmCrumbVolta').onclick = function(e) { e.preventDefault(); mmTelaLista(); };
 }
 async function mmAbrirPagina() {
-  MM.tela = 'lista'; MM.atual = null; MM.sel = null;
+  MM.tela = 'lista'; MM.atual = null; MM.sel = null; MM.multi = false; MM.selVarias = {};
   mmTelaLista(true);
 }
 function mmCarregando(txt) { mmEl('mmConteudo').innerHTML = '<div class="mm-load"><div class="spinner"></div> ' + mmEsc(txt) + '</div>'; }
@@ -7075,11 +7146,30 @@ async function mmTelaLista(recarregar) {
       '<div class="mm-bar"><i style="width:' + pct + '%"></i></div><div class="n"><span><b>' + c.at + '</b> de ' + c.total + ' ativas</span><span>' + pct + '%</span></div><span hidden>' + mmEsc(mmNomeMolde(m)) + '</span></div>';
   };
   const porGram = function(a, b) { return String(a.gramatura).localeCompare(String(b.gramatura), 'pt-BR', { numeric: true }); };
+  // Em produção: cartão em destaque no topo da coluna; os outros moldes em lista compacta (decisão do Cleber, 27/11/2026)
+  const cardProd = function(m) {
+    const c = mmContagem(m), pct = c.total ? Math.round(c.at / c.total * 100) : 0;
+    return '<div class="mm-card mm-prodcard" role="button" tabindex="0" data-m="' + m.id + '" aria-label="Abrir ' + mmEsc(mmNomeMolde(m)) + ' (em produção)"><div class="t"><div><b>' + mmEsc(m.gramatura + ' g') + '</b>' +
+      '<button type="button" class="mm-card-ed" data-ed="' + m.id + '" title="Editar nome (máquina e gramatura)" aria-label="Editar nome de ' + mmEsc(mmNomeMolde(m)) + '">' + MM_SVG.edit + '</button><br><small>' + mmEsc(c.total + ' cavidades' + (m.camara ? ' · ' + m.camara : '')) +
+      (c.iso ? ' · <span style="color:var(--danger)">' + c.iso + ' isolada' + (c.iso > 1 ? 's' : '') + '</span>' : '') + '</small></div><span class="mm-badge prod">Em produção</span></div>' +
+      (m.prodDesde ? '<span class="mm-desde">desde ' + mmEsc(m.prodDesde) + '</span>' : '') +
+      '<div class="mm-bar"><i style="width:' + pct + '%"></i></div><div class="mm-rod"><span class="n"><span><b>' + c.at + '</b> de ' + c.total + ' ativas · ' + pct + '%</span></span>' +
+      '<button type="button" class="mm-acao" data-parar="' + m.id + '">' + MM_SVG.parar + 'Parar</button></div></div>';
+  };
+  const linha = function(m) {
+    const c = mmContagem(m);
+    return '<div class="mm-row" role="button" tabindex="0" data-m="' + m.id + '" aria-label="Abrir ' + mmEsc(mmNomeMolde(m)) + '"><span class="mm-row-tx"><b>' + mmEsc(m.gramatura + ' g') + '</b><small title="' + c.total + ' cavidades">' +
+      (c.iso ? '<span style="color:var(--danger)">' + c.iso + ' isolada' + (c.iso > 1 ? 's' : '') + '</span>' : 'todas ativas') + '</small></span>' +
+      '<span class="mm-row-ac"><button type="button" class="mm-card-ed" data-ed="' + m.id + '" title="Editar nome (máquina e gramatura)" aria-label="Editar nome de ' + mmEsc(mmNomeMolde(m)) + '">' + MM_SVG.edit + '</button>' +
+      '<button type="button" class="mm-acao" data-produzir="' + m.id + '">' + MM_SVG.play + 'Produzir</button></span></div>';
+  };
   const cols = MM_MAQUINAS.map(function(q) {
     const ms = MM.moldes.filter(function(m) { return mmMaquinaPadrao(m.maquina) === q; }).sort(porGram);
     const iso = ms.reduce(function(s, m) { return s + mmContagem(m).iso; }, 0);
+    const mp = mmProducaoDa(q), resto = ms.filter(function(m) { return !mp || m.id !== mp.id; });
     return '<section class="mm-col" aria-label="' + mmEsc(q) + '"><div class="mm-col-cab"><b>' + mmEsc(q) + '</b><small>' + ms.length + ' molde' + (ms.length === 1 ? '' : 's') + (iso ? ' · <span style="color:var(--danger)">' + iso + ' isolada' + (iso > 1 ? 's' : '') + '</span>' : '') + '</small></div>' +
-      (ms.length ? ms.map(card).join('') : '<div class="mm-col-vazia">Nenhum molde</div>') + '</section>';
+      (!ms.length ? '<div class="mm-col-vazia">Nenhum molde</div>' :
+        (mp ? cardProd(mp) : '') + (resto.length ? '<div class="mm-sep">' + (mp ? 'Fora de produção' : 'Nenhum molde em produção') + '</div><div class="mm-lista">' + resto.map(linha).join('') + '</div>' : '')) + '</section>';
   }).join('');
   const outros = MM.moldes.filter(function(m) { return !mmMaquinaPadrao(m.maquina); }).sort(function(a, b) { return mmNomeMolde(a).localeCompare(mmNomeMolde(b), 'pt-BR', { numeric: true }); });
   const htmlOutros = outros.length ? '<div class="mm-outros"><div class="mm-col-cab"><b>Sem máquina definida</b><small>' + outros.length + ' molde' + (outros.length === 1 ? '' : 's') + ' — use o lápis do cartão para escolher a máquina (Hypet, Husky 1, Husky 2 ou Husky GL)</small></div><div class="mm-cards">' +
@@ -7093,13 +7183,15 @@ async function mmTelaLista(recarregar) {
       : '<div class="mm-vazio-msg">Nenhum molde cadastrado ainda. ' + (pend.length ? 'Importe os desenhos da planilha ou cadastre um molde novo.' : 'Use "Novo molde" para cadastrar.') + '</div>');
   if (MM.moldes.length) {
     const abrir = function(e) {
+      const pr = e.target.closest('[data-produzir],[data-parar]');
+      if (pr) { e.stopPropagation(); const lig = pr.hasAttribute('data-produzir'), m = MM.moldes.find(function(x) { return x.id === Number(pr.getAttribute(lig ? 'data-produzir' : 'data-parar')); }); if (m) mmConfirmarProducao(m, lig); return; }
       const ed = e.target.closest('[data-ed]');
       if (ed) { e.stopPropagation(); const m = MM.moldes.find(function(x) { return x.id === Number(ed.getAttribute('data-ed')); }); if (m) mmAbrirNome(m); return; }
       const b = e.target.closest('[data-m]'); if (b) mmTelaMolde(Number(b.getAttribute('data-m')));
     };
     mmEl('mmCards').addEventListener('click', abrir);
-    mmEl('mmCards').addEventListener('keydown', function(e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('mm-card')) { e.preventDefault(); abrir(e); } });
-    mmEl('mmBusca').addEventListener('input', function(e) { const q = e.target.value.toLowerCase(); document.querySelectorAll('#mmCards .mm-card').forEach(function(c) { const sec = c.closest('.mm-col'), t = c.textContent + ' ' + (sec ? sec.getAttribute('aria-label') : ''); c.hidden = !!q && t.toLowerCase().indexOf(q) === -1; }); });
+    mmEl('mmCards').addEventListener('keydown', function(e) { if ((e.key === 'Enter' || e.key === ' ') && (e.target.classList.contains('mm-card') || e.target.classList.contains('mm-row'))) { e.preventDefault(); abrir(e); } });
+    mmEl('mmBusca').addEventListener('input', function(e) { const q = e.target.value.toLowerCase(); document.querySelectorAll('#mmCards .mm-card, #mmCards .mm-row').forEach(function(c) { const sec = c.closest('.mm-col'), t = c.textContent + ' ' + (sec ? sec.getAttribute('aria-label') : ''); c.hidden = !!q && t.toLowerCase().indexOf(q) === -1; }); });
   }
 }
 
@@ -7127,7 +7219,7 @@ const MM_LEG = '<div class="mm-leg"><span><i class="mini"></i>Ativa</span><span>
 async function mmTelaMolde(id, manterSel) {
   const m = MM.moldes.find(function(x) { return x.id === id; });
   if (!m) { mmTelaLista(); return; }
-  MM.tela = 'molde'; MM.atual = m; if (!manterSel) MM.sel = null;
+  MM.tela = 'molde'; MM.atual = m; if (!manterSel) MM.sel = null; MM.multi = false; MM.selVarias = {};
   mmRenderMolde();
   window.scrollTo(0, 0);
 }
@@ -7136,14 +7228,20 @@ function mmRenderMolde() {
   mmCrumb(m);
   const kp = '<div class="mm-kpis"><div class="mm-kpi"><small>Cavidades ativas</small><b style="color:var(--ok)">' + c.at + '</b> <small style="display:inline">de ' + c.total + '</small></div><div class="mm-kpi"><small>Isoladas agora</small><b style="color:var(--danger)">' + c.iso + '</b></div><div class="mm-kpi"><small>Capacidade</small><b>' + (c.total ? Math.round(c.at / c.total * 100) : 0) + '%</b></div><div class="mm-kpi"><small>Registros no histórico</small><b>' + evs.length + '</b></div></div>';
   const info = [c.total + ' cavidades', m.camara ? 'câmara quente ' + m.camara : '', m.rev ? 'Rev. ' + m.rev : ''].filter(Boolean).join(' · ');
-  mmEl('mmConteudo').innerHTML = '<div class="mm-cab"><div class="mm-tt"><h1 class="page-title">' + mmEsc(mmNomeMolde(m)) + '</h1><p class="page-sub">' + mmEsc(info) + '</p></div>' +
-    '<div class="mm-acoes"><button type="button" class="btn" id="mmBtnNum">' + MM_SVG.edit + 'Editar números</button><button type="button" class="btn" id="mmBtnDados">' + MM_SVG.molde + 'Editar molde</button><button type="button" class="btn" id="mmBtnPdf">' + MM_SVG.pdf + 'PDF do mapa</button></div></div>' + kp +
+  const q = mmMaquinaPadrao(m.maquina);
+  const selo = m.producao ? ' <span class="mm-badge prod" style="vertical-align:4px">Em produção' + (m.prodDesde ? ' · desde ' + mmEsc(m.prodDesde) : '') + '</span>' : '';
+  const btProd = !q ? '' : m.producao ? '<button type="button" class="btn" id="mmBtnProd">' + MM_SVG.parar + 'Parar</button>' : '<button type="button" class="btn" id="mmBtnProd">' + MM_SVG.play + 'Produzir</button>';
+  mmEl('mmConteudo').innerHTML = '<div class="mm-cab"><div class="mm-tt"><h1 class="page-title">' + mmEsc(mmNomeMolde(m)) + selo + '</h1><p class="page-sub">' + mmEsc(info) + '</p></div>' +
+    '<div class="mm-acoes">' + btProd + '<button type="button" class="btn' + (MM.multi ? ' btn-accent' : '') + '" id="mmBtnVarias">' + MM_SVG.varias + (MM.multi ? 'Sair da seleção' : 'Selecionar várias') + '</button><button type="button" class="btn" id="mmBtnNum">' + MM_SVG.edit + 'Editar números</button><button type="button" class="btn" id="mmBtnDados">' + MM_SVG.molde + 'Editar molde</button><button type="button" class="btn" id="mmBtnPdf">' + MM_SVG.pdf + 'PDF do mapa</button></div></div>' + kp +
     '<div class="mm-wrap"><div class="mm-mapa">' + MM_LEG + mmHtmlMapa(m, { st: c.st, sel: MM.sel }) + '</div><aside class="mm-lateral"><div class="mm-lateral-in"><section class="mm-painel mm-sel" id="mmPainel" aria-label="Cavidade selecionada"></section>' +
     '<section class="mm-painel mm-hcard" aria-label="Histórico do molde"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap"><h3>Histórico do molde</h3><small style="color:var(--fg-faint)">' + evs.length + ' registro' + (evs.length === 1 ? '' : 's') + ' · mais recentes em cima</small></div><div class="mm-hleg"><b>29(29)</b> = cavidade(castanha)</div><div class="mm-hlist" id="mmHlist">' + mmHtmlHistorico(evs, m) + '</div></section></div></aside></div>';
   mmEl('mmBtnNum').onclick = function() { mmAbrirEdicao(null); };
   mmEl('mmBtnDados').onclick = mmAbrirDadosMolde;
   mmEl('mmBtnPdf').onclick = function() { mmGerarPdf(m); };
-  document.querySelector('#mmConteudo .mm-mapa').addEventListener('click', function(e) { const b = e.target.closest('.mm-cav'); if (b) { MM.sel = b.getAttribute('data-l'); mmRenderMolde(); if (window.innerWidth <= 1100) mmEl('mmPainel').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
+  mmEl('mmBtnVarias').onclick = function() { MM.multi = !MM.multi; MM.selVarias = {}; mmRenderMolde(); };
+  mmAtualizarSelecao();
+  if (mmEl('mmBtnProd')) mmEl('mmBtnProd').onclick = function() { mmConfirmarProducao(m, !m.producao); };
+  document.querySelector('#mmConteudo .mm-mapa').addEventListener('click', function(e) { const b = e.target.closest('.mm-cav'); if (b && MM.multi) { const k = b.getAttribute('data-l'); if (MM.selVarias[k]) delete MM.selVarias[k]; else MM.selVarias[k] = 1; mmAtualizarSelecao(); return; } if (b) { MM.sel = b.getAttribute('data-l'); mmRenderMolde(); if (window.innerWidth <= 1100) mmEl('mmPainel').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
   mmEl('mmHlist').addEventListener('click', function(e) {
     const f = e.target.closest('.mm-hfoto'); if (f) { mmVerFoto(Number(f.getAttribute('data-ev'))); return; }
     if (e.target.closest('a')) return;
@@ -7167,11 +7265,14 @@ function mmRenderPainel(c) {
 const MM_TIPOS = { isolada: ['bad', 'isolada'], liberada: ['ok', 'liberada'], numeros: ['alt', 'números alterados'], cadastro: ['alt', 'molde cadastrado'], desenho: ['alt', 'molde alterado'], obs: ['dim', 'observação'] };
 function mmHtmlHistorico(evs, m) {
   if (!evs.length) return '<p class="vazio" style="color:var(--fg-dim);font-size:13px">Nenhum registro neste molde ainda.</p>';
-  return evs.map(function(e) {
-    const t = MM_TIPOS[e.tipo] || ['dim', e.tipo];
-    const pos = e.lugar !== '' ? mmCC(e.cav, e.cast) : (e.tipo === 'obs' ? 'Molde' : 'Molde todo');
+  const grupos = [];   // registros do mesmo "lote" (isoladas/liberadas juntas) viram 1 item
+  evs.forEach(function(e) { const g = grupos[grupos.length - 1]; if (e.lote && g && g[0].lote === e.lote) g.push(e); else grupos.push([e]); });
+  return grupos.map(function(g) {
+    const e = g[0], t = MM_TIPOS[e.tipo] || ['dim', e.tipo], varios = g.length > 1;
+    const pos = varios ? g.slice().reverse().map(function(x) { return mmCC(x.cav, x.cast); }).join(', ') : (e.lugar !== '' ? mmCC(e.cav, e.cast) : (e.tipo === 'obs' ? 'Molde' : 'Molde todo'));
+    const marcado = g.some(function(x) { return x.lugar !== '' && String(x.lugar) === String(MM.sel); });
     const foto = e.fotoItem ? '<img class="mm-hfoto" data-ev="' + e.id + '" alt="Foto do registro">' : '';
-    return '<div class="mm-hitem' + (e.lugar !== '' && String(e.lugar) === String(MM.sel) ? ' marcado' : '') + '" data-l="' + mmEsc(e.lugar) + '"><div class="hl"><span class="mm-hpos">' + pos + '</span><span class="mm-badge ' + t[0] + '">' + mmEsc(t[1]) + '</span></div>' +
+    return '<div class="mm-hitem' + (marcado ? ' marcado' : '') + '" data-l="' + (varios ? '' : mmEsc(e.lugar)) + '"><div class="hl"><span class="mm-hpos">' + pos + '</span><span class="mm-badge ' + t[0] + '">' + mmEsc(t[1]) + (varios ? ' · ' + g.length : '') + '</span></div>' +
       '<div class="mm-hcorpo"><div class="mm-htxt"><div class="mm-hquando">' + mmEsc((e.data || 'sem data') + (e.hora ? ' ' + e.hora : '')) + ' · ' + mmEsc(e.resp || '—') + '</div>' +
       (e.mudanca ? '<div style="font-weight:600">' + mmEsc(e.mudanca) + '</div>' : '') + '<div>' + mmEsc(e.desc) + '</div>' +
       (e.origem === 'planilha' ? '<div class="mm-himp">Importado da planilha (registros antigos não têm foto)</div>' : '') + '</div>' + foto + '</div></div>';
@@ -7249,12 +7350,16 @@ function mmEventoBase(m, L, tipo, resp, desc) {
 function mmComFoto(o, foto) { if (foto) { o.mmFotoDrive = foto.drive; o.mmFotoItem = foto.item; o.mmFotoUrl = foto.url; } return o; }
 
 // Isolar / liberar
-function mmAbrirForm(tipo, L) {
-  const m = MM.atual, iso = tipo === 'isolada';
-  const f = mmModal('<h3>' + (iso ? 'Isolar ' : 'Liberar ') + mmEsc(mmNomeLugar(L)) + '</h3><p class="sub">' + mmEsc(mmNomeMolde(m)) + '</p>' +
+function mmAbrirForm(tipo, Ls) {
+  if (!Array.isArray(Ls)) Ls = [Ls];
+  const m = MM.atual, iso = tipo === 'isolada', varias = Ls.length > 1;
+  const lista = Ls.map(function(L) { return L.cav + '(' + L.cast + ')'; }).join(', ');
+  const f = mmModal('<h3>' + (iso ? 'Isolar ' : 'Liberar ') + (varias ? Ls.length + ' cavidades' : mmEsc(mmNomeLugar(Ls[0]))) + '</h3><p class="sub">' + mmEsc(mmNomeMolde(m)) + '</p>' +
+    (varias ? '<div class="mm-chips">' + Ls.map(function(L) { return '<span class="mm-chip ' + (iso ? 'bad' : 'ok') + '">' + mmCC(L.cav, L.cast) + '</span>'; }).join('') + '</div>' +
+      '<p class="mm-opc" style="margin:0">O mesmo nome, motivo e foto valem para todas. Cada cavidade fica com o seu registro, e o histórico mostra o grupo junto.</p>' : '') +
     '<div class="mm-fld"><label for="mmFNome">Seu nome</label><input type="text" id="mmFNome" autocomplete="name" maxlength="80"></div>' +
     '<div class="mm-fld"><label for="mmFDesc">' + (iso ? 'Motivo do isolamento' : 'O que foi feito para liberar') + '</label><textarea id="mmFDesc" maxlength="2000"></textarea></div>' +
-    mmCampoFoto(true) + mmRodapeForm(iso ? 'Isolar cavidade' : 'Liberar cavidade', iso ? 'mm-red' : 'mm-grn'));
+    mmCampoFoto(true) + mmRodapeForm(iso ? (varias ? 'Isolar ' + Ls.length + ' cavidades' : 'Isolar cavidade') : (varias ? 'Liberar ' + Ls.length + ' cavidades' : 'Liberar cavidade'), iso ? 'mm-red' : 'mm-grn'));
   mmLigarFoto(f);
   f.onsubmit = function(ev) {
     ev.preventDefault();
@@ -7266,13 +7371,20 @@ function mmAbrirForm(tipo, L) {
     mmSalvando(f, async function() {
       await mmCarregar(true);                         // confere se ninguém mudou antes
       const m2 = MM.moldes.find(function(x) { return x.id === m.id; }); if (!m2) throw new Error('o molde não existe mais');
-      const L2 = mmLugar(m2, L.id), atual = mmSituacao(m2)[L.id], jaIso = !!(atual && atual.tipo === 'isolada');
-      if (jaIso === iso) { f._fechar(); MM.atual = m2; mmRenderMolde(); mostrarToast('Esta cavidade já está ' + (iso ? 'isolada' : 'ativa') + ' (outra pessoa registrou antes).', true); return; }
-      const foto = await mmEnviarFoto(f._foto.blob, m2, (iso ? 'isolada_' : 'liberada_') + L2.cav + '(' + L2.cast + ')');
-      await mmIncluir('hist', [mmCampos('hist', mmComFoto(mmEventoBase(m2, L2, tipo, resp, desc), foto))]);
+      const st = mmSituacao(m2), pular = [];
+      const alvo = Ls.map(function(L) { return mmLugar(m2, L.id); }).filter(function(L2) {
+        if (!L2) return false;
+        const e = st[L2.id], jaIso = !!(e && e.tipo === 'isolada');
+        if (jaIso === iso) { pular.push(L2.cav + '(' + L2.cast + ')'); return false; }
+        return true;
+      });
+      if (!alvo.length) { f._fechar(); MM.atual = m2; MM.selVarias = {}; mmRenderMolde(); mostrarToast((varias ? 'Essas cavidades já estão ' : 'Esta cavidade já está ') + (iso ? 'isoladas' : 'ativas') + ' (outra pessoa registrou antes).', true); return; }
+      const foto = await mmEnviarFoto(f._foto.blob, m2, (iso ? 'isolada_' : 'liberada_') + (alvo.length > 1 ? alvo.length + '_cavidades' : alvo[0].cav + '(' + alvo[0].cast + ')'));
+      const lote = alvo.length > 1 ? 'G' + Date.now().toString(36) : '';
+      await mmIncluir('hist', alvo.map(function(L2) { const o = mmComFoto(mmEventoBase(m2, L2, tipo, resp, desc), foto); if (lote) o.mmLote = lote; return mmCampos('hist', o); }));
       await mmCarregar(true);
-      f._fechar(); MM.atual = MM.moldes.find(function(x) { return x.id === m.id; }) || m2; mmRenderMolde();
-      mostrarToast(mmNomeLugar(L2) + (iso ? ' isolada.' : ' liberada.'));
+      f._fechar(); MM.atual = MM.moldes.find(function(x) { return x.id === m.id; }) || m2; MM.multi = false; MM.selVarias = {}; mmRenderMolde();
+      mostrarToast((alvo.length > 1 ? alvo.length + ' cavidades ' + (iso ? 'isoladas' : 'liberadas') : mmNomeLugar(alvo[0]) + (iso ? ' isolada' : ' liberada')) + '.' + (pular.length ? ' ' + pular.join(', ') + ' já estava' + (pular.length > 1 ? 'm' : '') + ' assim.' : ''));
     });
   };
 }
@@ -7435,6 +7547,47 @@ function mmAbrirNome(m) {
       if (MM.tela === 'molde') { MM.atual = MM.moldes.find(function(x) { return x.id === m.id; }) || m; mmRenderMolde(); } else mmTelaLista();
     });
   };
+}
+
+/* ===== produzir / parar (com confirmação; não grava no histórico) ===== */
+function mmConfirmarProducao(m, ligar) {
+  const q = mmMaquinaPadrao(m.maquina), atual = ligar && q ? mmProducaoDa(q) : null;
+  const txt = ligar
+    ? 'Colocar o molde <b>' + mmEsc(m.gramatura + ' g') + '</b> em produção na <b>' + mmEsc(q || m.maquina) + '</b>?' + (atual && atual.id !== m.id ? ' O molde <b>' + mmEsc(atual.gramatura + ' g') + '</b> sai de produção.' : '')
+    : 'Parar o molde <b>' + mmEsc(m.gramatura + ' g') + '</b> na <b>' + mmEsc(q || m.maquina) + '</b>? A máquina fica sem molde em produção.';
+  const f = mmModal('<h3>' + (ligar ? 'Colocar em produção?' : 'Parar o molde?') + '</h3><p class="sub" style="margin:0;font-size:13.5px">' + txt + '</p>' +
+    '<p class="mm-opc" style="margin:0">Não entra no histórico do molde: fica guardado só quem está em produção agora e desde quando.</p>' +
+    '<div class="mm-erro" id="mmFErro" hidden></div><div class="mm-rodape"><button type="button" class="btn" data-fechar>Cancelar</button><button type="submit" class="btn ' + (ligar ? 'mm-prod' : 'mm-red') + '" id="mmFSalvar">' + (ligar ? 'Produzir' : 'Parar') + '</button></div>');
+  setTimeout(function() { const b = mmEl('mmFSalvar'); if (b) b.focus(); }, 40);
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    mmSalvando(f, async function() {
+      await mmDefinirProducao(m, ligar);
+      f._fechar();
+      mostrarToast(ligar ? (q || m.maquina) + ': ' + m.gramatura + ' g em produção.' : (q || m.maquina) + ': nenhum molde em produção.');
+      if (MM.tela === 'molde') { MM.atual = MM.moldes.find(function(x) { return x.id === m.id; }) || m; mmRenderMolde(); } else mmTelaLista();
+    });
+  };
+}
+
+/* ===== modo "Selecionar várias" (isolar/liberar em grupo) ===== */
+function mmAtualizarSelecao() {
+  const m = MM.atual; let bar = mmEl('mmBarraSel');
+  document.querySelectorAll('#mmConteudo .mm-cav').forEach(function(b) { b.classList.toggle('marc', !!(MM.multi && MM.selVarias[b.getAttribute('data-l')])); });
+  const mapa = document.querySelector('#mmConteudo .mm-mapa'); if (mapa) mapa.classList.toggle('mm-modo-sel', !!MM.multi);
+  if (!MM.multi) { if (bar) bar.remove(); return; }
+  if (!bar) { bar = document.createElement('div'); bar.id = 'mmBarraSel'; bar.className = 'mm-barra'; mmEl('mmConteudo').appendChild(bar); }
+  const st = mmSituacao(m), sel = mmLugares(m.desenho).filter(function(L) { return MM.selVarias[L.id]; });
+  const isoS = sel.filter(function(L) { const e = st[L.id]; return e && e.tipo === 'isolada'; }), atS = sel.filter(function(L) { return isoS.indexOf(L) === -1; });
+  bar.innerHTML = '<div class="mm-barra-tx"><b>' + (sel.length ? sel.length + ' selecionada' + (sel.length > 1 ? 's' : '') : 'Toque nas cavidades para selecionar') + '</b>' +
+    (sel.length ? '<small>' + sel.map(function(L) { return mmCC(L.cav, L.cast); }).join(', ') + '</small>' : '<small>Ativas para isolar, isoladas para liberar (dá para misturar).</small>') + '</div>' +
+    '<div class="mm-acoes">' + (atS.length ? '<button type="button" class="btn mm-red" id="mmSelIso">Isolar ' + atS.length + '</button>' : '') +
+    (isoS.length ? '<button type="button" class="btn mm-grn" id="mmSelLib">Liberar ' + isoS.length + '</button>' : '') +
+    (sel.length ? '<button type="button" class="btn" id="mmSelLimpar">Limpar</button>' : '') + '<button type="button" class="btn" id="mmSelSair">Cancelar</button></div>';
+  if (mmEl('mmSelIso')) mmEl('mmSelIso').onclick = function() { mmAbrirForm('isolada', atS); };
+  if (mmEl('mmSelLib')) mmEl('mmSelLib').onclick = function() { mmAbrirForm('liberada', isoS); };
+  if (mmEl('mmSelLimpar')) mmEl('mmSelLimpar').onclick = function() { MM.selVarias = {}; mmAtualizarSelecao(); };
+  mmEl('mmSelSair').onclick = function() { MM.multi = false; MM.selVarias = {}; mmRenderMolde(); };
 }
 
 /* ===== novo molde (3 passos) ===== */
@@ -7664,13 +7817,12 @@ async function mmGerarPdf(m) {
   doc.save(nome);
 }
 function mmDesenharPdf(doc, m) {
-  const W = 297, H = 210, MG = 8, GAP = 6, AV = W - 2 * MG, LW = AV * 0.61, RX = MG + LW + GAP, RW = AV - LW - GAP, TOP = MG, ALT = H - 2 * MG;
+  const W = 297, H = 210, MG = 8, GAP = 6, AV = W - 2 * MG, TOP = MG, ALT = H - 2 * MG;
   const COR = { tinta: [21, 24, 29], dim: [91, 99, 114], faint: [136, 144, 156], borda: [154, 163, 173], linha: [221, 225, 230], placa: [238, 241, 244], verm: [198, 47, 54], rosa: [249, 220, 221], verde: [31, 122, 85], acc: [21, 127, 153], escuro: [61, 67, 75], chip: [238, 240, 243] };
   const cor = function(k, t) { const c = COR[k]; if (t === 'f') doc.setFillColor(c[0], c[1], c[2]); else if (t === 'd') doc.setDrawColor(c[0], c[1], c[2]); else doc.setTextColor(c[0], c[1], c[2]); };
   const des = m.desenho, st = mmSituacao(m), lug = mmLugares(des);
   const isoDe = function(L) { const e = st[L.id]; return !!(e && e.tipo === 'isolada'); };
   // ---------- mapa ----------
-  cor('placa', 'f'); cor('borda', 'd'); doc.setLineWidth(0.3); doc.roundedRect(MG, TOP, LW, ALT, 3, 3, 'FD');
   const PAD = 2.5, CANAL = 9, CHIP = 6.5, ENTRE = 6, nf = des.faixas.length;
   const linhasF = des.faixas.map(function(fx) { return Math.max.apply(null, fx.blocos.map(function(b) { return Math.ceil(b.lug.length / b.cols); })); });
   const extras = des.faixas.reduce(function(s, fx, i) { return s + (i < nf - 1 ? (fx.abaixo ? ENTRE : PAD) : 0); }, 0);
@@ -7679,9 +7831,16 @@ function mmDesenharPdf(doc, m) {
   const passoL = hUtil / totLin;
   const maxCols = Math.max.apply(null, des.faixas.map(function(fx) { return fx.blocos.reduce(function(s, b) { return s + b.cols; }, 0); }));
   const maxBlocos = Math.max.apply(null, des.faixas.map(function(fx) { return fx.blocos.length; }));
-  const passoC = (LW - 2 * PAD - (maxBlocos - 1) * CANAL - maxBlocos * 4) / maxCols;
-  const D = Math.max(5, Math.min(12, passoL * 0.8, passoC * 0.62)), R = D / 2;
-  const fsCav = Math.min(12.5, D * 1.05), fsCast = Math.min(8.5, D * 0.72);
+  // A largura do quadro acompanha o desenho: círculo pelo espaço vertical, e o quadro só tão largo quanto as colunas pedem
+  // (o que sobra vai para o histórico). Entre 38% e 61% da folha.
+  let D = Math.max(5, Math.min(13, passoL * 0.82));
+  const CEL = 2.0;                                                    // largura de uma coluna = círculo + castanha
+  const larg = function(d) { return 2 * PAD + (maxBlocos - 1) * CANAL + maxBlocos * 4 + maxCols * d * CEL; };
+  const LMAX = AV * 0.61, LMIN = AV * 0.38;
+  if (larg(D) > LMAX) D = (LMAX - 2 * PAD - (maxBlocos - 1) * CANAL - maxBlocos * 4) / (maxCols * CEL);
+  const LW = Math.max(LMIN, Math.min(LMAX, larg(D))), RX = MG + LW + GAP, RW = AV - LW - GAP, R = D / 2;
+  cor('placa', 'f'); cor('borda', 'd'); doc.setLineWidth(0.3); doc.roundedRect(MG, TOP, LW, ALT, 3, 3, 'FD');
+  const fsCav = Math.min(14, D * 1.05), fsCast = Math.min(9, D * 0.7);
   let y = TOP + PAD;
   des.faixas.forEach(function(fx, fi) {
     const hF = linhasF[fi] * passoL + CHIP + 1.5, nc = fx.blocos.reduce(function(s, b) { return s + b.cols; }, 0);
@@ -7766,12 +7925,26 @@ function mmDesenharPdf(doc, m) {
     .map(function(p) { return [p.L.cav + '(' + p.L.cast + ')', p.e.data ? p.e.data + (p.e.hora ? ' ' + p.e.hora : '') : '—', p.e.desc || '—', p.e.resp || '—']; });
   cor('escuro', 'f'); doc.roundedRect(RX, ry, RW, 6, 1, 1, 'F'); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(255, 255, 255); doc.text('CAVIDADES ISOLADAS', RX + 2.5, ry + 4.2); ry += 7;
   if (!linhas.length) { doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); cor('dim'); doc.text('Nenhuma cavidade isolada.', RX + 1.5, ry + 5); }
-  else doc.autoTable({
-    startY: ry, head: [['CAV.(CAST.)', 'ISOLADA EM', 'MOTIVO', 'RESPONSÁVEL']], body: linhas, margin: { left: RX, right: MG, top: MG, bottom: 26 }, tableWidth: RW, theme: 'plain',
-    styles: { font: 'helvetica', fontSize: 7.8, cellPadding: { top: 1.3, bottom: 1.3, left: 1.4, right: 1.4 }, textColor: COR.tinta, lineColor: COR.linha, lineWidth: { bottom: 0.25 }, valign: 'top', overflow: 'linebreak' },
-    headStyles: { fontStyle: 'bold', fontSize: 6.5, textColor: COR.dim, lineColor: COR.borda, lineWidth: { bottom: 0.3 } },
-    columnStyles: { 0: { fontStyle: 'bold', cellWidth: 18 }, 1: { cellWidth: 24 }, 3: { cellWidth: 20 } }
-  });
+  else {
+    // Só 1 folha: entram as isoladas mais recentes que couberem; as demais viram uma linha de aviso.
+    const LIM = H - MG - 13;
+    const opcoes = function(corpo) { return {
+      startY: ry, head: [['CAV.(CAST.)', 'ISOLADA EM', 'MOTIVO', 'RESPONSÁVEL']], body: corpo, margin: { left: RX, right: MG, top: MG, bottom: H - LIM }, tableWidth: RW, theme: 'plain',
+      styles: { font: 'helvetica', fontSize: 7.8, cellPadding: { top: 1.3, bottom: 1.3, left: 1.4, right: 1.4 }, textColor: COR.tinta, lineColor: COR.linha, lineWidth: { bottom: 0.25 }, valign: 'top', overflow: 'linebreak' },
+      headStyles: { fontStyle: 'bold', fontSize: 6.5, textColor: COR.dim, lineColor: COR.borda, lineWidth: { bottom: 0.3 } },
+      columnStyles: { 0: { fontStyle: 'bold', cellWidth: 19 }, 1: { cellWidth: 25 }, 3: { cellWidth: 22 } } }; };
+    const corpoCom = function(n) {
+      const c = linhas.slice(0, n);
+      if (n < linhas.length) { const f = linhas.length - n; c.push([{ content: '+ ' + f + ' cavidade' + (f > 1 ? 's isoladas não cabem' : ' isolada não cabe') + ' nesta folha — veja no sistema (Mapa do Molde).', colSpan: 4, styles: { fontStyle: 'italic', textColor: COR.dim } }]); }
+      return c;
+    };
+    const J = (window.jspdf && window.jspdf.jsPDF) || doc.constructor;
+    const cabe = function(n) { const t = new J({ orientation: 'landscape', unit: 'mm', format: 'a4' }); t.autoTable(opcoes(corpoCom(n))); return t.getNumberOfPages() === 1 && t.lastAutoTable.finalY <= LIM; };
+    let n = linhas.length;
+    if (!cabe(n)) { let lo = 0, hi = n - 1; while (lo < hi) { const md = Math.ceil((lo + hi) / 2); if (cabe(md)) lo = md; else hi = md - 1; } n = lo; }
+    doc.autoTable(opcoes(corpoCom(n)));
+    while (doc.getNumberOfPages() > 1) doc.deletePage(doc.getNumberOfPages());   // garantia: nunca passa de 1 folha
+  }
   // rodapé de cada página
   const np = doc.getNumberOfPages();
   for (let p = 1; p <= np; p++) {
