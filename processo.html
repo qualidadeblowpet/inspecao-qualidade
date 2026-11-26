@@ -921,7 +921,7 @@
       <div class="op-brandrow"><img class="a-logo" src="sq-icone-192.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><svg class="a-logo a-logo-svg" viewBox="0 0 40 30" aria-hidden="true"><rect width="40" height="30" rx="7" fill="#c8202f"/><text x="20" y="20.5" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="14" fill="#fff">BP</text></svg><div><b>Controle de Processo</b><small>Registro do check list e últimos registros</small></div></div>
       <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h10"/><path d="M12 7h6l4 5-4 5h-6z"/><path d="M5 9v6"/></svg></span><span class="op-bt"><b>Injetora</b><span>Registro do check list e últimos registros das injetoras</span></span><span class="op-chev">›</span></button>
       <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4v3h-4z"/><path d="M9 5h6l1 4v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9z"/><path d="M8 13h8"/></svg></span><span class="op-bt"><b>Sopro</b><span>Registro do check list e últimos registros das sopradoras</span></span><span class="op-chev">›</span></button>
-      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 15:56</span></div>
+      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 16:43</span></div>
     </section>
     <section id="opDash" hidden>
       <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Últimos 8 registros de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
@@ -963,7 +963,7 @@
         <button class="nav-item" data-page="listasTeste" onclick="mudarPagina('listasTeste')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>Banco de dados</span></button>
       </nav>
       <button type="button" class="a-opbtn" id="btnVersaoOperacao" onclick="usarVersaoOperacao()" hidden>Voltar à versão da operação</button>
-      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 15:56</b></span></div>
+      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 16:43</b></span></div>
       <div class="a-user"><span class="av" id="userAv">·</span><div class="who"><b id="userNome">—</b><small id="userEmail"></small></div><button type="button" class="a-ic-btn" title="Sair" aria-label="Sair" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button></div>
     </aside>
 
@@ -6805,7 +6805,7 @@ const MM_LISTAS = {
 };
 const MM_PASTA_FOTOS = 'Mapa do Molde - Fotos';
 const MM = { ids: {}, iniciado: null, carregado: false, carregando: null, moldes: [], hist: [], erro: '', atual: null, sel: null,
-  thumbs: {}, pastaPai: null, tela: 'lista' };
+  thumbs: {}, fotosDrive: null, tela: 'lista' };
 
 function mmEsc(s) { return escHtml(s == null ? '' : s); }
 function mmP2(n) { return String(n).padStart(2, '0'); }
@@ -6977,26 +6977,42 @@ function mmReduzirFoto(arquivo) {
   });
 }
 function mmNomePasta(s) { return String(s || 'molde').replace(/[\\/:*?"<>|#%]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80) || 'molde'; }
-async function mmEnviarFoto(blob, m, rotulo) {
-  if (!driveId || !itemId) throw new Error('a planilha não está conectada (Configurações) — não há onde guardar a foto');
-  if (!MM.pastaPai) {
-    const it = await lstG('GET', '/drives/' + driveId + '/items/' + itemId + '?$select=id,parentReference');
-    MM.pastaPai = (it.parentReference && it.parentReference.id) || 'root';
+// As fotos ficam numa BIBLIOTECA DE DOCUMENTOS do mesmo site das listas ("CP Mapa do Molde - Fotos"), criada pelo app.
+// Ela herda a permissão do site — quem grava nas listas "CP …" também grava as fotos (a pasta da planilha no OneDrive
+// costuma dar "Access denied" para quem não é o dono). Uma subpasta por molde.
+async function mmDriveFotos() {
+  if (MM.fotosDrive) return MM.fotosDrive;
+  await lstIniciar();
+  const nome = LISTS_CFG.prefixo + MM_PASTA_FOTOS;
+  const ls = await lstTodos(lstSite() + '/lists?$select=id,displayName');
+  let l = ls.find(function(x) { return x.displayName === nome; });
+  if (!l) {
+    try { l = await lstG('POST', lstSite() + '/lists', { displayName: nome, list: { template: 'documentLibrary' } }); }
+    catch (e) {   // outra pessoa criou ao mesmo tempo
+      const ls2 = await lstTodos(lstSite() + '/lists?$select=id,displayName');
+      l = ls2.find(function(x) { return x.displayName === nome; });
+      if (!l) throw new Error('não foi possível criar a biblioteca de fotos "' + nome + '" (' + e.message + ')');
+    }
   }
+  const d = await lstG('GET', lstSite() + '/lists/' + l.id + '/drive?$select=id');
+  MM.fotosDrive = d.id;
+  return MM.fotosDrive;
+}
+async function mmEnviarFoto(blob, m, rotulo) {
+  const drv = await mmDriveFotos();
   const a = mmAgora(), nome = (a.iso + '_' + a.hora.replace(':', 'h') + '_' + mmNomePasta(rotulo) + '.jpg').replace(/\s+/g, '_');
-  const cam = [MM_PASTA_FOTOS, mmNomePasta(mmNomeMolde(m)), nome].map(encodeURIComponent).join('/');
-  const base = MM.pastaPai === 'root' ? '/drives/' + driveId + '/root:/' : '/drives/' + driveId + '/items/' + MM.pastaPai + ':/';
+  const cam = [mmNomePasta(mmNomeMolde(m)), nome].map(encodeURIComponent).join('/');
   const token = await getToken();
   let r, j = {};
   for (let t = 0; ; t++) {
-    r = await lstRede('https://graph.microsoft.com/v1.0' + base + cam + ':/content?@microsoft.graph.conflictBehavior=rename',
+    r = await lstRede('https://graph.microsoft.com/v1.0/drives/' + drv + '/root:/' + cam + ':/content?@microsoft.graph.conflictBehavior=rename',
       { method: 'PUT', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'image/jpeg' }, body: blob });
     if ((r.status === 429 || r.status === 503) && t < 4) { await lstEsperar(1500 * (t + 1)); continue; }
     break;
   }
   try { j = await r.json(); } catch (e) { j = {}; }
-  if (!r.ok) throw new Error('a foto não subiu: ' + ((j.error && j.error.message) || ('erro ' + r.status)));
-  return { drive: (j.parentReference && j.parentReference.driveId) || driveId, item: j.id || '', url: j.webUrl || '' };
+  if (!r.ok) throw new Error('a foto não subiu: ' + ((j.error && j.error.message) || ('erro ' + r.status)) + (r.status === 403 ? ' — sem permissão para gravar na biblioteca "' + LISTS_CFG.prefixo + MM_PASTA_FOTOS + '"' : ''));
+  return { drive: (j.parentReference && j.parentReference.driveId) || drv, item: j.id || '', url: j.webUrl || '' };
 }
 // Miniatura/foto grande pelo Graph (link temporário já autorizado)
 async function mmMiniatura(e, grande) {
