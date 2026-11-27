@@ -940,6 +940,79 @@
   @media (max-width:640px){ .mm-maqs{grid-template-columns:1fr} }
   @media (max-width:760px){ .mm-kpis{grid-template-columns:repeat(2,minmax(0,1fr))} .mm-grid2,.mm-grid3,.mm-escolha{grid-template-columns:1fr} .mm-hfoto{width:92px} }
   @media (prefers-reduced-motion: reduce){ .mm-cav .c{transition:none} .mm-badge.prod::before{animation:none} }
+  /* ---- versão celular/tablet (operação) ---- */
+  .op-big.mol{border-color:var(--border) !important}
+  .mmo-row{width:100%;border:0;border-top:1px solid var(--border);background:none;font:inherit;color:inherit;text-align:left}
+  .mmo-row:first-child{border-top:0}
+  .mmo-card{width:100%;font:inherit;text-align:left;color:var(--fg)}
+  .mmo-chev{color:var(--fg-faint);font-size:22px;line-height:1}
+  .mmo-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px}
+  .mmo-tabs::-webkit-scrollbar{display:none}
+  .mmo-tabs button{flex:none;border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:8px 15px;font:inherit;font-size:13.5px;font-weight:500;color:var(--fg-dim);cursor:pointer}
+  .mmo-tabs button[aria-selected="true"]{background:var(--accent-soft);border-color:var(--accent-border);color:var(--accent);font-weight:650}
+  .mmo-pag{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch;margin:0 -16px;overscroll-behavior-x:contain}
+  .mmo-pag::-webkit-scrollbar{display:none}
+  .mmo-pg{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;padding:0 16px;display:flex;flex-direction:column;gap:10px;min-width:0;box-sizing:border-box}
+  .mmo-pgcab{display:flex;flex-direction:column;padding:4px 2px 0}.mmo-pgcab b{font-size:19px;font-weight:650}.mmo-pgcab small{font-size:12.5px;color:var(--fg-dim)}
+  .mmo-dots{display:flex;justify-content:center;gap:6px;margin-top:4px}
+  .mmo-dots i{width:7px;height:7px;border-radius:4px;background:var(--border);transition:width .15s ease}
+  .mmo-dots i.on{background:var(--accent);width:18px}
+  .mmo-mapa{padding:8px;border-radius:12px}
+  .mmo .mm-molde{--d:clamp(24px, calc((100cqw - 16px - var(--nb) * 18px - (var(--nb) - 1) * 26px) / var(--n) - 24px), 58px)}
+  .mmo-leg{font-size:11.5px;gap:12px;margin-bottom:0}
+  #opMolde .op-ttl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  #opMolde .op-sub{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:2px}
+  #opMolde .op-body{padding-right:max(40px, calc(env(safe-area-inset-right,0px) + 36px))}
+  .mmo-histtab{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:6;writing-mode:vertical-rl;background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px 0 0 10px;
+    padding:14px 6px calc(14px) 6px;font:inherit;font-size:12.5px;font-weight:650;letter-spacing:.6px;display:flex;gap:8px;align-items:center;box-shadow:-4px 4px 14px var(--mm-sombra);cursor:pointer;margin-right:env(safe-area-inset-right,0px)}
+  .mmo-histtab b{writing-mode:horizontal-tb;background:rgba(255,255,255,.28);border-radius:999px;padding:1px 6px;font-size:11px}
+  .mmo-gaveta-ov{position:fixed;inset:0;z-index:115;background:var(--mm-ov);display:flex;justify-content:flex-end}
+  .mmo-gaveta-ov[hidden]{display:none}
+  .mmo-gaveta{width:min(440px,90vw);height:100%;background:var(--surface);color:var(--fg);display:flex;flex-direction:column;gap:10px;box-shadow:-10px 0 30px var(--mm-sombra);animation:mmoEntra .2s ease;
+    padding:calc(14px + env(safe-area-inset-top,0px)) max(16px, env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) 16px}
+  @keyframes mmoEntra{from{transform:translateX(40px);opacity:.5}}
+  .mmo-gcab{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.mmo-gcab b{display:block;font-size:16px;font-weight:650}.mmo-gcab small{font-size:12px;color:var(--fg-dim)}
+  .mmo-gaveta .mm-hlist{flex:1;min-height:0}
+  .mmo-gaveta .mm-hfoto{width:96px}
+  .mmo-bt{width:100%;height:48px;border-radius:12px;border:0;font:inherit;font-size:15px;font-weight:650;color:#fff;cursor:pointer}
+  .mmo-bt.red{background:var(--danger)}.mmo-bt.grn{background:var(--ok)}
+  #opApp .mm-ov .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:9px;border:1px solid var(--border);background:var(--surface-2);color:var(--fg);font-weight:600;font-size:14px;padding:0 15px;height:42px;cursor:pointer;text-transform:none;letter-spacing:0;width:auto}
+  #opApp .mm-ov .btn-accent{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  #opApp .mm-ov .btn.mm-red{background:var(--danger);border-color:var(--danger);color:#fff}
+  #opApp .mm-ov .btn.mm-grn{background:var(--ok);border-color:var(--ok);color:#fff}
+  #opApp .mm-ov .btn.mm-prod{background:var(--mm-prod);border-color:var(--mm-prod);color:var(--mm-prod-ink)}
+  #opApp .mm-ov .mm-modal{max-height:calc(100% - 24px)}
+  @media (prefers-reduced-motion: reduce){ .mmo-gaveta{animation:none} .mmo-dots i{transition:none} }
+  .mmo-pdfbt{font-size:12px !important;font-weight:700;letter-spacing:.4px;color:var(--accent) !important;width:auto !important;padding:0 10px}
+  .mmo-pdfarq{display:flex;gap:12px;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;padding:10px 12px}
+  .mmo-pdfarq b{display:block;font-size:13.5px;overflow-wrap:anywhere}.mmo-pdfarq small{font-size:12px;color:var(--fg-dim)}
+  .mmo-pdfic{flex:none;width:42px;height:50px;border-radius:7px;background:var(--danger);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;letter-spacing:.5px}
+  .mmo-bt.acc{background:var(--accent);color:var(--accent-ink)}
+  .mmo-bt.sec{background:var(--surface-2);color:var(--fg);border:1px solid var(--border)}
+  /* menu lateral reorganizado (27/11/2026): "Sistema" recolhido */
+  .nav-sist-toggle{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:22px 10px 2px;padding:8px 12px;border:0;border-top:1px solid var(--border);background:none;
+    font:inherit;font-size:10.5px;text-transform:uppercase;letter-spacing:.9px;color:var(--fg-faint);cursor:pointer;border-radius:0;width:auto;text-align:left}
+  .nav-sist-toggle:hover{color:var(--fg)}
+  .nav-sist-toggle svg{width:14px;height:14px;transition:transform .15s ease}
+  .nav-sist-toggle[aria-expanded="true"]{color:var(--fg-dim)}
+  .nav-sist-toggle[aria-expanded="true"] svg{transform:rotate(90deg)}
+  .nav-sist-toggle:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  .nav-sist{display:flex;flex-direction:column}
+  .nav-sist[hidden]{display:none}
+  @media (prefers-reduced-motion: reduce){ .nav-sist-toggle svg{transition:none} }
+  /* itens cadastrados em tabela (27/11/2026) */
+  .lista-qtd{display:inline-block;margin-left:6px;font-size:10.5px;font-weight:650;color:var(--fg-faint);background:var(--surface-2);border:1px solid var(--border);border-radius:999px;padding:0 7px;letter-spacing:0}
+  .lista-tabwrap{border:1px solid var(--border);border-radius:10px;max-height:264px;overflow:auto;background:var(--surface)}
+  .lista-tab{width:100%;border-collapse:collapse;font-size:12.5px}
+  .lista-tab td{padding:6px 8px;border-top:1px solid var(--border);vertical-align:middle;color:var(--fg)}
+  .lista-tab tr:first-child td{border-top:0}
+  .lista-tab tr:hover td{background:var(--surface-2)}
+  .lista-tab td.n{width:30px;color:var(--fg-faint);font-size:11px;text-align:right;padding-right:4px;font-variant-numeric:tabular-nums}
+  .lista-tab td.x{width:1%;white-space:nowrap;text-align:right;padding:3px 6px}
+  .lista-rem{background:transparent;border:1px solid transparent;color:var(--fg-faint);cursor:pointer;font:inherit;font-size:14px;line-height:1;padding:3px 7px;border-radius:6px}
+  .lista-rem:hover{color:var(--danger);background:var(--danger-bg)}
+  .lista-rem.confirmando{color:var(--danger);border-color:var(--danger);background:var(--danger-bg);font-size:11.5px;font-weight:650}
+  .lista-rem:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 </style>
 </head>
 <body>
@@ -962,7 +1035,8 @@
       <div class="op-brandrow"><img class="a-logo" src="sq-icone-192.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><svg class="a-logo a-logo-svg" viewBox="0 0 40 30" aria-hidden="true"><rect width="40" height="30" rx="7" fill="#c8202f"/><text x="20" y="20.5" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="14" fill="#fff">BP</text></svg><div><b>Controle de Processo</b><small>Registro do check list e últimos registros</small></div></div>
       <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h10"/><path d="M12 7h6l4 5-4 5h-6z"/><path d="M5 9v6"/></svg></span><span class="op-bt"><b>Injetora</b><span>Registro do check list e últimos registros das injetoras</span></span><span class="op-chev">›</span></button>
       <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4v3h-4z"/><path d="M9 5h6l1 4v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9z"/><path d="M8 13h8"/></svg></span><span class="op-bt"><b>Sopro</b><span>Registro do check list e últimos registros das sopradoras</span></span><span class="op-chev">›</span></button>
-      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 22:14</span></div>
+      <button type="button" class="op-big mol" onclick="mmoAbrirLista()"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="2"/><circle cx="15.5" cy="8.5" r="2"/><circle cx="8.5" cy="15.5" r="2"/><path d="m13.8 13.8 3.4 3.4M17.2 13.8l-3.4 3.4"/></svg></span><span class="op-bt"><b>Moldes</b><span>Mapa do molde por máquina e cavidades isoladas</span></span><span class="op-chev">›</span></button>
+      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 22:38</span></div>
     </section>
     <section id="opDash" hidden>
       <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Últimos 8 registros de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
@@ -973,6 +1047,17 @@
         <p class="note" style="margin:0">Toque numa bolinha para ver o que foi registrado naquele horário.</p>
       </div>
       <div class="op-sheetwrap" id="opSheetWrap" hidden onclick="if(event.target===this)opFecharSheet()"><div class="op-sheet" id="opSheet"></div></div>
+    </section>
+    <section id="opMoldes" hidden>
+      <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl">Moldes</div><div class="op-sub">Mapa do molde por máquina</div></div><button type="button" class="op-refresh" onclick="mmoAbrirLista(true)" aria-label="Atualizar">↻</button></div>
+      <div class="op-body mmo" id="mmoLista"></div>
+    </section>
+    <section id="opMolde" hidden>
+      <div class="op-top"><button type="button" class="op-back" onclick="mmoAbrirLista()" aria-label="Voltar">‹</button><div style="min-width:0;flex:1"><div class="op-ttl" id="mmoTitulo"></div><div class="op-sub" id="mmoSub"></div></div><button type="button" class="op-refresh mmo-pdfbt" onclick="mmoPdf()" aria-label="Exportar PDF do mapa">PDF</button><button type="button" class="op-refresh" onclick="mmoAtualizarMolde()" aria-label="Atualizar">↻</button></div>
+      <div class="op-body mmo" id="mmoMolde"></div>
+      <button type="button" class="mmo-histtab" id="mmoHistTab" aria-expanded="false" aria-controls="mmoGaveta" onclick="mmoHistorico(true)"><span>Histórico</span><b id="mmoHistN">0</b></button>
+      <div class="mmo-gaveta-ov" id="mmoGaveta" hidden onclick="if(event.target===this)mmoHistorico(false)"><aside class="mmo-gaveta" aria-label="Histórico do molde"><div class="mmo-gcab"><div><b>Histórico do molde</b><small id="mmoHistCab"></small></div><button type="button" class="op-back" onclick="mmoHistorico(false)" aria-label="Fechar">✕</button></div><div class="mm-hleg"><b>29(29)</b> = cavidade(castanha)</div><div class="mm-hlist" id="mmoHlist"></div></aside></div>
+      <div class="op-sheetwrap" id="mmoSheetWrap" hidden onclick="if(event.target===this)mmoFecharSheet()"><div class="op-sheet" id="mmoSheet"></div></div>
     </section>
   </div>
 
@@ -985,33 +1070,36 @@
       <div class="a-brand"><img class="a-logo" src="sq-icone-192.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><svg class="a-logo a-logo-svg" viewBox="0 0 40 30" aria-hidden="true"><rect width="40" height="30" rx="7" fill="#c8202f"/><text x="20" y="20.5" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="14" fill="#fff">BP</text></svg><div><b>Controle de Processo</b><small>BlowPet · Qualidade</small></div></div>
       <a class="portal-volta hidden" id="btnPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a>
       <nav class="a-nav">
-        <div class="nav-section-label">Injeção</div>
+        <div class="nav-section-label">Molde - Injeção</div>
+        <button class="nav-item" data-page="mapaMolde" onclick="mudarPagina('mapaMolde')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="2"/><circle cx="15.5" cy="8.5" r="2"/><circle cx="8.5" cy="15.5" r="2"/><path d="m13.8 13.8 3.4 3.4M17.2 13.8l-3.4 3.4"/></svg><span>Mapa do Molde</span></button>
+        <div class="nav-section-label">Check List - Injeção</div>
         <button class="nav-item active" data-page="dashboard" onclick="mudarPagina('dashboard')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>Dashboard</span></button>
         <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('injecao')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg><span>Registro do Check List</span></button>
         <button class="nav-item" data-page="dadosCadastrados" onclick="mudarPagina('dadosCadastrados')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg><span>Dados Cadastrados</span></button>
-        <button class="nav-item" data-page="mapaMolde" onclick="mudarPagina('mapaMolde')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="2"/><circle cx="15.5" cy="8.5" r="2"/><circle cx="8.5" cy="15.5" r="2"/><path d="m13.8 13.8 3.4 3.4M17.2 13.8l-3.4 3.4"/></svg><span>Mapa do Molde</span></button>
-        <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Carregar Dados</span></button>
-        <button class="nav-item" data-page="criterios" onclick="mudarPagina('criterios')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3"/><path d="M14 2v4M8 10v4M16 18v4"/></svg><span>Critérios</span></button>
-        <button class="nav-item" data-page="iqr" onclick="mudarPagina('iqr')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>IQR / Intervalo Interquartil</span></button>
-        <div class="nav-section-label">Sopro</div>
+        <div class="nav-section-label">Check List - Sopro</div>
         <button class="nav-item" data-page="dashboardSopro" onclick="mudarPagina('dashboardSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>Dashboard</span></button>
         <button class="nav-item novo" onclick="pedirConfirmacaoLancamento('sopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg><span>Registro do Check List</span></button>
         <button class="nav-item" data-page="dadosCadastradosSopro" onclick="mudarPagina('dadosCadastradosSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg><span>Dados Cadastrados</span></button>
-        <button class="nav-item" data-page="carregarDadosSopro" onclick="mudarPagina('carregarDadosSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Carregar Dados</span></button>
-        <button class="nav-item" data-page="criteriosSopro" onclick="mudarPagina('criteriosSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3"/><path d="M14 2v4M8 10v4M16 18v4"/></svg><span>Critérios</span></button>
-        <div class="nav-section-label">Sistema</div>
-        <button class="nav-item" data-page="configuracoes" onclick="mudarPagina('configuracoes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg><span>Configurações</span></button>
-        <button class="nav-item" data-page="listasTeste" onclick="mudarPagina('listasTeste')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>Banco de dados</span></button>
+        <div class="nav-section-label">Analítico</div>
+        <button class="nav-item" data-page="iqr" onclick="mudarPagina('iqr')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg><span>IQR / Intervalo Interquartil</span></button>
+        <button type="button" class="nav-sist-toggle" id="navSistToggle" aria-expanded="false" aria-controls="navSistema" onclick="navSistemaAbrir()"><span>Sistema</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></button>
+        <div class="nav-sist" id="navSistema" hidden>
+          <button class="nav-item" data-page="configuracoes" onclick="mudarPagina('configuracoes')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg><span>Configurações</span></button>
+          <button class="nav-item" data-page="carregarDados" onclick="mudarPagina('carregarDados')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Carregar Dados - Injetora</span></button>
+          <button class="nav-item" data-page="criterios" onclick="mudarPagina('criterios')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3"/><path d="M14 2v4M8 10v4M16 18v4"/></svg><span>Critérios - Injetoras</span></button>
+          <button class="nav-item" data-page="carregarDadosSopro" onclick="mudarPagina('carregarDadosSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Carregar Dados - Sopro</span></button>
+          <button class="nav-item" data-page="criteriosSopro" onclick="mudarPagina('criteriosSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3"/><path d="M14 2v4M8 10v4M16 18v4"/></svg><span>Critérios - Sopro</span></button>
+        </div>
       </nav>
       <button type="button" class="a-opbtn" id="btnVersaoOperacao" onclick="usarVersaoOperacao()" hidden>Voltar à versão da operação</button>
-      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 22:14</b></span></div>
+      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 22:38</b></span></div>
       <div class="a-user"><span class="av" id="userAv">·</span><div class="who"><b id="userNome">—</b><small id="userEmail"></small></div><button type="button" class="a-ic-btn" title="Sair" aria-label="Sair" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button></div>
     </aside>
 
     <div class="a-main">
     <header class="a-top">
       <button type="button" class="a-ic-btn a-burger" onclick="alternarMenuMobile()" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      <div class="a-crumb" id="aCrumb">Injeção / <b>Dashboard</b></div>
+      <div class="a-crumb" id="aCrumb">Check List - Injeção / <b>Dashboard</b></div>
       <span class="conn-status"><span class="status-dot" id="statusDot"></span><span id="statusText">conectando…</span></span>
       <div class="a-acts">
         <button class="btn" id="btnCarregarDash" data-acts="dashboard" onclick="carregarRegistrosInjecao()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg><span class="bt">Carregar registros</span></button>
@@ -1121,7 +1209,7 @@
             <div class="lista-chips" id="listaChips_operadores"></div>
           </div>
         </div>
-        <p class="note" style="margin:10px 0 0;">Essas 5 listas são só da Injeção. O Sopro tem seu próprio cadastro (Máquinas, Gramaturas, Cores, Frascos e Operadores), separado daqui — veja em <strong>Sopro → Critérios</strong>.</p>
+        <p class="note" style="margin:10px 0 0;">Essas 5 listas são só da Injeção. O Sopro tem seu próprio cadastro (Máquinas, Gramaturas, Cores, Frascos e Operadores), separado daqui — veja em <strong>Sistema → Critérios - Sopro</strong>.</p>
       </div>
 
       <div class="card" style="margin-bottom:16px;">
@@ -1642,7 +1730,7 @@
             <div class="field"><label>Frasco</label><select id="lmFrascoS" onchange="lmRenderSopro()"></select></div>
             <div class="field"><label>Lançado em</label><input id="lmAgoraS" readonly></div>
           </div>
-          <p class="note" style="margin:-6px 0 14px;">Responsável e Frasco vêm das listas cadastradas em Sopro → Critérios → Listas de apoio (separadas das listas da Injeção). Gramatura e Cor aparecem logo abaixo, junto com os parâmetros. Data e hora são preenchidas automaticamente no momento do cadastro.</p>
+          <p class="note" style="margin:-6px 0 14px;">Responsável e Frasco vêm das listas cadastradas em Sistema → Critérios - Sopro (separadas das listas da Injeção). Gramatura e Cor aparecem logo abaixo, junto com os parâmetros. Data e hora são preenchidas automaticamente no momento do cadastro.</p>
 
           <div class="legend">
             <span class="ok"><i></i>Dentro do limite</span>
@@ -3088,11 +3176,17 @@ var ICONE_SOL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 
 // Faixa superior: "Grupo / Página" e as ações pequenas que fazem sentido em cada tela.
 var CRUMB_PAGINAS = {
-  dashboard:['Injeção','Dashboard'], dadosCadastrados:['Injeção','Dados Cadastrados'], criterios:['Injeção','Critérios'],
-  carregarDados:['Injeção','Carregar Dados'], iqr:['Injeção','IQR / Intervalo Interquartil'],
-  dashboardSopro:['Sopro','Dashboard'], dadosCadastradosSopro:['Sopro','Dados Cadastrados'], criteriosSopro:['Sopro','Critérios'],
-  carregarDadosSopro:['Sopro','Carregar Dados'], configuracoes:['Sistema','Configurações'], listasTeste:['Sistema','Banco de dados'], mapaMolde:['Injeção','Mapa do Molde']
+  dashboard:['Check List - Injeção','Dashboard'], dadosCadastrados:['Check List - Injeção','Dados Cadastrados'], criterios:['Sistema','Critérios - Injetoras'],
+  carregarDados:['Sistema','Carregar Dados - Injetora'], iqr:['Analítico','IQR / Intervalo Interquartil'],
+  dashboardSopro:['Check List - Sopro','Dashboard'], dadosCadastradosSopro:['Check List - Sopro','Dados Cadastrados'], criteriosSopro:['Sistema','Critérios - Sopro'],
+  carregarDadosSopro:['Sistema','Carregar Dados - Sopro'], configuracoes:['Sistema','Configurações'], listasTeste:['Sistema','Banco de Dados'], mapaMolde:['Molde - Injeção','Mapa do Molde']
 };
+// "Sistema" fica recolhido; abre ao clicar ou quando a página aberta é dele.
+function navSistemaAbrir(abrir){
+  var t = document.getElementById('navSistToggle'), b = document.getElementById('navSistema'); if (!t || !b) return;
+  var ab = (abrir === undefined) ? b.hidden : !!abrir;
+  b.hidden = !ab; t.setAttribute('aria-expanded', ab ? 'true' : 'false');
+}
 function atualizarFaixaSuperior(pagina){
   var c = CRUMB_PAGINAS[pagina] || ['', ''];
   var el = document.getElementById('aCrumb');
@@ -3126,6 +3220,7 @@ function mudarPagina(pagina){
   if (pagina === 'listasTeste') lstRenderStatus();
   if (pagina === 'mapaMolde') mmAbrirPagina();
   atualizarFaixaSuperior(pagina);
+  if (document.querySelector('#navSistema [data-page="' + pagina + '"]')) navSistemaAbrir(true);
   fecharMenuMobile();
   window.scrollTo(0, 0);
 }
@@ -4720,6 +4815,8 @@ function opIniciar(){
 function opIr(tela){
   document.getElementById('opHome').hidden = tela !== 'home';
   document.getElementById('opDash').hidden = tela !== 'dash';
+  ['moldes', 'molde'].forEach(function(t){ var el = document.getElementById(t === 'moldes' ? 'opMoldes' : 'opMolde'); if (el) el.hidden = tela !== t; });
+  if (tela !== 'moldes' && tela !== 'molde' && typeof MM !== 'undefined') { MM.op = false; if (typeof mmoFecharSheet === 'function') mmoFecharSheet(); }
   opFecharSheet();
   document.getElementById('opApp').scrollTop = 0;
 }
@@ -5797,10 +5894,13 @@ function renderListas(){
   Object.keys(LISTA_CHAVE_PARA_TIPO).forEach(function(chave){
     var container = document.getElementById('listaChips_'+chave);
     if (!container) return;
-    var itens = listas[chave].slice().sort(function(a,b){ return a.valor.localeCompare(b.valor, 'pt-BR'); });
-    container.innerHTML = itens.length ? itens.map(function(item){
-      return '<span class="lista-chip">'+escHtml(item.valor)+'<button type="button" onclick="removerItemLista(\''+chave+'\','+item._index+')" title="Remover">×</button></span>';
-    }).join('') : '<span class="note" style="margin:0;">Nenhum(a) cadastrado(a) ainda.</span>';
+    var itens = listas[chave].slice().sort(function(a,b){ return String(a.valor).localeCompare(String(b.valor), 'pt-BR', { numeric:true, sensitivity:'base' }); });
+    var h4 = container.parentNode && container.parentNode.querySelector('h4');
+    if (h4) { if (!h4.dataset.titulo) h4.dataset.titulo = h4.textContent; h4.innerHTML = escHtml(h4.dataset.titulo) + ' <span class="lista-qtd">' + itens.length + '</span>'; }
+    container.className = 'lista-tabwrap';
+    container.innerHTML = itens.length ? '<table class="lista-tab"><tbody>' + itens.map(function(item, k){
+      return '<tr><td class="n">'+(k+1)+'</td><td>'+escHtml(item.valor)+'</td><td class="x"><button type="button" class="lista-rem" data-chave="'+chave+'" data-idx="'+item._index+'" onclick="confirmarRemoverItemLista(this)" title="Remover" aria-label="Remover '+escHtml(item.valor)+'">×</button></td></tr>';
+    }).join('') + '</tbody></table>' : '<p class="note" style="margin:6px 0 0;">Nenhum(a) cadastrado(a) ainda.</p>';
   });
 }
 
@@ -5834,6 +5934,13 @@ async function adicionarItemLista(chave){
   btn.disabled = false;
 }
 
+// Remover pede um 2º clique ("Remover?") para evitar exclusão sem querer.
+function confirmarRemoverItemLista(btn){
+  if (btn.classList.contains('confirmando')) { btn.disabled = true; removerItemLista(btn.getAttribute('data-chave'), Number(btn.getAttribute('data-idx'))); return; }
+  document.querySelectorAll('.lista-rem.confirmando').forEach(function(b){ b.classList.remove('confirmando'); b.textContent = '×'; });
+  btn.classList.add('confirmando'); btn.textContent = 'Remover?';
+  clearTimeout(btn._t); btn._t = setTimeout(function(){ btn.classList.remove('confirmando'); btn.textContent = '×'; }, 3500);
+}
 async function removerItemLista(chave, idx){
   try {
     var token = await getToken();
@@ -7123,8 +7230,8 @@ const MM_SVG = {
 function mmEl(id) { return document.getElementById(id); }
 function mmCrumb(m) {
   const el = mmEl('aCrumb'); if (!el) return;
-  if (!m) { el.innerHTML = 'Injeção / <b>Mapa do Molde</b>'; return; }
-  el.innerHTML = 'Injeção / <a href="#" id="mmCrumbVolta" style="color:inherit">Mapa do Molde</a> / <b>' + mmEsc(mmNomeMolde(m)) + '</b>';
+  if (!m) { el.innerHTML = 'Molde - Injeção / <b>Mapa do Molde</b>'; return; }
+  el.innerHTML = 'Molde - Injeção / <a href="#" id="mmCrumbVolta" style="color:inherit">Mapa do Molde</a> / <b>' + mmEsc(mmNomeMolde(m)) + '</b>';
   mmEl('mmCrumbVolta').onclick = function(e) { e.preventDefault(); mmTelaLista(); };
 }
 async function mmAbrirPagina() {
@@ -7139,6 +7246,7 @@ function mmPendentesImport() {
   return MM_IMPORT.filter(function(x) { return !ja['planilha: ' + x.chave]; });
 }
 async function mmTelaLista(recarregar) {
+  if (MM.op) return mmoAbrirLista(recarregar);
   MM.tela = 'lista'; MM.atual = null; MM.sel = null; mmCrumb(null);
   if (recarregar || !MM.carregado) {
     mmCarregando('Carregando os moldes…');
@@ -7239,6 +7347,7 @@ async function mmTelaMolde(id, manterSel) {
   window.scrollTo(0, 0);
 }
 function mmRenderMolde() {
+  if (MM.op) { mmoRenderMolde(); return; }   // versão celular/tablet
   const m = MM.atual, c = mmContagem(m), evs = mmEventosDo(m);
   mmCrumb(m);
   const kp = '<div class="mm-kpis"><div class="mm-kpi"><small>Cavidades ativas</small><b style="color:var(--ok)">' + c.at + '</b> <small style="display:inline">de ' + c.total + '</small></div><div class="mm-kpi"><small>Isoladas agora</small><b style="color:var(--danger)">' + c.iso + '</b></div><div class="mm-kpi"><small>Capacidade</small><b>' + (c.total ? Math.round(c.at / c.total * 100) : 0) + '%</b></div><div class="mm-kpi"><small>Registros no histórico</small><b>' + evs.length + '</b></div></div>';
@@ -7314,7 +7423,7 @@ function mmCarregarMiniaturas(raiz) {
 async function mmVerFoto(evId) {
   const e = MM.hist.find(function(x) { return x.id === evId; }); if (!e) return;
   const lb = document.createElement('div'); lb.className = 'mm-lb'; lb.innerHTML = '<span>Carregando a foto…</span>';
-  lb.onclick = function() { lb.remove(); }; (document.getElementById('app') || document.body).appendChild(lb);
+  lb.onclick = function() { lb.remove(); }; mmHost().appendChild(lb);
   const u = await mmMiniatura(e, true);
   if (!lb.isConnected) return;
   lb.innerHTML = u ? '<img src="' + mmEsc(u) + '" alt="Foto do registro">' : '<span>Não foi possível abrir a foto aqui. ' + (e.fotoUrl ? '<a style="color:#fff" target="_blank" rel="noopener" href="' + mmEsc(e.fotoUrl) + '">Abrir no OneDrive</a>' : '') + '</span>';
@@ -7324,7 +7433,7 @@ async function mmVerFoto(evId) {
 function mmModal(html, larga) {
   const ov = document.createElement('div'); ov.className = 'mm-ov';
   ov.innerHTML = '<form class="mm-modal' + (larga ? ' larga' : '') + '" novalidate>' + html + '</form>';
-  (document.getElementById('app') || document.body).appendChild(ov);
+  mmHost().appendChild(ov);
   const f = ov.querySelector('form');
   const fechar = function() { ov.remove(); document.removeEventListener('keydown', esc); };
   const esc = function(e) { const ovs = document.querySelectorAll('.mm-ov'); if (e.key === 'Escape' && !f._salvando && ovs[ovs.length - 1] === ov) fechar(); };
@@ -7689,7 +7798,7 @@ const MM_ORDENS = [
 function mmNovoMolde() {
   const W = { passo: 1, maq: '', gram: '', cam: '', base: 'zero', copia: '', linhas: '6, 6', cols: '2, 2', ordem: 'linha-dir', inicio: 1, des: null, origemTxt: '', removidos: {} };
   const ov = document.createElement('div'); ov.className = 'mm-ov';
-  ov.innerHTML = '<form class="mm-modal larga" novalidate></form>'; (document.getElementById('app') || document.body).appendChild(ov);
+  ov.innerHTML = '<form class="mm-modal larga" novalidate></form>'; mmHost().appendChild(ov);
   const f = ov.querySelector('form');
   const fechar = function() { if (!f._salvando) { ov.remove(); document.removeEventListener('keydown', esc); } };
   const esc = function(e) { const ovs = document.querySelectorAll('.mm-ov'); if (e.key === 'Escape' && ovs[ovs.length - 1] === ov) fechar(); };
@@ -7911,17 +8020,21 @@ function mmUsarFonte(doc, fontes) {
   doc.addFileToVFS('Inter-Bold.ttf', fontes.bold); doc.addFont('Inter-Bold.ttf', 'Inter', 'bold');
   return 'Inter';
 }
-async function mmGerarPdf(m) {
-  let JsPDF;
-  try { JsPDF = await carregarJsPDF(); } catch (e) { mostrarToast('Não foi possível gerar o PDF: ' + e.message, true); return; }
+async function mmCriarPdf(m) {
+  const JsPDF = await carregarJsPDF();
   const doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
   mmDesenharPdf(doc, m, await mmCarregarFontes());
   const nome = ('Mapa_do_Molde_' + m.maquina + '_' + m.gramatura + 'g').replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, '_') + '.pdf';
+  return { doc: doc, nome: nome, blob: doc.output('blob') };
+}
+async function mmGerarPdf(m) {
+  let r;
+  try { r = await mmCriarPdf(m); } catch (e) { mostrarToast('Não foi possível gerar o PDF: ' + e.message, true); return; }
   try {
-    const blob = doc.output('blob'), arq = new File([blob], nome, { type: 'application/pdf' });
-    if (navigator.canShare && navigator.canShare({ files: [arq] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) { await navigator.share({ files: [arq], title: nome }); return; }
+    const arq = new File([r.blob], r.nome, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [arq] }) && /Android|iPhone|iPad/i.test(navigator.userAgent)) { await navigator.share({ files: [arq], title: r.nome }); return; }
   } catch (e) { if (e && e.name === 'AbortError') return; }
-  doc.save(nome);
+  r.doc.save(r.nome);
 }
 function mmDesenharPdf(doc, m, fontes) {
   const FT = mmUsarFonte(doc, fontes);
@@ -8061,6 +8174,154 @@ function mmDesenharPdf(doc, m, fontes) {
       doc.setFont(FT, 'normal'); doc.setFontSize(7.5); cor('dim'); doc.text('Conferido por', RX, H - MG - 6); doc.text('Data', RX + RW / 2 + 3, H - MG - 6); }
     doc.setFontSize(6.8); cor('faint'); doc.text('Mapa do Molde · Controle de Processo BlowPet', RX, H - MG - 0.5); doc.text('Página ' + p + ' de ' + np, RX + RW, H - MG - 0.5, { align: 'right' });
   }
+}
+
+/* =============================================================================
+   MAPA DO MOLDE no celular/tablet (versão da operação) — 27/11/2026
+   Início ganha o cartão "Moldes". Lista: uma máquina por tela, deslizando para o lado troca de
+   máquina (com abas em cima). Toque no molde: o mapa em tela cheia; a aba "Histórico" recuada
+   na lateral direita abre o histórico numa gaveta. Toque numa cavidade: detalhes + isolar/liberar.
+   ============================================================================= */
+const MMO = { pag: 0, rolando: null };
+function mmHost() { return document.body.classList.contains('modo-op') ? (document.getElementById('opApp') || document.body) : (document.getElementById('app') || document.body); }
+function mmoAbas() {
+  const abas = MM_MAQUINAS.slice();
+  if (MM.moldes.some(function(m) { return !mmMaquinaPadrao(m.maquina); })) abas.push('Sem máquina');
+  return abas;
+}
+async function mmoAbrirLista(recarregar) {
+  MM.op = true; MM.tela = 'lista'; MM.atual = null; MM.sel = null;
+  opIr('moldes');
+  const corpo = mmEl('mmoLista');
+  if (recarregar || !MM.carregado) {
+    corpo.innerHTML = '<div class="mm-load"><div class="spinner"></div> Carregando os moldes…</div>';
+    try { await mmCarregar(true); }
+    catch (e) { corpo.innerHTML = '<div class="mm-vazio-msg"><b>Não foi possível ler os moldes.</b><br>' + mmEsc(e.message || e) + '<div style="margin-top:10px"><button type="button" class="op-cta" style="font-size:14px;padding:10px" onclick="mmoAbrirLista(true)">Tentar de novo</button></div></div>'; return; }
+    if (!MM.op || MM.tela !== 'lista') return;
+  }
+  mmoRenderLista();
+}
+function mmoRenderLista() {
+  const abas = mmoAbas(), corpo = mmEl('mmoLista');
+  if (MMO.pag >= abas.length) MMO.pag = 0;
+  const porGram = function(a, b) { return String(a.gramatura).localeCompare(String(b.gramatura), 'pt-BR', { numeric: true }); };
+  const linha = function(m) {
+    const c = mmContagem(m);
+    return '<button type="button" class="mm-row mmo-row" data-mo="' + m.id + '"><span class="mm-row-tx"><b>' + mmEsc(q0(m)) + '</b><small>' + c.total + ' cav. · ' +
+      (c.iso ? '<span style="color:var(--danger)">' + c.iso + ' isolada' + (c.iso > 1 ? 's' : '') + '</span>' : 'todas ativas') + '</small></span><span class="mmo-chev">›</span></button>';
+  };
+  const q0 = function(m) { return mmMaquinaPadrao(m.maquina) ? m.gramatura + ' g' : mmNomeMolde(m); };
+  const pagina = function(q) {
+    const ms = (q === 'Sem máquina' ? MM.moldes.filter(function(m) { return !mmMaquinaPadrao(m.maquina); }) : MM.moldes.filter(function(m) { return mmMaquinaPadrao(m.maquina) === q; })).sort(porGram);
+    const mp = q === 'Sem máquina' ? null : mmProducaoDa(q), resto = ms.filter(function(m) { return !mp || m.id !== mp.id; });
+    const iso = ms.reduce(function(s, m) { return s + mmContagem(m).iso; }, 0);
+    let h = '<section class="mmo-pg" aria-label="' + mmEsc(q) + '"><div class="mmo-pgcab"><b>' + mmEsc(q) + '</b><small>' + ms.length + ' molde' + (ms.length === 1 ? '' : 's') + (iso ? ' · <span style="color:var(--danger)">' + iso + ' isolada' + (iso > 1 ? 's' : '') + '</span>' : '') + '</small></div>';
+    if (!ms.length) return h + '<div class="mm-col-vazia">Nenhum molde nesta máquina</div></section>';
+    if (mp) {
+      const c = mmContagem(mp), pct = c.total ? Math.round(c.at / c.total * 100) : 0;
+      h += '<button type="button" class="mm-card mm-prodcard mmo-card" data-mo="' + mp.id + '"><div class="t"><div><b>' + mmEsc(mp.gramatura + ' g') + '</b><br><small>' + mmEsc(c.total + ' cavidades' + (mp.camara ? ' · ' + mp.camara : '')) +
+        (c.iso ? ' · <span style="color:var(--danger)">' + c.iso + ' isolada' + (c.iso > 1 ? 's' : '') + '</span>' : '') + '</small></div><span class="mm-badge prod">Em produção</span></div>' +
+        (mp.prodDesde ? '<span class="mm-desde">desde ' + mmEsc(mp.prodDesde) + '</span>' : '') +
+        '<div class="mm-bar"><i style="width:' + pct + '%"></i></div><div class="mm-rod"><span class="n"><span><b>' + c.at + '</b> de ' + c.total + ' ativas · ' + pct + '%</span></span><span class="mmo-chev">›</span></div></button>';
+    }
+    if (resto.length) h += '<div class="mm-sep">' + (mp ? 'Fora de produção' : (q === 'Sem máquina' ? 'Máquina a definir (na versão completa)' : 'Nenhum molde em produção')) + '</div><div class="mm-lista">' + resto.map(linha).join('') + '</div>';
+    return h + '</section>';
+  };
+  corpo.innerHTML = '<div class="mmo-tabs" role="tablist" aria-label="Máquinas">' + abas.map(function(q, i) { return '<button type="button" role="tab" data-pg="' + i + '" aria-selected="' + (i === MMO.pag) + '">' + mmEsc(q) + '</button>'; }).join('') + '</div>' +
+    '<div class="mmo-pag" id="mmoPag">' + abas.map(pagina).join('') + '</div>' +
+    '<div class="mmo-dots" aria-hidden="true">' + abas.map(function(q, i) { return '<i class="' + (i === MMO.pag ? 'on' : '') + '"></i>'; }).join('') + '</div>' +
+    '<p class="note" style="margin:6px 0 0;text-align:center">Deslize para o lado para trocar de máquina. Toque no molde para abrir o mapa.</p>';
+  const pag = mmEl('mmoPag');
+  pag.scrollLeft = MMO.pag * pag.clientWidth;
+  const marcar = function(i) {
+    MMO.pag = i;
+    corpo.querySelectorAll('.mmo-tabs [data-pg]').forEach(function(b) { b.setAttribute('aria-selected', String(+b.getAttribute('data-pg') === i)); });
+    corpo.querySelectorAll('.mmo-dots i').forEach(function(d, k) { d.classList.toggle('on', k === i); });
+    const ab = corpo.querySelector('.mmo-tabs [data-pg="' + i + '"]'); if (ab && ab.scrollIntoView) ab.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  };
+  pag.addEventListener('scroll', function() { if (MMO.rolando) cancelAnimationFrame(MMO.rolando); MMO.rolando = requestAnimationFrame(function() { const i = Math.round(pag.scrollLeft / Math.max(1, pag.clientWidth)); if (i !== MMO.pag) marcar(i); }); });
+  corpo.querySelector('.mmo-tabs').addEventListener('click', function(e) { const b = e.target.closest('[data-pg]'); if (!b) return; const i = +b.getAttribute('data-pg'); marcar(i); pag.scrollTo({ left: i * pag.clientWidth, behavior: 'smooth' }); });
+  pag.addEventListener('click', function(e) { const b = e.target.closest('[data-mo]'); if (b) mmoAbrirMolde(Number(b.getAttribute('data-mo'))); });
+}
+
+/* ---- molde em tela cheia ---- */
+function mmoAbrirMolde(id) {
+  const m = MM.moldes.find(function(x) { return x.id === id; }); if (!m) return;
+  MM.op = true; MM.tela = 'molde'; MM.atual = m; MM.sel = null;
+  opIr('molde'); mmoLigar(); mmoHistorico(false);
+  mmoRenderMolde();
+}
+function mmoRenderMolde() {
+  const m = MM.atual; if (!m) return;
+  const c = mmContagem(m), evs = mmEventosDo(m);
+  mmEl('mmoTitulo').textContent = mmNomeMolde(m);
+  mmEl('mmoSub').innerHTML = (m.producao ? '<span class="mm-badge prod">Em produção</span> ' : '') + '<b style="color:var(--ok)">' + c.at + '</b> de ' + c.total + ' ativas' + (c.iso ? ' · <b style="color:var(--danger)">' + c.iso + '</b> isolada' + (c.iso > 1 ? 's' : '') : '');
+  const corpo = mmEl('mmoMolde');
+  corpo.innerHTML = '<div class="mm-leg mmo-leg"><span><i class="mini"></i>Ativa</span><span><i class="mini x"></i>Isolada</span><span>dentro = cavidade · ao lado = castanha</span></div>' +
+    '<div class="mm-mapa mmo-mapa">' + mmHtmlMapa(m, { st: c.st, sel: MM.sel }) + '</div>' +
+    '<p class="note" style="margin:8px 0 0;text-align:center">Toque numa cavidade para ver os detalhes, isolar ou liberar.</p>';
+  mmEl('mmoHistN').textContent = evs.length;
+  corpo.querySelector('.mmo-mapa').addEventListener('click', function(e) { const b = e.target.closest('.mm-cav'); if (b) { MM.sel = b.getAttribute('data-l'); mmoRenderMolde(); mmoCavidade(); } });
+  if (!mmEl('mmoGaveta').hidden) mmoRenderHistorico();
+}
+function mmoCavidade() {
+  const m = MM.atual, L = MM.sel ? mmLugar(m, MM.sel) : null; if (!L) return;
+  const ult = mmSituacao(m)[L.id] || null, iso = !!(ult && ult.tipo === 'isolada');
+  const w = mmEl('mmoSheetWrap'), sh = mmEl('mmoSheet');
+  sh.innerHTML = '<div class="op-sheethead"><div><h3>' + mmEsc(mmNomeLugar(L)) + '</h3><div style="margin-top:4px">' + (iso ? '<span class="mm-badge bad">isolada</span>' : '<span class="mm-badge ok">ativa</span>') + '</div></div><button type="button" class="op-back" aria-label="Fechar" id="mmoSheetX">✕</button></div>' +
+    '<div class="op-sheetbody"><div class="mm-sel-ult">' + (ult ? (ult.tipo === 'isolada' ? 'Isolada' : 'Liberada') + ' em ' + mmEsc((ult.data || 'data não informada') + (ult.hora ? ' ' + ult.hora : '')) + (ult.resp ? ' por ' + mmEsc(ult.resp) : '') + ' — ' + mmEsc(ult.desc) : 'Sem isolamentos registrados nesta cavidade.') + '</div>' +
+    '<button type="button" class="mmo-bt ' + (iso ? 'grn' : 'red') + '" id="mmoAcao">' + (iso ? 'Liberar cavidade' : 'Isolar cavidade') + '</button></div>';
+  w.hidden = false;
+  mmEl('mmoSheetX').onclick = mmoFecharSheet;
+  mmEl('mmoAcao').onclick = function() { mmoFecharSheet(); mmAbrirForm(iso ? 'liberada' : 'isolada', L); };
+}
+function mmoFecharSheet() { const w = mmEl('mmoSheetWrap'); if (w) w.hidden = true; }
+function mmoHistorico(abrir) {
+  const g = mmEl('mmoGaveta'), t = mmEl('mmoHistTab');
+  g.hidden = !abrir; t.setAttribute('aria-expanded', String(!!abrir));
+  if (abrir) mmoRenderHistorico();
+}
+function mmoRenderHistorico() {
+  const m = MM.atual; if (!m) return;
+  const evs = mmEventosDo(m), lst = mmEl('mmoHlist');
+  mmEl('mmoHistCab').textContent = evs.length + ' registro' + (evs.length === 1 ? '' : 's') + ' · mais recentes em cima';
+  lst.innerHTML = mmHtmlHistorico(evs, m);
+  mmCarregarMiniaturas(lst);
+}
+function mmoLigar() {
+  if (mmoLigar.ok) return; mmoLigar.ok = true;
+  mmEl('mmoHlist').addEventListener('click', function(e) {
+    const ad = e.target.closest('[data-adm]');
+    if (ad) { const ids = ad.getAttribute('data-ids').split(',').map(Number); if (ad.getAttribute('data-adm') === 'data') mmAdmData(ids); else mmAdmExcluir(ids); return; }
+    const f = e.target.closest('.mm-hfoto'); if (f) mmVerFoto(Number(f.getAttribute('data-ev')));
+  });
+}
+async function mmoAtualizarMolde() {
+  try { await mmCarregar(true); } catch (e) { mostrarToast('Não foi possível atualizar: ' + e.message, true); return; }
+  if (MM.atual) MM.atual = MM.moldes.find(function(x) { return x.id === MM.atual.id; }) || MM.atual;
+  mmoRenderMolde();
+}
+
+/* ---- PDF no celular: gera e abre as opções (compartilhar: WhatsApp, e-mail, copiar…; ou abrir/baixar) ---- */
+async function mmoPdf() {
+  const m = MM.atual; if (!m) return;
+  const w = mmEl('mmoSheetWrap'), sh = mmEl('mmoSheet');
+  const cab = '<div class="op-sheethead"><div><h3>PDF do mapa</h3><div class="op-sub" style="margin-top:3px">' + mmEsc(mmNomeMolde(m)) + ' · A4 paisagem</div></div><button type="button" class="op-back" aria-label="Fechar" onclick="mmoFecharSheet()">✕</button></div>';
+  sh.innerHTML = cab + '<div class="op-sheetbody"><div class="mm-load"><div class="spinner"></div> Gerando o PDF…</div></div>'; w.hidden = false;
+  let r;
+  try { r = await mmCriarPdf(m); } catch (e) { sh.innerHTML = cab + '<div class="op-sheetbody"><p class="mm-erro">Não foi possível gerar o PDF: ' + mmEsc(e.message) + '</p></div>'; return; }
+  if (w.hidden) return;
+  let arq = null, podeComp = false;
+  try { arq = new File([r.blob], r.nome, { type: 'application/pdf' }); podeComp = !!(navigator.canShare && navigator.canShare({ files: [arq] })); } catch (e) { podeComp = false; }
+  const kb = Math.max(1, Math.round(r.blob.size / 1024));
+  sh.innerHTML = cab + '<div class="op-sheetbody"><div class="mmo-pdfarq"><span class="mmo-pdfic">PDF</span><span><b>' + mmEsc(r.nome) + '</b><small>' + (kb > 1024 ? (kb / 1024).toFixed(1).replace('.', ',') + ' MB' : kb + ' KB') + '</small></span></div>' +
+    (podeComp ? '<button type="button" class="mmo-bt acc" id="mmoPdfComp">Compartilhar ou copiar</button><p class="note" style="margin:-4px 0 0;text-align:center">Abre as opções do aparelho: WhatsApp, e-mail, copiar, salvar em Arquivos…</p>' : '') +
+    '<button type="button" class="mmo-bt sec" id="mmoPdfAbrir">' + (podeComp ? 'Abrir / baixar o PDF' : 'Baixar o PDF') + '</button></div>';
+  if (podeComp) mmEl('mmoPdfComp').onclick = async function() {
+    try { await navigator.share({ files: [arq], title: r.nome }); mmoFecharSheet(); }
+    catch (e) { if (!e || e.name !== 'AbortError') mostrarToast('Não foi possível compartilhar: ' + ((e && e.message) || e) + '. Use "Abrir / baixar".', true); }
+  };
+  mmEl('mmoPdfAbrir').onclick = function() { r.doc.save(r.nome); mmoFecharSheet(); };
 }
 
 </script>
