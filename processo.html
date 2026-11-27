@@ -1095,7 +1095,7 @@
       <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h10"/><path d="M12 7h6l4 5-4 5h-6z"/><path d="M5 9v6"/></svg></span><span class="op-bt"><b>Injetora</b><span>Registro do check list e últimos registros das injetoras</span></span><span class="op-chev">›</span></button>
       <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4v3h-4z"/><path d="M9 5h6l1 4v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9z"/><path d="M8 13h8"/></svg></span><span class="op-bt"><b>Sopro</b><span>Registro do check list e últimos registros das sopradoras</span></span><span class="op-chev">›</span></button>
       <button type="button" class="op-big mol" onclick="mmoAbrirLista()"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="2"/><circle cx="15.5" cy="8.5" r="2"/><circle cx="8.5" cy="15.5" r="2"/><path d="m13.8 13.8 3.4 3.4M17.2 13.8l-3.4 3.4"/></svg></span><span class="op-bt"><b>Moldes</b><span>Mapa do molde por máquina e cavidades isoladas</span></span><span class="op-chev">›</span></button>
-      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 23:37</span></div>
+      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 27/11/2026 17:33</span></div>
     </section>
     <section id="opDash" hidden>
       <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Registros do turno de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
@@ -1152,7 +1152,7 @@
         </div>
       </nav>
       <button type="button" class="a-opbtn" id="btnVersaoOperacao" onclick="usarVersaoOperacao()" hidden>Voltar à versão da operação</button>
-      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 23:37</b></span></div>
+      <div class="a-versao"><span>Versão do sistema: <b>27/11/2026 17:33</b></span></div>
       <div class="a-user"><span class="av" id="userAv">·</span><div class="who"><b id="userNome">—</b><small id="userEmail"></small></div><button type="button" class="a-ic-btn" title="Sair" aria-label="Sair" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button></div>
     </aside>
 
@@ -7439,9 +7439,8 @@ async function mmTelaLista(recarregar) {
   };
   const cols = MM_MAQUINAS.map(function(q) {
     const ms = MM.moldes.filter(function(m) { return mmMaquinaPadrao(m.maquina) === q; }).sort(porGram);
-    const iso = ms.reduce(function(s, m) { return s + mmContagem(m).iso; }, 0);
     const mp = mmProducaoDa(q), resto = ms.filter(function(m) { return !mp || m.id !== mp.id; });
-    return '<section class="mm-col" aria-label="' + mmEsc(q) + '"><div class="mm-col-cab"><b>' + mmEsc(q) + '</b><small>' + ms.length + ' molde' + (ms.length === 1 ? '' : 's') + (iso ? ' · <span style="color:var(--danger)">' + iso + ' isolada' + (iso > 1 ? 's' : '') + '</span>' : '') + '</small></div>' +
+    return '<section class="mm-col" aria-label="' + mmEsc(q) + '"><div class="mm-col-cab"><b>' + mmEsc(q) + '</b><small>' + ms.length + ' molde' + (ms.length === 1 ? '' : 's') + '</small></div>' +
       (!ms.length ? '<div class="mm-col-vazia">Nenhum molde</div>' :
         (mp ? cardProd(mp) : '') + (resto.length ? '<div class="mm-sep">' + (mp ? 'Fora de produção' : 'Nenhum molde em produção') + '</div><div class="mm-lista">' + resto.map(linha).join('') + '</div>' : '')) + '</section>';
   }).join('');
@@ -8476,8 +8475,7 @@ function mmoRenderLista() {
   const pagina = function(q) {
     const ms = (q === 'Sem máquina' ? MM.moldes.filter(function(m) { return !mmMaquinaPadrao(m.maquina); }) : MM.moldes.filter(function(m) { return mmMaquinaPadrao(m.maquina) === q; })).sort(porGram);
     const mp = q === 'Sem máquina' ? null : mmProducaoDa(q), resto = ms.filter(function(m) { return !mp || m.id !== mp.id; });
-    const iso = ms.reduce(function(s, m) { return s + mmContagem(m).iso; }, 0);
-    let h = '<section class="mmo-pg" aria-label="' + mmEsc(q) + '"><div class="mmo-pgcab"><b>' + mmEsc(q) + '</b><small>' + ms.length + ' molde' + (ms.length === 1 ? '' : 's') + (iso ? ' · <span style="color:var(--danger)">' + iso + ' isolada' + (iso > 1 ? 's' : '') + '</span>' : '') + '</small></div>';
+    let h = '<section class="mmo-pg" aria-label="' + mmEsc(q) + '"><div class="mmo-pgcab"><b>' + mmEsc(q) + '</b><small>' + ms.length + ' molde' + (ms.length === 1 ? '' : 's') + '</small></div>';
     if (!ms.length) return h + '<div class="mm-col-vazia">Nenhum molde nesta máquina</div></section>';
     if (mp) {
       const c = mmContagem(mp), pct = c.total ? Math.round(c.at / c.total * 100) : 0;
