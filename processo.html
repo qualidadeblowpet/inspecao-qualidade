@@ -907,6 +907,8 @@
   .mm-lb{position:fixed;inset:0;background:rgba(0,0,0,.82);display:grid;place-items:center;z-index:320;padding:16px;cursor:zoom-out}
   .mm-lb img{max-width:100%;max-height:90vh;border-radius:10px;background:#fff}
   .mm-lb span{color:#fff;font-size:13px}
+  .mm-lb{cursor:default}
+  .mm-lb-x{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));right:calc(14px + env(safe-area-inset-right,0px));border:0;border-radius:10px;background:rgba(255,255,255,.92);color:#15181d;font:inherit;font-size:14px;font-weight:650;padding:9px 14px;cursor:pointer}
   .mm-ed{display:flex;flex-direction:column;gap:10px;max-height:50vh;overflow:auto;padding:2px}
   .mm-ed-faixa{display:flex;gap:12px;justify-content:center}
   .mm-ed-bloco{display:grid;gap:6px;border:1px solid var(--border);border-radius:12px;padding:8px;background:var(--mm-plate);align-content:start}
@@ -989,6 +991,32 @@
   .mmo-pdfic{flex:none;width:42px;height:50px;border-radius:7px;background:var(--danger);color:#fff;font-size:11px;font-weight:800;display:grid;place-items:center;letter-spacing:.5px}
   .mmo-bt.acc{background:var(--accent);color:var(--accent-ink)}
   .mmo-bt.sec{background:var(--surface-2);color:var(--fg);border:1px solid var(--border)}
+  /* Mapa Obsoleto */
+  .mm-obs-tab{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:auto}
+  .mm-obs-tab table{width:100%;border-collapse:collapse;font-size:13px}
+  .mm-obs-tab th{background:var(--surface-2);text-align:left;font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--fg-faint);padding:9px 12px;white-space:nowrap}
+  .mm-obs-tab td{padding:10px 12px;border-top:1px solid var(--border);vertical-align:top}
+  .mm-obs-tab td small{display:block;color:var(--fg-dim);font-size:12px}
+  .mm-obs-tab td.acoes{white-space:nowrap;text-align:right}
+  .mm-obs-tab td.acoes .btn{margin-left:6px}
+  .mm-eds{white-space:nowrap;display:inline-flex;vertical-align:-2px}
+  .mm-eds .mm-card-ed{vertical-align:0}
+  .mm-card-ed[data-obs]:hover,.mm-card-ed[data-obs]:focus-visible{color:var(--bad,#c0392b);background:rgba(192,57,43,.1)}
+  /* celular: selecionar várias */
+  .mmo-varias{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:44px;margin:0 0 12px;border-radius:12px;border:1px solid var(--border);background:var(--surface);color:var(--fg);font:inherit;font-size:14.5px;font-weight:650;cursor:pointer}
+  .mmo-varias svg{width:18px;height:18px}
+  .mmo-varias.on{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  #opApp .mm-barra{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));margin:0;z-index:60;padding:12px;gap:10px}
+  #opApp .mm-barra-tx{min-width:0;flex-basis:100%}
+  #opApp .mm-barra .mm-acoes{display:flex;gap:8px;width:100%;flex-wrap:nowrap}
+  #opApp .mm-barra .mm-acoes .btn{flex:1;height:46px;justify-content:center;font-size:14.5px;padding:0 8px}
+  #opApp .mm-com-barra{padding-bottom:170px}
+  #opApp .mm-barra .btn{border:1px solid var(--border);background:var(--surface-2);color:var(--fg);border-radius:10px;font-weight:650;display:inline-flex;align-items:center;cursor:pointer}
+  #opApp .mm-barra .btn.mm-red{background:var(--danger);border-color:var(--danger);color:#fff}
+  #opApp .mm-barra .btn.mm-grn{background:var(--ok);border-color:var(--ok);color:#fff}
+  .mm-dup{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 12px;border:1px dashed var(--border);border-radius:12px;background:var(--surface-2)}
+  .mm-dup span{flex:1;min-width:220px;font-size:12.5px;color:var(--fg-dim)}
+  .mm-foto-kb{display:block;margin-top:4px;font-size:11.5px;color:var(--fg-faint)}
   /* menu lateral reorganizado (27/11/2026): "Sistema" recolhido */
   .nav-sist-toggle{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:22px 10px 2px;padding:8px 12px;border:0;border-top:1px solid var(--border);background:none;
     font:inherit;font-size:10.5px;text-transform:uppercase;letter-spacing:.9px;color:var(--fg-faint);cursor:pointer;border-radius:0;width:auto;text-align:left}
@@ -1013,6 +1041,25 @@
   .lista-rem:hover{color:var(--danger);background:var(--danger-bg)}
   .lista-rem.confirmando{color:var(--danger);border-color:var(--danger);background:var(--danger-bg);font-size:11.5px;font-weight:650}
   .lista-rem:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  /* administrador: editar/excluir registros (27/11/2026) */
+  .adm-reg{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:6px;padding:10px 12px;border:1px dashed var(--border);border-radius:10px}
+  .adm-reg-tag{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--fg-faint);width:100%}
+  .adm-reg .btn{height:34px;padding:0 12px;font-size:12.5px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);color:var(--fg);cursor:pointer;width:auto}
+  .adm-reg .adm-reg-ex:hover{border-color:var(--danger);color:var(--danger)}
+  .widetable th.wt-adm,.widetable td.wt-adm{white-space:nowrap;text-align:center;padding:2px 4px}
+  .wt-admbt{border:1px solid var(--border);background:var(--surface-2);border-radius:6px;cursor:pointer;font-size:12px;padding:2px 6px;margin:0 1px;color:var(--fg)}
+  .wt-admbt.ex:hover{border-color:var(--danger);background:var(--danger-bg)}
+  .reg-cab{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+  .reg-params{max-height:42vh;overflow:auto;border:1px solid var(--border);border-radius:10px}
+  .reg-params table{width:100%;border-collapse:collapse;font-size:12.5px}
+  .reg-params th{position:sticky;top:0;background:var(--surface-2);text-align:left;font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--fg-faint);padding:6px 8px}
+  .reg-params td{padding:4px 8px;border-top:1px solid var(--border);vertical-align:middle}
+  .reg-params td input{width:100%;min-width:70px;height:30px;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--fg);padding:0 8px;font:inherit}
+  .reg-params tr.bad td:first-child{color:var(--danger);font-weight:600}
+  .reg-params td.lim{color:var(--fg-dim);font-size:11.5px;white-space:nowrap}
+  /* celular: bolinhas do turno */
+  .op-dots-turno{grid-template-columns:repeat(4,1fr) !important}
+  .op-dbtn.vazio.futuro{opacity:.45}
 </style>
 </head>
 <body>
@@ -1036,17 +1083,17 @@
       <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h10"/><path d="M12 7h6l4 5-4 5h-6z"/><path d="M5 9v6"/></svg></span><span class="op-bt"><b>Injetora</b><span>Registro do check list e últimos registros das injetoras</span></span><span class="op-chev">›</span></button>
       <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4v3h-4z"/><path d="M9 5h6l1 4v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9z"/><path d="M8 13h8"/></svg></span><span class="op-bt"><b>Sopro</b><span>Registro do check list e últimos registros das sopradoras</span></span><span class="op-chev">›</span></button>
       <button type="button" class="op-big mol" onclick="mmoAbrirLista()"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="2"/><circle cx="15.5" cy="8.5" r="2"/><circle cx="8.5" cy="15.5" r="2"/><path d="m13.8 13.8 3.4 3.4M17.2 13.8l-3.4 3.4"/></svg></span><span class="op-bt"><b>Moldes</b><span>Mapa do molde por máquina e cavidades isoladas</span></span><span class="op-chev">›</span></button>
-      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 22:38</span></div>
+      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 23:15</span></div>
     </section>
     <section id="opDash" hidden>
-      <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Últimos 8 registros de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
+      <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Registros do turno de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
       <div class="op-body">
         <button type="button" class="op-cta" onclick="opNovoRegistro()">＋ Registro do Check List</button>
         <div class="op-legend"><span><i style="background:var(--ok)"></i>Tudo dentro</span><span><i style="background:var(--danger)"></i>Com parâmetro fora (nº)</span><span><i style="background:var(--text-dim)"></i>Sem critério</span></div>
         <div id="opCards" class="op-cards"></div>
         <p class="note" style="margin:0">Toque numa bolinha para ver o que foi registrado naquele horário.</p>
       </div>
-      <div class="op-sheetwrap" id="opSheetWrap" hidden onclick="if(event.target===this)opFecharSheet()"><div class="op-sheet" id="opSheet"></div></div>
+      <div class="op-sheetwrap" id="opSheetWrap" hidden><div class="op-sheet" id="opSheet"></div></div>
     </section>
     <section id="opMoldes" hidden>
       <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl">Moldes</div><div class="op-sub">Mapa do molde por máquina</div></div><button type="button" class="op-refresh" onclick="mmoAbrirLista(true)" aria-label="Atualizar">↻</button></div>
@@ -1056,8 +1103,8 @@
       <div class="op-top"><button type="button" class="op-back" onclick="mmoAbrirLista()" aria-label="Voltar">‹</button><div style="min-width:0;flex:1"><div class="op-ttl" id="mmoTitulo"></div><div class="op-sub" id="mmoSub"></div></div><button type="button" class="op-refresh mmo-pdfbt" onclick="mmoPdf()" aria-label="Exportar PDF do mapa">PDF</button><button type="button" class="op-refresh" onclick="mmoAtualizarMolde()" aria-label="Atualizar">↻</button></div>
       <div class="op-body mmo" id="mmoMolde"></div>
       <button type="button" class="mmo-histtab" id="mmoHistTab" aria-expanded="false" aria-controls="mmoGaveta" onclick="mmoHistorico(true)"><span>Histórico</span><b id="mmoHistN">0</b></button>
-      <div class="mmo-gaveta-ov" id="mmoGaveta" hidden onclick="if(event.target===this)mmoHistorico(false)"><aside class="mmo-gaveta" aria-label="Histórico do molde"><div class="mmo-gcab"><div><b>Histórico do molde</b><small id="mmoHistCab"></small></div><button type="button" class="op-back" onclick="mmoHistorico(false)" aria-label="Fechar">✕</button></div><div class="mm-hleg"><b>29(29)</b> = cavidade(castanha)</div><div class="mm-hlist" id="mmoHlist"></div></aside></div>
-      <div class="op-sheetwrap" id="mmoSheetWrap" hidden onclick="if(event.target===this)mmoFecharSheet()"><div class="op-sheet" id="mmoSheet"></div></div>
+      <div class="mmo-gaveta-ov" id="mmoGaveta" hidden><aside class="mmo-gaveta" aria-label="Histórico do molde"><div class="mmo-gcab"><div><b>Histórico do molde</b><small id="mmoHistCab"></small></div><button type="button" class="op-back" onclick="mmoHistorico(false)" aria-label="Fechar">✕</button></div><div class="mm-hleg"><b>29(29)</b> = cavidade(castanha)</div><div class="mm-hlist" id="mmoHlist"></div></aside></div>
+      <div class="op-sheetwrap" id="mmoSheetWrap" hidden><div class="op-sheet" id="mmoSheet"></div></div>
     </section>
   </div>
 
@@ -1089,10 +1136,11 @@
           <button class="nav-item" data-page="criterios" onclick="mudarPagina('criterios')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3"/><path d="M14 2v4M8 10v4M16 18v4"/></svg><span>Critérios - Injetoras</span></button>
           <button class="nav-item" data-page="carregarDadosSopro" onclick="mudarPagina('carregarDadosSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m17 8-5-5-5 5"/><path d="M12 3v12"/></svg><span>Carregar Dados - Sopro</span></button>
           <button class="nav-item" data-page="criteriosSopro" onclick="mudarPagina('criteriosSopro')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3"/><path d="M14 2v4M8 10v4M16 18v4"/></svg><span>Critérios - Sopro</span></button>
+          <button class="nav-item" data-page="mapaObsoleto" onclick="mudarPagina('mapaObsoleto')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9"/><path d="M10 13h4"/></svg><span>Mapa Obsoleto</span></button>
         </div>
       </nav>
       <button type="button" class="a-opbtn" id="btnVersaoOperacao" onclick="usarVersaoOperacao()" hidden>Voltar à versão da operação</button>
-      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 22:38</b></span></div>
+      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 23:15</b></span></div>
       <div class="a-user"><span class="av" id="userAv">·</span><div class="who"><b id="userNome">—</b><small id="userEmail"></small></div><button type="button" class="a-ic-btn" title="Sair" aria-label="Sair" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button></div>
     </aside>
 
@@ -1146,7 +1194,7 @@
       <p class="note">Clique numa bolinha para abrir o lançamento. As cores usam o resultado gravado em cada lançamento (o critério que valia no dia).</p>
       <div id="dmTendencia" class="dm-trend" hidden></div>
     </div>
-    <div id="dmPainelWrap" hidden><div class="dm-scrim" onclick="dmFecharPainel()"></div><aside class="dm-drawer" id="dmPainel" aria-label="Detalhe do lançamento"></aside></div>
+    <div id="dmPainelWrap" hidden><div class="dm-scrim"></div><aside class="dm-drawer" id="dmPainel" aria-label="Detalhe do lançamento"></aside></div>
     </div><!-- /#pageDashboard -->
 
     <!-- ===== PÁGINA: DADOS CADASTRADOS ===== -->
@@ -1658,6 +1706,7 @@
 
   <!-- ===== PÁGINA: MAPA DO MOLDE ===== -->
   <div id="pageMapaMolde" hidden><div id="mmConteudo"></div></div>
+  <div id="pageMapaObsoleto" hidden><div id="mmObsConteudo"></div></div>
   </div><!-- /.main -->
   </div><!-- /.a-main -->
 
@@ -3008,7 +3057,6 @@ function mostrarJustificativa(titulo, texto){
   function onKey(e){ if (e.key === 'Escape') fechar(); }
   document.addEventListener('keydown', onKey);
   b.onclick = fechar;
-  ov.onclick = function(e){ if (e.target === ov) fechar(); };
 }
 
 // Lista os parâmetros fora do critério de um horário (Carregar Dados), no formato da janela de justificativa.
@@ -3139,7 +3187,7 @@ var registrosCarregados = null; // array de objetos {id_sessao,data,hora,maquina
 var PAGINAS_IDS = {
   dashboard:'pageDashboard', dadosCadastrados:'pageDadosCadastrados', criterios:'pageCriterios', carregarDados:'pageCarregarDados', iqr:'pageIqr',
   dashboardSopro:'pageDashboardSopro', dadosCadastradosSopro:'pageDadosCadastradosSopro', criteriosSopro:'pageCriteriosSopro', carregarDadosSopro:'pageCarregarDadosSopro',
-  configuracoes:'pageConfiguracoes', listasTeste:'pageListasTeste', mapaMolde:'pageMapaMolde'
+  configuracoes:'pageConfiguracoes', listasTeste:'pageListasTeste', mapaMolde:'pageMapaMolde', mapaObsoleto:'pageMapaObsoleto'
 };
 
 // =============================================================================
@@ -3179,7 +3227,7 @@ var CRUMB_PAGINAS = {
   dashboard:['Check List - Injeção','Dashboard'], dadosCadastrados:['Check List - Injeção','Dados Cadastrados'], criterios:['Sistema','Critérios - Injetoras'],
   carregarDados:['Sistema','Carregar Dados - Injetora'], iqr:['Analítico','IQR / Intervalo Interquartil'],
   dashboardSopro:['Check List - Sopro','Dashboard'], dadosCadastradosSopro:['Check List - Sopro','Dados Cadastrados'], criteriosSopro:['Sistema','Critérios - Sopro'],
-  carregarDadosSopro:['Sistema','Carregar Dados - Sopro'], configuracoes:['Sistema','Configurações'], listasTeste:['Sistema','Banco de Dados'], mapaMolde:['Molde - Injeção','Mapa do Molde']
+  carregarDadosSopro:['Sistema','Carregar Dados - Sopro'], configuracoes:['Sistema','Configurações'], listasTeste:['Sistema','Banco de Dados'], mapaMolde:['Molde - Injeção','Mapa do Molde'], mapaObsoleto:['Sistema','Mapa Obsoleto']
 };
 // "Sistema" fica recolhido; abre ao clicar ou quando a página aberta é dele.
 function navSistemaAbrir(abrir){
@@ -3219,6 +3267,7 @@ function mudarPagina(pagina){
   if (pagina === 'configuracoes') atualizarBotoesTema();
   if (pagina === 'listasTeste') lstRenderStatus();
   if (pagina === 'mapaMolde') mmAbrirPagina();
+  if (pagina === 'mapaObsoleto') mmObsAbrirPagina();
   atualizarFaixaSuperior(pagina);
   if (document.querySelector('#navSistema [data-page="' + pagina + '"]')) navSistemaAbrir(true);
   fecharMenuMobile();
@@ -4324,7 +4373,7 @@ function dmAbrirLancamento(mi, i){
     });
     html += '</details>';
   });
-  html += '</div>';
+  html += (typeof regEhAdmin === 'function' && regEhAdmin() ? regBotoes("regEditar('injecao', DASH.maquinas[" + mi + "].sessoes[" + i + "])", "regExcluir('injecao', DASH.maquinas[" + mi + "].sessoes[" + i + "])") : '') + '</div>';
   document.getElementById('dmPainel').innerHTML = html;
   document.getElementById('dmPainelWrap').hidden = false;
   var x = document.querySelector('#dmPainel .dm-x'); if (x) x.focus();
@@ -4452,7 +4501,7 @@ function agruparPorSessao(lista){
 function construirCabecalhoTabelaLarga(){
   var head = document.getElementById('widetableHead');
   var fixas = ['Data','Hora','Máquina','Responsável','Gramatura','Cor','Resina'];
-  var html = fixas.map(function(c){ return '<th class="wt-fixo">' + c + '</th>'; }).join('');
+  var html = (typeof regEhAdmin === 'function' && regEhAdmin() ? '<th class="wt-adm">Admin</th>' : '') + fixas.map(function(c){ return '<th class="wt-fixo">' + c + '</th>'; }).join('');
   html += '<th class="wt-just">Justificativa</th>';
   html += PARAMETROS_INJECAO.map(function(p){
     return '<th class="wt-param"><div class="wt-paramtxt">' + p + '</div></th>';
@@ -4513,7 +4562,7 @@ function renderTabelaLarga(sessoes){
   TABELA_LARGA_ATUAL = mostrar;
   body.innerHTML = mostrar.map(function(s, si){
     var fixas = [s.data, s.hora, s.maquina, s.responsavel, s.gramatura, s.cor, s.resina];
-    var tds = fixas.map(function(v){ return '<td class="wt-fixo">' + (v || '—') + '</td>'; }).join('');
+    var tds = (typeof regEhAdmin === 'function' && regEhAdmin() ? '<td class="wt-adm"><button type="button" class="wt-admbt" title="Editar registro" aria-label="Editar registro" onclick="regEditar(\'injecao\', TABELA_LARGA_ATUAL[' + si + '])">✎</button><button type="button" class="wt-admbt ex" title="Excluir registro" aria-label="Excluir registro" onclick="regExcluir(\'injecao\', TABELA_LARGA_ATUAL[' + si + '])">🗑</button></td>' : '') + fixas.map(function(v){ return '<td class="wt-fixo">' + (v || '—') + '</td>'; }).join('');
     tds += '<td class="wt-just">' + (s.justificativa ? '<button type="button" class="jbtn" onclick="verJustificativaTabela(' + si + ')">Ver</button><span class="jtxt">' + escHtml(s.justificativa.length > 34 ? s.justificativa.slice(0, 34) + '…' : s.justificativa) + '</span>' : '') + '</td>';
     tds += PARAMETROS_INJECAO.map(function(p){
       var info = s.valores[p];
@@ -4898,10 +4947,26 @@ function opSessoesPorMaquina(regs){
   return porMaq;
 }
 
+// Turno atual: 07h–19h (dia) ou 19h–07h (noite). Cada turno tem 4 horários do checklist; cada
+// horário vale um bloco de 3 h a partir do início do turno (ex.: 07:00–09:59 = 08h). Sem registro
+// no bloco, a bolinha fica na cor de "não feito".
+function opTurnoAtual(agora){
+  agora = agora || new Date();
+  var h = agora.getHours(), ini = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 7, 0, 0, 0), dia = true;
+  if (h >= 19){ ini.setHours(19); dia = false; }
+  else if (h < 7){ ini.setDate(ini.getDate() - 1); ini.setHours(19); dia = false; }
+  var horas = dia ? [8, 11, 14, 17] : [20, 23, 2, 5];
+  var blocos = horas.map(function(hh, k){ var a = new Date(ini.getTime() + k * 3 * 3600e3), b = new Date(a.getTime() + 3 * 3600e3); return { h: hh, ini: a, fim: b }; });
+  var p2 = function(n){ return String(n).padStart(2, '0'); };
+  return { dia: dia, ini: ini, fim: new Date(ini.getTime() + 12 * 3600e3), blocos: blocos,
+    rotulo: (dia ? 'Turno do dia 07h–19h' : 'Turno da noite 19h–07h') + ' · ' + p2(ini.getDate()) + '/' + p2(ini.getMonth() + 1) };
+}
 function opRenderDash(){
   var el = document.getElementById('opCards');
   var p = OP.proc, regs = OP.dados[p];
   if (!regs) return;
+  var turno = opTurnoAtual(new Date());
+  var sub = document.querySelector('#opDash .op-sub'); if (sub) sub.textContent = turno.rotulo + ' · registros de cada máquina';
   var porMaq = opSessoesPorMaquina(regs);
   var nomes = p === 'inj' ? (listas.maquinas || []).map(function(i){ return i.valor; }) : MAQUINAS_SOPRO_ORDEM.slice();
   Object.keys(porMaq).forEach(function(k){
@@ -4910,10 +4975,17 @@ function opRenderDash(){
     }
   });
   if (p === 'inj') nomes.sort(function(a,b){ return a.localeCompare(b, 'pt-BR', { numeric: true }); });
+  var agora = new Date();
   OP.cards = nomes.map(function(nome){
     var m = porMaq[normMaquina(nome)];
-    var ses = m ? m.sessoes.slice().sort(function(a,b){ return a.t - b.t; }).slice(-8) : [];
-    return { nome: nome, sessoes: ses };
+    var todas = m ? m.sessoes.slice().sort(function(a,b){ return a.t - b.t; }) : [];
+    var sessoes = [], slots = turno.blocos.map(function(b){
+      var noBloco = todas.filter(function(s){ return s.t >= b.ini && s.t < b.fim; });
+      var s = noBloco[noBloco.length - 1] || null;
+      if (s) sessoes.push(s);
+      return { h: b.h, s: s, idx: s ? sessoes.length - 1 : -1, futuro: b.ini > agora, extra: Math.max(0, noBloco.length - 1) };
+    });
+    return { nome: nome, sessoes: sessoes, slots: slots };
   });
   if (!OP.cards.length){ el.innerHTML = '<p class="note">Nenhuma máquina cadastrada.</p>'; return; }
   el.innerHTML = OP.cards.map(function(c, ci){
@@ -4922,16 +4994,15 @@ function opRenderDash(){
     var temCrit = c.sessoes.some(function(s){ return s.nCrit > 0; });
     var produto = ult ? (p === 'inj' ? (ult.gramatura || '—') + ' · ' + (ult.resina || '—') : (ult.frasco || '—') + ' · ' + (ult.gramatura || '—')) : '';
     var selo = !c.sessoes.length ? '' : !temCrit ? '<span class="critpill vazio">sem critério</span>' : nf ? '<span class="critpill nao">' + nf + ' c/ fora</span>' : '<span class="critpill sim">ok</span>';
-    var dots = '';
-    for (var i = 0; i < 8; i++){
-      var s = c.sessoes[i];
-      if (!s){ dots += '<span class="op-dbtn vazio"><span class="op-dot vazio"></span>&nbsp;</span>'; continue; }
-      var st = s.nFora > 0 ? 'bad' : s.nCrit > 0 ? 'ok' : 'none';
-      dots += '<button type="button" class="op-dbtn" onclick="opAbrirRegistro(' + ci + ',' + i + ')" aria-label="' + escHtml(c.nome + ' ' + s.data + ' ' + s.hora) + '"><span class="op-dot ' + st + '">' + (s.nFora || '') + '</span>' + escHtml(String(s.hora || '').slice(0, 2)) + 'h</button>';
-    }
+    var dots = c.slots.map(function(sl){
+      var hh = String(sl.h).padStart(2, '0') + 'h';
+      if (!sl.s) return '<span class="op-dbtn vazio' + (sl.futuro ? ' futuro' : '') + '" title="' + hh + (sl.futuro ? ' — ainda não chegou' : ' — não feito') + '"><span class="op-dot vazio"></span>' + hh + '</span>';
+      var s = sl.s, st = s.nFora > 0 ? 'bad' : s.nCrit > 0 ? 'ok' : 'none';
+      return '<button type="button" class="op-dbtn" onclick="opAbrirRegistro(' + ci + ',' + sl.idx + ')" aria-label="' + escHtml(c.nome + ' ' + s.data + ' ' + s.hora) + '"><span class="op-dot ' + st + '">' + (s.nFora || '') + '</span>' + hh + '</button>';
+    }).join('');
     return '<div class="op-card"><div class="op-mrow"><span class="op-mname">' + escHtml(c.nome) + '</span>' + selo + '<span class="op-mprod">' + escHtml(produto) + '</span></div>' +
-      '<div class="op-dots">' + dots + '</div>' +
-      '<div class="op-mfoot" style="align-items:center"><span>' + (ult ? 'último: ' + escHtml(ult.data.slice(0, 5)) + ' ' + escHtml(ult.hora) + ' · ' + escHtml(ult.responsavel || '') : 'sem registros ainda') + '</span><button type="button" class="op-pdfbtn" onclick="opPdfDia(' + ci + ')">📄 PDF do dia</button></div></div>';
+      '<div class="op-dots op-dots-turno">' + dots + '</div>' +
+      '<div class="op-mfoot" style="align-items:center"><span>' + (ult ? 'último do turno: ' + escHtml(ult.hora) + ' · ' + escHtml(ult.responsavel || '') : 'nenhum registro neste turno') + '</span><button type="button" class="op-pdfbtn" onclick="opPdfDia(' + ci + ')">📄 PDF do dia</button></div></div>';
   }).join('');
 }
 
@@ -4958,7 +5029,7 @@ function opAbrirRegistro(ci, i){
       g[1].map(function(p){ var v = s.valores[p] || {}; var cls = v.dentro === 'NÃO' ? 'bad' : v.dentro === 'SIM' ? 'ok' : '';
         return '<div class="op-prow"><div>' + escHtml(p) + '<small>' + escHtml(v.dentro ? textoLimite(v.min, v.max) : 'sem critério') + '</small></div><div class="dm-val ' + cls + '">' + escHtml(v.valor === undefined || v.valor === '' ? '—' : v.valor) + '</div></div>'; }).join('') + '</details>';
   });
-  html += '</div>';
+  html += (typeof regEhAdmin === 'function' && regEhAdmin() ? regBotoes("regEditar(OP.proc === 'inj' ? 'injecao' : 'sopro', OP.cards[" + ci + "].sessoes[" + i + "])", "regExcluir(OP.proc === 'inj' ? 'injecao' : 'sopro', OP.cards[" + ci + "].sessoes[" + i + "])") : '') + '</div>';
   document.getElementById('opSheet').innerHTML = html;
   document.getElementById('opSheetWrap').hidden = false;
 }
@@ -5417,7 +5488,6 @@ async function opPdfDia(ci){
   ov.className = 'modal-overlay'; ov.id = 'pdfDiaOv';
   ov.innerHTML = '<div class="modal-card just-card pdf-card"><h4 style="color:var(--text)">PDF do dia · ' + escHtml(card.nome) + '</h4><div id="pdfDiaCorpo"><div class="loading-row"><div class="spinner"></div> Gerando o PDF…</div></div>' +
     '<div class="modal-actions" style="grid-template-columns:1fr"><button type="button" class="btn btn-outline" onclick="document.getElementById(\'pdfDiaOv\').remove()">Fechar</button></div></div>';
-  ov.addEventListener('click', function(e){ if (e.target === ov) ov.remove(); });
   document.body.appendChild(ov);
   try {
     var sessoes = pdSessoesDaMaquina(OP.dados[OP.proc] || [], card.nome);
@@ -6954,7 +7024,7 @@ const MM_LISTAS = {
 };
 const MM_PASTA_FOTOS = 'Mapa do Molde - Fotos';
 const MM = { ids: {}, iniciado: null, carregado: false, carregando: null, moldes: [], hist: [], erro: '', atual: null, sel: null,
-  thumbs: {}, fotosDrive: null, tela: 'lista', colunas: {}, multi: false, selVarias: {} };
+  thumbs: {}, fotosDrive: null, tela: 'lista', colunas: {}, multi: false, selVarias: {}, todos: [], obsoletos: [] };
 
 function mmEsc(s) { return escHtml(s == null ? '' : s); }
 function mmP2(n) { return String(n).padStart(2, '0'); }
@@ -7110,7 +7180,9 @@ async function mmCarregar(forcar) {
       await mmIniciar();
       await mmGarantirColunas();
       const [ms, hs] = await Promise.all([mmLerLista('moldes'), mmLerLista('hist')]);
-      MM.moldes = ms.map(mmMoldeDeItem).filter(function(m) { return m.ativo; });
+      MM.todos = ms.map(mmMoldeDeItem);
+      MM.moldes = MM.todos.filter(function(m) { return m.ativo; });
+      MM.obsoletos = MM.todos.filter(function(m) { return !m.ativo; });
       MM.hist = hs.map(mmEventoDeItem).sort(function(a, b) { return mmChaveEv(a) < mmChaveEv(b) ? -1 : 1; });
       MM.carregado = true; MM.erro = '';
     } catch (e) { MM.erro = (e && e.message) || String(e); throw e; }
@@ -7132,14 +7204,26 @@ function mmContagem(m) {
 }
 
 /* ---- fotos (OneDrive, ao lado da planilha) ---- */
+// Reduz a foto antes de anexar: lado maior até 1280 px (nítido para ver rebarba/defeito), JPEG ~75%,
+// e se ainda passar de ~350 KB baixa a qualidade aos poucos (mín. 60%). Fica tipicamente entre 120 e 300 KB.
 function mmReduzirFoto(arquivo) {
   return new Promise(function(ok, falha) {
     const url = URL.createObjectURL(arquivo), img = new Image();
     img.onload = function() {
-      const max = 1600, k = Math.min(1, max / Math.max(img.width, img.height));
-      const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
-      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
-      c.toBlob(function(b) { b ? ok({ blob: b, url: c.toDataURL('image/jpeg', .82) }) : falha(new Error('não foi possível ler a foto')); }, 'image/jpeg', .82);
+      URL.revokeObjectURL(url);
+      const max = 1280, k = Math.min(1, max / Math.max(img.width, img.height));
+      const c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.width * k)); c.height = Math.max(1, Math.round(img.height * k));
+      const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height);
+      g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(img, 0, 0, c.width, c.height);
+      const tentar = function(q) {
+        c.toBlob(function(b) {
+          if (!b) { falha(new Error('não foi possível ler a foto')); return; }
+          if (b.size > 350 * 1024 && q > 0.6) { tentar(Math.round((q - 0.07) * 100) / 100); return; }
+          if (arquivo.type === 'image/jpeg' && arquivo.size <= b.size) b = arquivo;   // a original já era menor: usa ela
+          ok({ blob: b, url: URL.createObjectURL(b), kb: Math.round(b.size / 1024) });
+        }, 'image/jpeg', q);
+      };
+      tentar(0.75);
     };
     img.onerror = function() { URL.revokeObjectURL(url); falha(new Error('o arquivo escolhido não é uma imagem')); };
     img.src = url;
@@ -7213,6 +7297,21 @@ async function mmDefinirProducao(m, ligar) {
 }
 function mmProducaoDa(q) { return MM.moldes.find(function(x) { return x.producao && mmMaquinaPadrao(x.maquina) === q; }) || null; }
 
+/* ---- molde obsoleto (sai do Mapa do Molde e vai para Sistema > Mapa Obsoleto; dá para reativar) ---- */
+async function mmDefinirObsoleto(m, obsoleto, resp, desc) {
+  await mmCarregar(true);
+  const m2 = MM.todos.find(function(x) { return x.id === m.id; });
+  if (!m2) throw new Error('o molde não existe mais');
+  if (!m2.ativo === obsoleto) throw new Error(obsoleto ? 'este molde já está obsoleto' : 'este molde já está ativo');
+  const campos = { mmAtivo: obsoleto ? 'FALSE' : 'TRUE' };
+  if (obsoleto) { campos.mmProducao = ''; campos.mmProdDesde = ''; }
+  await mmAtualizar('moldes', m2.id, campos);
+  const o = mmEventoBase(m2, null, obsoleto ? 'obsoleto' : 'reativado', resp, desc);
+  o.mmMudanca = obsoleto ? 'Molde tornado obsoleto' + (m2.producao ? ' (estava em produção; a produção foi parada)' : '') : 'Molde reativado';
+  await mmIncluir('hist', [mmCampos('hist', o)]);
+  await mmCarregar(true);
+}
+
 /* ---------- MAPA DO MOLDE: telas ---------- */
 const MM_SVG = {
   novo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>',
@@ -7220,9 +7319,11 @@ const MM_SVG = {
   pdf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><path d="M14 2v6h6"/></svg>',
   att: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>',
   molde: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 3v18"/></svg>',
+  copiar: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>',
   varias: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="m14.5 17.5 2 2 4-4"/></svg>',
   relogio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
   lixo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>',
+  arquivo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1"/><path d="M5 9v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9"/><path d="M10 13h4"/></svg>',
   play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>',
   parar: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>',
   imp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>'
@@ -7242,7 +7343,7 @@ function mmCarregando(txt) { mmEl('mmConteudo').innerHTML = '<div class="mm-load
 
 /* ===== lista de moldes ===== */
 function mmPendentesImport() {
-  const ja = {}; MM.moldes.forEach(function(m) { if (m.origem) ja[m.origem] = 1; });
+  const ja = {}; (MM.todos || MM.moldes).forEach(function(m) { if (m.origem) ja[m.origem] = 1; });
   return MM_IMPORT.filter(function(x) { return !ja['planilha: ' + x.chave]; });
 }
 async function mmTelaLista(recarregar) {
@@ -7262,7 +7363,7 @@ async function mmTelaLista(recarregar) {
   const card = function(m) {
     const c = mmContagem(m), pct = c.total ? Math.round(c.at / c.total * 100) : 0;
     return '<div class="mm-card" role="button" tabindex="0" data-m="' + m.id + '" aria-label="Abrir ' + mmEsc(mmNomeMolde(m)) + '"><div class="t"><div><b>' + mmEsc(m.gramatura ? m.gramatura + ' g' : mmNomeMolde(m)) + '</b>' +
-      '<button type="button" class="mm-card-ed" data-ed="' + m.id + '" title="Editar nome (máquina e gramatura)" aria-label="Editar nome de ' + mmEsc(mmNomeMolde(m)) + '">' + MM_SVG.edit + '</button><br><small>' + mmEsc(c.total + ' cavidades' + (m.camara ? ' · ' + m.camara : '')) + '</small></div>' +
+      '<span class="mm-eds"><button type="button" class="mm-card-ed" data-ed="' + m.id + '" title="Editar nome (máquina e gramatura)" aria-label="Editar nome de ' + mmEsc(mmNomeMolde(m)) + '">' + MM_SVG.edit + '</button>' + mmBtObs(m) + '</span><br><small>' + mmEsc(c.total + ' cavidades' + (m.camara ? ' · ' + m.camara : '')) + '</small></div>' +
       (c.iso ? '<span class="mm-badge bad">' + c.iso + ' isolada' + (c.iso > 1 ? 's' : '') + '</span>' : '<span class="mm-badge ok">todas ativas</span>') + '</div>' +
       '<div class="mm-bar"><i style="width:' + pct + '%"></i></div><div class="n"><span><b>' + c.at + '</b> de ' + c.total + ' ativas</span><span>' + pct + '%</span></div><span hidden>' + mmEsc(mmNomeMolde(m)) + '</span></div>';
   };
@@ -7271,7 +7372,7 @@ async function mmTelaLista(recarregar) {
   const cardProd = function(m) {
     const c = mmContagem(m), pct = c.total ? Math.round(c.at / c.total * 100) : 0;
     return '<div class="mm-card mm-prodcard" role="button" tabindex="0" data-m="' + m.id + '" aria-label="Abrir ' + mmEsc(mmNomeMolde(m)) + ' (em produção)"><div class="t"><div><b>' + mmEsc(m.gramatura + ' g') + '</b>' +
-      '<button type="button" class="mm-card-ed" data-ed="' + m.id + '" title="Editar nome (máquina e gramatura)" aria-label="Editar nome de ' + mmEsc(mmNomeMolde(m)) + '">' + MM_SVG.edit + '</button><br><small>' + mmEsc(c.total + ' cavidades' + (m.camara ? ' · ' + m.camara : '')) +
+      '<span class="mm-eds"><button type="button" class="mm-card-ed" data-ed="' + m.id + '" title="Editar nome (máquina e gramatura)" aria-label="Editar nome de ' + mmEsc(mmNomeMolde(m)) + '">' + MM_SVG.edit + '</button>' + mmBtObs(m) + '</span><br><small>' + mmEsc(c.total + ' cavidades' + (m.camara ? ' · ' + m.camara : '')) +
       (c.iso ? ' · <span style="color:var(--danger)">' + c.iso + ' isolada' + (c.iso > 1 ? 's' : '') + '</span>' : '') + '</small></div><span class="mm-badge prod">Em produção</span></div>' +
       '<span class="mm-desde">' + (m.prodDesde ? 'desde ' + mmEsc(m.prodDesde) : 'desde —') + (mmEhAdmin() ? '<button type="button" class="mm-desde-ed" data-desde="' + m.id + '" title="Mudar desde quando está em produção" aria-label="Mudar desde quando está em produção">' + MM_SVG.relogio + '</button>' : '') + '</span>' +
       '<div class="mm-bar"><i style="width:' + pct + '%"></i></div><div class="mm-rod"><span class="n"><span><b>' + c.at + '</b> de ' + c.total + ' ativas · ' + pct + '%</span></span>' +
@@ -7281,7 +7382,7 @@ async function mmTelaLista(recarregar) {
     const c = mmContagem(m);
     return '<div class="mm-row" role="button" tabindex="0" data-m="' + m.id + '" aria-label="Abrir ' + mmEsc(mmNomeMolde(m)) + '"><span class="mm-row-tx"><b>' + mmEsc(m.gramatura + ' g') + '</b><small title="' + c.total + ' cavidades">' +
       (c.iso ? '<span style="color:var(--danger)">' + c.iso + ' isolada' + (c.iso > 1 ? 's' : '') + '</span>' : 'todas ativas') + '</small></span>' +
-      '<span class="mm-row-ac"><button type="button" class="mm-card-ed" data-ed="' + m.id + '" title="Editar nome (máquina e gramatura)" aria-label="Editar nome de ' + mmEsc(mmNomeMolde(m)) + '">' + MM_SVG.edit + '</button>' +
+      '<span class="mm-row-ac"><button type="button" class="mm-card-ed" data-ed="' + m.id + '" title="Editar nome (máquina e gramatura)" aria-label="Editar nome de ' + mmEsc(mmNomeMolde(m)) + '">' + MM_SVG.edit + '</button>' + mmBtObs(m) +
       '<button type="button" class="mm-acao" data-produzir="' + m.id + '">' + MM_SVG.play + 'Produzir</button></span></div>';
   };
   const cols = MM_MAQUINAS.map(function(q) {
@@ -7304,6 +7405,8 @@ async function mmTelaLista(recarregar) {
       : '<div class="mm-vazio-msg">Nenhum molde cadastrado ainda. ' + (pend.length ? 'Importe os desenhos da planilha ou cadastre um molde novo.' : 'Use "Novo molde" para cadastrar.') + '</div>');
   if (MM.moldes.length) {
     const abrir = function(e) {
+      const ob = e.target.closest('[data-obs]');
+      if (ob) { e.stopPropagation(); const m = MM.moldes.find(function(x) { return x.id === Number(ob.getAttribute('data-obs')); }); if (m) mmAbrirObsoleto(m); return; }
       const dz = e.target.closest('[data-desde]');
       if (dz) { e.stopPropagation(); const m = MM.moldes.find(function(x) { return x.id === Number(dz.getAttribute('data-desde')); }); if (m) mmAdmProdDesde(m); return; }
       const pr = e.target.closest('[data-produzir],[data-parar]');
@@ -7390,7 +7493,7 @@ function mmRenderPainel(c) {
   mmEl('mmBtnAcao').onclick = function() { mmAbrirForm(iso ? 'liberada' : 'isolada', L); };
   mmEl('mmBtnNumUm').onclick = function() { mmAbrirEdicao(L.id); };
 }
-const MM_TIPOS = { isolada: ['bad', 'isolada'], liberada: ['ok', 'liberada'], numeros: ['alt', 'números alterados'], cadastro: ['alt', 'molde cadastrado'], desenho: ['alt', 'molde alterado'], obs: ['dim', 'observação'] };
+const MM_TIPOS = { isolada: ['bad', 'isolada'], liberada: ['ok', 'liberada'], numeros: ['alt', 'números alterados'], cadastro: ['alt', 'molde cadastrado'], desenho: ['alt', 'molde alterado'], obs: ['dim', 'observação'], obsoleto: ['dim', 'tornado obsoleto'], reativado: ['alt', 'reativado'] };
 function mmHtmlHistorico(evs, m) {
   if (!evs.length) return '<p class="vazio" style="color:var(--fg-dim);font-size:13px">Nenhum registro neste molde ainda.</p>';
   const adm = mmEhAdmin();
@@ -7423,10 +7526,12 @@ function mmCarregarMiniaturas(raiz) {
 async function mmVerFoto(evId) {
   const e = MM.hist.find(function(x) { return x.id === evId; }); if (!e) return;
   const lb = document.createElement('div'); lb.className = 'mm-lb'; lb.innerHTML = '<span>Carregando a foto…</span>';
-  lb.onclick = function() { lb.remove(); }; mmHost().appendChild(lb);
+  const fx = document.createElement('button'); fx.type = 'button'; fx.className = 'mm-lb-x'; fx.textContent = '✕ Fechar'; fx.onclick = function() { lb.remove(); };
+  mmHost().appendChild(lb); lb.appendChild(fx);
   const u = await mmMiniatura(e, true);
   if (!lb.isConnected) return;
   lb.innerHTML = u ? '<img src="' + mmEsc(u) + '" alt="Foto do registro">' : '<span>Não foi possível abrir a foto aqui. ' + (e.fotoUrl ? '<a style="color:#fff" target="_blank" rel="noopener" href="' + mmEsc(e.fotoUrl) + '">Abrir no OneDrive</a>' : '') + '</span>';
+  lb.appendChild(fx);
 }
 
 /* ===== janelas ===== */
@@ -7438,7 +7543,6 @@ function mmModal(html, larga) {
   const fechar = function() { ov.remove(); document.removeEventListener('keydown', esc); };
   const esc = function(e) { const ovs = document.querySelectorAll('.mm-ov'); if (e.key === 'Escape' && !f._salvando && ovs[ovs.length - 1] === ov) fechar(); };
   document.addEventListener('keydown', esc);
-  ov.addEventListener('click', function(e) { if (e.target === ov && !f._salvando) fechar(); });
   f.querySelectorAll('[data-fechar]').forEach(function(b) { b.onclick = function() { if (!f._salvando) fechar(); }; });
   f._fechar = fechar;
   const pri = f.querySelector('input[type=text],textarea'); if (pri) setTimeout(function() { pri.focus(); }, 30);
@@ -7453,7 +7557,7 @@ function mmLigarFoto(f) {
   f._foto = null;
   const ler = async function(inp) {
     const a = inp.files && inp.files[0]; if (!a) return;
-    try { f._foto = await mmReduzirFoto(a); mmEl('mmFotoPrev').innerHTML = '<img src="' + f._foto.url + '" alt="Foto escolhida">'; mmEl('mmFotoBtn').textContent = 'Trocar arquivo'; }
+    try { f._foto = await mmReduzirFoto(a); mmEl('mmFotoPrev').innerHTML = '<img src="' + f._foto.url + '" alt="Foto escolhida"><small class="mm-foto-kb">foto reduzida para ' + f._foto.kb + ' KB</small>'; mmEl('mmFotoBtn').textContent = 'Trocar arquivo'; }
     catch (e) { mostrarToast(e.message, true); }
     inp.value = '';
   };
@@ -7623,8 +7727,10 @@ function mmAbrirDadosMolde() {
   const f = mmModal('<h3>Editar molde</h3><p class="sub">Dados do molde e rótulos do desenho (ZA, ZM, PB…). Para mudar números de cavidade/castanha use "Editar números".</p>' +
     '<div class="mm-grid3"><div class="mm-fld"><label for="mmDMaq">Máquina</label>' + mmSelectMaq('mmDMaq', m.maquina) + '</div><div class="mm-fld"><label for="mmDGram">Gramatura (g)</label><input type="text" id="mmDGram" value="' + mmEsc(m.gramatura) + '" maxlength="40"></div><div class="mm-fld"><label for="mmDCam">Câmara quente <span class="mm-opc">(opcional)</span></label><input type="text" id="mmDCam" value="' + mmEsc(m.camara) + '" maxlength="40"></div></div>' +
     '<div class="mm-fld"><label>Rótulos do desenho</label><div id="mmDRot">' + mmHtmlRotulos(des) + '</div></div><div class="mm-pre" id="mmDPre">' + mmHtmlMapa({ desenho: des }, { leitura: true }) + '</div>' +
+    '<div class="mm-dup"><button type="button" class="btn" id="mmDDup">' + MM_SVG.copiar + 'Duplicar desenho para outra máquina</button><span>Cria um molde novo com este mesmo desenho (cavidades, castanhas e rótulos), com todas as cavidades ativas e histórico próprio.</span></div>' +
     '<div class="mm-grid2"><div class="mm-fld"><label for="mmFNome">Seu nome</label><input type="text" id="mmFNome" maxlength="80"></div><div class="mm-fld"><label for="mmFDesc">Motivo da alteração</label><input type="text" id="mmFDesc" maxlength="500"></div></div>' +
     mmRodapeForm('Salvar molde', 'btn-accent'), true);
+  mmEl('mmDDup').onclick = function() { f._fechar(); mmAbrirDuplicar(m); };
   mmEl('mmDRot').addEventListener('input', function() { mmEl('mmDPre').innerHTML = mmHtmlMapa({ desenho: mmLerRotulos(mmEl('mmDRot'), mmClonar(m.desenho)) }, { leitura: true }); });
   f.onsubmit = function(ev) {
     ev.preventDefault();
@@ -7649,6 +7755,39 @@ function mmAbrirDadosMolde() {
       await mmIncluir('hist', [mmCampos('hist', o)]);
       await mmCarregar(true);
       f._fechar(); MM.atual = MM.moldes.find(function(x) { return x.id === m.id; }) || m; mmRenderMolde(); mostrarToast('Molde atualizado.');
+    });
+  };
+}
+
+/* ===== duplicar o desenho para outra máquina ===== */
+function mmAbrirDuplicar(m) {
+  const outra = MM_MAQUINAS.filter(function(q) { return q !== mmMaquinaPadrao(m.maquina); })[0] || '';
+  const f = mmModal('<h3>Duplicar desenho</h3><p class="sub">Cria um molde novo com o desenho de <b>' + mmEsc(mmNomeMolde(m)) + '</b> (' + mmLugares(m.desenho).length + ' cavidades). O novo molde começa com todas as cavidades ativas e com histórico próprio; o original não muda.</p>' +
+    '<div class="mm-grid3"><div class="mm-fld"><label for="mmDupMaq">Máquina do novo molde</label>' + mmSelectMaq('mmDupMaq', outra) + '</div><div class="mm-fld"><label for="mmDupGram">Gramatura (g)</label><input type="text" id="mmDupGram" value="' + mmEsc(m.gramatura) + '" maxlength="40"></div><div class="mm-fld"><label for="mmDupCam">Câmara quente <span class="mm-opc">(opcional)</span></label><input type="text" id="mmDupCam" value="' + mmEsc(m.camara) + '" maxlength="40"></div></div>' +
+    '<div class="mm-pre">' + mmHtmlMapa({ desenho: m.desenho }, { leitura: true }) + '</div>' +
+    '<div class="mm-fld"><label for="mmFNome">Seu nome</label><input type="text" id="mmFNome" maxlength="80"></div>' +
+    mmRodapeForm('Duplicar', 'btn-accent'), true);
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    const maq = mmEl('mmDupMaq').value.trim(), gram = mmEl('mmDupGram').value.trim(), cam = mmEl('mmDupCam').value.trim(), resp = mmEl('mmFNome').value.trim(), falta = [];
+    if (!maq) falta.push('escolha a máquina'); if (!gram) falta.push('informe a gramatura'); if (!resp) falta.push('digite o seu nome');
+    if (falta.length) { mmErroForm('Para salvar: ' + falta.join(', ') + '.'); return; }
+    mmSalvando(f, async function() {
+      await mmCarregar(true);
+      const nome = mmNomeMolde({ maquina: maq, gramatura: gram }).toLowerCase();
+      const ja = (MM.todos || MM.moldes).find(function(x) { return mmNomeMolde(x).toLowerCase() === nome; });
+      if (ja) throw new Error('já existe o molde ' + mmNomeMolde(ja) + (ja.ativo === false ? ' (no Mapa Obsoleto)' : '') + ' — escolha outra máquina ou gramatura');
+      const it = await lstG('GET', mmItensUrl('moldes') + '/' + m.id + '?$expand=fields($select=mmDesenho)');
+      let des; try { des = JSON.parse(it.fields.mmDesenho); } catch (e) { throw new Error('o desenho do molde não pôde ser lido'); }
+      const lug = mmLugares(des), a = mmAgora();
+      const ids = await mmIncluir('moldes', [mmCampos('moldes', { Title: maq + ' ' + gram, mmMaquina: maq, mmGramatura: gram, mmCamara: cam, mmCavidades: lug.length,
+        mmRev: a.data + ' ' + a.hora, mmDesenho: JSON.stringify(des), mmAtivo: 'TRUE', mmOrigem: 'app' })]);
+      const novo = { id: ids[0], maquina: maq, gramatura: gram };
+      const o = mmEventoBase(novo, null, 'cadastro', resp, 'Desenho duplicado de ' + mmNomeMolde(m) + '.'); o.mmMudanca = lug.length + ' cavidades';
+      const o2 = mmEventoBase(m, null, 'obs', resp, 'Desenho duplicado para ' + mmNomeMolde(novo) + '.'); o2.mmMudanca = 'Cópia do desenho criada';
+      await mmIncluir('hist', [mmCampos('hist', o), mmCampos('hist', o2)]);
+      await mmCarregar(true);
+      f._fechar(); mostrarToast('Desenho duplicado: ' + mmNomeMolde(novo) + ' criado.'); mmTelaMolde(ids[0]);
     });
   };
 }
@@ -7704,10 +7843,13 @@ function mmConfirmarProducao(m, ligar) {
 /* ===== modo "Selecionar várias" (isolar/liberar em grupo) ===== */
 function mmAtualizarSelecao() {
   const m = MM.atual; let bar = mmEl('mmBarraSel');
-  document.querySelectorAll('#mmConteudo .mm-cav').forEach(function(b) { b.classList.toggle('marc', !!(MM.multi && MM.selVarias[b.getAttribute('data-l')])); });
-  const mapa = document.querySelector('#mmConteudo .mm-mapa'); if (mapa) mapa.classList.toggle('mm-modo-sel', !!MM.multi);
+  const raiz = MM.op ? mmEl('mmoMolde') : mmEl('mmConteudo'); if (!raiz) return;
+  if (bar && bar.parentNode !== raiz) { bar.remove(); bar = null; }
+  raiz.classList.toggle('mm-com-barra', !!MM.multi);
+  raiz.querySelectorAll('.mm-cav').forEach(function(b) { b.classList.toggle('marc', !!(MM.multi && MM.selVarias[b.getAttribute('data-l')])); });
+  const mapa = raiz.querySelector('.mm-mapa'); if (mapa) mapa.classList.toggle('mm-modo-sel', !!MM.multi);
   if (!MM.multi) { if (bar) bar.remove(); return; }
-  if (!bar) { bar = document.createElement('div'); bar.id = 'mmBarraSel'; bar.className = 'mm-barra'; mmEl('mmConteudo').appendChild(bar); }
+  if (!bar) { bar = document.createElement('div'); bar.id = 'mmBarraSel'; bar.className = 'mm-barra'; raiz.appendChild(bar); }
   const st = mmSituacao(m), sel = mmLugares(m.desenho).filter(function(L) { return MM.selVarias[L.id]; });
   const isoS = sel.filter(function(L) { const e = st[L.id]; return e && e.tipo === 'isolada'; }), atS = sel.filter(function(L) { return isoS.indexOf(L) === -1; });
   bar.innerHTML = '<div class="mm-barra-tx"><b>' + (sel.length ? sel.length + ' selecionada' + (sel.length > 1 ? 's' : '') : 'Toque nas cavidades para selecionar') + '</b>' +
@@ -7783,6 +7925,74 @@ function mmAdmProdDesde(m) {
       await mmAtualizar('moldes', m.id, { mmProdDesde: d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4) + ' ' + h });
       await mmCarregar(true);
       f._fechar(); mmRerender(); mostrarToast('Data de início da produção alterada.');
+    });
+  };
+}
+
+/* ===== molde obsoleto ===== */
+function mmBtObs(m) { return '<button type="button" class="mm-card-ed" data-obs="' + m.id + '" title="Tornar obsoleto (vai para Sistema › Mapa Obsoleto)" aria-label="Tornar obsoleto ' + mmEsc(mmNomeMolde(m)) + '">' + MM_SVG.arquivo + '</button>'; }
+function mmAbrirObsoleto(m) {
+  const f = mmModal('<h3>Tornar obsoleto?</h3><p class="sub" style="margin:0;font-size:13.5px">O molde <b>' + mmEsc(mmNomeMolde(m)) + '</b> sai desta tela e vai para <b>Sistema › Mapa Obsoleto</b>. O desenho e o histórico continuam guardados, e dá para reativar depois.</p>' +
+    (m.producao ? '<p class="mm-aviso" style="margin:0">Ele está em produção — a produção desta máquina será parada.</p>' : '') +
+    '<div class="mm-grid2"><div class="mm-fld"><label for="mmFNome">Seu nome</label><input type="text" id="mmFNome" maxlength="80"></div><div class="mm-fld"><label for="mmFDesc">Motivo</label><input type="text" id="mmFDesc" maxlength="500" placeholder="ex.: molde sucateado"></div></div>' +
+    mmRodapeForm('Tornar obsoleto', 'mm-red'));
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    const resp = mmEl('mmFNome').value.trim(), desc = mmEl('mmFDesc').value.trim(), falta = [];
+    if (!resp) falta.push('digite o seu nome'); if (!desc) falta.push('descreva o motivo');
+    if (falta.length) { mmErroForm('Para salvar: ' + falta.join(', ') + '.'); return; }
+    mmSalvando(f, async function() {
+      await mmDefinirObsoleto(m, true, resp, desc);
+      f._fechar(); mostrarToast(mmNomeMolde(m) + ' foi para o Mapa Obsoleto.');
+      mmTelaLista();
+    });
+  };
+}
+async function mmObsAbrirPagina(recarregar) {
+  const el = mmEl('mmObsConteudo'); if (!el) return;
+  MM.op = false;
+  el.innerHTML = '<div class="mm-load"><div class="spinner"></div> Carregando…</div>';
+  try { if (recarregar !== false) await mmCarregar(true); }
+  catch (e) { el.innerHTML = '<h1 class="page-title">Mapa Obsoleto</h1><div class="mm-vazio-msg"><b>Não foi possível ler os moldes.</b><br>' + mmEsc(e.message || e) + '</div>'; return; }
+  const ult = function(m) { return MM.hist.filter(function(e) { return e.moldeId === m.id && e.tipo === 'obsoleto'; }).pop() || null; };
+  const linhas = MM.obsoletos.slice().sort(function(a, b) { return mmNomeMolde(a).localeCompare(mmNomeMolde(b), 'pt-BR', { numeric: true }); }).map(function(m) {
+    const e = ult(m), c = mmContagem(m);
+    return '<tr><td><b>' + mmEsc(mmNomeMolde(m)) + '</b><small>' + c.total + ' cavidades' + (m.camara ? ' · ' + mmEsc(m.camara) : '') + '</small></td><td>' + mmEsc(e ? (e.data + (e.hora ? ' ' + e.hora : '')) : '—') + '</td><td>' + mmEsc(e ? e.resp : '—') + '</td><td>' + mmEsc(e ? e.desc : '—') + '</td>' +
+      '<td class="acoes"><button type="button" class="btn" data-ver="' + m.id + '">Ver mapa</button><button type="button" class="btn btn-accent" data-reat="' + m.id + '">Reativar</button></td></tr>';
+  }).join('');
+  el.innerHTML = '<div class="mm-cab"><div class="mm-tt"><h1 class="page-title">Mapa Obsoleto</h1><p class="page-sub">Moldes tornados obsoletos no Mapa do Molde. Eles não aparecem para a produção (computador e celular), mas o desenho e o histórico continuam guardados. "Reativar" devolve o molde para a tela do Mapa do Molde.</p></div>' +
+    '<div class="mm-acoes"><button class="btn" onclick="mmObsAbrirPagina()">' + MM_SVG.att + 'Atualizar</button></div></div>' +
+    (linhas ? '<div class="mm-obs-tab"><table><thead><tr><th>Molde</th><th>Obsoleto desde</th><th>Por</th><th>Motivo</th><th></th></tr></thead><tbody>' + linhas + '</tbody></table></div>' : '<div class="mm-vazio-msg">Nenhum molde obsoleto.</div>');
+  el.onclick = function(ev) {
+    const v = ev.target.closest('[data-ver]'), r = ev.target.closest('[data-reat]');
+    const m = (v || r) && MM.obsoletos.find(function(x) { return x.id === Number((v || r).getAttribute(v ? 'data-ver' : 'data-reat')); });
+    if (!m) return;
+    if (v) mmObsVer(m); else mmObsReativar(m);
+  };
+}
+function mmObsVer(m) {
+  const evs = mmEventosDo(m), c = mmContagem(m);
+  const f = mmModal('<h3>' + mmEsc(mmNomeMolde(m)) + ' <span class="mm-badge dim" style="vertical-align:3px">obsoleto</span></h3><p class="sub">' + c.total + ' cavidades · ' + c.iso + ' isolada' + (c.iso === 1 ? '' : 's') + (m.rev ? ' · Rev. ' + mmEsc(m.rev) : '') + '</p>' +
+    '<div class="mm-pre">' + MM_LEG + mmHtmlMapa(m, { st: c.st, leitura: true }) + '</div>' +
+    '<div class="mm-fld"><label>Histórico</label><div class="mm-hlist" style="max-height:280px" id="mmObsHist">' + mmHtmlHistorico(evs, m) + '</div></div>' +
+    '<div class="mm-rodape"><button type="button" class="btn" data-fechar>Fechar</button></div>', true);
+  f.onsubmit = function(e) { e.preventDefault(); };
+  mmCarregarMiniaturas(mmEl('mmObsHist'));
+  mmEl('mmObsHist').addEventListener('click', function(e) { const ft = e.target.closest('.mm-hfoto'); if (ft) mmVerFoto(Number(ft.getAttribute('data-ev'))); });
+}
+function mmObsReativar(m) {
+  const f = mmModal('<h3>Reativar molde?</h3><p class="sub" style="margin:0;font-size:13.5px"><b>' + mmEsc(mmNomeMolde(m)) + '</b> volta para a tela do Mapa do Molde, na coluna da máquina dele.</p>' +
+    '<div class="mm-grid2"><div class="mm-fld"><label for="mmFNome">Seu nome</label><input type="text" id="mmFNome" maxlength="80"></div><div class="mm-fld"><label for="mmFDesc">Motivo</label><input type="text" id="mmFDesc" maxlength="500"></div></div>' +
+    mmRodapeForm('Reativar', 'btn-accent'));
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    const resp = mmEl('mmFNome').value.trim(), desc = mmEl('mmFDesc').value.trim(), falta = [];
+    if (!resp) falta.push('digite o seu nome'); if (!desc) falta.push('descreva o motivo');
+    if (falta.length) { mmErroForm('Para salvar: ' + falta.join(', ') + '.'); return; }
+    mmSalvando(f, async function() {
+      await mmDefinirObsoleto(m, false, resp, desc);
+      f._fechar(); mostrarToast(mmNomeMolde(m) + ' reativado.');
+      mmObsAbrirPagina(false);
     });
   };
 }
@@ -7959,7 +8169,7 @@ function mmAbrirImport() {
   const f = mmModal('<h3>Importar desenhos da planilha</h3><p class="sub">Cada molde entra com o desenho (cavidade, castanha, blocos e rótulos ZA/ZM), as cavidades marcadas com X como <b>isoladas</b> (com a descrição da observação, quando houver) e as demais observações no histórico. Toque em "Ver" para conferir.</p>' +
     '<div class="mm-imp-lista">' + pend.map(function(x, i) {
       const st = mmImportSituacao(x), iso = Object.keys(st).length;
-      const igual = MM.moldes.find(function(m) { return mmChaveMolde(m) === mmChaveMolde(x); });
+      const igual = (MM.todos || MM.moldes).find(function(m) { return mmChaveMolde(m) === mmChaveMolde(x); });
       return '<label class="mm-imp-it"><input type="checkbox" data-i="' + i + '"' + (igual ? '' : ' checked') + '><span><b>' + mmEsc(mmImportNome(x)) + '</b><small>' + mmLugares(x.desenho).length + ' cav. · ' + iso + ' isolada' + (iso === 1 ? '' : 's') + '</small>' +
         (igual ? '<small class="mm-aviso" style="display:block">Já existe ' + mmEsc(mmNomeMolde(igual)) + ' no sistema — desmarcado para não duplicar</small>' : '') + '</span><button type="button" class="btn" data-ver="' + i + '">Ver</button></label>';
     }).join('') + '</div>' +
@@ -7976,7 +8186,7 @@ function mmAbrirImport() {
       prog.textContent = 'Preparando as listas…';
       await mmGarantirListas();
       await mmCarregar(true);
-      const ja = {}; MM.moldes.forEach(function(m) { ja[m.origem] = 1; });
+      const ja = {}; (MM.todos || MM.moldes).forEach(function(m) { ja[m.origem] = 1; });
       let n = 0;
       for (const x of sel) {
         if (ja['planilha: ' + x.chave]) continue;                 // outra pessoa importou no meio tempo
@@ -8247,7 +8457,7 @@ function mmoRenderLista() {
 /* ---- molde em tela cheia ---- */
 function mmoAbrirMolde(id) {
   const m = MM.moldes.find(function(x) { return x.id === id; }); if (!m) return;
-  MM.op = true; MM.tela = 'molde'; MM.atual = m; MM.sel = null;
+  MM.op = true; MM.tela = 'molde'; MM.atual = m; MM.sel = null; MM.multi = false; MM.selVarias = {};
   opIr('molde'); mmoLigar(); mmoHistorico(false);
   mmoRenderMolde();
 }
@@ -8257,11 +8467,18 @@ function mmoRenderMolde() {
   mmEl('mmoTitulo').textContent = mmNomeMolde(m);
   mmEl('mmoSub').innerHTML = (m.producao ? '<span class="mm-badge prod">Em produção</span> ' : '') + '<b style="color:var(--ok)">' + c.at + '</b> de ' + c.total + ' ativas' + (c.iso ? ' · <b style="color:var(--danger)">' + c.iso + '</b> isolada' + (c.iso > 1 ? 's' : '') : '');
   const corpo = mmEl('mmoMolde');
-  corpo.innerHTML = '<div class="mm-leg mmo-leg"><span><i class="mini"></i>Ativa</span><span><i class="mini x"></i>Isolada</span><span>dentro = cavidade · ao lado = castanha</span></div>' +
+  corpo.innerHTML = '<button type="button" class="mmo-varias' + (MM.multi ? ' on' : '') + '" id="mmoVarias">' + MM_SVG.varias + (MM.multi ? 'Sair da seleção' : 'Selecionar várias cavidades') + '</button>' +
+    '<div class="mm-leg mmo-leg"><span><i class="mini"></i>Ativa</span><span><i class="mini x"></i>Isolada</span><span>dentro = cavidade · ao lado = castanha</span></div>' +
     '<div class="mm-mapa mmo-mapa">' + mmHtmlMapa(m, { st: c.st, sel: MM.sel }) + '</div>' +
-    '<p class="note" style="margin:8px 0 0;text-align:center">Toque numa cavidade para ver os detalhes, isolar ou liberar.</p>';
+    '<p class="note" style="margin:8px 0 0;text-align:center">' + (MM.multi ? 'Toque nas cavidades para marcar. Depois use Isolar ou Liberar na barra de baixo.' : 'Toque numa cavidade para ver os detalhes, isolar ou liberar.') + '</p>';
   mmEl('mmoHistN').textContent = evs.length;
-  corpo.querySelector('.mmo-mapa').addEventListener('click', function(e) { const b = e.target.closest('.mm-cav'); if (b) { MM.sel = b.getAttribute('data-l'); mmoRenderMolde(); mmoCavidade(); } });
+  corpo.querySelector('.mmo-mapa').addEventListener('click', function(e) {
+    const b = e.target.closest('.mm-cav'); if (!b) return;
+    if (MM.multi) { const k = b.getAttribute('data-l'); if (MM.selVarias[k]) delete MM.selVarias[k]; else MM.selVarias[k] = 1; mmAtualizarSelecao(); return; }
+    MM.sel = b.getAttribute('data-l'); mmoRenderMolde(); mmoCavidade();
+  });
+  mmEl('mmoVarias').onclick = function() { MM.multi = !MM.multi; MM.selVarias = {}; MM.sel = null; mmoRenderMolde(); };
+  mmAtualizarSelecao();
   if (!mmEl('mmoGaveta').hidden) mmoRenderHistorico();
 }
 function mmoCavidade() {
@@ -8322,6 +8539,108 @@ async function mmoPdf() {
     catch (e) { if (!e || e.name !== 'AbortError') mostrarToast('Não foi possível compartilhar: ' + ((e && e.message) || e) + '. Use "Abrir / baixar".', true); }
   };
   mmEl('mmoPdfAbrir').onclick = function() { r.doc.save(r.nome); mmoFecharSheet(); };
+}
+
+</script>
+<script>
+
+/* =============================================================================
+   ADMINISTRADOR — editar e excluir registros do Check List (27/11/2026)
+   Só a conta em MM_ADMINS (cleber.rodrigues@blowpet.com.br). Os registros ficam nas listas
+   "CP Registros Injeção/Sopro" (1 item por horário); a edição regrava o item inteiro, recalculando
+   "dentro do critério" com os mínimos/máximos que valiam no dia (os critérios aplicados não mudam).
+   Onde aparece: painel do lançamento (Dashboard), tabela de Dados Cadastrados e o registro no celular.
+   ============================================================================= */
+function regEhAdmin() { return typeof mmEhAdmin === 'function' && mmEhAdmin(); }
+function regTabela(proc) { return proc === 'sopro' ? 'TabelaRegistrosSopro' : 'TabelaRegistrosInjecao'; }
+function regBotoes(onEd, onEx) {
+  return '<div class="adm-reg"><span class="adm-reg-tag">Administrador</span><button type="button" class="btn btn-outline" onclick="' + onEd + '">✎ Editar registro</button>' +
+    '<button type="button" class="btn btn-outline adm-reg-ex" onclick="' + onEx + '">🗑 Excluir registro</button></div>';
+}
+// Acha o item da lista que guarda o horário (sessão) s
+async function regAcharItem(proc, s) {
+  const tab = regTabela(proc);
+  await lstIniciar();
+  if (!LST.listas[tab]) throw new Error('os registros ainda estão na planilha (migração para o Lists pendente) — edição só depois da migração');
+  lstInvalidar(tab);
+  const itens = await lstItens(tab), t = lstTabelaPor(tab), cols = t.cols(), ix = {};
+  cols.forEach(function(c, i) { ix[c] = i; });
+  const v = function(l, c) { return String(l[ix[c]] == null ? '' : l[ix[c]]); };
+  const sid = s.id_sessao || s.id;
+  let it = itens.find(function(x) { return x.linhas.length && sid && v(x.linhas[0], 'id_sessao') === String(sid); });
+  if (!it) it = itens.find(function(x) { const l = x.linhas[0]; return l && v(l, 'data') === String(s.data) && v(l, 'hora') === String(s.hora) && normMaquina(v(l, 'maquina')) === normMaquina(s.maquina) && (!s.criado_em || v(l, 'criado_em') === String(s.criado_em)); });
+  if (!it) throw new Error('não encontrei este registro na lista (talvez já tenha sido excluído) — atualize a tela');
+  return { tab: tab, t: t, cols: cols, ix: ix, it: it };
+}
+async function regDepois(proc) {
+  if (document.body.classList.contains('modo-op')) { OP.dados[OP.proc] = null; opFecharSheet(); opCarregar(OP.proc); return; }
+  if (typeof dmFecharPainel === 'function') dmFecharPainel();
+  if (proc !== 'sopro') { registrosCarregados = null; await carregarRegistrosInjecao(); try { aplicarFiltroTabela(); } catch (e) {} }
+}
+function regDataIso(d) { const m = String(d || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/); return m ? m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0') : ''; }
+async function regEditar(proc, s) {
+  if (!regEhAdmin()) return;
+  const sopro = proc === 'sopro';
+  const f = mmModal('<h3>Editar registro do Check List</h3><p class="sub">' + escHtml((s.maquina || '') + ' · ' + (s.data || '') + ' ' + (s.hora || '')) + ' · somente administrador</p><div id="regCorpo"><div class="mm-load"><div class="spinner"></div> Abrindo o registro…</div></div>' +
+    '<div class="mm-erro" id="mmFErro" hidden></div><div class="mm-rodape"><button type="button" class="btn" data-fechar>Cancelar</button><button type="submit" class="btn btn-accent" id="mmFSalvar" disabled>Salvar alterações</button></div>', true);
+  let R;
+  try { R = await regAcharItem(proc, s); } catch (e) { mmErroForm(e.message); mmEl('regCorpo').innerHTML = ''; return; }
+  const l0 = R.it.linhas[0], v = function(l, c) { return String(l[R.ix[c]] == null ? '' : l[R.ix[c]]); };
+  const cab = [['data', 'Data', 'date', regDataIso(v(l0, 'data'))], ['hora', 'Hora', 'time', v(l0, 'hora').slice(0, 5)], ['maquina', 'Máquina', 'text', v(l0, 'maquina')], ['responsavel', 'Responsável', 'text', v(l0, 'responsavel')],
+    ['gramatura', 'Gramatura', 'text', v(l0, 'gramatura')], ['cor', 'Cor', 'text', v(l0, 'cor')], sopro ? ['frasco', 'Frasco', 'text', v(l0, 'frasco')] : ['resina', 'Resina', 'text', v(l0, 'resina')]];
+  mmEl('regCorpo').innerHTML = '<div class="reg-cab">' + cab.map(function(c) { return '<div class="mm-fld"><label for="reg_' + c[0] + '">' + c[1] + '</label><input type="' + c[2] + '" id="reg_' + c[0] + '" value="' + escHtml(c[3]) + '"></div>'; }).join('') + '</div>' +
+    (sopro ? '' : '<div class="mm-fld"><label for="reg_just">Justificativa</label><textarea id="reg_just" maxlength="2000">' + escHtml(v(l0, 'justificativa')) + '</textarea></div>') +
+    '<div class="mm-fld"><label>Parâmetros (' + R.it.linhas.length + ')</label><div class="reg-params"><table><thead><tr><th>Parâmetro</th><th>Valor</th><th>Critério do dia</th></tr></thead><tbody>' +
+    R.it.linhas.map(function(l, k) {
+      const mn = v(l, 'tolerancia_min_aplicada'), mx = v(l, 'tolerancia_max_aplicada'), dc = v(l, 'dentro_criterio');
+      return '<tr class="' + (dc === 'NÃO' ? 'bad' : dc === 'SIM' ? 'ok' : '') + '"><td>' + escHtml(v(l, 'parametro')) + '</td><td><input data-k="' + k + '" value="' + escHtml(v(l, 'valor_medido')) + '" aria-label="Valor de ' + escHtml(v(l, 'parametro')) + '"></td><td class="lim">' + escHtml(mn || mx ? textoLimite(mn, mx) : 'sem critério') + '</td></tr>';
+    }).join('') + '</tbody></table></div><span class="mm-opc">O verde/vermelho é recalculado com o critério que valia no dia do registro.</span></div>';
+  mmEl('mmFSalvar').disabled = false;
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    const d = mmEl('reg_data').value, h = mmEl('reg_hora').value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || !h || !mmEl('reg_maquina').value.trim()) { mmErroForm('Informe data, hora e máquina.'); return; }
+    mmSalvando(f, async function() {
+      const novo = { data: d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4), hora: h };
+      cab.slice(2).forEach(function(c) { novo[c[0]] = mmEl('reg_' + c[0]).value.trim(); });
+      if (!sopro) novo.justificativa = mmEl('reg_just').value.trim();
+      const vals = {}; f.querySelectorAll('.reg-params input[data-k]').forEach(function(i) { vals[i.getAttribute('data-k')] = i.value.trim(); });
+      const linhas = R.it.linhas.map(function(l, k) {
+        const n = l.slice();
+        Object.keys(novo).forEach(function(c) { if (R.ix[c] !== undefined) n[R.ix[c]] = novo[c]; });
+        const val = vals[k] === undefined ? v(l, 'valor_medido') : (vals[k] || '—');
+        if (val !== v(l, 'valor_medido')) {
+          n[R.ix.valor_medido] = val;
+          const mn = v(l, 'tolerancia_min_aplicada'), mx = v(l, 'tolerancia_max_aplicada');
+          if (mn || mx) { const st = lmStatus(val, { valor_min: mn, valor_max: mx }); n[R.ix.dentro_criterio] = st === 'ok' ? 'SIM' : st === 'bad' ? 'NÃO' : ''; }
+        }
+        return n;
+      });
+      const g = lstLinhasParaItens(R.t, linhas);
+      if (g.length !== 1) throw new Error('o registro ficou inconsistente (' + g.length + ' partes) — nada foi gravado');
+      const c = await lstColunas(R.tab), campos = lstCamposItem(c, g[0].campos, g[0].campos.id_sessao || g[0].campos.data);
+      await lstG('PATCH', lstSite() + '/lists/' + LST.listas[R.tab] + '/items/' + R.it.id + '/fields', campos);
+      lstInvalidar(R.tab);
+      f._fechar(); mostrarToast('Registro alterado.');
+      await regDepois(proc);
+    });
+  };
+}
+async function regExcluir(proc, s) {
+  if (!regEhAdmin()) return;
+  const f = mmModal('<h3>Excluir registro do Check List?</h3><p class="sub" style="margin:0;font-size:13.5px"><b>' + escHtml(s.maquina || '') + '</b> · ' + escHtml((s.data || '') + ' ' + (s.hora || '')) + ' · ' + escHtml(s.responsavel || '—') + '</p>' +
+    '<p class="mm-aviso" style="margin:0">Todos os parâmetros deste horário serão apagados. Não dá para desfazer.</p>' +
+    '<div class="mm-erro" id="mmFErro" hidden></div><div class="mm-rodape"><button type="button" class="btn" data-fechar>Cancelar</button><button type="submit" class="btn mm-red" id="mmFSalvar">Excluir</button></div>');
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    mmSalvando(f, async function() {
+      const R = await regAcharItem(proc, s);
+      await lstExcluirIds(R.tab, [R.it.id]);
+      lstInvalidar(R.tab);
+      f._fechar(); mostrarToast('Registro excluído.');
+      await regDepois(proc);
+    });
+  };
 }
 
 </script>
