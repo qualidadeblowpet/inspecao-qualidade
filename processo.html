@@ -16,7 +16,6 @@
     } catch (e) {}
   })();
 </script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.18.0/lib/msal-browser.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;650;700&family=JetBrains+Mono:wght@500&display=swap');
@@ -1060,6 +1059,19 @@
   /* celular: bolinhas do turno */
   .op-dots-turno{grid-template-columns:repeat(4,1fr) !important}
   .op-dbtn.vazio.futuro{opacity:.45}
+  /* melhorias 27/11/2026 */
+  .reg-janela{margin:0 0 8px;font-size:12.5px}
+  .reg-tudo{border:0;background:none;padding:0;font:inherit;color:var(--accent);text-decoration:underline;cursor:pointer}
+  .rasc-aviso{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:400;width:min(560px,calc(100% - 20px));background:var(--surface);color:var(--fg);
+    border:2px solid var(--warn);border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,.28);padding:12px 14px;display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow:auto}
+  .rasc-cab{display:flex;flex-direction:column;gap:2px}.rasc-cab b{color:var(--warn);font-size:14.5px}.rasc-cab span{font-size:12.5px;color:var(--fg-dim)}
+  .rasc-it{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--border);padding-top:8px}
+  .rasc-tx{flex:1;min-width:180px;display:flex;flex-direction:column}.rasc-tx b{font-size:13.5px}.rasc-tx small{font-size:12px;color:var(--fg-dim)}
+  .rasc-bts{display:flex;gap:6px}
+  .rasc-bts button{border-radius:9px;font:inherit;font-size:13px;font-weight:650;padding:8px 12px;cursor:pointer;border:1px solid var(--border);background:var(--surface-2);color:var(--fg)}
+  .rasc-bts .rasc-env{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+  .rasc-bts .rasc-des.conf{border-color:var(--danger);color:var(--danger)}
+  .rasc-bts button:disabled{opacity:.6;cursor:default}
 </style>
 </head>
 <body>
@@ -1083,7 +1095,7 @@
       <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h10"/><path d="M12 7h6l4 5-4 5h-6z"/><path d="M5 9v6"/></svg></span><span class="op-bt"><b>Injetora</b><span>Registro do check list e últimos registros das injetoras</span></span><span class="op-chev">›</span></button>
       <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4v3h-4z"/><path d="M9 5h6l1 4v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9z"/><path d="M8 13h8"/></svg></span><span class="op-bt"><b>Sopro</b><span>Registro do check list e últimos registros das sopradoras</span></span><span class="op-chev">›</span></button>
       <button type="button" class="op-big mol" onclick="mmoAbrirLista()"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="2"/><circle cx="15.5" cy="8.5" r="2"/><circle cx="8.5" cy="15.5" r="2"/><path d="m13.8 13.8 3.4 3.4M17.2 13.8l-3.4 3.4"/></svg></span><span class="op-bt"><b>Moldes</b><span>Mapa do molde por máquina e cavidades isoladas</span></span><span class="op-chev">›</span></button>
-      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 23:15</span></div>
+      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 23:37</span></div>
     </section>
     <section id="opDash" hidden>
       <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Registros do turno de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
@@ -1140,7 +1152,7 @@
         </div>
       </nav>
       <button type="button" class="a-opbtn" id="btnVersaoOperacao" onclick="usarVersaoOperacao()" hidden>Voltar à versão da operação</button>
-      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 23:15</b></span></div>
+      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 23:37</b></span></div>
       <div class="a-user"><span class="av" id="userAv">·</span><div class="who"><b id="userNome">—</b><small id="userEmail"></small></div><button type="button" class="a-ic-btn" title="Sair" aria-label="Sair" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button></div>
     </aside>
 
@@ -1179,6 +1191,7 @@
         <span class="note" id="dmPeriodo" style="margin:0"></span>
       </div>
       <p class="note" id="dmErroData" style="color:var(--danger);margin:-4px 0 8px;" hidden></p>
+      <p class="note reg-janela" hidden></p>
       <div class="dm-legend">
         <span><i style="background:var(--ok)"></i>Tudo dentro do critério</span>
         <span><i style="background:var(--danger)"></i>Com parâmetro fora (número = quantos)</span>
@@ -1210,6 +1223,7 @@
         <div class="dv3-filtergroup"><label>Data final</label><input type="date" id="tData_ate"></div>
         <button class="dv3-filtergroup dv3-btnfiltrar" onclick="aplicarFiltroTabela()">Aplicar filtro</button>
       </div>
+      <p class="note reg-janela" hidden></p>
       <p class="note" id="tabelaContagem"></p>
       <div class="widetablewrap">
         <table class="widetable" id="widetable">
@@ -1484,6 +1498,7 @@
         <span><span class="critpill aviso">amostra insuficiente</span> menos de 10 leituras</span>
         <span><span class="critpill azul">inconsistência de escala</span> ver detalhe por clusters</span>
       </div>
+      <p class="note reg-janela" hidden></p>
       <p class="note" id="contagemProdutos" style="margin:0 0 10px;"></p>
       <div class="widetablewrap">
         <table class="widetable">
@@ -1872,11 +1887,11 @@ function lstErroResp(e) { return lstResp({ error: { message: (e && e.message) ||
 function lstTxt(v) { if (v === null || v === undefined) return ''; if (typeof v === 'boolean') return v ? 'TRUE' : 'FALSE'; return String(v); }
 
 /* ---- chamadas ao Microsoft Graph ---- */
-async function lstG(method, path, body) {
+async function lstG(method, path, body, extraH) {
   const token = await getToken();
   const url = /^https:/.test(path) ? path : 'https://graph.microsoft.com/v1.0' + path;
   for (let t = 0; ; t++) {
-    const h = { Authorization: 'Bearer ' + token };
+    const h = Object.assign({ Authorization: 'Bearer ' + token }, extraH || {});
     if (body !== undefined) h['Content-Type'] = 'application/json';
     let r;
     try { r = await lstRede(url, { method: method, headers: h, body: body === undefined ? undefined : JSON.stringify(body) }); }
@@ -1895,9 +1910,9 @@ function lstRetryAfter(r, tent) {
   const h = r && r.headers ? (r.headers['Retry-After'] || r.headers['retry-after']) : null, ra = parseFloat(h);
   return Math.min(isNaN(ra) ? 1000 * tent : Math.max(ra * 1000, 300), 20000);
 }
-async function lstTodos(path) {
-  let url = 'https://graph.microsoft.com/v1.0' + path, todos = [];
-  while (url) { const j = await lstG('GET', url); todos = todos.concat(j.value || []); url = j['@odata.nextLink'] || null; }
+async function lstTodos(path, extraH) {
+  let url = /^https:/.test(path) ? path : 'https://graph.microsoft.com/v1.0' + path, todos = [];
+  while (url) { const j = await lstG('GET', url, undefined, extraH); todos = todos.concat(j.value || []); url = j['@odata.nextLink'] || null; }
   return todos;
 }
 // Até 20 chamadas num pacote só. sequencial=true mantém a ordem (a lista guarda a ordem de inclusão).
@@ -2003,31 +2018,54 @@ async function lstAdicionarColuna(tabela, nome) {
 }
 
 /* ---- leitura ---- */
+// Registros: ao abrir, só os últimos REG_MESES meses (Cleber, 27/11/2026). REG_DESDE = '' lê tudo.
+const REG_MESES = 3;
+var REG_DESDE = (function() { const d = new Date(); d.setMonth(d.getMonth() - REG_MESES); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); })();
 // Itens da lista na ordem de inclusão. Registros: cada item já vem convertido nas linhas que o app espera.
-async function lstItens(tabela) {
+// desdeArg: data ISO mínima (registros); omitido = REG_DESDE; '' = todos.
+async function lstItens(tabela, desdeArg) {
+  const t0 = lstTabelaPor(tabela);
+  const desde = t0 && t0.largo ? (desdeArg === undefined ? REG_DESDE : (desdeArg || '')) : '';
   const cache = LST.itens[tabela];
-  if (cache && cache.itens && Date.now() - cache.ts < 4000) return cache.itens;
-  if (cache && cache.promessa) return cache.promessa;
+  if (cache && cache.desde === desde) {
+    if (cache.itens && Date.now() - cache.ts < 4000) return cache.itens;
+    if (cache.promessa) return cache.promessa;
+  }
   const p = (async function() {
-    const t = lstTabelaPor(tabela), c = await lstColunas(tabela), ini = Date.now();
+    const t = t0, c = await lstColunas(tabela), ini = Date.now();
     const sel = ['Title'].concat(c.ordem.map(function(h) { return c.interno[h]; })).join(',');
-    const brutos = await lstTodos(lstSite() + '/lists/' + LST.listas[tabela] + '/items?$expand=fields($select=' + sel + ')&$top=999');
-    const itens = brutos.map(function(it) {
+    const base = lstSite() + '/lists/' + LST.listas[tabela] + '/items?$expand=fields($select=' + sel + ')&$top=999';
+    let brutos = null, filtrou = false;
+    if (desde && c.interno.data_iso && !(LST.semFiltroData && LST.semFiltroData[tabela])) {
+      try {   // coluna data_iso é indexada: o Lists devolve só os registros do período
+        brutos = await lstTodos(base + '&$filter=' + encodeURIComponent('fields/' + c.interno.data_iso + " ge '" + desde + "'"), { Prefer: 'HonorNonIndexedQueriesWarningMayFailRandomly' });
+        filtrou = true;
+      } catch (e) {
+        console.warn('[Lists] filtro por data não aceito em ' + tabela + ' (' + e.message + ') — lendo a lista inteira');
+        LST.semFiltroData = LST.semFiltroData || {}; LST.semFiltroData[tabela] = true; brutos = null;
+      }
+    }
+    if (!brutos) brutos = await lstTodos(base);
+    let itens = brutos.map(function(it) {
       const f = it.fields || {}, porNome = {};
       c.ordem.forEach(function(h) { const v = f[c.interno[h]]; porNome[h] = v == null ? '' : String(v); });
       return t.largo ? { id: Number(it.id), linhas: lstItemParaLinhas(t, porNome) } : { id: Number(it.id), valores: c.ordem.map(function(h) { return porNome[h]; }) };
     }).sort(function(a, b) { return a.id - b.id; });
-    LST.leituras[tabela] = { itens: itens.length, linhas: t.largo ? itens.reduce(function(s, x) { return s + x.linhas.length; }, 0) : itens.length, ms: Date.now() - ini, quando: Date.now() };
-    LST.itens[tabela] = { ts: Date.now(), itens: itens };
+    if (desde && t.largo && !filtrou) {   // sem filtro no Lists: corta aqui pela data do registro
+      const ix = t.cols().indexOf('data');
+      itens = itens.filter(function(x) { const l = x.linhas[0], iso = l ? lstDataIso(l[ix]) : ''; return !iso || iso >= desde; });
+    }
+    LST.leituras[tabela] = { itens: itens.length, linhas: t.largo ? itens.reduce(function(s, x) { return s + x.linhas.length; }, 0) : itens.length, ms: Date.now() - ini, quando: Date.now(), desde: desde, filtroNoLists: filtrou };
+    LST.itens[tabela] = { ts: Date.now(), itens: itens, desde: desde };
     return itens;
   })();
-  LST.itens[tabela] = { ts: 0, promessa: p };
+  LST.itens[tabela] = { ts: 0, promessa: p, desde: desde };
   try { return await p; } catch (e) { delete LST.itens[tabela]; throw e; }
 }
 function lstInvalidar(tabela) { delete LST.itens[tabela]; }
 // Linhas "de planilha" de uma tabela (registros: todas as linhas de todos os itens, em ordem)
-async function lstLinhas(tabela) {
-  const t = lstTabelaPor(tabela), itens = await lstItens(tabela);
+async function lstLinhas(tabela, desde) {
+  const t = lstTabelaPor(tabela), itens = await lstItens(tabela, desde);
   if (!t.largo) return itens.map(function(x) { return x.valores; });
   const out = []; itens.forEach(function(x) { x.linhas.forEach(function(l) { out.push(l); }); });
   return out;
@@ -2342,7 +2380,7 @@ async function lstComparar(log) {
     const pl = await lstLerPlanilha(t);
     const r = { lista: lstNomeLista(t), tabela: t.tabela, largo: !!t.largo, existe: !!LST.listas[t.tabela], planilha: pl.linhas.length, msPlanilha: pl.ms };
     if (!r.existe) { r.status = 'sem lista'; out.push(r); continue; }
-    const ini = Date.now(), ls = await lstLinhas(t.tabela);
+    const ini = Date.now(), ls = await lstLinhas(t.tabela, '');
     r.msLista = Date.now() - ini; r.lista_linhas = ls.length; r.itens = (LST.leituras[t.tabela] || {}).itens;
     const nomes = t.largo ? t.cols() : pl.nomes, n = Math.min(pl.linhas.length, ls.length);
     r.iguais = 0; r.diferentes = 0; r.diffs = []; r.porParametro = {};
@@ -2835,6 +2873,13 @@ function voltarUpload(){
 function lerPlanilha(){
   if (!arquivoEscolhido) return;
   show('viewProcessing'); setSteps('done','active','');
+  if (typeof XLSX === 'undefined') {   // leitor de Excel baixado só agora (não pesa na abertura do sistema)
+    carregarXlsx().then(lerPlanilha).catch(function(err){
+      document.getElementById('errList').innerHTML = '<li>' + escHtml(err.message) + ' — confira a internet e tente de novo.</li>';
+      show('viewError'); setSteps('done','','');
+    });
+    return;
+  }
 
   var reader = new FileReader();
   reader.onload = function(e){
@@ -3261,6 +3306,7 @@ function mudarPagina(pagina){
     btn.classList.toggle('active', btn.getAttribute('data-page') === pagina);
   });
   if ((pagina === 'dashboard' || pagina === 'dadosCadastrados') && registrosCarregados === null) carregarRegistrosInjecao();
+  if (pagina === 'carregarDados' && typeof carregarXlsx === 'function') carregarXlsx().catch(function(){});   // já vai baixando
   if (pagina === 'criterios') renderCriterios();
   if (pagina === 'criteriosSopro') renderCriteriosSopro();
   if (pagina === 'iqr') iqrAbrirPagina();
@@ -3906,6 +3952,7 @@ async function carregarRegistrosInjecao(){
     popularFiltroTabela();
     aplicarFiltroTabela();
     rotularBotao(btnT, 'Atualizar registros');
+    regRenderJanela();
   } catch (err) {
     mostrarToast('Falha de conexão ao carregar registros: ' + err.message, true);
   } finally {
@@ -4200,6 +4247,7 @@ function dmAplicarDatas(){
   if ((ate - de) / 86400000 > 92) return erro('Escolha um período de até 3 meses.');
   DASH.datas = { de: de, ate: ate };
   document.querySelectorAll('.dm-chip-dias').forEach(function(b){ b.classList.remove('on'); });
+  if (regPrecisaAmpliar(dmDataISO(de))) { regAmpliar(dmDataISO(de)); return; }   // carrega o período e redesenha
   renderDashMaquinas();
 }
 
@@ -4523,6 +4571,7 @@ function aplicarFiltroTabela(){
   var maquinas = mselValores('tMaquina');
   var de = document.getElementById('tData_de').value;
   var ate = document.getElementById('tData_ate').value;
+  if (regPrecisaAmpliar(de)) { regAmpliarTabela(de, ate, maquinas); return; }   // data anterior ao que foi carregado
 
   var filtrados = registrosCarregados.filter(function(r){
     if (!valorBateFiltro(maquinas, r.maquina, 'maquina')) return false;
@@ -5140,9 +5189,11 @@ async function lmConcluir(){
   try {
     c.ident.quando = lmAgora(); // hora real da gravação
     await lmGravar(c);
+    rascRemover(c._rascId); rascAviso();
     lmTelaConcluido();
   } catch (err) {
-    errEl.textContent = 'Não foi possível salvar: ' + err.message; errEl.hidden = false;
+    var guardou = rascGuardar(c, err.message);
+    errEl.innerHTML = escHtml('Não foi possível salvar: ' + err.message) + (guardou ? '<br><b>O check list ficou guardado neste aparelho.</b> Toque em "Concluir" para tentar de novo agora — ou, se fechar, ao abrir o sistema aparece o aviso para enviar novamente.' : ''); errEl.hidden = false;
     btn.disabled = false; btn.textContent = 'Concluir ✓';
   }
 }
@@ -5164,6 +5215,7 @@ async function lmGravar(c){
     var cols = c.processo === 'injecao' ? COLS_INJ : COLS_SOPRO;
     linhas.push(cols.map(function(campo){ return obj[campo] !== undefined ? String(obj[campo]) : ''; }));
   }); });
+  c._linhas = linhas;   // para guardar como rascunho se não salvar
   var token = await getToken();
   if (c.processo === 'injecao') await prepararColunasTextoRegistrosInjecao(token); else await prepararColunasTextoRegistrosSopro(token);
   var tabela = c.processo === 'injecao' ? 'TabelaRegistrosInjecao' : 'TabelaRegistrosSopro';
@@ -8642,6 +8694,169 @@ async function regExcluir(proc, s) {
     });
   };
 }
+
+</script>
+<script>
+
+/* =============================================================================
+   MELHORIAS DE DESEMPENHO E SEGURANÇA (Cleber, 27/11/2026)
+   1) Registros: ao abrir, só os últimos 3 meses. Data inicial mais antiga no filtro (ou "carregar tudo")
+      amplia a leitura. A lista é filtrada no próprio Lists pela coluna indexada "data_iso".
+   2) Check list que não salvou (rede caiu): fica guardado no aparelho como rascunho e, ao abrir o
+      sistema de novo, aparece um aviso para enviar novamente.
+   3) Biblioteca de leitura de Excel (Carregar Dados) só é baixada quando for usada.
+   4) O sistema se atualiza sozinho (F5) depois de 6 horas aberto, quando ninguém está no meio de algo.
+   ============================================================================= */
+
+/* ---- 1) janela de leitura dos registros ---- */
+function regIsoHoje(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function regFmtIso(iso) { const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; }
+function regDesdePadrao() { return regIsoHoje(new Date(new Date().setMonth(new Date().getMonth() - REG_MESES))); }
+function regRenderJanela() {
+  document.querySelectorAll('.reg-janela').forEach(function(el) {
+    el.hidden = false;
+    el.innerHTML = REG_DESDE
+      ? 'Registros carregados desde <b>' + regFmtIso(REG_DESDE) + '</b>' + (REG_DESDE === regDesdePadrao() ? ' (últimos ' + REG_MESES + ' meses)' : '') + '. Para ver mais antigos, escolha uma data inicial anterior no filtro ou <button type="button" class="reg-tudo" onclick="regCarregarTudo()">carregue todos</button>.'
+      : 'Todos os registros carregados (desde o primeiro). <button type="button" class="reg-tudo" onclick="regVoltarJanela()">Voltar aos últimos ' + REG_MESES + ' meses</button>';
+  });
+}
+// Amplia a leitura até "isoDe" (ou tudo, com '') e recarrega Dashboard / Dados Cadastrados / IQR
+async function regAmpliar(isoDe) {
+  REG_DESDE = isoDe || '';
+  lstInvalidar('TabelaRegistrosInjecao'); lstInvalidar('TabelaRegistrosSopro');
+  registrosCarregados = null;
+  if (typeof OP !== 'undefined' && OP.dados) { OP.dados.inj = null; OP.dados.sop = null; }
+  await carregarRegistrosInjecao();
+  const iqr = document.getElementById('pageIqr');
+  if (iqr && !iqr.hidden && registrosCarregados) { try { iqrRecalcular(); iqrRenderViewAtual(); } catch (e) {} }
+}
+async function regCarregarTudo() { mostrarToast('Carregando todos os registros… pode levar alguns segundos.'); await regAmpliar(''); }
+async function regVoltarJanela() { await regAmpliar(regDesdePadrao()); }
+// Dados Cadastrados: data inicial antes do que está carregado -> amplia e reaplica o mesmo filtro
+function regPrecisaAmpliar(isoDe) { return !!(REG_DESDE && isoDe && isoDe < REG_DESDE); }
+async function regAmpliarTabela(de, ate, maquinas) {
+  await regAmpliar(de);
+  if (!registrosCarregados) return;
+  document.getElementById('tData_de').value = de; document.getElementById('tData_ate').value = ate;
+  if (maquinas && maquinas.length) mselConfigurar('tMaquina', valoresUnicos('maquina'), maquinas, null, 'Todas');
+  aplicarFiltroTabela();
+}
+
+/* ---- 2) rascunho do check list que não foi salvo ---- */
+const RASC_CHAVE = 'processoRascunhos';
+function rascLer() { try { const v = JSON.parse(localStorage.getItem(RASC_CHAVE) || '[]'); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+function rascGravar(l) { try { if (l.length) localStorage.setItem(RASC_CHAVE, JSON.stringify(l)); else localStorage.removeItem(RASC_CHAVE); return true; } catch (e) { return false; } }
+function rascGuardar(c, erro) {
+  if (!c || !c._linhas || !c._linhas.length) return false;
+  const cols = c.processo === 'injecao' ? COLS_INJ : COLS_SOPRO, l0 = c._linhas[0], v = function(k) { return l0[cols.indexOf(k)] || ''; };
+  if (!c._rascId) c._rascId = 'R' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const lista = rascLer().filter(function(r) { return r.id !== c._rascId; });
+  lista.push({ id: c._rascId, processo: c.processo, tabela: c.processo === 'injecao' ? 'TabelaRegistrosInjecao' : 'TabelaRegistrosSopro', idSessao: v('id_sessao'),
+    linhas: c._linhas, maquina: v('maquina'), data: v('data'), hora: v('hora'), responsavel: v('responsavel'), n: c._linhas.length, erro: String(erro || '').slice(0, 200), guardadoEm: Date.now() });
+  return rascGravar(lista);
+}
+function rascRemover(id) { if (id) rascGravar(rascLer().filter(function(r) { return r.id !== id; })); }
+function rascAviso() {
+  let el = document.getElementById('rascAviso');
+  const lista = rascLer();
+  if (!lista.length) { if (el) el.remove(); return; }
+  if (!el) { el = document.createElement('div'); el.id = 'rascAviso'; el.className = 'rasc-aviso'; el.setAttribute('role', 'alert'); ((document.body.classList.contains('modo-op') && document.getElementById('opApp')) || document.body).appendChild(el); }
+  el.innerHTML = '<div class="rasc-cab"><b>⚠ ' + (lista.length === 1 ? '1 check list não foi salvo' : lista.length + ' check lists não foram salvos') + '</b><span>A conexão caiu na hora de salvar. Os valores ficaram guardados neste aparelho — envie novamente.</span></div>' +
+    lista.map(function(r) {
+      return '<div class="rasc-it" data-id="' + escHtml(r.id) + '"><div class="rasc-tx"><b>' + (r.processo === 'injecao' ? 'Injeção' : 'Sopro') + ' · ' + escHtml(r.maquina) + '</b><small>' + escHtml(r.data + ' ' + r.hora + ' · ' + (r.responsavel || '—') + ' · ' + r.n + ' parâmetros') + '</small></div>' +
+        '<div class="rasc-bts"><button type="button" class="rasc-env" data-env="' + escHtml(r.id) + '">Enviar agora</button><button type="button" class="rasc-des" data-des="' + escHtml(r.id) + '">Descartar</button></div></div>';
+    }).join('');
+  el.onclick = function(e) {
+    const env = e.target.closest('[data-env]'), des = e.target.closest('[data-des]');
+    if (env) { rascEnviar(env.getAttribute('data-env'), env); return; }
+    if (des) {
+      if (!des.classList.contains('conf')) { des.classList.add('conf'); des.textContent = 'Descartar? Toque de novo'; clearTimeout(des._t); des._t = setTimeout(function() { des.classList.remove('conf'); des.textContent = 'Descartar'; }, 4000); return; }
+      rascRemover(des.getAttribute('data-des')); rascAviso(); mostrarToast('Rascunho descartado.');
+    }
+  };
+}
+async function rascEnviar(id, bt) {
+  const r = rascLer().find(function(x) { return x.id === id; }); if (!r) { rascAviso(); return; }
+  if (!itemId) { mostrarToast('Ainda conectando — aguarde um instante e toque em "Enviar agora" de novo.', true); return; }
+  if (bt) { bt.disabled = true; bt.textContent = 'Enviando…'; }
+  try {
+    // Já chegou? (às vezes a rede cai depois de o Lists gravar) — não duplica
+    if (r.idSessao && typeof LST !== 'undefined' && LST.listas && LST.listas[r.tabela]) {
+      const t = lstTabelaPor(r.tabela), ix = t.cols().indexOf('id_sessao');
+      lstInvalidar(r.tabela);
+      const itens = await lstItens(r.tabela);
+      if (itens.some(function(x) { return x.linhas[0] && String(x.linhas[0][ix]) === String(r.idSessao); })) {
+        rascRemover(id); rascAviso(); mostrarToast('Este check list já estava salvo — rascunho removido.'); return;
+      }
+    }
+    const token = await getToken();
+    const url = 'https://graph.microsoft.com/v1.0/drives/' + driveId + '/items/' + itemId + '/workbook/tables/' + r.tabela + '/rows/add';
+    const resp = await fetch(url, { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' }, body: JSON.stringify({ values: r.linhas }) });
+    if (!resp.ok) { const j = await resp.json().catch(function() { return {}; }); throw new Error(j.error ? j.error.message : 'status ' + resp.status); }
+    rascRemover(id); rascAviso();
+    if (r.processo === 'injecao') registrosCarregados = null;
+    if (typeof OP !== 'undefined' && OP.dados) { OP.dados[r.processo === 'injecao' ? 'inj' : 'sop'] = null; if (document.body.classList.contains('modo-op') && OP.proc && !document.getElementById('opDash').hidden) opCarregar(OP.proc); }
+    else if (r.processo === 'injecao' && !document.getElementById('pageDashboard').hidden) carregarRegistrosInjecao();
+    mostrarToast('Check list ' + r.maquina + ' · ' + r.data + ' ' + r.hora + ' enviado.');
+  } catch (e) {
+    mostrarToast('Ainda não foi possível enviar: ' + ((e && e.message) || e) + '. Tente de novo quando a conexão voltar.', true);
+    if (bt && bt.isConnected) { bt.disabled = false; bt.textContent = 'Enviar agora'; }
+  }
+}
+// Aviso ao abrir (depois de conectar) e quando a conexão volta
+(function() {
+  let n = 0;
+  const t = setInterval(function() { if ((typeof itemId !== 'undefined' && itemId) || ++n > 120) { clearInterval(t); rascAviso(); } }, 1000);
+  window.addEventListener('online', function() { rascAviso(); });
+})();
+
+/* ---- 3) biblioteca de Excel sob demanda (só "Carregar Dados") ---- */
+const XLSX_URL = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+let _xlsxCarregando = null;
+function carregarXlsx() {
+  if (typeof XLSX !== 'undefined') return Promise.resolve();
+  if (!_xlsxCarregando) _xlsxCarregando = new Promise(function(ok, falha) {
+    const s = document.createElement('script'); s.src = XLSX_URL; s.async = true;
+    s.onload = function() { typeof XLSX !== 'undefined' ? ok() : falha(new Error('biblioteca de Excel não carregou')); };
+    s.onerror = function() { _xlsxCarregando = null; s.remove(); falha(new Error('sem conexão para baixar o leitor de Excel')); };
+    document.head.appendChild(s);
+  });
+  return _xlsxCarregando;
+}
+
+/* ---- 4) atualização automática (F5) depois de 6 horas aberto ---- */
+const APP_ABERTO_EM = Date.now();
+function appRecarregarApos() { return window.__RECARREGAR_MS__ || 6 * 3600 * 1000; }
+function appOcupado() {
+  const vis = function(id) { const e = document.getElementById(id); return !!(e && !e.hidden); };
+  if (document.querySelector('.mm-ov')) return true;                                   // janela aberta
+  if (vis('lmFullscreen') || vis('opSheetWrap') || vis('dmPainelWrap') || vis('mmoSheetWrap') || vis('mmoGaveta')) return true;
+  if (typeof MM !== 'undefined' && MM.multi) return true;                               // selecionando cavidades
+  const a = document.activeElement;
+  if (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && a.type !== 'search') return true;
+  const pc = document.getElementById('pageCarregarDados'); if (pc && !pc.hidden && typeof arquivoEscolhido !== 'undefined' && arquivoEscolhido) return true;
+  return false;
+}
+function appTalvezRecarregar() {
+  if (Date.now() - APP_ABERTO_EM < appRecarregarApos()) return;
+  if (appOcupado()) return;                    // tenta de novo no próximo minuto
+  try { const p = document.querySelector('.nav-item.active'); if (p && p.getAttribute('data-page')) sessionStorage.setItem('processoVoltarPagina', p.getAttribute('data-page')); } catch (e) {}
+  window.__recarregou = true;
+  location.reload();
+}
+setInterval(appTalvezRecarregar, 60 * 1000);
+document.addEventListener('visibilitychange', function() { if (!document.hidden) appTalvezRecarregar(); });
+// Depois do F5 automático, volta para a página em que estava (computador)
+(function() {
+  let pg = null; try { pg = sessionStorage.getItem('processoVoltarPagina'); sessionStorage.removeItem('processoVoltarPagina'); } catch (e) {}
+  if (!pg || pg === 'dashboard') return;
+  let n = 0;
+  const t = setInterval(function() {
+    if (++n > 60) { clearInterval(t); return; }
+    const app = document.getElementById('app');
+    if (app && !app.hidden && typeof itemId !== 'undefined' && itemId && typeof PAGINAS_IDS !== 'undefined' && PAGINAS_IDS[pg]) { clearInterval(t); mudarPagina(pg); }
+  }, 1000);
+})();
 
 </script>
 </body>
