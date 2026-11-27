@@ -875,6 +875,14 @@
   .mm-hquando{font-size:12px;color:var(--fg-dim)}
   .mm-himp{font-size:11px;color:var(--fg-faint)}
   .mm-hfoto{width:116px;aspect-ratio:4/3;object-fit:cover;border-radius:8px;border:1px solid var(--border);cursor:zoom-in;display:block;background:var(--surface-2)}
+  .mm-desde-ed{border:0;background:none;color:var(--mm-prod);cursor:pointer;padding:1px 3px;margin-left:4px;border-radius:5px;display:inline-flex;vertical-align:-2px}
+  .mm-desde-ed svg{width:13px;height:13px}
+  .mm-desde-ed:hover,.mm-desde-ed:focus-visible{background:var(--mm-prod-soft);outline:none}
+  .mm-hadm{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+  .mm-hadm button{border:1px dashed var(--border);background:none;color:var(--fg-dim);border-radius:6px;font:inherit;font-size:11px;font-weight:600;padding:2px 7px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+  .mm-hadm button svg{width:11px;height:11px}
+  .mm-hadm button:hover,.mm-hadm button:focus-visible{border-style:solid;border-color:var(--accent-border);color:var(--accent);outline:none}
+  .mm-hadm button[data-adm="excluir"]:hover{border-color:var(--danger);color:var(--danger)}
   .mm-hfoto-link{font-size:12px;color:var(--accent)}
   .mm-ov{position:fixed;inset:0;background:var(--mm-ov);display:grid;place-items:center;z-index:300;padding:16px}
   .mm-modal{background:var(--surface);color:var(--fg);border:1px solid var(--border);border-radius:16px;width:min(540px,100%);max-height:92vh;overflow:auto;padding:18px 20px;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 50px var(--mm-sombra)}
@@ -954,7 +962,7 @@
       <div class="op-brandrow"><img class="a-logo" src="sq-icone-192.png" alt="" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><svg class="a-logo a-logo-svg" viewBox="0 0 40 30" aria-hidden="true"><rect width="40" height="30" rx="7" fill="#c8202f"/><text x="20" y="20.5" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="800" font-size="14" fill="#fff">BP</text></svg><div><b>Controle de Processo</b><small>Registro do check list e últimos registros</small></div></div>
       <button type="button" class="op-big inj" onclick="opAbrirProcesso('inj')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12h10"/><path d="M12 7h6l4 5-4 5h-6z"/><path d="M5 9v6"/></svg></span><span class="op-bt"><b>Injetora</b><span>Registro do check list e últimos registros das injetoras</span></span><span class="op-chev">›</span></button>
       <button type="button" class="op-big sop" onclick="opAbrirProcesso('sop')"><span class="op-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 2h4v3h-4z"/><path d="M9 5h6l1 4v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V9z"/><path d="M8 13h8"/></svg></span><span class="op-bt"><b>Sopro</b><span>Registro do check list e últimos registros das sopradoras</span></span><span class="op-chev">›</span></button>
-      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 17:45</span></div>
+      <div class="op-foot"><a class="portal-volta hidden" id="opPortal" href="https://qualidadeblowpet.github.io/inspecao-qualidade/portal.html" title="Voltar ao Portal da Qualidade"><span class="pv-seta">‹</span><span class="pv-ic"><i></i><i></i></span><span>Portal da Qualidade<small>Inspeção · Sistema da Qualidade</small></span></a><span id="opEmail"></span><div class="op-footbtns"><button type="button" onclick="logout()">Sair</button><button type="button" onclick="usarVersaoCompleta()">Abrir versão completa</button></div><span class="op-ver">Versão do sistema: 26/11/2026 22:14</span></div>
     </section>
     <section id="opDash" hidden>
       <div class="op-top"><button type="button" class="op-back" onclick="opIr('home')" aria-label="Voltar">‹</button><div><div class="op-ttl" id="opDashTitulo">Injetora</div><div class="op-sub">Últimos 8 registros de cada máquina</div></div><button type="button" class="op-refresh" onclick="opCarregar(OP.proc)" aria-label="Atualizar">↻</button></div>
@@ -996,7 +1004,7 @@
         <button class="nav-item" data-page="listasTeste" onclick="mudarPagina('listasTeste')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg><span>Banco de dados</span></button>
       </nav>
       <button type="button" class="a-opbtn" id="btnVersaoOperacao" onclick="usarVersaoOperacao()" hidden>Voltar à versão da operação</button>
-      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 17:45</b></span></div>
+      <div class="a-versao"><span>Versão do sistema: <b>26/11/2026 22:14</b></span></div>
       <div class="a-user"><span class="av" id="userAv">·</span><div class="who"><b id="userNome">—</b><small id="userEmail"></small></div><button type="button" class="a-ic-btn" title="Sair" aria-label="Sair" onclick="logout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg></button></div>
     </aside>
 
@@ -6847,6 +6855,9 @@ function mmAgora() { const d = new Date(); return { data: mmP2(d.getDate()) + '/
 function mmIsoDe(data) { const m = String(data || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/); return m ? m[3] + '-' + mmP2(m[2]) + '-' + mmP2(m[1]) : ''; }
 function mmCC(cav, cast) { return mmEsc(cav) + '(' + mmEsc(cast) + ')'; }     // cavidade(castanha)
 function mmNomeLista(k) { return LISTS_CFG.prefixo + MM_LISTAS[k].nome; }
+// Administrador do Mapa do Molde (Cleber, 27/11/2026): só ele exclui registros do histórico e muda data/hora.
+const MM_ADMINS = ['cleber.rodrigues@blowpet.com.br'];
+function mmEhAdmin() { try { return !!(contaAtual && MM_ADMINS.indexOf(String(contaAtual.username || '').toLowerCase()) > -1); } catch (e) { return false; } }
 // Máquinas (colunas da lista de moldes) — definidas pelo Cleber em 26/11/2026
 const MM_MAQUINAS = ['Hypet', 'Husky 1', 'Husky 2', 'Husky GL'];
 function mmMaquinaPadrao(nome) {
@@ -7103,6 +7114,8 @@ const MM_SVG = {
   att: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/></svg>',
   molde: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 3v18"/></svg>',
   varias: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="m14.5 17.5 2 2 4-4"/></svg>',
+  relogio: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+  lixo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>',
   play: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l13-7.5z"/></svg>',
   parar: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>',
   imp: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></svg>'
@@ -7152,7 +7165,7 @@ async function mmTelaLista(recarregar) {
     return '<div class="mm-card mm-prodcard" role="button" tabindex="0" data-m="' + m.id + '" aria-label="Abrir ' + mmEsc(mmNomeMolde(m)) + ' (em produção)"><div class="t"><div><b>' + mmEsc(m.gramatura + ' g') + '</b>' +
       '<button type="button" class="mm-card-ed" data-ed="' + m.id + '" title="Editar nome (máquina e gramatura)" aria-label="Editar nome de ' + mmEsc(mmNomeMolde(m)) + '">' + MM_SVG.edit + '</button><br><small>' + mmEsc(c.total + ' cavidades' + (m.camara ? ' · ' + m.camara : '')) +
       (c.iso ? ' · <span style="color:var(--danger)">' + c.iso + ' isolada' + (c.iso > 1 ? 's' : '') + '</span>' : '') + '</small></div><span class="mm-badge prod">Em produção</span></div>' +
-      (m.prodDesde ? '<span class="mm-desde">desde ' + mmEsc(m.prodDesde) + '</span>' : '') +
+      '<span class="mm-desde">' + (m.prodDesde ? 'desde ' + mmEsc(m.prodDesde) : 'desde —') + (mmEhAdmin() ? '<button type="button" class="mm-desde-ed" data-desde="' + m.id + '" title="Mudar desde quando está em produção" aria-label="Mudar desde quando está em produção">' + MM_SVG.relogio + '</button>' : '') + '</span>' +
       '<div class="mm-bar"><i style="width:' + pct + '%"></i></div><div class="mm-rod"><span class="n"><span><b>' + c.at + '</b> de ' + c.total + ' ativas · ' + pct + '%</span></span>' +
       '<button type="button" class="mm-acao" data-parar="' + m.id + '">' + MM_SVG.parar + 'Parar</button></div></div>';
   };
@@ -7183,6 +7196,8 @@ async function mmTelaLista(recarregar) {
       : '<div class="mm-vazio-msg">Nenhum molde cadastrado ainda. ' + (pend.length ? 'Importe os desenhos da planilha ou cadastre um molde novo.' : 'Use "Novo molde" para cadastrar.') + '</div>');
   if (MM.moldes.length) {
     const abrir = function(e) {
+      const dz = e.target.closest('[data-desde]');
+      if (dz) { e.stopPropagation(); const m = MM.moldes.find(function(x) { return x.id === Number(dz.getAttribute('data-desde')); }); if (m) mmAdmProdDesde(m); return; }
       const pr = e.target.closest('[data-produzir],[data-parar]');
       if (pr) { e.stopPropagation(); const lig = pr.hasAttribute('data-produzir'), m = MM.moldes.find(function(x) { return x.id === Number(pr.getAttribute(lig ? 'data-produzir' : 'data-parar')); }); if (m) mmConfirmarProducao(m, lig); return; }
       const ed = e.target.closest('[data-ed]');
@@ -7229,7 +7244,8 @@ function mmRenderMolde() {
   const kp = '<div class="mm-kpis"><div class="mm-kpi"><small>Cavidades ativas</small><b style="color:var(--ok)">' + c.at + '</b> <small style="display:inline">de ' + c.total + '</small></div><div class="mm-kpi"><small>Isoladas agora</small><b style="color:var(--danger)">' + c.iso + '</b></div><div class="mm-kpi"><small>Capacidade</small><b>' + (c.total ? Math.round(c.at / c.total * 100) : 0) + '%</b></div><div class="mm-kpi"><small>Registros no histórico</small><b>' + evs.length + '</b></div></div>';
   const info = [c.total + ' cavidades', m.camara ? 'câmara quente ' + m.camara : '', m.rev ? 'Rev. ' + m.rev : ''].filter(Boolean).join(' · ');
   const q = mmMaquinaPadrao(m.maquina);
-  const selo = m.producao ? ' <span class="mm-badge prod" style="vertical-align:4px">Em produção' + (m.prodDesde ? ' · desde ' + mmEsc(m.prodDesde) : '') + '</span>' : '';
+  const selo = m.producao ? ' <span class="mm-badge prod" style="vertical-align:4px">Em produção' + (m.prodDesde ? ' · desde ' + mmEsc(m.prodDesde) : '') + '</span>' +
+    (mmEhAdmin() ? '<button type="button" class="mm-desde-ed" id="mmBtnDesde" title="Mudar desde quando está em produção" aria-label="Mudar desde quando está em produção" style="vertical-align:2px">' + MM_SVG.relogio + '</button>' : '') : '';
   const btProd = !q ? '' : m.producao ? '<button type="button" class="btn" id="mmBtnProd">' + MM_SVG.parar + 'Parar</button>' : '<button type="button" class="btn" id="mmBtnProd">' + MM_SVG.play + 'Produzir</button>';
   mmEl('mmConteudo').innerHTML = '<div class="mm-cab"><div class="mm-tt"><h1 class="page-title">' + mmEsc(mmNomeMolde(m)) + selo + '</h1><p class="page-sub">' + mmEsc(info) + '</p></div>' +
     '<div class="mm-acoes">' + btProd + '<button type="button" class="btn' + (MM.multi ? ' btn-accent' : '') + '" id="mmBtnVarias">' + MM_SVG.varias + (MM.multi ? 'Sair da seleção' : 'Selecionar várias') + '</button><button type="button" class="btn" id="mmBtnNum">' + MM_SVG.edit + 'Editar números</button><button type="button" class="btn" id="mmBtnDados">' + MM_SVG.molde + 'Editar molde</button><button type="button" class="btn" id="mmBtnPdf">' + MM_SVG.pdf + 'PDF do mapa</button></div></div>' + kp +
@@ -7240,9 +7256,12 @@ function mmRenderMolde() {
   mmEl('mmBtnPdf').onclick = function() { mmGerarPdf(m); };
   mmEl('mmBtnVarias').onclick = function() { MM.multi = !MM.multi; MM.selVarias = {}; mmRenderMolde(); };
   mmAtualizarSelecao();
+  if (mmEl('mmBtnDesde')) mmEl('mmBtnDesde').onclick = function() { mmAdmProdDesde(m); };
   if (mmEl('mmBtnProd')) mmEl('mmBtnProd').onclick = function() { mmConfirmarProducao(m, !m.producao); };
   document.querySelector('#mmConteudo .mm-mapa').addEventListener('click', function(e) { const b = e.target.closest('.mm-cav'); if (b && MM.multi) { const k = b.getAttribute('data-l'); if (MM.selVarias[k]) delete MM.selVarias[k]; else MM.selVarias[k] = 1; mmAtualizarSelecao(); return; } if (b) { MM.sel = b.getAttribute('data-l'); mmRenderMolde(); if (window.innerWidth <= 1100) mmEl('mmPainel').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } });
   mmEl('mmHlist').addEventListener('click', function(e) {
+    const ad = e.target.closest('[data-adm]');
+    if (ad) { const ids = ad.getAttribute('data-ids').split(',').map(Number); if (ad.getAttribute('data-adm') === 'data') mmAdmData(ids); else mmAdmExcluir(ids); return; }
     const f = e.target.closest('.mm-hfoto'); if (f) { mmVerFoto(Number(f.getAttribute('data-ev'))); return; }
     if (e.target.closest('a')) return;
     const it = e.target.closest('.mm-hitem'); if (it && it.getAttribute('data-l')) { MM.sel = it.getAttribute('data-l'); mmRenderMolde(); }
@@ -7265,6 +7284,7 @@ function mmRenderPainel(c) {
 const MM_TIPOS = { isolada: ['bad', 'isolada'], liberada: ['ok', 'liberada'], numeros: ['alt', 'números alterados'], cadastro: ['alt', 'molde cadastrado'], desenho: ['alt', 'molde alterado'], obs: ['dim', 'observação'] };
 function mmHtmlHistorico(evs, m) {
   if (!evs.length) return '<p class="vazio" style="color:var(--fg-dim);font-size:13px">Nenhum registro neste molde ainda.</p>';
+  const adm = mmEhAdmin();
   const grupos = [];   // registros do mesmo "lote" (isoladas/liberadas juntas) viram 1 item
   evs.forEach(function(e) { const g = grupos[grupos.length - 1]; if (e.lote && g && g[0].lote === e.lote) g.push(e); else grupos.push([e]); });
   return grupos.map(function(g) {
@@ -7275,7 +7295,9 @@ function mmHtmlHistorico(evs, m) {
     return '<div class="mm-hitem' + (marcado ? ' marcado' : '') + '" data-l="' + (varios ? '' : mmEsc(e.lugar)) + '"><div class="hl"><span class="mm-hpos">' + pos + '</span><span class="mm-badge ' + t[0] + '">' + mmEsc(t[1]) + (varios ? ' · ' + g.length : '') + '</span></div>' +
       '<div class="mm-hcorpo"><div class="mm-htxt"><div class="mm-hquando">' + mmEsc((e.data || 'sem data') + (e.hora ? ' ' + e.hora : '')) + ' · ' + mmEsc(e.resp || '—') + '</div>' +
       (e.mudanca ? '<div style="font-weight:600">' + mmEsc(e.mudanca) + '</div>' : '') + '<div>' + mmEsc(e.desc) + '</div>' +
-      (e.origem === 'planilha' ? '<div class="mm-himp">Importado da planilha (registros antigos não têm foto)</div>' : '') + '</div>' + foto + '</div></div>';
+      (e.origem === 'planilha' ? '<div class="mm-himp">Importado da planilha (registros antigos não têm foto)</div>' : '') +
+      (adm ? '<div class="mm-hadm"><button type="button" data-adm="data" data-ids="' + g.map(function(x) { return x.id; }).join(',') + '">' + MM_SVG.relogio + 'Data e hora</button><button type="button" data-adm="excluir" data-ids="' + g.map(function(x) { return x.id; }).join(',') + '">' + MM_SVG.lixo + 'Excluir</button></div>' : '') +
+      '</div>' + foto + '</div></div>';
   }).join('');
 }
 function mmCarregarMiniaturas(raiz) {
@@ -7590,6 +7612,72 @@ function mmAtualizarSelecao() {
   mmEl('mmSelSair').onclick = function() { MM.multi = false; MM.selVarias = {}; mmRenderMolde(); };
 }
 
+/* ===== administrador: excluir registro e mudar data/hora (só MM_ADMINS) ===== */
+function mmEvsPorIds(ids) { return ids.map(function(id) { return MM.hist.find(function(x) { return x.id === id; }); }).filter(Boolean); }
+function mmDescEvs(evs) {
+  const e = evs[0], t = (MM_TIPOS[e.tipo] || ['', e.tipo])[1];
+  const pos = evs.filter(function(x) { return x.lugar !== ''; }).map(function(x) { return x.cav + '(' + x.cast + ')'; }).join(', ');
+  return t + (pos ? ' · ' + pos : ' · molde todo') + ' · ' + (e.data || 'sem data') + (e.hora ? ' ' + e.hora : '') + ' · ' + (e.resp || '—');
+}
+function mmAdmData(ids) {
+  if (!mmEhAdmin()) return;
+  const evs = mmEvsPorIds(ids); if (!evs.length) return;
+  const e = evs[0], iso = mmIsoDe(e.data);
+  const f = mmModal('<h3>Mudar data e hora</h3><p class="sub">' + mmEsc(mmDescEvs(evs)) + (evs.length > 1 ? ' — vale para as ' + evs.length + ' cavidades do grupo' : '') + '</p>' +
+    '<div class="mm-grid2"><div class="mm-fld"><label for="mmAData">Data</label><input type="date" id="mmAData" value="' + mmEsc(iso) + '"></div><div class="mm-fld"><label for="mmAHora">Hora</label><input type="time" id="mmAHora" value="' + mmEsc(e.hora || '') + '"></div></div>' +
+    '<p class="mm-opc" style="margin:0">Somente o administrador vê esta opção. A ordem do histórico e a situação das cavidades são recalculadas pela nova data.</p>' +
+    '<div class="mm-erro" id="mmFErro" hidden></div><div class="mm-rodape"><button type="button" class="btn" data-fechar>Cancelar</button><button type="submit" class="btn btn-accent" id="mmFSalvar">Salvar data e hora</button></div>');
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    const d = mmEl('mmAData').value, h = mmEl('mmAHora').value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) { mmErroForm('Informe a data.'); return; }
+    const data = d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4);
+    mmSalvando(f, async function() {
+      for (const x of evs) await mmAtualizar('hist', x.id, { mmData: data, mmHora: h || '', mmDataIso: d });
+      await mmCarregar(true);
+      f._fechar(); mmRerender(); mostrarToast('Data e hora alteradas.');
+    });
+  };
+}
+function mmAdmExcluir(ids) {
+  if (!mmEhAdmin()) return;
+  const evs = mmEvsPorIds(ids); if (!evs.length) return;
+  const muda = evs.some(function(x) { return x.tipo === 'isolada' || x.tipo === 'liberada'; });
+  const f = mmModal('<h3>Excluir do histórico?</h3><p class="sub" style="margin:0;font-size:13.5px">' + mmEsc(mmDescEvs(evs)) + '</p>' +
+    (evs.length > 1 ? '<p class="mm-opc" style="margin:0">São ' + evs.length + ' registros (um por cavidade do grupo); todos serão excluídos.</p>' : '') +
+    (muda ? '<p class="mm-aviso" style="margin:0">A situação da cavidade volta a ser a do registro anterior (sem registro anterior, ela fica ativa).</p>' : '') +
+    '<p class="mm-opc" style="margin:0">Não dá para desfazer. A foto continua guardada na biblioteca de fotos.</p>' +
+    '<div class="mm-erro" id="mmFErro" hidden></div><div class="mm-rodape"><button type="button" class="btn" data-fechar>Cancelar</button><button type="submit" class="btn mm-red" id="mmFSalvar">Excluir</button></div>');
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    mmSalvando(f, async function() {
+      for (const x of evs) { try { await lstG('DELETE', mmItensUrl('hist') + '/' + x.id); } catch (e) { if (e.status !== 404) throw e; } }
+      await mmCarregar(true);
+      f._fechar(); mmRerender(); mostrarToast(evs.length > 1 ? evs.length + ' registros excluídos.' : 'Registro excluído.');
+    });
+  };
+}
+function mmRerender() { if (MM.tela === 'molde' && MM.atual) { MM.atual = MM.moldes.find(function(x) { return x.id === MM.atual.id; }) || MM.atual; mmRenderMolde(); } else mmTelaLista(); }
+
+function mmAdmProdDesde(m) {
+  if (!mmEhAdmin()) return;
+  const mt = String(m.prodDesde || '').match(/^(\d{2})\/(\d{2})\/(\d{4})\s*(\d{2}:\d{2})?/);
+  const f = mmModal('<h3>Em produção desde</h3><p class="sub">' + mmEsc(mmNomeMolde(m)) + '</p>' +
+    '<div class="mm-grid2"><div class="mm-fld"><label for="mmAData">Data</label><input type="date" id="mmAData" value="' + (mt ? mt[3] + '-' + mt[2] + '-' + mt[1] : '') + '"></div><div class="mm-fld"><label for="mmAHora">Hora</label><input type="time" id="mmAHora" value="' + (mt && mt[4] ? mt[4] : '') + '"></div></div>' +
+    '<p class="mm-opc" style="margin:0">Somente o administrador vê esta opção. Não entra no histórico.</p>' +
+    '<div class="mm-erro" id="mmFErro" hidden></div><div class="mm-rodape"><button type="button" class="btn" data-fechar>Cancelar</button><button type="submit" class="btn btn-accent" id="mmFSalvar">Salvar</button></div>');
+  f.onsubmit = function(ev) {
+    ev.preventDefault();
+    const d = mmEl('mmAData').value, h = mmEl('mmAHora').value;
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d) || !h) { mmErroForm('Informe a data e a hora.'); return; }
+    mmSalvando(f, async function() {
+      await mmAtualizar('moldes', m.id, { mmProdDesde: d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(0, 4) + ' ' + h });
+      await mmCarregar(true);
+      f._fechar(); mmRerender(); mostrarToast('Data de início da produção alterada.');
+    });
+  };
+}
+
 /* ===== novo molde (3 passos) ===== */
 function mmNumeros(txt) { return String(txt || '').split(/[^\d]+/).filter(Boolean).map(Number).filter(function(n) { return n > 0 && n <= 40; }); }
 const MM_ORDENS = [
@@ -7804,11 +7892,30 @@ function mmAbrirImport() {
 }
 
 /* ===== PDF do mapa (A4 paisagem): mapa na altura toda à esquerda; à direita máquina/gramatura, indicadores e cavidades isoladas ===== */
+// Fonte do PDF = Inter (a mesma do sistema). jsPDF precisa do .ttf: baixa uma vez (jsDelivr) e reaproveita.
+const MM_FONTE_URL = 'https://cdn.jsdelivr.net/npm/@expo-google-fonts/inter@0.2.3/';
+let _mmFontes = null;
+function mmCarregarFontes() {
+  if (!_mmFontes) {
+    const b64 = function(buf) { const u = new Uint8Array(buf); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+    _mmFontes = Promise.all(['Inter_400Regular.ttf', 'Inter_700Bold.ttf'].map(function(n) {
+      return fetch(MM_FONTE_URL + n).then(function(r) { if (!r.ok) throw new Error('fonte ' + r.status); return r.arrayBuffer(); }).then(b64);
+    })).then(function(v) { return { normal: v[0], bold: v[1] }; })
+      .catch(function(e) { console.warn('[Mapa do Molde] fonte Inter não carregou, PDF sai em Helvetica: ' + e.message); _mmFontes = null; return null; });
+  }
+  return _mmFontes;
+}
+function mmUsarFonte(doc, fontes) {
+  if (!fontes) return 'helvetica';
+  doc.addFileToVFS('Inter-Regular.ttf', fontes.normal); doc.addFont('Inter-Regular.ttf', 'Inter', 'normal');
+  doc.addFileToVFS('Inter-Bold.ttf', fontes.bold); doc.addFont('Inter-Bold.ttf', 'Inter', 'bold');
+  return 'Inter';
+}
 async function mmGerarPdf(m) {
   let JsPDF;
   try { JsPDF = await carregarJsPDF(); } catch (e) { mostrarToast('Não foi possível gerar o PDF: ' + e.message, true); return; }
   const doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-  mmDesenharPdf(doc, m);
+  mmDesenharPdf(doc, m, await mmCarregarFontes());
   const nome = ('Mapa_do_Molde_' + m.maquina + '_' + m.gramatura + 'g').replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, '_') + '.pdf';
   try {
     const blob = doc.output('blob'), arq = new File([blob], nome, { type: 'application/pdf' });
@@ -7816,7 +7923,8 @@ async function mmGerarPdf(m) {
   } catch (e) { if (e && e.name === 'AbortError') return; }
   doc.save(nome);
 }
-function mmDesenharPdf(doc, m) {
+function mmDesenharPdf(doc, m, fontes) {
+  const FT = mmUsarFonte(doc, fontes);
   const W = 297, H = 210, MG = 8, GAP = 6, AV = W - 2 * MG, TOP = MG, ALT = H - 2 * MG;
   const COR = { tinta: [21, 24, 29], dim: [91, 99, 114], faint: [136, 144, 156], borda: [154, 163, 173], linha: [221, 225, 230], placa: [238, 241, 244], verm: [198, 47, 54], rosa: [249, 220, 221], verde: [31, 122, 85], acc: [21, 127, 153], escuro: [61, 67, 75], chip: [238, 240, 243] };
   const cor = function(k, t) { const c = COR[k]; if (t === 'f') doc.setFillColor(c[0], c[1], c[2]); else if (t === 'd') doc.setDrawColor(c[0], c[1], c[2]); else doc.setTextColor(c[0], c[1], c[2]); };
@@ -7851,11 +7959,11 @@ function mmDesenharPdf(doc, m) {
       if (bi) {   // canal
         const cx = x + CANAL / 2; cor('borda', 'd'); doc.setLineWidth(0.35); doc.setLineDashPattern([1.2, 1], 0); doc.line(cx, y + 2, cx, y + hF - 2); doc.setLineDashPattern([], 0);
         const t = fx.canais[bi - 1];
-        if (t) { doc.setFont('helvetica', 'bold'); doc.setFontSize(7); const tw = doc.getTextWidth(t); cor('placa', 'f'); doc.rect(cx - 2, y + hF / 2 - tw / 2 - 1, 4, tw + 2, 'F'); cor('dim'); doc.text(t, cx + 1.2, y + hF / 2 + tw / 2, { angle: 90 }); }
+        if (t) { doc.setFont(FT, 'bold'); doc.setFontSize(7); const tw = doc.getTextWidth(t); cor('placa', 'f'); doc.rect(cx - 2, y + hF / 2 - tw / 2 - 1, 4, tw + 2, 'F'); cor('dim'); doc.text(t, cx + 1.2, y + hF / 2 + tw / 2, { angle: 90 }); }
         x += CANAL;
       }
       doc.setFillColor(255, 255, 255); cor('borda', 'd'); doc.setLineWidth(0.3); doc.roundedRect(x, y, bw, hF, 2, 2, 'FD');
-      let cxh = x + 2; doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5);
+      let cxh = x + 2; doc.setFont(FT, 'bold'); doc.setFontSize(6.5);
       (b.rot || []).forEach(function(t) { const tw = doc.getTextWidth(t) + 2.6; if (cxh + tw > x + bw - 1) return; cor('chip', 'f'); doc.roundedRect(cxh, y + 1.4, tw, 3.6, 0.8, 0.8, 'F'); cor('dim'); doc.text(t, cxh + 1.3, y + 4.1); cxh += tw + 1.2; });
       const cw = (bw - 2) / b.cols;
       b.lug.forEach(function(L, k) {
@@ -7871,10 +7979,10 @@ function mmDesenharPdf(doc, m) {
           doc.restoreGraphicsState();
           cor('verm', 'd'); doc.setLineWidth(0.45); doc.circle(ccx, ccy, R, 'S');
         } else { doc.setFillColor(255, 255, 255); doc.setDrawColor(111, 123, 136); doc.setLineWidth(0.4); doc.circle(ccx, ccy, R, 'FD'); }
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(Math.max(5, fsCav * (String(L.cav).length > 3 ? 0.72 : String(L.cav).length > 2 ? 0.85 : 1)));
+        doc.setFont(FT, 'bold'); doc.setFontSize(Math.max(5, fsCav * (String(L.cav).length > 3 ? 0.72 : String(L.cav).length > 2 ? 0.85 : 1)));
         if (iso) cor('verm'); else cor('tinta');
         doc.text(String(L.cav), ccx, ccy + fsCav * 0.13, { align: 'center' });
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(fsCast); cor('dim');
+        doc.setFont(FT, 'normal'); doc.setFontSize(fsCast); cor('dim');
         doc.text(String(L.cast), ccx + R + 0.6, ccy + R * 0.95);
         if (iso) {   // selo vermelho com ✕ (igual ao app)
           const bx = ccx + R * 0.74, by = ccy - R * 0.74, br = Math.max(1.4, R * 0.36);
@@ -7887,59 +7995,59 @@ function mmDesenharPdf(doc, m) {
     });
     y += hF;
     if (fi < nf - 1) {
-      if (fx.abaixo) { doc.setFont('helvetica', 'bold'); doc.setFontSize(7); const tw = doc.getTextWidth(fx.abaixo) + 4, cx = MG + LW / 2; doc.setFillColor(255, 255, 255); cor('borda', 'd'); doc.setLineWidth(0.25); doc.roundedRect(cx - tw / 2, y + 1.2, tw, ENTRE - 2.4, 1, 1, 'FD'); cor('dim'); doc.text(fx.abaixo, cx, y + ENTRE / 2 + 1, { align: 'center' }); y += ENTRE; }
+      if (fx.abaixo) { doc.setFont(FT, 'bold'); doc.setFontSize(7); const tw = doc.getTextWidth(fx.abaixo) + 4, cx = MG + LW / 2; doc.setFillColor(255, 255, 255); cor('borda', 'd'); doc.setLineWidth(0.25); doc.roundedRect(cx - tw / 2, y + 1.2, tw, ENTRE - 2.4, 1, 1, 'FD'); cor('dim'); doc.text(fx.abaixo, cx, y + ENTRE / 2 + 1, { align: 'center' }); y += ENTRE; }
       else y += PAD;
     }
   });
   // ---------- lado direito ----------
   let ry = TOP + 3;
-  doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); cor('acc'); doc.text('MAPA DO MOLDE · SITUAÇÃO DAS CAVIDADES', RX, ry); ry += 6;
+  doc.setFont(FT, 'bold'); doc.setFontSize(7.5); cor('acc'); doc.text('MAPA DO MOLDE · SITUAÇÃO DAS CAVIDADES', RX, ry); ry += 6;
   doc.setFontSize(7.5); cor('dim'); doc.text('MÁQUINA', RX, ry); doc.text('GRAMATURA', RX + RW / 2 + 2, ry); ry += 9;
   doc.setFontSize(23); cor('tinta');
   const ajusta = function(t, w, fs) { doc.setFontSize(fs); while (doc.getTextWidth(t) > w && fs > 10) { fs -= 1; doc.setFontSize(fs); } return fs; };
   ajusta(m.maquina || '—', RW / 2 - 2, 23); doc.text(m.maquina || '—', RX, ry);
   ajusta((m.gramatura || '—') + ' g', RW / 2 - 2, 23); doc.text((m.gramatura || '—') + ' g', RX + RW / 2 + 2, ry); ry += 5;
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); cor('dim');
+  doc.setFont(FT, 'normal'); doc.setFontSize(8.5); cor('dim');
   doc.text('Injetora', RX, ry); doc.text('Preforma · molde ' + lug.length + ' cavidades' + (m.camara ? ' · ' + m.camara : ''), RX + RW / 2 + 2, ry, { maxWidth: RW / 2 - 2 }); ry += 6;
   const a = mmAgora();
   doc.setFontSize(7.8); let mx = RX;
-  [['Rev. ', m.rev || '—'], ['Emitido ', a.data + ' ' + a.hora], ['Seção ', 'Injeção']].forEach(function(p) { doc.setFont('helvetica', 'normal'); cor('dim'); doc.text(p[0], mx, ry); mx += doc.getTextWidth(p[0]); doc.setFont('helvetica', 'bold'); cor('tinta'); doc.text(p[1], mx, ry); mx += doc.getTextWidth(p[1]) + 5; });
+  [['Rev. ', m.rev || '—'], ['Emitido ', a.data + ' ' + a.hora], ['Seção ', 'Injeção']].forEach(function(p) { doc.setFont(FT, 'normal'); cor('dim'); doc.text(p[0], mx, ry); mx += doc.getTextWidth(p[0]); doc.setFont(FT, 'bold'); cor('tinta'); doc.text(p[1], mx, ry); mx += doc.getTextWidth(p[1]) + 5; });
   ry += 3; cor('tinta', 'd'); doc.setLineWidth(0.5); doc.line(RX, ry, RX + RW, ry); ry += 4;
   // indicadores
   const nIso = lug.filter(isoDe).length, at = lug.length - nIso, kw = (RW - 5) / 3;
   [['CAVIDADES ATIVAS', String(at), ' de ' + lug.length, 'verde'], ['ISOLADAS', String(nIso), '', 'verm'], ['CAPACIDADE', (lug.length ? Math.round(at / lug.length * 100) : 0) + '%', '', 'tinta']].forEach(function(k, i) {
     const kx = RX + i * (kw + 2.5); doc.setDrawColor(201, 207, 214); doc.setLineWidth(0.3); doc.roundedRect(kx, ry, kw, 14, 2, 2, 'S');
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(6.5); cor('dim'); doc.text(k[0], kx + 3, ry + 4.5);
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(15); cor(k[3]); doc.text(k[1], kx + 3, ry + 11.3);
-    if (k[2]) { const w = doc.getTextWidth(k[1]); doc.setFont('helvetica', 'normal'); doc.setFontSize(9); cor('tinta'); doc.text(k[2], kx + 3 + w, ry + 11.3); }
+    doc.setFont(FT, 'normal'); doc.setFontSize(6.5); cor('dim'); doc.text(k[0], kx + 3, ry + 4.5);
+    doc.setFont(FT, 'bold'); doc.setFontSize(15); cor(k[3]); doc.text(k[1], kx + 3, ry + 11.3);
+    if (k[2]) { const w = doc.getTextWidth(k[1]); doc.setFont(FT, 'normal'); doc.setFontSize(9); cor('tinta'); doc.text(k[2], kx + 3 + w, ry + 11.3); }
   });
   ry += 19;
   // legenda
-  doc.setFontSize(7.5); doc.setFont('helvetica', 'normal');
+  doc.setFontSize(7.5); doc.setFont(FT, 'normal');
   doc.setDrawColor(111, 123, 136); doc.setLineWidth(0.3); doc.circle(RX + 1.6, ry - 1, 1.6, 'S'); cor('dim'); doc.text('Ativa', RX + 4.2, ry);
   cor('rosa', 'f'); cor('verm', 'd'); doc.circle(RX + 17, ry - 1, 1.6, 'FD'); cor('verm', 'f'); doc.circle(RX + 18.3, ry - 2.3, 0.85, 'F'); cor('dim'); doc.text('Isolada', RX + 20.4, ry);
-  doc.setFont('helvetica', 'bold'); cor('tinta'); doc.text('29(29)', RX + 36, ry); const w29 = doc.getTextWidth('29(29)'); doc.setFont('helvetica', 'normal'); cor('dim'); doc.text(' = cavidade(castanha)', RX + 36 + w29, ry);
+  doc.setFont(FT, 'bold'); cor('tinta'); doc.text('29(29)', RX + 36, ry); const w29 = doc.getTextWidth('29(29)'); doc.setFont(FT, 'normal'); cor('dim'); doc.text(' = cavidade(castanha)', RX + 36 + w29, ry);
   ry += 4;
   // tabela de isoladas
   const linhas = lug.filter(isoDe).map(function(L) { const e = st[L.id]; return { L: L, e: e, k: mmChaveEv(e) }; }).sort(function(p, q) { return p.k < q.k ? 1 : -1; })
     .map(function(p) { return [p.L.cav + '(' + p.L.cast + ')', p.e.data ? p.e.data + (p.e.hora ? ' ' + p.e.hora : '') : '—', p.e.desc || '—', p.e.resp || '—']; });
-  cor('escuro', 'f'); doc.roundedRect(RX, ry, RW, 6, 1, 1, 'F'); doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5); doc.setTextColor(255, 255, 255); doc.text('CAVIDADES ISOLADAS', RX + 2.5, ry + 4.2); ry += 7;
-  if (!linhas.length) { doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); cor('dim'); doc.text('Nenhuma cavidade isolada.', RX + 1.5, ry + 5); }
+  cor('escuro', 'f'); doc.roundedRect(RX, ry, RW, 6, 1, 1, 'F'); doc.setFont(FT, 'bold'); doc.setFontSize(8.5); doc.setTextColor(255, 255, 255); doc.text('CAVIDADES ISOLADAS', RX + 2.5, ry + 4.2); ry += 7;
+  if (!linhas.length) { doc.setFont(FT, 'normal'); doc.setFontSize(8.5); cor('dim'); doc.text('Nenhuma cavidade isolada.', RX + 1.5, ry + 5); }
   else {
     // Só 1 folha: entram as isoladas mais recentes que couberem; as demais viram uma linha de aviso.
     const LIM = H - MG - 13;
     const opcoes = function(corpo) { return {
       startY: ry, head: [['CAV.(CAST.)', 'ISOLADA EM', 'MOTIVO', 'RESPONSÁVEL']], body: corpo, margin: { left: RX, right: MG, top: MG, bottom: H - LIM }, tableWidth: RW, theme: 'plain',
-      styles: { font: 'helvetica', fontSize: 7.8, cellPadding: { top: 1.3, bottom: 1.3, left: 1.4, right: 1.4 }, textColor: COR.tinta, lineColor: COR.linha, lineWidth: { bottom: 0.25 }, valign: 'top', overflow: 'linebreak' },
+      styles: { font: FT, fontSize: 7.8, cellPadding: { top: 1.3, bottom: 1.3, left: 1.4, right: 1.4 }, textColor: COR.tinta, lineColor: COR.linha, lineWidth: { bottom: 0.25 }, valign: 'top', overflow: 'linebreak' },
       headStyles: { fontStyle: 'bold', fontSize: 6.5, textColor: COR.dim, lineColor: COR.borda, lineWidth: { bottom: 0.3 } },
       columnStyles: { 0: { fontStyle: 'bold', cellWidth: 19 }, 1: { cellWidth: 25 }, 3: { cellWidth: 22 } } }; };
     const corpoCom = function(n) {
       const c = linhas.slice(0, n);
-      if (n < linhas.length) { const f = linhas.length - n; c.push([{ content: '+ ' + f + ' cavidade' + (f > 1 ? 's isoladas não cabem' : ' isolada não cabe') + ' nesta folha — veja no sistema (Mapa do Molde).', colSpan: 4, styles: { fontStyle: 'italic', textColor: COR.dim } }]); }
+      if (n < linhas.length) { const f = linhas.length - n; c.push([{ content: '+ ' + f + ' cavidade' + (f > 1 ? 's isoladas não cabem' : ' isolada não cabe') + ' nesta folha — veja no sistema (Mapa do Molde).', colSpan: 4, styles: { fontStyle: 'normal', textColor: COR.dim } }]); }
       return c;
     };
     const J = (window.jspdf && window.jspdf.jsPDF) || doc.constructor;
-    const cabe = function(n) { const t = new J({ orientation: 'landscape', unit: 'mm', format: 'a4' }); t.autoTable(opcoes(corpoCom(n))); return t.getNumberOfPages() === 1 && t.lastAutoTable.finalY <= LIM; };
+    const cabe = function(n) { const t = new J({ orientation: 'landscape', unit: 'mm', format: 'a4' }); mmUsarFonte(t, fontes); t.autoTable(opcoes(corpoCom(n))); return t.getNumberOfPages() === 1 && t.lastAutoTable.finalY <= LIM; };
     let n = linhas.length;
     if (!cabe(n)) { let lo = 0, hi = n - 1; while (lo < hi) { const md = Math.ceil((lo + hi) / 2); if (cabe(md)) lo = md; else hi = md - 1; } n = lo; }
     doc.autoTable(opcoes(corpoCom(n)));
@@ -7950,7 +8058,7 @@ function mmDesenharPdf(doc, m) {
   for (let p = 1; p <= np; p++) {
     doc.setPage(p);
     if (p === 1) { doc.setDrawColor(154, 163, 173); doc.setLineWidth(0.3); doc.line(RX, H - MG - 9, RX + RW / 2 - 3, H - MG - 9); doc.line(RX + RW / 2 + 3, H - MG - 9, RX + RW, H - MG - 9);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); cor('dim'); doc.text('Conferido por', RX, H - MG - 6); doc.text('Data', RX + RW / 2 + 3, H - MG - 6); }
+      doc.setFont(FT, 'normal'); doc.setFontSize(7.5); cor('dim'); doc.text('Conferido por', RX, H - MG - 6); doc.text('Data', RX + RW / 2 + 3, H - MG - 6); }
     doc.setFontSize(6.8); cor('faint'); doc.text('Mapa do Molde · Controle de Processo BlowPet', RX, H - MG - 0.5); doc.text('Página ' + p + ' de ' + np, RX + RW, H - MG - 0.5, { align: 'right' });
   }
 }
